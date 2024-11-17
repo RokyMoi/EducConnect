@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E6DC45B4-F4E4-46CC-9833-A708E97775D4}|backend\\backend.csproj|c:\\users\\dusko\\desktop\\rs1-2024-25-educonnect\\backend\\backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6DC45B4-F4E4-46CC-9833-A708E97775D4}|backend\\backend.csproj|solutionrelative:backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -34,6 +39,19 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\backend\\Program.cs",
+              "RelativeDocumentMoniker": "backend\\Program.cs",
+              "ToolTip": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\backend\\Program.cs",
+              "RelativeToolTip": "backend\\Program.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAQwA4AAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-17T12:34:45.144Z",
+              "EditorCaption": ""
             }
           ]
         }
