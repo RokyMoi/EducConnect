@@ -15,6 +15,7 @@ namespace EduConnect.Extensions
 
             //ADD SCOOPED SERVICES 
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
 
        
             
