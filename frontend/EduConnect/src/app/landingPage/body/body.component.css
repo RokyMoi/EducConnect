@@ -1,0 +1,149 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  margin: 2%;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 86%;
+  margin: 5%;
+  margin-bottom: 15%;
+}
+.hero h1 {
+  font-size: 5rem;
+  color: rgb(2, 80, 176);
+  text-align: center;
+}
+
+.hero h3 {
+  font-size: 1.5rem;
+  text-align: center;
+  text-decoration: underline rgb(2, 80, 176);
+}
+
+.subhero {
+  margin-bottom: 10%;
+  width: 100%;
+}
+
+.subhero h2 {
+  font-size: 2.5rem;
+  color: rgb(0, 185, 0);
+}
+
+.subhero p {
+  font-size: 1.5rem;
+  width: 75%;
+}
+
+.joinCommunityContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.joinCommunityContainer h2 {
+  font-size: 4rem;
+  color: rgb(2, 80, 176);
+  text-align: center;
+  padding-bottom: 2rem;
+}
+
+.joinCommunityContainer h3 {
+  font-size: 2.5rem;
+}
+
+.signupButton {
+  width: 20%;
+  color: black;
+  border: none;
+  border-radius: 18px;
+  padding: 12px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.signupButton:hover {
+}
+.tutorButton:hover {
+  background-color: rgb(0, 185, 0);
+  color: white;
+  box-shadow: 4px 6px 0 rgba(63, 63, 63, 0.135);
+  width: 25%;
+}
+
+.studentButton:hover:hover {
+  background-color: rgb(2, 80, 176);
+  color: white;
+  box-shadow: 4px 6px 0 rgba(63, 63, 63, 0.135);
+  width: 25%;
+}
+
+.orSeparator {
+  color: grey;
+  margin: 64px 0px;
+}
+
+.alreadyMemberText {
+  width: 50%;
+  text-align: center;
+  padding: 4rem 0 3rem;
+}
+
+.signinButton {
+  width: 20%;
+  color: black;
+  border: none;
+  border-radius: 18px;
+  padding: 12px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.signinButton:hover {
+  color: white;
+  background-color: red;
+  border: none;
+  width: 25%;
+  border-radius: 18px;
+  padding: 18px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 4px 6px 0 rgba(63, 63, 63, 0.135);
+}
+
+.benefitsContainer {
+  width: 100%;
+  margin: 5% 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.benefitItem {
+  padding: 24px 0px;
+  width: 95%;
+  margin-right: 5%;
+}
+
+.benefitTitle {
+  font-size: 24px;
+}
+.benefitText {
+  font-size: 18px;
+}

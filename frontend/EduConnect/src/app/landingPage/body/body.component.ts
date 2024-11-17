@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-body',
+  selector: 'app-landing-page-body',
   standalone: true,
   imports: [],
   templateUrl: './body.component.html',

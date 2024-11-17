@@ -2,10 +2,11 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './landingPage/header/header.component';
 import { HttpClient } from '@angular/common/http';
+import { BodyComponent } from "./landingPage/body/body.component";
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent],
+  imports: [RouterOutlet, HeaderComponent, BodyComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
