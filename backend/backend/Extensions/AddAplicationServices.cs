@@ -1,4 +1,7 @@
-﻿namespace EduConnect.Extensions
+﻿using EduConnect.Interfaces;
+using EduConnect.Services;
+
+namespace EduConnect.Extensions
 {
     public static class AddAppServices
     {
@@ -8,6 +11,10 @@
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+
+
+            //ADD SCOOPED SERVICES 
+            services.AddScoped<ITokenService, TokenService>();
 
        
             

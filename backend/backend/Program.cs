@@ -10,9 +10,10 @@ namespace EduConnect
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Extension for services implemented
             builder.Services.AddApplicationServices(builder.Configuration);
             builder.Services.AddDatabaseConnectionServices(builder.Configuration);
+            builder.Services.AddJWTAuthService(builder.Configuration);
 
 
 
@@ -33,6 +34,7 @@ namespace EduConnect
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
