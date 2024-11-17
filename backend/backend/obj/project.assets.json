@@ -5162,9 +5162,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\backend\\backend.csproj",
-      "projectName": "backend",
-      "projectPath": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\backend\\backend.csproj",
+      "projectUniqueName": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\backend\\EduConnect.csproj",
+      "projectName": "EduConnect",
+      "projectPath": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\backend\\EduConnect.csproj",
       "packagesPath": "C:\\Users\\Dusko\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\backend\\obj\\",
       "projectStyle": "PackageReference",

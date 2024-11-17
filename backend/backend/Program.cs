@@ -1,8 +1,8 @@
-
 using EduConnect.Data;
+using EduConnect.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend
+namespace EduConnect
 {
     public class Program
     {
@@ -11,10 +11,8 @@ namespace backend
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddDbContext<DataContext>(options => {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-
-            });
+            builder.Services.AddApplicationServices(builder.Configuration);
+            builder.Services.AddDatabaseConnectionServices(builder.Configuration);
 
 
 
