@@ -1,0 +1,232 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300,100,500);
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden; 
+}
+
+input {
+  border: none;
+}
+
+button:focus {
+  outline: none;
+}
+
+::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+::-webkit-input-placeholder .input-line:focus +::input-placeholder {
+  color: #fff;
+}
+
+.highlight {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  cursor: pointer;
+  transition: color .2s ease;
+}
+
+.highlight:hover {
+  color: #fff;
+  transition: color .2s ease;
+}
+
+.spacing {
+  flex-grow: 1;
+  height: 120px;
+  font-weight: 300;
+  text-align: center;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.input-line:focus {
+  outline: none;
+  border-color: #fff;
+  transition: all .2s ease;
+}
+
+.ghost-round {
+  cursor: pointer;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  align-self: flex-end;
+  font-size: 1.2rem;
+  font-family: roboto;
+  font-weight: 300;
+  line-height: 2.5em;
+  margin-top: auto;
+  margin-bottom: 25px;
+  transition: all .2s ease;
+}
+
+.ghost-round:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.input-line {
+  background: none;
+  margin-bottom: 10px;
+  line-height: 2.4em;
+  color: #fff;
+  font-family: roboto;
+  font-weight: 300;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+  transition: all .2s ease;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.input-fields {
+  margin-top: 25px;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+  height: 100%;
+}
+
+.content {
+  padding-left: 25px;
+  padding-right: 25px;
+  display: flex;
+  flex-flow: column;
+  z-index: 5;
+}
+
+.welcome {
+  color:#fff;
+  font-family: roboto;
+  font-weight: 200;
+  margin-top: 75px;
+  text-align: center;
+  font-size: 2.5rem;
+  letter-spacing: 0.05rem;
+}
+
+.subtitle {
+  font-family: roboto;
+  color: #fff;
+  text-align: center;
+  line-height: 1em;
+  font-weight: 100;
+  letter-spacing: 0.02rem;
+}
+
+.menu {
+  background: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  height: 50px;
+}
+
+.window {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  box-shadow: 0px 15px 50px 10px rgba(0, 0, 0, 0.2);
+  height: 610px;
+  width: 360px;
+  background: url('https://images.pexels.com/photos/1454360/pexels-photo-1454360.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') top left no-repeat;
+  background-size: cover;
+}
+
+#checking {
+  display: flex;
+  flex-flow: column;
+  box-shadow: 0px 15px 50px 10px rgba(0, 0, 0, 0.2);
+  height: 360px;
+  width: 360px;
+  background: url('https://images.pexels.com/photos/1454360/pexels-photo-1454360.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') top left no-repeat;
+  background-size: cover;
+  position: relative;
+}
+
+#checking::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgb(2, 80, 176), rgb(100, 150, 220));
+  opacity: 0.96;
+  z-index: 1;
+}
+
+.registrationChecking {
+  font-size: 1.2rem;
+  font-family: roboto;
+  padding: 10px;
+  text-align: center;
+  font-weight: 100;
+  letter-spacing: 0.02rem;
+  margin-bottom: 10px;
+  color: #fff;
+  z-index: 2;
+}
+
+
+
+.overlay {
+  background: linear-gradient(rgb(2, 80, 176), rgb(100, 150, 220));
+  opacity: 0.75;
+  filter: alpha(opacity=85);
+  height: 610px;
+  position: absolute;
+  width: 360px;
+  z-index: 1;
+}
+
+
+.bold-line {
+  background: url('https://images.pexels.com/photos/1438081/pexels-photo-1438081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') left no-repeat;
+  background-size: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 2;
+  opacity: 0.1;
+}
+
+@media (max-width: 700px) {
+ body html{
+  width: 100vw;
+  height: 100;
+ }
+  .window {
+    width: 100%;
+    height: 100%;
+  }
+  #checking {
+    width: 100%;
+    height: 100%;
+  }
+  #checking::before{
+    width: 100%;
+    height: 100%;
+  }
+  .overlay {
+    width: 100%;
+    height: 100%;
+  }
+  .bold-line {
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+  }
+}

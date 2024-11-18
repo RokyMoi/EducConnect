@@ -1,1 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
+@font-face {
+  font-family: "Sour Gummy";
+  src: url("../public/fonts/sour_gummy/static/SourGummy-Light.ttf");
+  font-weight: 300;
+  font-style: normal;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Sour Gummy", sans-serif;
+}
