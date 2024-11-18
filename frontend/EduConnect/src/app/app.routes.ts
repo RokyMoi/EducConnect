@@ -8,5 +8,6 @@ import { RegisterStudentComponent } from './signup/Student/register-student/regi
 export const routes: Routes = [
     { path: '', component:BodyComponent },
     { path: 'student-register', component: RegisterStudentComponent },
+    { path: 'tutor-signup', component: TutorSignupComponent },
     { path: '**', component:BodyComponent },
 ];
