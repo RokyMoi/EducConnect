@@ -1,3 +1,7 @@
 ﻿<Project>
+<<<<<<< HEAD:backend/obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.EduConnect.props
   <Import Project="../buildMultiTargeting/EduConnect.props" />
+=======
+  <Import Project="..\buildMultiTargeting\EduConnect.props" />
+>>>>>>> 9208a65d051a222c340106b7ffb7dde15d9ab71f:backend/backend/obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.EduConnect.props
 </Project>
