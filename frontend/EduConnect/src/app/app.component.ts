@@ -7,6 +7,7 @@ import { ServerHealthCheckService } from './services/server-health-check.service
 import { CommonModule, NgIf } from '@angular/common';
 import { ServerOfflineComponent } from './error/server-offline/server-offline.component';
 import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -20,14 +21,15 @@ import { RouterModule } from '@angular/router';
     ServerOfflineComponent,
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
   title = 'EduConnect';
-  http = inject(HttpClient);
   users: any;
   isServerRunning = false;
+
   constructor(private serverHealthCheckService: ServerHealthCheckService) {}
+
   ngOnInit(): void {
     console.log('Checking server health...');
     this.serverHealthCheckService.getServerHealth().subscribe(
@@ -37,7 +39,7 @@ export class AppComponent implements OnInit {
       },
       (error) => {
         console.log('Server health: Server offline');
-        console.log('Error: ', error);
+        console.error('Error: ', error);
         this.isServerRunning = false;
       }
     );
