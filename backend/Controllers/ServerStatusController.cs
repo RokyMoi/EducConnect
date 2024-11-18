@@ -14,11 +14,15 @@ namespace backend.Controllers
         [HttpGet]
         public ActionResult GetServerStatus()
         {
-
+            var data = new
+            {
+                ServerOnline = true
+            };
             var response = new
             {
                 Status = "Success",
                 Message = "Server is operational",
+                Data = data,
                 Timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds()
             };
 

@@ -2,11 +2,21 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './landingPage/header/header.component';
 import { HttpClient } from '@angular/common/http';
-import { BodyComponent } from "./landingPage/body/body.component";
+import { BodyComponent } from './landingPage/body/body.component';
+import { ServerHealthCheckService } from './services/server-health-check.service';
+import { CommonModule, NgIf } from '@angular/common';
+import { ServerOfflineComponent } from './error/server-offline/server-offline.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, BodyComponent],
+  imports: [
+    RouterOutlet,
+    HeaderComponent,
+    BodyComponent,
+    CommonModule,
+    NgIf,
+    ServerOfflineComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
@@ -14,16 +24,19 @@ export class AppComponent implements OnInit {
   title = 'EduConnect';
   http = inject(HttpClient);
   users: any;
-
+  isServerRunning = false;
+  constructor(private serverHealthCheckService: ServerHealthCheckService) {}
   ngOnInit(): void {
-    console.log('AppComponent initialized');
-    this.http.get('http://localhost:8080/api/v1/users/1').subscribe(
+    console.log('Checking server health...');
+    this.serverHealthCheckService.getServerHealth().subscribe(
       (response) => {
-        this.users = response;
-        console.log('User:', this.users);
+        console.log('Server health: ', response.data.serverOnline);
+        this.isServerRunning = response.data.serverOnline;
       },
       (error) => {
-        console.error('Error fetching user:', error);
+        console.log('Server health: Server offline');
+        console.log('Error: ', error);
+        this.isServerRunning = false;
       }
     );
   }
