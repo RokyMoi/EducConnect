@@ -1,0 +1,23 @@
+* {
+    margin: 0;
+    padding: 0;
+  }
+  
+  header {
+    width: 100%;
+    min-height: 100px;
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(2, 80, 176);
+    color: white;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2%;
+  }
+  
+  .headerLogo {
+    font-size: 32px;
+    font-weight: 900;
+    text-decoration: none;
+  }
+  
