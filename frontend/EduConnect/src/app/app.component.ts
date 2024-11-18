@@ -6,11 +6,13 @@ import { BodyComponent } from './landingPage/body/body.component';
 import { ServerHealthCheckService } from './services/server-health-check.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { ServerOfflineComponent } from './error/server-offline/server-offline.component';
+import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     RouterOutlet,
+    RouterModule,
     HeaderComponent,
     BodyComponent,
     CommonModule,
