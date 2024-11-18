@@ -1,7 +1,7 @@
 using EduConnect.Data;
 using EduConnect.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
+
 namespace EduConnect
 {
     public class Program
@@ -17,6 +17,8 @@ namespace EduConnect
 
 
 
+
+            builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -35,9 +37,6 @@ namespace EduConnect
             app.UseAuthentication();
             app.UseAuthorization();
 
-            //Configuration of the backend application to allow usage of CORS policy for frontend application requests from URL http://localhost:4200 with any headers and usage of any request method
-            app.UseCors(policy =>
-            policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod());
 
             app.MapControllers();
 

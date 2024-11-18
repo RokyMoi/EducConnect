@@ -9,19 +9,11 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = EduConnect
 build_property.RootNamespace = EduConnect
-<<<<<<< HEAD:backend/obj/Debug/net8.0/EduConnect.GeneratedMSBuildEditorConfig.editorconfig
-build_property.ProjectDir = /Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/
-=======
-build_property.ProjectDir = C:\Users\Dusko\Desktop\rs1-2024-25-educonnect\backend\backend\
->>>>>>> 9208a65d051a222c340106b7ffb7dde15d9ab71f:backend/backend/obj/Debug/net8.0/EduConnect.GeneratedMSBuildEditorConfig.editorconfig
+build_property.ProjectDir = C:\Users\Dusko\Desktop\rs1-2024-25-educonnect\backend\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-<<<<<<< HEAD:backend/obj/Debug/net8.0/EduConnect.GeneratedMSBuildEditorConfig.editorconfig
-build_property.MSBuildProjectDirectory = /Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend
-=======
-build_property.MSBuildProjectDirectory = C:\Users\Dusko\Desktop\rs1-2024-25-educonnect\backend\backend
->>>>>>> 9208a65d051a222c340106b7ffb7dde15d9ab71f:backend/backend/obj/Debug/net8.0/EduConnect.GeneratedMSBuildEditorConfig.editorconfig
+build_property.MSBuildProjectDirectory = C:\Users\Dusko\Desktop\rs1-2024-25-educonnect\backend
 build_property._RazorSourceGeneratorDebug = 
