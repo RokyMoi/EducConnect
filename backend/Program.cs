@@ -1,6 +1,7 @@
 using EduConnect.Data;
 using EduConnect.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 
 namespace EduConnect
 {
@@ -10,11 +11,14 @@ namespace EduConnect
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            Console.WriteLine(RuntimeInformation.OSDescription);
+
+
+
             // Extension for services implemented
             builder.Services.AddApplicationServices(builder.Configuration);
-            builder.Services.AddDatabaseConnectionServices(builder.Configuration);
             builder.Services.AddJWTAuthService(builder.Configuration);
-
+            builder.Services.AddDatabaseConnectionServices(builder.Configuration, builder.Environment);
 
 
 
@@ -25,6 +29,8 @@ namespace EduConnect
 
             var app = builder.Build();
 
+            // Add Database Connection
+            
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

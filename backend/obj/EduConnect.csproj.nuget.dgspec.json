@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\EduConnect.csproj": {}
+    "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/rs1-2024-25-educonnect/backend/EduConnect.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\EduConnect.csproj": {
+    "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/rs1-2024-25-educonnect/backend/EduConnect.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\EduConnect.csproj",
+        "projectUniqueName": "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/rs1-2024-25-educonnect/backend/EduConnect.csproj",
         "projectName": "EduConnect",
-        "projectPath": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\EduConnect.csproj",
-        "packagesPath": "C:\\Users\\Dusko\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Dusko\\Desktop\\rs1-2024-25-educonnect\\backend\\obj\\",
+        "projectPath": "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/rs1-2024-25-educonnect/backend/EduConnect.csproj",
+        "packagesPath": "/Users/mahirkeran/.nuget/packages/",
+        "outputPath": "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/rs1-2024-25-educonnect/backend/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Dusko\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/mahirkeran/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -42,8 +36,9 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "direct"
-        }
+          "auditMode": "all"
+        },
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net8.0": {
@@ -97,6 +92,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.11, 8.0.11]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.osx-arm64",
+              "version": "[8.0.11, 8.0.11]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.11, 8.0.11]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -105,7 +114,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
