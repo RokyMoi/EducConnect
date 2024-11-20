@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "LTodEuYnOPZaqM/8/KZSsN/9lSqDWzEqBrc7m0ZAIYs=",
+  "Hash": "EziL+46dV5ovLuvUnEURBTYa1I0OxuDviVe3rn5Tfdk=",
   "Source": "EduConnect",
   "BasePath": "_content/EduConnect",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }
