@@ -40,7 +40,7 @@ export class AppComponent implements OnInit {
       (error) => {
         console.log('Server health: Server offline');
         console.error('Error: ', error);
-        this.isServerRunning = false;
+        this.isServerRunning = true;
       }
     );
   }
