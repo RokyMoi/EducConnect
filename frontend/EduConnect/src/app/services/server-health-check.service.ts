@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ServerHealthCheckService {
-  private serverHealthStatusUrl = 'http://127.0.0.1:5177/server/status';
+  private serverHealthStatusUrl = 'http://localhost:5177/server/status';
   constructor(private http: HttpClient) {}
 
   getServerHealth(): Observable<any> {

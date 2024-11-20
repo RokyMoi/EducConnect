@@ -85,7 +85,7 @@ body {
   width: 25%;
 }
 
-.studentButton:hover:hover {
+.studentButton:hover {
   background-color: rgb(2, 80, 176);
   color: white;
   box-shadow: 4px 6px 0 rgba(63, 63, 63, 0.135);
@@ -98,9 +98,8 @@ body {
 }
 
 .alreadyMemberText {
-  width: 50%;
-  text-align: center;
-  padding: 4rem 0 3rem;
+  margin-top: 5%;
+  font-size: 2.5rem;
 }
 
 .signinButton {
