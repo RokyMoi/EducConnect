@@ -15,7 +15,6 @@ import { RouterModule } from '@angular/router';
     RouterOutlet,
     RouterModule,
     HeaderComponent,
-    BodyComponent,
     CommonModule,
     NgIf,
     ServerOfflineComponent,
