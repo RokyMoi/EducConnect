@@ -40,6 +40,22 @@ namespace EduConnect
                     policy.WithOrigins(frontendApplicationOrigin).AllowAnyHeader().AllowAnyMethod();
                 });
             });
+
+            //Set CORS Policy for requests from Swagger, only in development environment
+            if (builder.Environment.IsDevelopment())
+            {
+                //Get link to swagger localhost instance for http requests testing from app.settings.json (AllowedOrigins:Swagger)
+                var swaggerLink = builder.Configuration.GetSection("AllowedOrigins:Swagger").Value;
+
+                //Add CORS Policy
+                builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy("SwaggerDevelopmentEnvironmentPolicy", policy =>
+                    {
+                        policy.WithOrigins(swaggerLink).AllowAnyHeader().AllowAnyMethod();
+                    });
+                });
+            }
             var app = builder.Build();
 
 
@@ -58,6 +74,12 @@ namespace EduConnect
 
             //Set backend application to use CORS policy for requests originating only from specific origin (frontend application)
             app.UseCors("FrontEndPolicy");
+
+            //Set backend application to use CORS policy for requests originating only from specific origin (swagger) in development environment
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseCors("SwaggerDevelopmentEnvironmentPolicy");
+            }
 
             app.MapControllers();
 
