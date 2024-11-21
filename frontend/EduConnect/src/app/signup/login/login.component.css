@@ -44,12 +44,10 @@ body {
 }
 
 .container {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  
- 
-    height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 .login-container {
@@ -58,22 +56,19 @@ body {
 }
 
 .form-container {
-  
     border: 1px solid hsla(0, 0%, 65%, 0.158);
     box-shadow: 0 0 36px 1px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     backdrop-filter: blur(20px);
     z-index: 99;
     padding: 2rem;
-    margin-top:10%;
-   
 }
 
 .login-container form input {
     display: block;
     padding: 14.5px;
     width: 100%;
-    margin: 3px;
+    margin: 2rem 0;
     font-family: roboto;
 
     color: white;
@@ -126,26 +121,10 @@ body {
 }
 
 
-
-.checking{
-  width:30%;
-  border: 1px solid hsla(0, 0%, 65%, 0.158);
-  box-shadow: 0 0 36px 1px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  height: 30%;
-  box-sizing: border-box;
-  backdrop-filter: blur(20px);
-  z-index: 99;
-  padding: 2rem;
-  margin-top:10%;
-}
-.registrationChecking{
-  font-size: 15px;
-}
 .loginText {
     position:absolute;
-    top:-3%;
-    right:10%;
+    top:-5%;
+    right:20%;
     font-family: roboto;
 
     color: white;
@@ -155,7 +134,14 @@ body {
     text-align: center;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
 }
-
+.illustration {
+    position: absolute;
+    top: -50%;
+    left: 1px;
+    
+    opacity: 80%;
+    width: 140%;
+}
 
 .circle-one {
     top: 0;
@@ -222,49 +208,4 @@ body {
     font-family: roboto;
 
     opacity: 1;
-}
-@media (max-width: 700px) {
-  .container {
-      height: auto;
-      padding: 2rem;
-  }
-
-  .login-container {
-      width: 90%;
-      max-width: 320px;
-      margin-top: 2rem;
-  }
-
-  .form-container {
-      padding: 1.5rem;
-  }
-
-  .loginText {
-      font-size: 28px;
-      top: 0;
-      right: 5%;
-  }
-
-  .login-container form input {
-      font-size: 14px;
-      padding: 12px;
-  }
-
-  .login-container form button {
-      padding: 12px;
-      font-size: 16px;
-  }
-
- 
-
-  .circle {
-      width: 6rem;
-      height: 6rem;
-  }
-
-  .circle-one,
-  .circle-two {
-      width: 6rem;
-      height: 6rem;
-  }
 }

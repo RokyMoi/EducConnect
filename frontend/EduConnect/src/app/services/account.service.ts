@@ -1,0 +1,43 @@
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable, signal } from '@angular/core';
+import { User } from '../_models/User';
+import { map } from 'rxjs';
+        
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AccountService {
+http = inject(HttpClient);
+baseUrl="http://localhost:5177/api/"
+CurrentUser = signal<User | null>(null);
+
+login(model: any) {
+  return this.http.post<User>(this.baseUrl + "Student/student-login", model).pipe(
+    map(user => {
+     if(user){
+      localStorage.setItem('user',JSON.stringify(user))
+      this.CurrentUser.set(user)
+     }
+    })
+  );
+}
+register(model:any){
+  return this.http.post<User>(this.baseUrl + "Student/student-register", model).pipe(
+    map(user => {
+     if(user){
+      localStorage.setItem('user',JSON.stringify(user))
+      this.CurrentUser.set(user)
+     }
+
+    })
+  
+  );
+}
+
+logout(){
+  localStorage.removeItem('user')
+  this.CurrentUser.set(null)
+}
+}
+

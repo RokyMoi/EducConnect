@@ -1,9 +1,113 @@
-
- 
-<div class='bold-line'>
+<body>
+  <div class="blueOverall">
+  <div class="OverLayGradient">
+  <section class="container">
+          <div class="login-container">
    
+          <div class="circle circle-one"></div>
+         
+          <div class="form-container">
+              <h1 class="loginText">REGISTRACIJA</h1>
+             
+          
+              <form #RegisterForm="ngForm" (ngSubmit)="RegistrujSe()" >
+                <input 
+                name="firstname" 
+                [(ngModel)]="model.firstname" 
+                type="text" 
+                placeholder="First Name" 
+                class="input-line full-width" 
+                required>
+            
+            <input 
+                name="lastname" 
+                [(ngModel)]="model.lastname" 
+                type="text" 
+                placeholder="Last Name" 
+                class="input-line full-width" 
+                required>
+            
+            <input 
+                name="username" 
+                [(ngModel)]="model.username" 
+                type="text" 
+                placeholder="Username" 
+                class="input-line full-width" 
+                required>
+            
+            <input 
+                name="email" 
+                [(ngModel)]="model.email" 
+                type="email" 
+                placeholder="Email" 
+                class="input-line full-width" 
+                required email>
+            
+            <input 
+                name="password" 
+                [(ngModel)]="model.password" 
+                type="password" 
+                placeholder="Password" 
+                class="input-line full-width" 
+                required minlength="8">
+            
+            <!-- Additional fields -->
+            <input 
+                name="phoneNumber" 
+                [(ngModel)]="model.phoneNumber" 
+                type="text" 
+                placeholder="Phone Number" 
+                class="input-line full-width" 
+                required>
+            
+            <input 
+                name="phoneNumberCountryCode" 
+                [(ngModel)]="model.phoneNumberCountryCode" 
+                type="text" 
+                placeholder="Phone Country Code" 
+                class="input-line full-width" 
+                required>
+            
+            <input 
+                name="countryOfOrigin" 
+                [(ngModel)]="model.countryOfOrigin" 
+                type="text" 
+                placeholder="Country of Origin" 
+                class="input-line full-width" 
+                required>
+                  <button class="opacity" type="submit">SUBMIT</button>
+              </form>
+              <div class="register-forget opacity">
+                  <a href="">NAZAD</a>
+             
+              </div>
+          </div>
+          
+    
+          <div class="circle circle-two"></div>
+      </div>
+      
+      <div class="theme-btn-container"></div>
+      <div class="checking">
+    
+        <h1 class="registrationChecking">Before you can register, you must have all options correct!</h1>
+        <h1 class="registrationChecking">Email format: {{ 'user@' + 'mail.com' }}</h1>
+        <h1 class="registrationChecking">Password need to contain: {{ '!@#$%*' }}</h1>
+        <h1 class="registrationChecking">Username is already used!</h1>
+        <h1 class="registrationChecking">You have passed all checking!Create account and enyoj on our website!</h1>
+        <h1 class="registrationChecking"></h1>
+    
+    
+    
+      </div>
+  
+  </section>
+
+  
+</div>
 </div>
 
+<<<<<<< HEAD
 <div class='container'>
    
   <div class='window'>
@@ -38,3 +142,6 @@
 
   </div>
 </div>
+=======
+</body>
+>>>>>>> LoginBranch

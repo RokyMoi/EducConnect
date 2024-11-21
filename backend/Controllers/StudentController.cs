@@ -3,7 +3,6 @@ using EduConnect.Data;
 using EduConnect.DTOs;
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
-using EduConnect.Entities.Tutor;
 using EduConnect.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,7 @@ using System.Text;
 
 namespace EduConnect.Controllers
 {
-    public class StudentController(DataContext db, ITokenService _tokenService, IStudentRepository _studentRepo) :MainController
+    public class StudentController(DataContext db, ITokenService _tokenService, IStudentRepository _studentRepo) : MainController
     {
         [HttpGet("all-students")]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudents()
@@ -21,11 +20,11 @@ namespace EduConnect.Controllers
 
             if (students == null || !students.Any())
             {
-              
+
                 return NotFound("No students found.");
             }
 
-        
+
             return Ok(students);
         }
         [HttpGet("student/{username}")]
@@ -42,12 +41,59 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
+        [HttpPost("student-login")]
+        public async Task<ActionResult<UserDTO>> Login(LoginDTO login)
+        {
+            // Retrieve the person's email
+            var personDetails = await db.PersonDetails
+                .FirstOrDefaultAsync(x => x.Username == login.Username);
+
+            if (personDetails == null)
+            {
+                return BadRequest("Invalid username.");
+            }
+
+            // Retrieve the corresponding person and password details
+            var person = await db.Person
+                .FirstOrDefaultAsync(x => x.PersonId == personDetails.PersonId);
+
+            var personPassword = await db.PersonPassword
+                .FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+
+            if (personPassword == null)
+            {
+                return BadRequest("Invalid email or password.");
+            }
+
+            // Hash the provided password using the same salt as the stored hash
+            using var hmac = new HMACSHA512(personPassword.Salt);
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(login.Password));
+
+            // Compare the computed hash with the stored hash
+            for (int i = 0; i < computedHash.Length; i++)
+            {
+                if (computedHash[i] != personPassword.Hash[i])
+                {
+                    return BadRequest("Invalid password.");
+                }
+            }
+
+       
+            var token = _tokenService.CreateToken(personDetails);
+
+            return new UserDTO
+            {
+                Username = personDetails.Username,
+                Token = token
+            };
+        }
+
         [HttpPost("student-register")]
         public async Task<ActionResult<UserDTO>> RegisterTutor(RegisterStudentDTO student)
         {
             if (await isRegistered(student))
             {
-                return BadRequest("That email was already taken");
+                return BadRequest("That username was already taken");
             }
             var Person = new Person
             {
@@ -145,7 +191,7 @@ namespace EduConnect.Controllers
         }
         private async Task<bool> isRegistered(RegisterStudentDTO tutor)
         {
-            return await db.PersonEmail.AnyAsync(x => x.Email == tutor.Email);
+            return await db.PersonDetails.AnyAsync(x => x.Username == tutor.Username);
         }
     }
 
