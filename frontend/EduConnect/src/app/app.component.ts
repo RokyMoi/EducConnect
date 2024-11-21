@@ -7,8 +7,11 @@ import { ServerHealthCheckService } from './services/server-health-check.service
 import { CommonModule, NgIf } from '@angular/common';
 import { ServerOfflineComponent } from './error/server-offline/server-offline.component';
 import { RouterModule } from '@angular/router';
+<<<<<<< HEAD
 import { AccountService } from './services/account.service';
 import { HeaderTemplateComponent } from "./common/header/header-template/header-template.component";
+=======
+>>>>>>> 745a0f1c2d045dcc86d662d3afdd053dfe664c4c
 
 @Component({
   selector: 'app-root',
@@ -29,7 +32,11 @@ export class AppComponent implements OnInit {
   title = 'EduConnect';
   users: any;
   isServerRunning = false;
+<<<<<<< HEAD
 private AccountService = inject(AccountService);
+=======
+
+>>>>>>> 745a0f1c2d045dcc86d662d3afdd053dfe664c4c
   constructor(private serverHealthCheckService: ServerHealthCheckService) {}
 
   ngOnInit(): void {
@@ -43,7 +50,11 @@ private AccountService = inject(AccountService);
       (error) => {
         console.log('Server health: Server offline');
         console.error('Error: ', error);
+<<<<<<< HEAD
         this.isServerRunning = true;
+=======
+        this.isServerRunning = false;
+>>>>>>> 745a0f1c2d045dcc86d662d3afdd053dfe664c4c
       }
     );
     

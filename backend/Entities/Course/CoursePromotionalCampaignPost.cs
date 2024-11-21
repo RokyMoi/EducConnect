@@ -5,27 +5,28 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduConnect.Entities.Course
 {
-//    CoursePromotionalCampaignPostId - PRIMARY KEY
+    //    CoursePromotionalCampaignPostId - PRIMARY KEY
 
-//CoursePromotionalCampaignId - (uuid) FOREIGN KEY TO „Course“.“CoursePromotionalCampaign“, 
+    //CoursePromotionalCampaignId - (uuid) FOREIGN KEY TO „Course“.“CoursePromotionalCampaign“, 
 
-//CourseId – (uuid) FOREIGN KEY TO „Course“.“Course“ 
+    //CourseId – (uuid) FOREIGN KEY TO „Course“.“Course“ 
 
-//PostTitle – (string)
+    //PostTitle – (string)
 
-//PostDescription – (string) NULLABLE(default „Course“.“ ShortDescription“)
+    //PostDescription – (string) NULLABLE(default „Course“.“ ShortDescription“)
 
-//CreatedAt – (bigint) – UNIX millis
+    //CreatedAt – (bigint) – UNIX millis
 
-//ModifiedAt – (bigint) – UNIX millis – NULLABLE
+    //ModifiedAt – (bigint) – UNIX millis – NULLABLE
+    [Table("CoursePromotionalCampaignPost", Schema = "Course")]
     public class CoursePromotionalCampaignPost
     {
         [Key]
         public required Guid CoursePromotionalCampaignPostId { get; set; }
         public required Guid CoursePromotionalCampaignId { get; set; }
         [ForeignKey(nameof(CoursePromotionalCampaignId))]
-        public CoursePromotionalCampaign CoursePromotionalCampaign{ get; set; }
-       
+        public CoursePromotionalCampaign CoursePromotionalCampaign { get; set; }
+
         public required string PostTitle { get; set; }
         public required string PostDescription { get; set; }
         public required long CreatedAt { get; set; }

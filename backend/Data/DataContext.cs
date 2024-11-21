@@ -22,4 +22,5 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<Student> Student {  get; set; }
     public DbSet<StudentDetails> StudentDetails { get; set; }
+
 }

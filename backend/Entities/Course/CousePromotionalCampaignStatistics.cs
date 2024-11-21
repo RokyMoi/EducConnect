@@ -18,6 +18,7 @@ namespace EduConnect.Entities.Course
 //NumberOfIndividualUsersWhoSubscribedFromThePost – (int)
 
 //PostGeneratedValue – (money)
+[Table("CousePromotionalCampaignStatistics", Schema = "Course")]
     public class CousePromotionalCampaignStatistics
     {
         [Key]

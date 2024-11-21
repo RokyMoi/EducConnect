@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduConnect.Entities.Course
 {
+    [Table("CoursePromotionalCampaign", Schema = "Course")]
     public class CoursePromotionalCampaign
     {
         //        CoursePromotionalCampaignId - (uuid) PRIMARY KEY, 
@@ -27,12 +28,12 @@ namespace EduConnect.Entities.Course
         public required Guid CourseId { get; set; }
         [ForeignKey(nameof(CourseId))]
         public Course Course { get; set; }
-        public required string  CampaignName { get; set; }
+        public required string CampaignName { get; set; }
         public required long CampaignStartDateTime { get; set; }
         public required long CampaignEndDateTime { get; set; }
         public required bool IsActive { get; set; }
         public required long CreatedAt { get; set; }
-        public long? ModifiedAt {  get; set; }
+        public long? ModifiedAt { get; set; }
 
 
 

@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241120223348_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +42,7 @@ namespace EduConnect.Migrations
 
                     b.HasKey("PersonId");
 
-                    b.ToTable("Person", "Person");
+                    b.ToTable("Person");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonDetails", b =>
@@ -86,7 +89,7 @@ namespace EduConnect.Migrations
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("PersonDetails", "Person");
+                    b.ToTable("PersonDetails");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonEmail", b =>
@@ -113,7 +116,7 @@ namespace EduConnect.Migrations
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("PersonEmail", "Person");
+                    b.ToTable("PersonEmail");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonPassword", b =>
@@ -143,7 +146,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("PersonPassword", "Person");
+                    b.ToTable("PersonPassword");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonProfilePicture", b =>
@@ -172,7 +175,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("PersonProfilePicture", "Person");
+                    b.ToTable("PersonProfilePicture");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonSalt", b =>
@@ -201,7 +204,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("PersonSalt", "Person");
+                    b.ToTable("PersonSalt");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Student.Student", b =>
@@ -223,7 +226,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("Student", "Student");
+                    b.ToTable("Student");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Student.StudentDetails", b =>
@@ -258,7 +261,7 @@ namespace EduConnect.Migrations
                     b.HasIndex("StudentId")
                         .IsUnique();
 
-                    b.ToTable("StudentDetails", "Student");
+                    b.ToTable("StudentDetails");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Tutor.Tutor", b =>
@@ -277,7 +280,7 @@ namespace EduConnect.Migrations
 
                     b.HasKey("PersonId");
 
-                    b.ToTable("Tutor", "Tutor");
+                    b.ToTable("Tutor");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Tutor.TutorAvailability", b =>
@@ -311,7 +314,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("TutorId");
 
-                    b.ToTable("TutorAvailability", "Tutor");
+                    b.ToTable("TutorAvailability");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Tutor.TutorCertification", b =>
@@ -353,7 +356,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("TutorId");
 
-                    b.ToTable("TutorCertification", "Tutor");
+                    b.ToTable("TutorCertification");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Tutor.TutorDetails", b =>
@@ -385,7 +388,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("TutorId");
 
-                    b.ToTable("TutorDetails", "Tutor");
+                    b.ToTable("TutorDetails");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Tutor.TutorRating", b =>
@@ -417,7 +420,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("TutorId");
 
-                    b.ToTable("TutorRating", "Tutor");
+                    b.ToTable("TutorRating");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonDetails", b =>

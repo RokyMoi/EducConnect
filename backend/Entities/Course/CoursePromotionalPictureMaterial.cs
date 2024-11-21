@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduConnect.Entities.Course
 {
+    [Table("CoursePromotionalPictureMaterial", Schema = "Course")]
     public class CoursePromotionalPictureMaterial
     {
         //        CoursePromotionalPictureMaterialId – (uuid)

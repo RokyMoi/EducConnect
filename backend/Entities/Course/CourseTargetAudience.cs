@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EduConnect.Entities.Course
 {
 
-
+    [Table("CourseTargetAudience", Schema = "Course")]
     public class CourseTargetAudience
     {
         [Key]

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EduConnect.Entities.Tutor;
 
+[Table("Tutor", Schema = "Tutor")]
 public class Tutor
 {
 
