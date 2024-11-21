@@ -8,6 +8,7 @@ import { CommonModule, NgIf } from '@angular/common';
 import { ServerOfflineComponent } from './error/server-offline/server-offline.component';
 import { RouterModule } from '@angular/router';
 import { AccountService } from './services/account.service';
+import { HeaderTemplateComponent } from "./common/header/header-template/header-template.component";
 
 @Component({
   selector: 'app-root',
@@ -19,7 +20,8 @@ import { AccountService } from './services/account.service';
     CommonModule,
     NgIf,
     ServerOfflineComponent,
-  ],
+    HeaderTemplateComponent
+],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })

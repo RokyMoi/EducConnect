@@ -1,13 +1,10 @@
-
 <div *ngIf="isServerRunning; else offlineTemplate">
-    <app-landing-page-header>
+    <app-header-template>
 
-    </app-landing-page-header>
+    </app-header-template>
 
     <router-outlet></router-outlet>
 </div>
 <ng-template #offlineTemplate>
     <app-server-offline></app-server-offline>
 </ng-template>
-
-
