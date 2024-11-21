@@ -37,7 +37,9 @@ namespace EduConnect
             {
                 options.AddPolicy("FrontEndPolicy", policy =>
                 {
-                    policy.WithOrigins(frontendApplicationOrigin).AllowAnyHeader().AllowAnyMethod();
+                    policy.WithOrigins(frontendApplicationOrigin)  // Allow frontend origin
+                          .AllowAnyHeader()                       // Allow any headers
+                          .AllowAnyMethod();                      // Allow any methods (GET, POST, etc.)
                 });
             });
 
@@ -55,6 +57,7 @@ namespace EduConnect
                         policy.WithOrigins(swaggerLink).AllowAnyHeader().AllowAnyMethod();
                     });
                 });
+
             }
             var app = builder.Build();
 

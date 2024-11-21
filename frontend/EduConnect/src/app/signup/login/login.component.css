@@ -123,8 +123,8 @@ body {
 
 .loginText {
     position:absolute;
-    top:2%;
-    right:10%;
+    top:-5%;
+    right:20%;
     font-family: roboto;
 
     color: white;

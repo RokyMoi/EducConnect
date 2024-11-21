@@ -1,232 +1,270 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,100,500);
 
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow-x: hidden; 
+:root {
+    --background: #1a1a2e;
+    --color: #ffffff;
+    --primary-color: #0f3460;
 }
 
-input {
-  border: none;
+.blueOverall {
+    background-color: rgba(0, 0, 128, 0.9);
+    opacity: 90%;
 }
 
-button:focus {
-  outline: none;
+.OverLayGradient {
+    background: rgba(255, 0, 0, 0.5);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 100%);
+    height: 100vh;
 }
 
-::-webkit-input-placeholder {
-  color: rgba(255, 255, 255, 0.65);
+* {
+    box-sizing: border-box;
 }
 
-::-webkit-input-placeholder .input-line:focus +::input-placeholder {
-  color: #fff;
+html {
+    scroll-behavior: smooth;
 }
 
-.highlight {
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 400;
-  cursor: pointer;
-  transition: color .2s ease;
+a {
+    text-decoration: none;
+    color: var(--color);
 }
 
-.highlight:hover {
-  color: #fff;
-  transition: color .2s ease;
+h1 {
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.6),
+        -2px -2px 4px rgba(0, 0, 0, 0.6);
 }
 
-.spacing {
-  flex-grow: 1;
-  height: 120px;
-  font-weight: 300;
-  text-align: center;
-  margin-top: 10px;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.input-line:focus {
-  outline: none;
-  border-color: #fff;
-  transition: all .2s ease;
-}
-
-.ghost-round {
-  cursor: pointer;
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 25px;
-  color: rgba(255, 255, 255, 0.65);
-  align-self: flex-end;
-  font-size: 1.2rem;
-  font-family: roboto;
-  font-weight: 300;
-  line-height: 2.5em;
-  margin-top: auto;
-  margin-bottom: 25px;
-  transition: all .2s ease;
-}
-
-.ghost-round:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-}
-
-.input-line {
-  background: none;
-  margin-bottom: 10px;
-  line-height: 2.4em;
-  color: #fff;
-  font-family: roboto;
-  font-weight: 300;
-  font-size: 1.2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
-  transition: all .2s ease;
-}
-
-.full-width {
-  width: 100%;
-}
-
-.input-fields {
-  margin-top: 25px;
+body {
+    background: url('https://images.pexels.com/photos/1438081/pexels-photo-1438081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') left no-repeat;
+    background-size: cover;
 }
 
 .container {
   display: flex;
-  align-items: center;
   justify-content: center;
-  background: #eee;
-  height: 100%;
+  flex-wrap: wrap;
+  
+ 
+    height: 90%;
 }
 
-.content {
-  padding-left: 25px;
-  padding-right: 25px;
-  display: flex;
-  flex-flow: column;
-  z-index: 5;
+.login-container {
+    position: relative;
+    width: 22.2rem;
 }
 
-.welcome {
-  color:#fff;
-  font-family: roboto;
-  font-weight: 200;
-  margin-top: 75px;
-  text-align: center;
-  font-size: 2.5rem;
-  letter-spacing: 0.05rem;
+.form-container {
+  
+    border: 1px solid hsla(0, 0%, 65%, 0.158);
+    box-shadow: 0 0 36px 1px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(20px);
+    z-index: 99;
+    padding: 2rem;
+    margin-top:10%;
+   
 }
 
-.subtitle {
-  font-family: roboto;
-  color: #fff;
-  text-align: center;
-  line-height: 1em;
-  font-weight: 100;
-  letter-spacing: 0.02rem;
+.login-container form input {
+    display: block;
+    padding: 14.5px;
+    width: 100%;
+    margin: 3px;
+    font-family: roboto;
+
+    color: white;
+    outline: none;
+    background-color: #9191911f;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    font-size: 15px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);  /* Dodana senka za input */
 }
 
-.menu {
-  background: rgba(0, 0, 0, 0.2);
-  width: 100%;
-  height: 50px;
+.login-container form input:focus {
+    box-shadow: 0 0 16px 1px rgba(0, 0, 0, 0.3);  /* Senka pri fokusu postaje izraženija */
+    animation: wobble 0.3s ease-in;
 }
 
-.window {
-  position: relative;
-  display: flex;
-  flex-flow: column;
-  box-shadow: 0px 15px 50px 10px rgba(0, 0, 0, 0.2);
-  height: 610px;
-  width: 360px;
-  background: url('https://images.pexels.com/photos/1454360/pexels-photo-1454360.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') top left no-repeat;
-  background-size: cover;
+.login-container form button {
+    background-color: transparent; 
+    color: white;  
+    display: block;
+    padding: 13px;
+    border-radius: 5px;
+    outline: none;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.1s ease-in-out;
 }
 
-#checking {
-  display: flex;
-  flex-flow: column;
-  box-shadow: 0px 15px 50px 10px rgba(0, 0, 0, 0.2);
-  height: 360px;
-  width: 360px;
-  background: url('https://images.pexels.com/photos/1454360/pexels-photo-1454360.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') top left no-repeat;
-  background-size: cover;
-  position: relative;
+.login-container form button:hover {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
+    transform: scale(1.02);
 }
 
-#checking::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(rgb(2, 80, 176), rgb(100, 150, 220));
-  opacity: 0.96;
-  z-index: 1;
-}
-
-.registrationChecking {
-  font-size: 1.2rem;
-  font-family: roboto;
-  padding: 10px;
-  text-align: center;
-  font-weight: 100;
-  letter-spacing: 0.02rem;
-  margin-bottom: 10px;
-  color: #fff;
-  z-index: 2;
+.circle {
+    width: 8rem;
+    height: 8rem;
+    background: var(--primary-color);
+    border-radius: 50%;
+    position: absolute;
 }
 
 
 
-.overlay {
-  background: linear-gradient(rgb(2, 80, 176), rgb(100, 150, 220));
-  opacity: 0.75;
-  filter: alpha(opacity=85);
-  height: 610px;
-  position: absolute;
-  width: 360px;
-  z-index: 1;
+.checking{
+  width:30%;
+  border: 1px solid hsla(0, 0%, 65%, 0.158);
+  box-shadow: 0 0 36px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  height: 30%;
+  box-sizing: border-box;
+  backdrop-filter: blur(20px);
+  z-index: 99;
+  padding: 2rem;
+  margin-top:10%;
+}
+.registrationChecking{
+  font-size: 15px;
+}
+.loginText {
+    position:absolute;
+    top:-3%;
+    right:10%;
+    font-family: roboto;
+
+    color: white;
+    font-size: 36px;
+    opacity:70%;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
 }
 
 
-.bold-line {
-  background: url('https://images.pexels.com/photos/1438081/pexels-photo-1438081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') left no-repeat;
-  background-size: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  z-index: 2;
-  opacity: 0.1;
+.circle-one {
+    top: 0;
+    left: 0;
+    z-index: -1;
+    transform: translate(-45%, -45%);
 }
 
+.circle-two {
+    bottom: 0;
+    right: 0;
+    z-index: -1;
+    transform: translate(45%, 45%);
+}
+
+.register-forget {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.opacity {
+    font-family: roboto;
+
+    z-index: 1;
+    color: white;
+    text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.1), 
+        -2px -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-btn-container {
+    position: absolute;
+    left: 0;
+    bottom: 2rem;
+}
+
+.theme-btn {
+    cursor: pointer;
+    transition: all 0.3s ease-in;
+}
+
+.theme-btn:hover {
+    width: 40px !important;
+}
+
+@keyframes wobble {
+    0% {
+        transform: scale(1.025);
+    }
+    25% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1.025);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.login-container form input::placeholder {
+    color: #ffffff;
+    font-family: roboto;
+
+    opacity: 1;
+}
 @media (max-width: 700px) {
- body html{
-  width: 100vw;
-  height: 100;
- }
-  .window {
-    width: 100%;
-    height: 100%;
+  .container {
+      height: auto;
+      padding: 2rem;
   }
-  #checking {
-    width: 100%;
-    height: 100%;
+
+  .login-container {
+      width: 90%;
+      max-width: 320px;
+      margin-top: 2rem;
   }
-  #checking::before{
-    width: 100%;
-    height: 100%;
+
+  .form-container {
+      padding: 1.5rem;
   }
-  .overlay {
-    width: 100%;
-    height: 100%;
+
+  .loginText {
+      font-size: 28px;
+      top: 0;
+      right: 5%;
   }
-  .bold-line {
-    width: 100vw;
-    height: 100vh;
-    background-size: cover;
+
+  .login-container form input {
+      font-size: 14px;
+      padding: 12px;
+  }
+
+  .login-container form button {
+      padding: 12px;
+      font-size: 16px;
+  }
+
+ 
+
+  .circle {
+      width: 6rem;
+      height: 6rem;
+  }
+
+  .circle-one,
+  .circle-two {
+      width: 6rem;
+      height: 6rem;
   }
 }

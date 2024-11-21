@@ -50,7 +50,7 @@ namespace EduConnect.Controllers
 
             if (personDetails == null)
             {
-                return BadRequest("Invalid email or password.");
+                return BadRequest("Invalid username.");
             }
 
             // Retrieve the corresponding person and password details
@@ -74,7 +74,7 @@ namespace EduConnect.Controllers
             {
                 if (computedHash[i] != personPassword.Hash[i])
                 {
-                    return BadRequest("Invalid email or password.");
+                    return BadRequest("Invalid password.");
                 }
             }
 

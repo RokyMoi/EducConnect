@@ -7,16 +7,16 @@
      
             <div class="circle circle-one"></div>
             <div class="form-container">
-                <h1 class="loginText">LOGIN</h1>
-                <img src="https://i.imgur.com/RTWAhXX.png" alt="illustration" class="illustration" />
+                <h1 class="loginText">LOGIN::USER </h1>
+                
             
-                <form>
-                    <input type="text" placeholder="USERNAME" />
-                    <input type="password" placeholder="PASSWORD" />
+                <form #LoginForm="ngForm" (ngSubmit)="login()" >
+                    <input name="username" [(ngModel)]="model.username" type="text" placeholder="USERNAME" />
+                    <input name="password" [(ngModel)]="model.password" type="password" placeholder="PASSWORD" />
                     <button class="opacity" type="submit">SUBMIT</button>
                 </form>
                 <div class="register-forget opacity">
-                    <a href="">REGISTER</a>
+             
                     <a href="">FORGOT PASSWORD</a>
                 </div>
             </div>
