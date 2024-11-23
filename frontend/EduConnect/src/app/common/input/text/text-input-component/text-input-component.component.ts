@@ -1,4 +1,12 @@
-import { Component, Input } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-text-input',
@@ -13,4 +21,11 @@ export class TextInputComponentComponent {
   @Input() inputId: string = 'input';
   @Input() type: string = 'text';
   @Input() warning: string = '';
+  @Input() value: string = '';
+
+  @Output() input = new EventEmitter<Event>();
+
+  onInput(event: Event) {
+    this.input.emit(event);
+  }
 }

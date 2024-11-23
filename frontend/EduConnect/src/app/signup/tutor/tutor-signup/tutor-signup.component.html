@@ -1,4 +1,18 @@
 <body>
-    <app-email-input></app-email-input>
-    <app-password-input></app-password-input>
+    <h1>
+        Sign up as a Tutor
+    </h1>
+    <form [formGroup]="signinForm">
+        <app-email-input [emailFormControl]="signinForm.controls.email" [emailWarning]="emailWarning"
+            (emailInput)="handleEmailInput($event)"></app-email-input>
+        <app-password-input [passwordWarning]="passwordWarning" [passwordFormControl]="signinForm.controls.password"
+            (passwordInput)="handlePasswordInput($event)"></app-password-input>
+        <app-submit-button [submitButtonText]="buttonText"></app-submit-button>
+    </form>
+    <h3 class="orSeparator" style="color: grey">Or</h3>
+    <h3 class="alreadyMemberText">
+        Already a member?
+    </h3>
+    <button class="signinButton" routerLink="/user-signin">Sign in</button>
+
 </body>
