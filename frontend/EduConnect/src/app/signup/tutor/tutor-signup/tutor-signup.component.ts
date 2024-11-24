@@ -30,6 +30,7 @@ export class TutorSignupComponent {
   buttonText = 'Register';
   emailWarning: string = '';
   passwordWarning: string = '';
+  formNotValidText: string = '';
   signinForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [
@@ -76,16 +77,29 @@ export class TutorSignupComponent {
       if (this.signinForm.controls.password.hasError('minlength')) {
         this.passwordWarning = 'Password must be at least 8 characters long';
       }
-      if (!this.signinForm.controls.password.hasError('minlength')) {
-        this.passwordWarning = '';
-      }
-      if (this.signinForm.controls.password.hasError('pattern')) {
-        this.passwordWarning = 'Password not valid';
-      }
     }
     if (this.signinForm.controls.password.valid) {
-      this.passwordWarning = 'Password is OK';
+      this.passwordWarning = '';
     }
     console.log(this.signinForm.controls.password.value);
+  }
+
+  handleSubmitButton($event: Event) {
+    if (this.signinForm.invalid) {
+      this.formNotValidText =
+        'Please input valid email and password to continue';
+    }
+    if (this.signinForm.valid) {
+      this.formNotValidText = '';
+      this.registerUserAsTutor();
+    }
+  }
+
+  private registerUserAsTutor() {
+    console.log(this.signinForm.controls.email.value);
+    console.log(this.signinForm.controls.password.value);
+
+    //TODO: Make a request to the backend to register the user as a tutor
+    
   }
 }

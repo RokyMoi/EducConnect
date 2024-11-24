@@ -20,8 +20,6 @@ public class Tutor
 
     public long? ModifiedAt { get; set; }
 
-    [NotMapped]
-    public TutorDetails TutorDetails { get; set; }
 
 
 }

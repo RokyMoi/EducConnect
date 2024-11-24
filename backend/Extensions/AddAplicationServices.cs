@@ -1,4 +1,6 @@
-﻿using EduConnect.Interfaces;
+﻿using backend.Interfaces.Person;
+using backend.Repositories.Person;
+using EduConnect.Interfaces;
 using EduConnect.Services;
 
 namespace EduConnect.Extensions
@@ -16,9 +18,11 @@ namespace EduConnect.Extensions
             //ADD SCOOPED SERVICES 
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<IPersonRepository, PersonRepository>();
 
-       
-            
+
+
+
 
 
 

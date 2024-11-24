@@ -10,16 +10,17 @@ namespace EduConnect.Entities.Person
         [Key]
         public Guid PersonId { get; set; }
 
-        public required bool IsActive { get; set; }
+        //Set to false by default 
+        public required bool IsActive { get; set; } = false;
 
         public required long CreatedAt { get; set; }
 
         public long? ModifiedAt { get; set; }
 
         ///Pristupi
-       
-       public PersonDetails PersonDetails { get; set; }
-       public PersonEmail PersonEmail { get; set; }
+
+        public PersonDetails PersonDetails { get; set; }
+        public PersonEmail PersonEmail { get; set; }
     }
 }
 

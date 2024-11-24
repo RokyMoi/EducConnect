@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/rs1-2024-25-educonnect/backend/EduConnect.csproj": {}
+    "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/EduConnect.csproj": {}
   },
   "projects": {
-    "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/rs1-2024-25-educonnect/backend/EduConnect.csproj": {
+    "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/EduConnect.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/rs1-2024-25-educonnect/backend/EduConnect.csproj",
+        "projectUniqueName": "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/EduConnect.csproj",
         "projectName": "EduConnect",
-        "projectPath": "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/rs1-2024-25-educonnect/backend/EduConnect.csproj",
+        "projectPath": "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/EduConnect.csproj",
         "packagesPath": "/Users/mahirkeran/.nuget/packages/",
-        "outputPath": "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/rs1-2024-25-educonnect/backend/obj/",
+        "outputPath": "/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/mahirkeran/.nuget/NuGet/NuGet.Config"
