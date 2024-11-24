@@ -31,6 +31,7 @@ export class TutorSignupComponent {
   emailWarning: string = '';
   passwordWarning: string = '';
   formNotValidText: string = '';
+  formNotValidText: string = '';
   signinForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [
