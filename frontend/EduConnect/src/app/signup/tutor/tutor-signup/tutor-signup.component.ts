@@ -31,7 +31,6 @@ export class TutorSignupComponent {
   emailWarning: string = '';
   passwordWarning: string = '';
   formNotValidText: string = '';
-  formNotValidText: string = '';
   signinForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [
@@ -101,6 +100,5 @@ export class TutorSignupComponent {
     console.log(this.signinForm.controls.password.value);
 
     //TODO: Make a request to the backend to register the user as a tutor
-    
   }
 }

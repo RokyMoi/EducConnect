@@ -49,10 +49,10 @@ namespace backend.Repositories.Person
             try
             {
 
-                _databaseContext.Person.Add(person);
-                _databaseContext.PersonEmail.Add(personEmail);
-                _databaseContext.PersonPassword.Add(personPassword);
-                _databaseContext.PersonSalt.Add(personSalt);
+                _databaseContext.Person.AddAsync(person);
+                _databaseContext.PersonEmail.AddAsync(personEmail);
+                _databaseContext.PersonPassword.AddAsync(personPassword);
+                _databaseContext.PersonSalt.AddAsync(personSalt);
                 await _databaseContext.SaveChangesAsync();
             }
             catch (Exception ex)

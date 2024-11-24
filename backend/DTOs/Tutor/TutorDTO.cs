@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace backend.DTOs.Tutor
 {
-    public class TutorSignupResponseDTO
+    public class TutorDTO
     {
         public Guid TutorId { get; set; }
-        public string Email { get; set; }
-
+        public Guid PersonId { get; set; }
     }
 }

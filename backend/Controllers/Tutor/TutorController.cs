@@ -16,11 +16,12 @@ using backend.Utilities;
 using EduConnect.Entities;
 using EduConnect.Entities.Tutor;
 using backend.DTOs.Person;
+using backend.Interfaces.Tutor;
 namespace backend.Controllers.Tutor
 {
     [ApiController]
     [Route("/tutor")]
-    public class TutorController(DataContext _databaseContext, IPersonRepository _personRepository) : ControllerBase
+    public class TutorController(DataContext _databaseContext, IPersonRepository _personRepository, ITutorRepository _tutorRepository) : ControllerBase
     {
 
         [HttpPost("signup")]
@@ -95,10 +96,12 @@ namespace backend.Controllers.Tutor
                 ModifiedAt = null
             };
 
+
             var savedPersonDataDTO = new PersonEmailPasswordSaltDTOGroup
             {
 
             };
+            var savedTutorDTO = new TutorDTO { };
             //Add Person, PersonEmail, PersonPassword, PersonSalt, Tutor to database
             try
             {
@@ -108,6 +111,9 @@ namespace backend.Controllers.Tutor
                     PersonPassword,
                     PersonSalt
                 );
+
+                savedTutorDTO = await _tutorRepository.CreateTutor(Tutor);
+
             }
             catch (Exception e)
             {
@@ -117,6 +123,7 @@ namespace backend.Controllers.Tutor
             //Return created Tutor
             var tutorSignupResponseDTO = new TutorSignupResponseDTO
             {
+                TutorId = savedTutorDTO.TutorId,
                 Email = savedPersonDataDTO.PersonEmailDTO.Email
             };
 
