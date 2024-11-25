@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EduConnect.Entities.Person;
 
+[Table("PersonSalt", Schema = "Person")]
 public class PersonSalt
 {
     [Key]

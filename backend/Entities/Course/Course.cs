@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduConnect.Entities.Course
 {
+    [Table("Course", Schema = "Course")]
     public class Course
     {
         //        CourseId – (uuid), PRIMARY KEY
