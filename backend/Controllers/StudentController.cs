@@ -6,6 +6,7 @@ using EduConnect.Entities.Student;
 using EduConnect.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -77,14 +78,32 @@ namespace EduConnect.Controllers
                     return BadRequest("Invalid password.");
                 }
             }
+            string role = "";
+            // Check if the user is a Student or Tutor by looking up the appropriate tables
+            var student = await db.Student.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+            var tutor = await db.Tutor.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
 
-       
-            var token = _tokenService.CreateToken(personDetails);
+            if (student != null)
+            {
+                role = "student";  // User is a student
+            }
+            else if (tutor != null)
+            {
+                role = "tutor";  // User is a tutor
+            }
+            else
+            {
+                return BadRequest("User is neither a student nor a tutor.");
+            }
+
+
+            var token = _tokenService.CreateTokenAsync(personDetails);
 
             return new UserDTO
             {
                 Username = personDetails.Username,
-                Token = token
+                Token = token,
+                Role=role
             };
         }
 
@@ -167,14 +186,15 @@ namespace EduConnect.Controllers
                 db.PersonPassword.Add(PersonPassword);
                 db.PersonSalt.Add(PersonSalt);
                 db.Student.Add(studentt);
-                //DodatiPersonPCC
+             
 
                 await db.SaveChangesAsync();
             });
             return new UserDTO
             {
                 Username = PersonDetails.Username,
-                Token = _tokenService.CreateToken(PersonDetails)
+                Token = _tokenService.CreateTokenAsync(PersonDetails),
+                Role = "student"
             };
         }
         private string GenerateSalt()
