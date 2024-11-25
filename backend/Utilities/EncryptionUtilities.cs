@@ -24,5 +24,17 @@ namespace backend.Utilities
 
             return Convert.ToBase64String(salt);
         }
+
+        public static string GenerateRandomString(int stringSize = 6)
+        {
+            var bytes = new byte[6];
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(bytes);
+            }
+            return Convert.ToBase64String(bytes);
+        }
+
+
     }
 }

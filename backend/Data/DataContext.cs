@@ -1,4 +1,5 @@
-﻿using EduConnect.Entities.Person;
+﻿using backend.Entities.Person;
+using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
 using EduConnect.Entities.Tutor;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<PersonPassword> PersonPassword { get; set; }
     public DbSet<PersonProfilePicture> PersonProfilePicture { get; set; }
     public DbSet<PersonSalt> PersonSalt { get; set; }
+    public DbSet<PersonVerificationCode> PersonVerificationCode { get; set; }
     public DbSet<Tutor> Tutor { get; set; }
 
 

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Person;
+using backend.Entities.Person;
 using backend.Interfaces.Person;
 using EduConnect.Data;
 using EduConnect.Entities.Person;
@@ -43,16 +44,17 @@ namespace backend.Repositories.Person
 
 
         }
-        public async Task<PersonEmailPasswordSaltDTOGroup> CreateNewPersonWithHelperTables(EduConnect.Entities.Person.Person person, PersonEmail personEmail, PersonPassword personPassword, PersonSalt personSalt)
+        public async Task<PersonEmailPasswordSaltDTOGroup> CreateNewPersonWithHelperTables(EduConnect.Entities.Person.Person person, PersonEmail personEmail, PersonPassword personPassword, PersonSalt personSalt, PersonVerificationCode personVerificationCode)
         {
 
             try
             {
 
-                _databaseContext.Person.AddAsync(person);
-                _databaseContext.PersonEmail.AddAsync(personEmail);
-                _databaseContext.PersonPassword.AddAsync(personPassword);
-                _databaseContext.PersonSalt.AddAsync(personSalt);
+                await _databaseContext.Person.AddAsync(person);
+                await _databaseContext.PersonEmail.AddAsync(personEmail);
+                await _databaseContext.PersonPassword.AddAsync(personPassword);
+                await _databaseContext.PersonSalt.AddAsync(personSalt);
+                await _databaseContext.PersonVerificationCode.AddAsync(personVerificationCode);
                 await _databaseContext.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -89,12 +91,23 @@ namespace backend.Repositories.Person
                 Salt = personSalt.Salt,
             };
 
+            var personVerificationCodeDTO = new PersonVerificationCodeDTO
+            {
+                PersonVerificationCodeId = personVerificationCode.PersonVerificationCodeId,
+                PersonId = personVerificationCode.PersonId,
+                VerificationCode = personVerificationCode.VerificationCode,
+                ExpiryDateTime = personVerificationCode.ExpiryDateTime,
+                IsVerified = personVerificationCode.IsVerified,
+
+            };
+
             return new PersonEmailPasswordSaltDTOGroup
             {
                 PersonDTO = personDTO,
                 PersonEmailDTO = personEmailDTO,
                 PersonPasswordDTO = personPasswordDTO,
                 PersonSaltDTO = personSaltDTO,
+                PersonVerificationCodeDTO = personVerificationCodeDTO,
             };
         }
 

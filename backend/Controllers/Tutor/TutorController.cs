@@ -18,6 +18,7 @@ using EduConnect.Entities.Tutor;
 using backend.DTOs.Person;
 using backend.Interfaces.Tutor;
 using backend.Services;
+using backend.Entities.Person;
 namespace backend.Controllers.Tutor
 {
     [ApiController]
@@ -40,13 +41,8 @@ namespace backend.Controllers.Tutor
             }
 
 
-            //Attempt to send email to given email address
-            var emailResult = await EmailService.SendEmailToAsync(tutorSingupRequest.Email, "Welcome to EduConnect!", "Thank you for joining EduConnect as a Tutor!");
 
-            if (!emailResult) { 
-                return BadRequest("Email address is not a registered email address");
-            }
-            
+
             //Create new Person
             var Person = new Person
             {
@@ -95,6 +91,17 @@ namespace backend.Controllers.Tutor
                 ModifiedAt = null
             };
 
+
+            //Create new PersonVerificationCode
+            var PersonVerificationCode = new PersonVerificationCode
+            {
+                PersonVerificationCodeId = Guid.NewGuid(),
+                PersonId = Person.PersonId,
+                Person = Person,
+                VerificationCode = EncryptionUtilities.GenerateRandomString(),
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                ModifiedAt = null
+            };
             //Create new Tutor 
             var Tutor = new EduConnect.Entities.Tutor.Tutor
             {
@@ -118,7 +125,8 @@ namespace backend.Controllers.Tutor
                     Person,
                     PersonEmail,
                     PersonPassword,
-                    PersonSalt
+                    PersonSalt,
+                    PersonVerificationCode
                 );
 
                 savedTutorDTO = await _tutorRepository.CreateTutor(Tutor);
@@ -137,11 +145,55 @@ namespace backend.Controllers.Tutor
             };
 
 
+            //Template for successful signup to platform as Tutor
+            /*
+            Dear [Tutor's Name],
+
+Congratulations on joining EduConnect! We are thrilled to welcome you as part of our global community of knowledge sharers.
+
+As a tutor on EduConnect, you have the opportunity to make a meaningful impact by sharing your expertise with eager learners worldwide. We're excited to see the amazing courses and lessons you will create to inspire and educate others.
+
+Before you can fully explore the platform and start sharing your knowledge, we need to verify your email address. This is an important step to secure your account and ensure smooth communication.
+
+Please verify your email by clicking the link below:
+[Verification Link]
+
+If you didn’t sign up for EduConnect, please ignore this email.
+
+Thank you for choosing EduConnect as your platform to spread knowledge. Together, we’re shaping the future of education.
+
+Best regards,  
+The EduConnect Team  
+
+P.S. Need help or have questions? Feel free to reach out to us at support@educonnect.com.  
+
+            */
+            //Attempt to send email to given email address
+            var emailResult = await EmailService.SendEmailToAsync(tutorSingupRequest.Email, "Welcome to EduConnect!",
+
+                    "Hello, \n\n"
+                    + "Congratulations on joining EduConnect! We are thrilled to welcome you as part of our global community of knowledge sharers.\n\n"
+                    + "As a tutor on EduConnect, you have the opportunity to make a meaningful impact by sharing your expertise with eager learners worldwide. We're excited to see the amazing courses and lessons you will create to inspire and educate others.\n\n"
+                    + "Before you can fully explore the platform and start sharing your knowledge, we need to verify your email address. This is an important step to secure your account and ensure smooth communication.\n\n"
+                    + $"Your verification code is: {savedPersonDataDTO.PersonVerificationCodeDTO.VerificationCode}\n\n"
+                    + $"Notice: This code expires at {DateTimeOffset.FromUnixTimeMilliseconds(savedPersonDataDTO.PersonVerificationCodeDTO.ExpiryDateTime).ToUniversalTime().ToString("HH:mm:ss dd.MM.yyyy.  'UTC'")}\n\n"
+                    + "Please use this code to verify your email within the platform.\n\n"
+                    + "If you didn’t sign up for EduConnect, please ignore this email.\n\n"
+                    + "Thank you for choosing EduConnect as your platform to spread knowledge. Together, we’re shaping the future of education.\n\n"
+                    + "Best regards,\n"
+                    + "The EduConnect Team\n\n"
+                    + "P.S. Need help or have questions? Feel free to reach out to us at support@educonnect.com.\n"
+            );
+
+            if (!emailResult)
+            {
+                return BadRequest("Email address is not a registered email address");
+            }
 
 
             return Ok(new
             {
-                message = "Tutor created successfully",
+                message = "You have successfully registered as a tutor on EduConnect, please verify your email address using the verification code sent to your email address",
                 data = tutorSignupResponseDTO
             });
 
