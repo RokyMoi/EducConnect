@@ -17,6 +17,7 @@ using EduConnect.Entities;
 using EduConnect.Entities.Tutor;
 using backend.DTOs.Person;
 using backend.Interfaces.Tutor;
+using backend.Services;
 namespace backend.Controllers.Tutor
 {
     [ApiController]
@@ -38,6 +39,14 @@ namespace backend.Controllers.Tutor
                 return BadRequest("Email is taken");
             }
 
+
+            //Attempt to send email to given email address
+            var emailResult = await EmailService.SendEmailToAsync(tutorSingupRequest.Email, "Welcome to EduConnect!", "Thank you for joining EduConnect as a Tutor!");
+
+            if (!emailResult) { 
+                return BadRequest("Email address is not a registered email address");
+            }
+            
             //Create new Person
             var Person = new Person
             {
@@ -126,6 +135,8 @@ namespace backend.Controllers.Tutor
                 TutorId = savedTutorDTO.TutorId,
                 Email = savedPersonDataDTO.PersonEmailDTO.Email
             };
+
+
 
 
             return Ok(new

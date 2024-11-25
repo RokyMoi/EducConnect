@@ -331,3 +331,6 @@ C:/Users/Dusko/Desktop/rs1-2024-25-educonnect/backend/backend/bin/Debug/net8.0/M
 /Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll
 /Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/obj/Debug/net8.0/staticwebassets.build.endpoints.json
 /Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/obj/Debug/net8.0/staticwebassets/msbuild.EduConnect.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/bin/Debug/net8.0/BouncyCastle.Cryptography.dll
+/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/bin/Debug/net8.0/MailKit.dll
+/Users/mahirkeran/Documents/Fakultet/3. Godina/Razvoj softvera 1/EduConnect/backend/bin/Debug/net8.0/MimeKit.dll
