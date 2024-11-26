@@ -13,6 +13,7 @@
             
                 <form #LoginForm="ngForm" (ngSubmit)="login()" >
                     <input name="username" [(ngModel)]="model.username" type="text" placeholder="USERNAME" />
+                    <p name = "warning" [class] = "warningClass">{{warning}}</p>
                     <input name="password" [(ngModel)]="model.password" type="password" placeholder="PASSWORD" />
                     <button class="opacity" type="submit">SUBMIT</button>
                 </form>

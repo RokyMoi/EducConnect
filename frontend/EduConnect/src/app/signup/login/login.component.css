@@ -210,3 +210,18 @@ body {
 
     opacity: 1;
 }
+
+
+.warning {
+    color: red;
+    font-size: 1rem;
+    padding: 0;
+    margin: 0;
+}
+
+.announcement{
+    color: green;
+    font-size: 1rem;
+    padding: 0;
+    margin: 0;
+}

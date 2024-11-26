@@ -25,6 +25,7 @@ RegistrujSe() {
   this.AccountService.register(this.model).subscribe({
     next: (response) => {
       console.log(response);
+      
     },
     error: (err) => {
       console.log('Error during registration:', err);
