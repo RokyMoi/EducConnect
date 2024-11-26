@@ -43,7 +43,7 @@ namespace EduConnect.Controllers
             return Ok(students);
         }
         [HttpPost("student-login")]
-        public async Task<ActionResult<UserDTO>> Login(LoginDTO login)
+        public async Task<IActionResult> Login(LoginDTO login)
         {
             // Retrieve the person's email
             var personDetails = await db.PersonDetails
@@ -51,7 +51,13 @@ namespace EduConnect.Controllers
 
             if (personDetails == null)
             {
-                return BadRequest("Invalid username.");
+                return NotFound(new {
+                    success = "false",
+                    message = "User not found",
+                    data = new { },
+                    timestamp = DateTime.Now,
+
+                });
             }
 
             // Retrieve the corresponding person and password details
@@ -63,7 +69,14 @@ namespace EduConnect.Controllers
 
             if (personPassword == null)
             {
-                return BadRequest("Invalid email or password.");
+                return BadRequest(
+                    new {
+                    success = "false",
+                    message = "Username or password invalid",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                    }
+                );
             }
 
             // Hash the provided password using the same salt as the stored hash
@@ -75,7 +88,13 @@ namespace EduConnect.Controllers
             {
                 if (computedHash[i] != personPassword.Hash[i])
                 {
-                    return BadRequest("Invalid password.");
+                    return BadRequest(new
+                    {
+                        success = "false",
+                        message = "Username or password invalid",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    });
                 }
             }
             string role = "";
@@ -93,18 +112,34 @@ namespace EduConnect.Controllers
             }
             else
             {
-                return BadRequest("User is neither a student nor a tutor.");
+                return Unauthorized(new {
+                    success = "error",
+                    message = "Role undefined",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                    });
             }
 
 
-            var token = _tokenService.CreateTokenAsync(personDetails);
+            var token = await _tokenService.CreateTokenAsync(personDetails);
 
-            return new UserDTO
+            return
+            Ok(
+                new
+                {
+                    success = "true",
+                    message = "Login succesfull",
+                    data = new 
+            
+            UserDTO
             {
                 Username = personDetails.Username,
                 Token = token,
                 Role=role
-            };
+            },
+                    timestamp = DateTime.Now,
+                });
+            
         }
 
         [HttpPost("student-register")]
@@ -193,7 +228,7 @@ namespace EduConnect.Controllers
             return new UserDTO
             {
                 Username = PersonDetails.Username,
-                Token = _tokenService.CreateTokenAsync(PersonDetails),
+                Token = await _tokenService.CreateTokenAsync(PersonDetails),
                 Role = "student"
             };
         }

@@ -19,6 +19,7 @@ namespace EduConnect.Services
         public TokenService(IConfiguration config, DataContext db)
         {
             _config = config;
+            _db = db;
         }
         public async Task<string> CreateTokenAsync(PersonDetails person)
         {
@@ -49,6 +50,16 @@ namespace EduConnect.Services
         }
         public async Task<string> GetRole(PersonDetails person)
         {
+            if (person == null)
+            {
+                throw new ArgumentNullException(nameof(person), "PersonDetails cannot be null.");
+            }
+
+            if (person.PersonId == Guid.Empty) 
+            {
+                throw new ArgumentException("Invalid PersonId.", nameof(person));
+            }
+
             var tutor = await _db.Tutor.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
             if (tutor != null)
             {
