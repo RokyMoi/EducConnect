@@ -1,10 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { HeaderTemplateComponent } from '../../../common/header/header-template/header-template.component';
 import { TextInputComponentComponent } from '../../../common/input/text/text-input-component/text-input-component.component';
 import { EmailInputComponent } from '../../../common/email/email-input/email-input.component';
 import { PasswordInputComponent } from '../../../common/password/password-input/password-input.component';
 import { SubmitButtonComponent } from '../../../common/button/submit-button/submit-button.component';
+import { AccountService } from '../../../services/account.service';
 import {
   FormControl,
   FormGroup,
@@ -42,6 +43,12 @@ export class TutorSignupComponent {
       Validators.pattern(/^(?=.*[@$!%*?&])/), //Password must have at least one special character from this set (@$!%*?&)
     ]),
   });
+
+  private AccountService = inject(AccountService);
+  tutorSignupModel = {
+    email: '',
+    password: '',
+  };
 
   handleEmailInput(event: Event) {
     this.signinForm.controls.email.setValue(
@@ -95,10 +102,27 @@ export class TutorSignupComponent {
     }
   }
 
-  private registerUserAsTutor() {
+  registerUserAsTutor() {
     console.log(this.signinForm.controls.email.value);
     console.log(this.signinForm.controls.password.value);
 
     //TODO: Make a request to the backend to register the user as a tutor
+    if (
+      this.signinForm.controls.email.value &&
+      this.signinForm.controls.password.value
+    ) {
+      this.AccountService.registerUserAsTutor(
+        this.signinForm.controls.email.value,
+        this.signinForm.controls.password.value
+      ).subscribe({
+        next: (response) => {
+          console.log(response);
+          
+        },
+        error: (error) => {
+          console.log('Error occurred during registration: ', error);
+        },
+      });
+    }
   }
 }

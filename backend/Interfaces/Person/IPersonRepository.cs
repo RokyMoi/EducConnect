@@ -12,5 +12,8 @@ namespace backend.Interfaces.Person
     {
         Task<PersonEmailDTO> GetPersonIdByEmail(string email);
         Task<PersonEmailPasswordSaltDTOGroup> CreateNewPersonWithHelperTables(EduConnect.Entities.Person.Person person, PersonEmail personEmail, PersonPassword personPassword, PersonSalt personSalt, PersonVerificationCode personVerificationCode);
+        Task<PersonVerificationCodeDTO> GetPersonVerificationCodeByEmail(string email);
+        Task<PersonVerificationCodeDTO> VerifyPersonVerificationCode(PersonVerificationCodeDTO personVerificationCodeDTO);
+
     }
 }

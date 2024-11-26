@@ -37,7 +37,14 @@ namespace backend.Controllers.Tutor
             //Check is email taken
             if (existingEmail != null)
             {
-                return BadRequest("Email is taken");
+                return BadRequest(new
+                {
+                    success = "false",
+                    message = "Email already taken",
+                    data = new { },
+                    timestamp = DateTime.Now
+
+                });
             }
 
 
@@ -196,6 +203,101 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
                 message = "You have successfully registered as a tutor on EduConnect, please verify your email address using the verification code sent to your email address",
                 data = tutorSignupResponseDTO
             });
+
+        }
+
+        [HttpPost("verify")]
+        public async Task<IActionResult> VerifyTutorEmail(TutorVerifyVerificationCodeRequestDTO verificationCodeRequestDTO, DataContext databaseContext)
+        {
+
+            //Check if the email exists
+            var existingEmail = await _personRepository.GetPersonIdByEmail(verificationCodeRequestDTO.Email);
+
+            if (existingEmail == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Email address is not a registered email address",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Check the verification code
+            var verificationCodeFromDatabase = await _personRepository.GetPersonVerificationCodeByEmail(verificationCodeRequestDTO.Email);
+
+            if (verificationCodeFromDatabase == null)
+            {
+                return BadRequest(new
+                {
+                    success = "false",
+                    message = "Given email address is not registered for verification",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            if (verificationCodeFromDatabase.ExpiryDateTime < DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Verification code has expired, please request a new verification code",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check is the verification code already verified
+            if (verificationCodeFromDatabase.IsVerified) {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Verification code has already been verified",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+             }
+            if (verificationCodeFromDatabase.VerificationCode != verificationCodeRequestDTO.VerificationCode)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Verification code is incorrect",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Set person account as verified
+            var updatedValue = await _personRepository.VerifyPersonVerificationCode(verificationCodeFromDatabase);
+
+            if (updatedValue == null)
+            {
+                return BadRequest(new
+                {
+                    success = "false",
+                    message = "Error while updating person verification code",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            return Ok(new
+            {
+                success = "true",
+                message = "Email address has been verified successfully",
+                data = new { },
+                timestamp = DateTime.Now
+            });
+
 
         }
     }

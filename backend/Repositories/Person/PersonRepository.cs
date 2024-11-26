@@ -112,7 +112,61 @@ namespace backend.Repositories.Person
         }
 
 
+
+
+
+        public async Task<PersonVerificationCodeDTO> GetPersonVerificationCodeByEmail(string email)
+        {
+
+            var personVerificationCode = await _databaseContext.PersonVerificationCode.Join(
+                            _databaseContext.PersonEmail,
+                            pvc => pvc.PersonId,
+                            pe => pe.PersonId,
+                            (pvc, pe) => new { PersonVerificationCode = pvc, pe.Email }
+                        )
+                        .Where(x => x.Email == email)
+                        .Select(x => x.PersonVerificationCode)
+                        .FirstOrDefaultAsync();
+
+            if (personVerificationCode == null)
+            {
+                return null;
+            }
+
+            return new PersonVerificationCodeDTO
+            {
+                PersonVerificationCodeId = personVerificationCode.PersonVerificationCodeId,
+                PersonId = personVerificationCode.PersonId,
+                VerificationCode = personVerificationCode.VerificationCode,
+                ExpiryDateTime = personVerificationCode.ExpiryDateTime,
+                IsVerified = personVerificationCode.IsVerified,
+            };
+        }
+
+        public async Task<PersonVerificationCodeDTO> VerifyPersonVerificationCode(PersonVerificationCodeDTO personVerificationCodeDTO)
+        {
+            var personVerificationCode = await _databaseContext.PersonVerificationCode.FindAsync(personVerificationCodeDTO.PersonVerificationCodeId);
+            if (personVerificationCode == null)
+            {
+                return null;
+            }
+
+            personVerificationCode.IsVerified = true;
+            personVerificationCode.ModifiedAt = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            await _databaseContext.SaveChangesAsync();
+            return new PersonVerificationCodeDTO
+            {
+                PersonVerificationCodeId = personVerificationCode.PersonVerificationCodeId,
+                PersonId = personVerificationCode.PersonId,
+                VerificationCode = personVerificationCode.VerificationCode,
+                ExpiryDateTime = personVerificationCode.ExpiryDateTime,
+                IsVerified = personVerificationCode.IsVerified,
+            };
+
+        }
+
+
     }
 
-
 }
+

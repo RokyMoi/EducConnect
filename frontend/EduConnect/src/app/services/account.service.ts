@@ -50,8 +50,6 @@ export class AccountService {
     };
 
     const response = this.http.post(ApiLinks.tutorRegister, requestBody);
-
-    console.log(response);
     return response;
   }
 }
