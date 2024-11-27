@@ -8,27 +8,28 @@ import { CommonModule, NgIf } from '@angular/common';
 import { ServerOfflineComponent } from './error/server-offline/server-offline.component';
 import { RouterModule } from '@angular/router';
 import { AccountService } from './services/account.service';
-import { HeaderTemplateComponent } from "./common/header/header-template/header-template.component";
+import { HeaderTemplateComponent } from './common/header/header-template/header-template.component';
 
 @Component({
-    selector: 'app-root',
-    imports: [
-        RouterOutlet,
-        RouterModule,
-        HeaderComponent,
-        CommonModule,
-        NgIf,
-        ServerOfflineComponent,
-        HeaderTemplateComponent
-    ],
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+  selector: 'app-root',
+  imports: [
+    RouterOutlet,
+    RouterModule,
+    HeaderComponent,
+    CommonModule,
+    NgIf,
+    ServerOfflineComponent,
+    HeaderTemplateComponent,
+  ],
+  standalone: true,
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
   title = 'EduConnect';
   users: any;
   isServerRunning = false;
-private AccountService = inject(AccountService);
+  private AccountService = inject(AccountService);
   constructor(private serverHealthCheckService: ServerHealthCheckService) {}
 
   ngOnInit(): void {
@@ -45,17 +46,16 @@ private AccountService = inject(AccountService);
         this.isServerRunning = true;
       }
     );
-    
   }
-  
+
   setCurrentUser() {
     const userString = localStorage.getItem('user');
-    if (userString) {  // Check if userString is not null
+    if (userString) {
+      // Check if userString is not null
       const user = JSON.parse(userString);
       this.AccountService.CurrentUser.set(user);
     } else {
       console.log('No user found in localStorage');
     }
   }
-  
 }

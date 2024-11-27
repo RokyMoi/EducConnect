@@ -53,3 +53,17 @@ body > * {
   transition: all 0.3s ease-in-out;
   box-shadow: 4px 6px 0 rgba(63, 63, 63, 0.135);
 }
+
+.progressBarField {
+  width: 100%;
+  background-color: #e0e2ec;
+}
+
+.ok-bar .mat-progress-bar-buffer {
+  background-color: #b6fff2!important;
+}
+
+.ok-bar .mat-progress-bar-fill::after {
+  background-color: #1eb980!important;
+}
+

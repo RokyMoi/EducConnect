@@ -3,10 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../../services/account.service';
 
 @Component({
-    selector: 'app-register-student',
-    imports: [FormsModule],
-    templateUrl: './register-student.component.html',
-    styleUrl: './register-student.component.css'
+  selector: 'app-register-student',
+  imports: [FormsModule],
+  templateUrl: './register-student.component.html',
+  styleUrl: './register-student.component.css',
+  standalone: true,
 })
 export class RegisterStudentComponent {
   private AccountService = inject(AccountService);
@@ -18,17 +19,16 @@ export class RegisterStudentComponent {
     password: '',
     phoneNumber: '',
     phoneNumberCountryCode: '',
-    countryOfOrigin: ''
+    countryOfOrigin: '',
   };
-RegistrujSe() {
-  this.AccountService.register(this.model).subscribe({
-    next: (response) => {
-      console.log(response);
-    },
-    error: (err) => {
-      console.log('Error during registration:', err);
-    }
-  });
-}
-
+  RegistrujSe() {
+    this.AccountService.register(this.model).subscribe({
+      next: (response) => {
+        console.log(response);
+      },
+      error: (err) => {
+        console.log('Error during registration:', err);
+      },
+    });
+  }
 }

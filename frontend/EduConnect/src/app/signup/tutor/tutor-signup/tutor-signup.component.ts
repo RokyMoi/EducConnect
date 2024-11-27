@@ -15,6 +15,7 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
+import { ProgressBarComponent } from '../../../common/output/progress-bar/progress-bar.component';
 
 @Component({
   selector: 'app-tutor-signup',
@@ -26,6 +27,7 @@ import {
     PasswordInputComponent,
     SubmitButtonComponent,
     ReactiveFormsModule,
+    ProgressBarComponent,
   ],
   standalone: true,
   templateUrl: './tutor-signup.component.html',
@@ -36,6 +38,7 @@ export class TutorSignupComponent {
   emailWarning: string = '';
   passwordWarning: string = '';
 
+  passwordStrength: number = 0;
   formNotValidText: string = '';
   signinForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -45,6 +48,38 @@ export class TutorSignupComponent {
     ]),
   });
 
+  //Variables for progress bar styling
+  progressBarMarginBottom: string = '2px';
+  progressBarWidth: string = '0%';
+  progressBarColor: string = 'red';
+  passwordStrengthDescription: string = '';
+  passwordStrengthDescriptionMarginBottom: string = '12px';
+  progressBarColorStrength: {
+    [key: number]: string;
+  } = {
+    0: '#ff0000',
+    10: '#ff4000',
+    30: '#bb8b09',
+    40: '#ffc000',
+    50: '#ffff00',
+    60: '#00b0ff',
+    70: '#006ad4',
+    80: '#00d1a2',
+    90: '#86cf00',
+    100: '#008000',
+  };
+  progressBarStrengthDescription: { [key: number]: string } = {
+    0: 'Nothing',
+    10: 'Barely secure',
+    30: 'Very weak',
+    40: 'Weak',
+    50: 'Medium strength',
+    60: 'Somewhat secure',
+    70: 'Secure',
+    80: 'Good strength',
+    90: 'Very strong',
+    100: 'Extremely strong',
+  };
   private AccountService = inject(AccountService);
   tutorSignupModel = {
     email: '',
@@ -91,6 +126,13 @@ export class TutorSignupComponent {
     }
     console.log(this.signinForm.controls.password.value);
     console.log('Password strength: ' + this.passwordStrengthValidator());
+    this.passwordStrength = this.passwordStrengthValidator();
+    console.log(this.passwordStrength);
+    this.progressBarWidth = this.passwordStrength + '%';
+    this.progressBarColor =
+      this.progressBarColorStrength[this.passwordStrength];
+    this.passwordStrengthDescription =
+      this.progressBarStrengthDescription[this.passwordStrength];
   }
 
   handleSubmitButton($event: Event) {
@@ -143,19 +185,19 @@ export class TutorSignupComponent {
     if (value) {
       //Check if the password has at least one uppercase letter
       if (/[A-Z]/.test(value)) {
-        passwordStrength += 1;
+        passwordStrength += 10;
       }
       //Check if the password has at least one lowercase letter
       if (/[a-z]/.test(value)) {
-        passwordStrength += 2;
+        passwordStrength += 20;
       }
       //Check if the password has at least one number
       if (/[0-9]/.test(value)) {
-        passwordStrength += 3;
+        passwordStrength += 30;
       }
       //Check if the password has at least one special character
       if (/[!@#$%^&*]+/.test(value)) {
-        passwordStrength += 4;
+        passwordStrength += 40;
       }
     }
 
