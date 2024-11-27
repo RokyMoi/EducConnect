@@ -3,11 +3,10 @@ import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../../services/account.service';
 
 @Component({
-  selector: 'app-register-student',
-  standalone: true,
-  imports: [FormsModule],
-  templateUrl: './register-student.component.html',
-  styleUrl: './register-student.component.css'
+    selector: 'app-register-student',
+    imports: [FormsModule],
+    templateUrl: './register-student.component.html',
+    styleUrl: './register-student.component.css'
 })
 export class RegisterStudentComponent {
   private AccountService = inject(AccountService);

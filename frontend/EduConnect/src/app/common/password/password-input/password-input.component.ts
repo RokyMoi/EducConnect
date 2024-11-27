@@ -1,12 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TextInputComponentComponent } from '../../input/text/text-input-component/text-input-component.component';
-import {
-  FormControl, ReactiveFormsModule
- } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 @Component({
   selector: 'app-password-input',
-  standalone: true,
   imports: [TextInputComponentComponent, ReactiveFormsModule],
+  standalone: true,
   templateUrl: './password-input.component.html',
   styleUrl: './password-input.component.css',
 })
@@ -18,7 +16,7 @@ export class PasswordInputComponent {
 
   @Input() passwordWarning: string = '';
   @Input() passwordFormControl: FormControl = new FormControl('');
-  
+
   @Output() passwordInput = new EventEmitter<Event>();
 
   handlePasswordInput(event: Event) {

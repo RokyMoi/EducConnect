@@ -15,10 +15,9 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
+
 @Component({
   selector: 'app-tutor-signup',
-  standalone: true,
   imports: [
     RouterModule,
     HeaderTemplateComponent,
@@ -28,6 +27,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
     SubmitButtonComponent,
     ReactiveFormsModule,
   ],
+  standalone: true,
   templateUrl: './tutor-signup.component.html',
   styleUrl: './tutor-signup.component.css',
 })

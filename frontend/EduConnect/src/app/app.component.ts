@@ -11,19 +11,18 @@ import { AccountService } from './services/account.service';
 import { HeaderTemplateComponent } from "./common/header/header-template/header-template.component";
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    RouterOutlet,
-    RouterModule,
-    HeaderComponent,
-    CommonModule,
-    NgIf,
-    ServerOfflineComponent,
-    HeaderTemplateComponent
-],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+    selector: 'app-root',
+    imports: [
+        RouterOutlet,
+        RouterModule,
+        HeaderComponent,
+        CommonModule,
+        NgIf,
+        ServerOfflineComponent,
+        HeaderTemplateComponent
+    ],
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
   title = 'EduConnect';
