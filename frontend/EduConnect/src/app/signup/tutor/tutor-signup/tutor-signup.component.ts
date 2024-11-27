@@ -11,7 +11,11 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  ValidatorFn,
+  AbstractControl,
+  ValidationErrors,
 } from '@angular/forms';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 @Component({
   selector: 'app-tutor-signup',
   standalone: true,
@@ -31,16 +35,13 @@ export class TutorSignupComponent {
   buttonText = 'Register';
   emailWarning: string = '';
   passwordWarning: string = '';
+
   formNotValidText: string = '';
   signinForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [
       Validators.required,
       Validators.minLength(8),
-      Validators.pattern(/^(?=.*[A-Z])/), //Password must have at least one uppercase letter,
-      Validators.pattern(/^(?=.*[a-z])/), //Password must have at least one lowercase letter,
-      Validators.pattern(/^(?=.*\d)/), //Password must have at least one digit,
-      Validators.pattern(/^(?=.*[@$!%*?&])/), //Password must have at least one special character from this set (@$!%*?&)
     ]),
   });
 
@@ -89,6 +90,7 @@ export class TutorSignupComponent {
       this.passwordWarning = '';
     }
     console.log(this.signinForm.controls.password.value);
+    console.log('Password strength: ' + this.passwordStrengthValidator());
   }
 
   handleSubmitButton($event: Event) {
@@ -117,12 +119,47 @@ export class TutorSignupComponent {
       ).subscribe({
         next: (response) => {
           console.log(response);
-          
+          this.formNotValidText = (response as any).message;
         },
         error: (error) => {
           console.log('Error occurred during registration: ', error);
+          console.log(error.error.message);
+          this.formNotValidText = error.error.message;
         },
       });
     }
+  }
+
+  //Checks password strength and returns a score from 0 to 10
+  //0 - no value
+  //1 - has at least one uppercase letter
+  //2 - has at least one lowercase letter
+  //3 - has at least one number
+  //4 - has at least one special character
+
+  private passwordStrengthValidator() {
+    const value = this.signinForm.controls.password.value;
+    let passwordStrength: number = 0;
+    if (value) {
+      //Check if the password has at least one uppercase letter
+      if (/[A-Z]/.test(value)) {
+        passwordStrength += 1;
+      }
+      //Check if the password has at least one lowercase letter
+      if (/[a-z]/.test(value)) {
+        passwordStrength += 2;
+      }
+      //Check if the password has at least one number
+      if (/[0-9]/.test(value)) {
+        passwordStrength += 3;
+      }
+      //Check if the password has at least one special character
+      if (/[!@#$%^&*]+/.test(value)) {
+        passwordStrength += 4;
+      }
+    }
+
+    console.log(passwordStrength);
+    return passwordStrength;
   }
 }
