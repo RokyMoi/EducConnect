@@ -21,7 +21,7 @@ namespace EduConnect.Services
             _config = config;
             _db = db;
         }
-        public async Task<string> CreateTokenAsync(PersonDetails person)
+        public async Task<string> CreateTokenAsync(PersonEmail person)
         {
             var _secretKey = _config["Jwt:SecretKey"];
             if (string.IsNullOrEmpty(_secretKey) || _secretKey.Length < 64) {
@@ -31,7 +31,8 @@ namespace EduConnect.Services
             var role = await GetRole(person);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier,person.Username),
+                new Claim(ClaimTypes.Name,person.Person.PersonDetails.Username),
+                new Claim(ClaimTypes.Email,person.Email),
                 new Claim(ClaimTypes.Role, role)
 
             };
@@ -48,7 +49,7 @@ namespace EduConnect.Services
 
 
         }
-        public async Task<string> GetRole(PersonDetails person)
+        public async Task<string> GetRole(PersonEmail person)
         {
             if (person == null)
             {

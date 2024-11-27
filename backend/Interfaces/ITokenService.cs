@@ -5,7 +5,7 @@ namespace EduConnect.Interfaces
     public interface ITokenService
     {
 
-        Task<string> CreateTokenAsync(PersonDetails person);  
+        Task<string> CreateTokenAsync(PersonEmail person);  
 
     }
 }

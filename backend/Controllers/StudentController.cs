@@ -28,10 +28,10 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-        [HttpGet("student/{username}")]
-        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByUsername(string username)
+        [HttpGet("student/{email}")]
+        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByEmail(string email)
         {
-            var students = await _studentRepo.GetStudentInfoByUsername(username);
+            var students = await _studentRepo.GetStudentInfoByEmail(email);
 
             if (students == null)
             {
@@ -46,10 +46,12 @@ namespace EduConnect.Controllers
         public async Task<IActionResult> Login(LoginDTO login)
         {
             // Retrieve the person's email
-            var personDetails = await db.PersonDetails
-                .FirstOrDefaultAsync(x => x.Username == login.Username);
+            var personEmail = await db.PersonEmail
+                .FirstOrDefaultAsync(x => x.Email== login.Email);
+                   var personDetails = await db.PersonDetails
+                .FirstOrDefaultAsync(x => x.PersonId== personEmail.PersonId);
 
-            if (personDetails == null)
+            if (personEmail == null)
             {
                 return NotFound(new {
                     success = "false",
@@ -62,7 +64,7 @@ namespace EduConnect.Controllers
 
             // Retrieve the corresponding person and password details
             var person = await db.Person
-                .FirstOrDefaultAsync(x => x.PersonId == personDetails.PersonId);
+                .FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
 
             var personPassword = await db.PersonPassword
                 .FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
@@ -121,7 +123,7 @@ namespace EduConnect.Controllers
             }
 
 
-            var token = await _tokenService.CreateTokenAsync(personDetails);
+            var token = await _tokenService.CreateTokenAsync(personEmail);
 
             return
             Ok(
@@ -134,6 +136,7 @@ namespace EduConnect.Controllers
             UserDTO
             {
                 Username = personDetails.Username,
+                Email= personEmail.Email,
                 Token = token,
                 Role=role
             },
@@ -147,7 +150,7 @@ namespace EduConnect.Controllers
         {
             if (await isRegistered(student))
             {
-                return BadRequest("That username was already taken");
+                return BadRequest("That email was already taken");
             }
             var Person = new Person
             {
@@ -228,7 +231,8 @@ namespace EduConnect.Controllers
             return new UserDTO
             {
                 Username = PersonDetails.Username,
-                Token = await _tokenService.CreateTokenAsync(PersonDetails),
+                Email = PersonEmail.Email,
+                Token = await _tokenService.CreateTokenAsync(PersonEmail),
                 Role = "student"
             };
         }
@@ -246,7 +250,7 @@ namespace EduConnect.Controllers
         }
         private async Task<bool> isRegistered(RegisterStudentDTO tutor)
         {
-            return await db.PersonDetails.AnyAsync(x => x.Username == tutor.Username);
+            return await db.PersonEmail.AnyAsync(x => x.Email == tutor.Email);
         }
     }
 
