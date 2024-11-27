@@ -24,7 +24,7 @@ namespace backend.Repositories.Person
 
 
 
-        public async Task<PersonEmailDTO> GetPersonIdByEmail(string email)
+        public async Task<PersonEmailDTO> GetPersonEmailByEmail(string email)
         {
             var personEmail = await _databaseContext.PersonEmail.Where(p => p.Email.Equals(email)).FirstOrDefaultAsync();
 
@@ -35,8 +35,8 @@ namespace backend.Repositories.Person
 
             return new PersonEmailDTO
             {
-                PersonId = personEmail.PersonId.ToString(),
-                PersonEmailId = personEmail.PersonEmailId.ToString(),
+                PersonId = personEmail.PersonId,
+                PersonEmailId = personEmail.PersonEmailId,
                 Email = personEmail.Email,
 
 
@@ -71,8 +71,8 @@ namespace backend.Repositories.Person
 
             var personEmailDTO = new PersonEmailDTO
             {
-                PersonId = personEmail.PersonId.ToString(),
-                PersonEmailId = personEmail.PersonEmailId.ToString(),
+                PersonId = personEmail.PersonId,
+                PersonEmailId = personEmail.PersonEmailId,
                 Email = personEmail.Email,
             };
 
@@ -166,7 +166,94 @@ namespace backend.Repositories.Person
         }
 
 
-    }
+        public async Task<PersonVerificationCodeDTO> CreateNewPersonVerificationCode(PersonVerificationCode personVerificationCode)
+        {
+            //Attempt to save a PersonVerificationCode object to the database provided within this functions' parameters.
+            try
+            {
+                await _databaseContext.PersonVerificationCode.AddAsync(personVerificationCode);
+                await _databaseContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
 
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+
+            return new PersonVerificationCodeDTO
+            {
+                PersonVerificationCodeId = personVerificationCode.PersonVerificationCodeId,
+                PersonId = personVerificationCode.PersonId,
+                VerificationCode = personVerificationCode.VerificationCode,
+                ExpiryDateTime = personVerificationCode.ExpiryDateTime,
+                IsVerified = personVerificationCode.IsVerified,
+            };
+        }
+
+        public async Task<PersonVerificationCode> DeletePersonVerificationCode(PersonVerificationCode personVerificationCode)
+        {
+            try
+            {
+
+                _databaseContext.PersonVerificationCode.Remove(personVerificationCode);
+                await _databaseContext.SaveChangesAsync();
+                return personVerificationCode;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error deleting person verification code: " + ex.Message);
+                return null;
+            }
+        }
+
+
+        public async Task<bool> DeletePersonVerificationCodeByPersonId(Guid personId)
+        {
+            try
+            {
+                var personVerificationCode = await _databaseContext.PersonVerificationCode.Where(x => x.PersonId == personId).FirstOrDefaultAsync();
+                if (personVerificationCode == null)
+                {
+                    return false;
+                }
+
+                _databaseContext.PersonVerificationCode.Remove(personVerificationCode);
+                await _databaseContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error deleting person verification code: " + ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<PersonEmailWithPersonObjectDTO> GetPersonEmailWithPersonObjectByEmail(string email)
+        {
+            var personEmail = await _databaseContext
+            .PersonEmail
+            .Include(x => x.Person)
+            .Where(x => x.Email == email)
+            .FirstOrDefaultAsync();
+
+            if (personEmail == null)
+            {
+                return null;
+            }
+
+            return new PersonEmailWithPersonObjectDTO
+            {
+                PersonEmailId = personEmail.PersonEmailId,
+                PersonId = personEmail.PersonId,
+                Person = personEmail.Person,
+                Email = personEmail.Email,
+            };
+        }
+    }
 }
+
+
 

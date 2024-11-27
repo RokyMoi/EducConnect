@@ -22,13 +22,12 @@ namespace backend.Entities.Person
 
         public string VerificationCode { get; set; } = string.Empty;
         public long ExpiryDateTime { get; set; } = new DateTimeOffset(DateTime.UtcNow.AddMinutes(15)).ToUnixTimeMilliseconds();
+
         public bool IsVerified { get; set; } = false;
 
         //Token expires in 15 minutes from the moment of it's creation in database
         public long CreatedAt { get; set; } = new DateTimeOffset().ToUnixTimeMilliseconds();
         public long? ModifiedAt { get; set; }
-
-
 
     }
 }

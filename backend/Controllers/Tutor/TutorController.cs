@@ -32,7 +32,7 @@ namespace backend.Controllers.Tutor
             Console.WriteLine("Register new tutor with following details: " + tutorSingupRequest.ToString());
             //Check is email taken
 
-            var existingEmail = await _personRepository.GetPersonIdByEmail(tutorSingupRequest.Email);
+            var existingEmail = await _personRepository.GetPersonEmailByEmail(tutorSingupRequest.Email);
 
             //Check is email taken
             if (existingEmail != null)
@@ -211,7 +211,7 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
         {
 
             //Check if the email exists
-            var existingEmail = await _personRepository.GetPersonIdByEmail(verificationCodeRequestDTO.Email);
+            var existingEmail = await _personRepository.GetPersonEmailByEmail(verificationCodeRequestDTO.Email);
 
             if (existingEmail == null)
             {
@@ -252,17 +252,18 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
             }
 
             //Check is the verification code already verified
-            if (verificationCodeFromDatabase.IsVerified) {
+            if (verificationCodeFromDatabase.IsVerified)
+            {
                 return BadRequest(
                     new
                     {
                         success = "false",
-                        message = "Verification code has already been verified",
+                        message = "This email address has already been verified",
                         data = new { },
                         timestamp = DateTime.Now
                     }
                 );
-             }
+            }
             if (verificationCodeFromDatabase.VerificationCode != verificationCodeRequestDTO.VerificationCode)
             {
                 return BadRequest(
@@ -300,5 +301,192 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
 
 
         }
+
+        [HttpPost("resend-verification-code")]
+        public async Task<IActionResult> ResendVerificationCode(TutorResendVerificationCodeRequestDTO resendVerificationCodeRequestDTO, DataContext databaseContext)
+        {
+
+            //Check if the email exists
+            var personEmail = await _personRepository.GetPersonEmailWithPersonObjectByEmail(resendVerificationCodeRequestDTO.Email);
+
+            if (personEmail == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Email address not found",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+            }
+
+            //Get verification code from the database
+            var verificationCodeFromDatabase = await _personRepository.GetPersonVerificationCodeByEmail(resendVerificationCodeRequestDTO.Email);
+
+            //Check is there already a verification code for the given email address
+            //If no verification code was found for the given email address, new verification code will be generated and email sent to the user with given email address
+            if (verificationCodeFromDatabase == null)
+            {
+                //Generate verification code
+                var newPersonVerificationCode = new PersonVerificationCode
+                {
+                    PersonVerificationCodeId = Guid.NewGuid(),
+                    PersonId = personEmail.PersonId,
+                    Person = personEmail.Person,
+                    VerificationCode = EncryptionUtilities.GenerateRandomString(),
+                    CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    ModifiedAt = null
+                };
+
+                var verificationCodeDatabaseResult = await _personRepository.CreateNewPersonVerificationCode(newPersonVerificationCode);
+
+                if (verificationCodeDatabaseResult == null)
+                {
+                    return StatusCode(500, new
+                    {
+                        success = "false",
+                        message = "Code could not be sent, please try again later",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    });
+
+                }
+
+                var emailSendingResult = await EmailService.SendEmailToAsync(resendVerificationCodeRequestDTO.Email, "EduConnect - Verification Code Resend",
+
+                    "Hello, \n\n"
+                    + "A new verification code has been requested to be sent to this email for only purpose of verification of the given email \n\n"
+                    + $"Your new verification code is: {verificationCodeDatabaseResult.VerificationCode}\n\n"
+                    + $"Notice: This code expires at {DateTimeOffset.FromUnixTimeMilliseconds(verificationCodeDatabaseResult.ExpiryDateTime).ToUniversalTime().ToString("HH:mm:ss dd.MM.yyyy.  'UTC'")}\n\n"
+                    + "Please use this code to verify your email for the usage the platform.\n\n"
+                    + "If you didn’t sign up for EduConnect, or didn't request verification code resend, please ignore this email.\n\n"
+                    + "Thank you for choosing EduConnect as your platform to spread knowledge. Together, we’re shaping the future of education.\n\n"
+                    + "Best regards,\n"
+                    + "The EduConnect Team\n\n"
+                    + "P.S. Need help or have questions? Feel free to reach out to us at support@educonnect.com.\n"
+            );
+                if (!emailSendingResult)
+                {
+                    return BadRequest(new
+                    {
+                        success = "false",
+                        message = "Code could not be sent, please try again later",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = "true",
+                    message = "New verification code has been sent, please check your email inbox",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+
+
+            }
+
+            //If verification code was found, the existing verification code will be deleted and a new one will be generated, and sent to the user
+
+            //Check is the existing verification code already verified
+            if (verificationCodeFromDatabase.IsVerified) { 
+                return BadRequest(new
+                {
+                    success = "false",
+                    message = "User with given email address is already verified",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Check is the existing verification code expired
+            if (verificationCodeFromDatabase.ExpiryDateTime > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()) { 
+                return BadRequest(new { 
+                    success = "false",
+                    message = "A valid verification code has already been sent your email address, please check your email inbox/spam",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+                
+            }
+
+            
+            //Generate verification code
+            var PersonVerificationCode = new PersonVerificationCode
+            {
+                PersonVerificationCodeId = Guid.NewGuid(),
+                PersonId = personEmail.PersonId,
+                Person = personEmail.Person,
+                VerificationCode = EncryptionUtilities.GenerateRandomString(),
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                ModifiedAt = null
+            };
+
+
+            //Delete the existing verification code from the database
+            var verificationCodeDeleteResult = await _personRepository.DeletePersonVerificationCodeByPersonId(verificationCodeFromDatabase.PersonId);
+            if (!verificationCodeDeleteResult)
+            {
+                return StatusCode(500, new
+                {
+                    success = "false",
+                    message = "Code could not be sent, please try again later",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Add new verification code to the database
+            var addToTheDatabaseResult = await _personRepository.CreateNewPersonVerificationCode(PersonVerificationCode);
+            if (addToTheDatabaseResult == null)
+            {
+                return StatusCode(500, new
+                {
+                    success = "false",
+                    message = "Code could not be sent, please try again later",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+
+            }
+
+            //Send email with the new verification code
+            var emailResult = await EmailService.SendEmailToAsync(resendVerificationCodeRequestDTO.Email, "EduConnect - Verification Code Resend",
+
+                  "Hello, \n\n"
+                  + "A new verification code has been requested to be sent to this email for only purpose of verification of the given email \n\n"
+                  + $"Your new verification code is: {addToTheDatabaseResult.VerificationCode}\n\n"
+                  + $"Notice: This code expires at {DateTimeOffset.FromUnixTimeMilliseconds(addToTheDatabaseResult.ExpiryDateTime).ToUniversalTime().ToString("HH:mm:ss dd.MM.yyyy.  'UTC'")}\n\n"
+                  + "Please use this code to verify your email for the usage the platform.\n\n"
+                  + "If you didn’t sign up for EduConnect, or didn't request verification code resend, please ignore this email.\n\n"
+                  + "Thank you for choosing EduConnect as your platform to spread knowledge. Together, we’re shaping the future of education.\n\n"
+                  + "Best regards,\n"
+                  + "The EduConnect Team\n\n"
+                  + "P.S. Need help or have questions? Feel free to reach out to us at support@educonnect.com.\n"
+          );
+
+            //Check if the email was sent
+            if (!emailResult)
+            {
+                return StatusCode(500, new
+                {
+                    success = "false",
+                    message = "Code could not be sent, please try again later",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            return Ok(new
+            {
+                success = "true",
+                message = "New verification code has been sent, please check your email inbox",
+                data = new { },
+                timestamp = DateTime.Now
+            });
+
+        }
+
     }
 }

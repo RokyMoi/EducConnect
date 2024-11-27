@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 
 namespace backend.DTOs.Person
 {
-    public class PersonEmailDTO
+    public class PersonEmailWithPersonObjectDTO
     {
-        public Guid PersonId { get; set; }
         public Guid PersonEmailId { get; set; }
+        public Guid PersonId { get; set; }
+
+        public EduConnect.Entities.Person.Person Person { get; set; }
         public string Email { get; set; }
+
 
     }
 }
