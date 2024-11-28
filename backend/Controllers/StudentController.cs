@@ -1,6 +1,7 @@
 ﻿
 using EduConnect.Data;
 using EduConnect.DTOs;
+
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
 using EduConnect.Interfaces;
@@ -41,6 +42,41 @@ namespace EduConnect.Controllers
 
 
             return Ok(students);
+        }
+        [HttpPost("check-mail{checker}")]
+        public async Task<ActionResult> CheckEmail(string checker)
+        {
+            if (string.IsNullOrEmpty(checker))
+            {
+                return BadRequest("Email is required.");
+            }
+            var emailPerson = await db.PersonEmail.FirstOrDefaultAsync(x => x.Email == checker);
+            if (emailPerson != null)
+            {
+                
+                return BadRequest(new
+                {
+                    
+                    IsAvaiable=false,
+                    message="Email je vec zauzet",
+                    data =new { },
+                    timestamp=DateTime.Now,
+
+
+                });
+            }
+            else
+            {
+                return Ok(new
+                {
+                    IsAvaiable = true,
+                    message = "Email je slobodan",
+                    data = new { },
+                    timestamp = DateTime.Now,
+
+                });
+            }
+
         }
         [HttpPost("student-login")]
         public async Task<IActionResult> Login(LoginDTO login)
