@@ -5,6 +5,7 @@ using EduConnect.Entities;
 
 namespace EduConnect.Entities.Student
 {
+    [Table("Student", Schema = "Student")]
     public class Student
     {
         //        StudentId(uuid), PRIMARY KEY

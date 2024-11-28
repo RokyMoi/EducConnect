@@ -4,23 +4,22 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EduConnect.Entities.Tutor;
 
+[Table("Tutor", Schema = "Tutor")]
 public class Tutor
 {
 
     [Key]
-    public Guid PersonId { get; set; }
+    public Guid TutorId { get; set; }
 
     [ForeignKey(nameof(PersonId))]
     public Person.Person Person { get; set; }
+    public Guid PersonId { get; set; }
 
-    public Guid TutorId { get; set; }
-
+    
     public long CreatedAt { get; set; }
 
     public long? ModifiedAt { get; set; }
 
-    [NotMapped]
-    public TutorDetails TutorDetails { get; set; }
 
 
 }

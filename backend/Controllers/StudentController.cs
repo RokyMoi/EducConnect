@@ -1,11 +1,13 @@
 ﻿
 using EduConnect.Data;
 using EduConnect.DTOs;
+
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
 using EduConnect.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -27,10 +29,10 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-        [HttpGet("student/{username}")]
-        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByUsername(string username)
+        [HttpGet("student/{email}")]
+        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByEmail(string email)
         {
-            var students = await _studentRepo.GetStudentInfoByUsername(username);
+            var students = await _studentRepo.GetStudentInfoByEmail(email);
 
             if (students == null)
             {
@@ -41,28 +43,78 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
+        [HttpPost("check-mail{checker}")]
+        public async Task<ActionResult> CheckEmail(string checker)
+        {
+            if (string.IsNullOrEmpty(checker))
+            {
+                return BadRequest("Email is required.");
+            }
+            var emailPerson = await db.PersonEmail.FirstOrDefaultAsync(x => x.Email == checker);
+            if (emailPerson != null)
+            {
+                
+                return BadRequest(new
+                {
+                    
+                    IsAvaiable=false,
+                    message="Email je vec zauzet",
+                    data =new { },
+                    timestamp=DateTime.Now,
+
+
+                });
+            }
+            else
+            {
+                return Ok(new
+                {
+                    IsAvaiable = true,
+                    message = "Email je slobodan",
+                    data = new { },
+                    timestamp = DateTime.Now,
+
+                });
+            }
+
+        }
         [HttpPost("student-login")]
-        public async Task<ActionResult<UserDTO>> Login(LoginDTO login)
+        public async Task<IActionResult> Login(LoginDTO login)
         {
             // Retrieve the person's email
-            var personDetails = await db.PersonDetails
-                .FirstOrDefaultAsync(x => x.Username == login.Username);
+            var personEmail = await db.PersonEmail
+                .FirstOrDefaultAsync(x => x.Email== login.Email);
+                   var personDetails = await db.PersonDetails
+                .FirstOrDefaultAsync(x => x.PersonId== personEmail.PersonId);
 
-            if (personDetails == null)
+            if (personEmail == null)
             {
-                return BadRequest("Invalid username.");
+                return NotFound(new {
+                    success = "false",
+                    message = "User not found",
+                    data = new { },
+                    timestamp = DateTime.Now,
+
+                });
             }
 
             // Retrieve the corresponding person and password details
             var person = await db.Person
-                .FirstOrDefaultAsync(x => x.PersonId == personDetails.PersonId);
+                .FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
 
             var personPassword = await db.PersonPassword
                 .FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
 
             if (personPassword == null)
             {
-                return BadRequest("Invalid email or password.");
+                return BadRequest(
+                    new {
+                    success = "false",
+                    message = "Username or password invalid",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                    }
+                );
             }
 
             // Hash the provided password using the same salt as the stored hash
@@ -74,18 +126,59 @@ namespace EduConnect.Controllers
             {
                 if (computedHash[i] != personPassword.Hash[i])
                 {
-                    return BadRequest("Invalid password.");
+                    return BadRequest(new
+                    {
+                        success = "false",
+                        message = "Username or password invalid",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    });
                 }
             }
+            string role = "";
+            // Check if the user is a Student or Tutor by looking up the appropriate tables
+            var student = await db.Student.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+            var tutor = await db.Tutor.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
 
-       
-            var token = _tokenService.CreateToken(personDetails);
+            if (student != null)
+            {
+                role = "student";  // User is a student
+            }
+            else if (tutor != null)
+            {
+                role = "tutor";  // User is a tutor
+            }
+            else
+            {
+                return Unauthorized(new {
+                    success = "error",
+                    message = "Role undefined",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                    });
+            }
 
-            return new UserDTO
+
+            var token = await _tokenService.CreateTokenAsync(personEmail);
+
+            return
+            Ok(
+                new
+                {
+                    success = "true",
+                    message = "Login succesfull",
+                    data = new 
+            
+            UserDTO
             {
                 Username = personDetails.Username,
-                Token = token
-            };
+                Email= personEmail.Email,
+                Token = token,
+                Role=role
+            },
+                    timestamp = DateTime.Now,
+                });
+            
         }
 
         [HttpPost("student-register")]
@@ -93,7 +186,7 @@ namespace EduConnect.Controllers
         {
             if (await isRegistered(student))
             {
-                return BadRequest("That username was already taken");
+                return BadRequest("That email was already taken");
             }
             var Person = new Person
             {
@@ -167,14 +260,16 @@ namespace EduConnect.Controllers
                 db.PersonPassword.Add(PersonPassword);
                 db.PersonSalt.Add(PersonSalt);
                 db.Student.Add(studentt);
-                //DodatiPersonPCC
+             
 
                 await db.SaveChangesAsync();
             });
             return new UserDTO
             {
                 Username = PersonDetails.Username,
-                Token = _tokenService.CreateToken(PersonDetails)
+                Email = PersonEmail.Email,
+                Token = await _tokenService.CreateTokenAsync(PersonEmail),
+                Role = "student"
             };
         }
         private string GenerateSalt()
@@ -191,7 +286,7 @@ namespace EduConnect.Controllers
         }
         private async Task<bool> isRegistered(RegisterStudentDTO tutor)
         {
-            return await db.PersonDetails.AnyAsync(x => x.Username == tutor.Username);
+            return await db.PersonEmail.AnyAsync(x => x.Email == tutor.Email);
         }
     }
 

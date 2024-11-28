@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduConnect.Entities.Student
 {
+    [Table("StudentDetails", Schema = "Student")]
     public class StudentDetails
     {
         [Key]
@@ -13,9 +14,9 @@ namespace EduConnect.Entities.Student
         [ForeignKey(nameof(StudentId))]
         public Student Student { get; set; }
         public string? Biography { get; set; }
-        public  string? CurrentAcademicInstitution { get; set; }
-        public  string? CurrentEducationLevel { get; set; }
-        public  string? MainAreaOfSpecialisation { get; set; }
+        public string? CurrentAcademicInstitution { get; set; }
+        public string? CurrentEducationLevel { get; set; }
+        public string? MainAreaOfSpecialisation { get; set; }
         public required long CreatedAt { get; set; }
         public long? ModifiedAt { get; set; }
 

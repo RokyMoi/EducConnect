@@ -1,20 +1,21 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,100,500);
 
 :root {
-    --background: #1a1a2e;
+    --background: #010149;
     --color: #ffffff;
     --primary-color: #0f3460;
 }
 
 .blueOverall {
+    height: 100%;
     background-color: rgba(0, 0, 128, 0.9);
-    opacity: 90%;
+    opacity: 90%
 }
 
 .OverLayGradient {
     background: rgba(255, 0, 0, 0.5);
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 100%);
-    height: 100vh;
+    height: 100%;
 }
 
 * {
@@ -41,6 +42,8 @@ h1 {
 body {
     background: url('https://images.pexels.com/photos/1438081/pexels-photo-1438081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') left no-repeat;
     background-size: cover;
+    height: 100vh;
+    width: 100%;
 }
 
 .container {
@@ -49,12 +52,12 @@ body {
   flex-wrap: wrap;
   
  
-    height: 90%;
+   
 }
 
 .login-container {
     position: relative;
-    width: 22.2rem;
+    width: 30%;
 }
 
 .form-container {
@@ -65,15 +68,19 @@ body {
     backdrop-filter: blur(20px);
     z-index: 99;
     padding: 2rem;
-    margin-top:10%;
+    margin-top:10%
+
    
 }
-
+.errow{
+    color:red;
+}
 .login-container form input {
     display: block;
-    padding: 14.5px;
+    padding: 9px;
     width: 100%;
     margin: 3px;
+
     font-family: roboto;
 
     color: white;
@@ -117,31 +124,9 @@ body {
     transform: scale(1.02);
 }
 
-.circle {
-    width: 8rem;
-    height: 8rem;
-    background: var(--primary-color);
-    border-radius: 50%;
-    position: absolute;
-}
 
 
 
-.checking{
-  width:30%;
-  border: 1px solid hsla(0, 0%, 65%, 0.158);
-  box-shadow: 0 0 36px 1px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  height: 30%;
-  box-sizing: border-box;
-  backdrop-filter: blur(20px);
-  z-index: 99;
-  padding: 2rem;
-  margin-top:10%;
-}
-.registrationChecking{
-  font-size: 15px;
-}
 .loginText {
     position:absolute;
     top:-3%;
@@ -157,25 +142,8 @@ body {
 }
 
 
-.circle-one {
-    top: 0;
-    left: 0;
-    z-index: -1;
-    transform: translate(-45%, -45%);
-}
 
-.circle-two {
-    bottom: 0;
-    right: 0;
-    z-index: -1;
-    transform: translate(45%, 45%);
-}
 
-.register-forget {
-    margin: 1rem 0;
-    display: flex;
-    justify-content: space-between;
-}
 
 .opacity {
     font-family: roboto;
@@ -224,47 +192,36 @@ body {
     opacity: 1;
 }
 @media (max-width: 700px) {
-  .container {
-      height: auto;
-      padding: 2rem;
-  }
-
-  .login-container {
-      width: 90%;
-      max-width: 320px;
-      margin-top: 2rem;
-  }
-
-  .form-container {
-      padding: 1.5rem;
-  }
-
-  .loginText {
-      font-size: 28px;
-      top: 0;
-      right: 5%;
-  }
-
-  .login-container form input {
-      font-size: 14px;
-      padding: 12px;
-  }
-
-  .login-container form button {
-      padding: 12px;
-      font-size: 16px;
-  }
+   
+  
+    .container{
+     
+     height: 50%;
+      box-sizing: border-box;
+        
+    }
+    .blueOverall{
+        height: 100%;
+        width:100%;
+       
+        box-sizing: border-box;
+    }
+    .input{
+       
+    }
+    .OverLayGradient{
+      
+        box-sizing: border-box;
+        height: 100%;
+        width:100%;
+    }
+    .login-container{
+      
+        padding: 0px;
+        width: 100%;
+    }
 
  
 
-  .circle {
-      width: 6rem;
-      height: 6rem;
-  }
-
-  .circle-one,
-  .circle-two {
-      width: 6rem;
-      height: 6rem;
-  }
+ 
 }

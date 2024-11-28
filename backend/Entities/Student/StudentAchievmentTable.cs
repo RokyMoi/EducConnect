@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduConnect.Entities.Student
 {
+    [Table("StudentAchievmentTable", Schema = "Student")]
     public class StudentAchievmentTable
     {
         //        StudentAchievmentId – (uuid) PRIMARY KEY, 

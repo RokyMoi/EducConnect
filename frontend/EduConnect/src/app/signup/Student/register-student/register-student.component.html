@@ -3,145 +3,135 @@
   <div class="OverLayGradient">
   <section class="container">
           <div class="login-container">
+
    
-          <div class="circle circle-one"></div>
+        
          
-          <div class="form-container">
+          <div class="form-container" (submit)="onSubmit()">
               <h1 class="loginText">REGISTRACIJA</h1>
              
-          
-              <form #RegisterForm="ngForm" (ngSubmit)="RegistrujSe()" >
-                <input 
-                name="firstname" 
-                [(ngModel)]="model.firstname" 
-                type="text" 
-                placeholder="First Name" 
-                class="input-line full-width" 
-                required>
-            
-            <input 
-                name="lastname" 
-                [(ngModel)]="model.lastname" 
-                type="text" 
-                placeholder="Last Name" 
-                class="input-line full-width" 
-                required>
-            
-            <input 
-                name="username" 
-                [(ngModel)]="model.username" 
-                type="text" 
-                placeholder="Username" 
-                class="input-line full-width" 
-                required>
-            
-            <input 
-                name="email" 
-                [(ngModel)]="model.email" 
-                type="email" 
-                placeholder="Email" 
-                class="input-line full-width" 
-                required email>
-            
-            <input 
-                name="password" 
-                [(ngModel)]="model.password" 
-                type="password" 
-                placeholder="Password" 
-                class="input-line full-width" 
-                required minlength="8">
-            
-            <!-- Additional fields -->
-            <input 
-                name="phoneNumber" 
-                [(ngModel)]="model.phoneNumber" 
-                type="text" 
-                placeholder="Phone Number" 
-                class="input-line full-width" 
-                required>
-            
-            <input 
-                name="phoneNumberCountryCode" 
-                [(ngModel)]="model.phoneNumberCountryCode" 
-                type="text" 
-                placeholder="Phone Country Code" 
-                class="input-line full-width" 
-                required>
-            
-            <input 
-                name="countryOfOrigin" 
-                [(ngModel)]="model.countryOfOrigin" 
-                type="text" 
-                placeholder="Country of Origin" 
-                class="input-line full-width" 
-                required>
-                  <button class="opacity" type="submit">SUBMIT</button>
+              <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                <input
+                  [class.is-invalid]="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched"
+                  name="firstname"
+                  formControlName="firstName"
+                  type="text"
+                  placeholder="First Name"
+                  class="input-line full-width"
+                  required
+                />
+                <div *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched">
+                  <span class="errow"  *ngIf="registerForm.get('firstName')?.hasError('required')">{{ firstNameWarning }}</span>
+                </div>
+              
+                <input
+                  [class.is-invalid]="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched"
+                  formControlName="lastName"
+                  type="text"
+                  placeholder="Last Name"
+                  class="input-line full-width"
+                  required
+                />
+                <div *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched">
+                  <span class="errow"  *ngIf="registerForm.get('lastName')?.hasError('required')">{{ LastNameWarning }}</span>
+                </div>
+              
+                <input
+                  [class.is-invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+                  formControlName="username"
+                  type="text"
+                  placeholder="Username"
+                  class="input-line full-width"
+                  required
+                />
+                <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
+                  <span class="errow"  *ngIf="registerForm.get('username')?.hasError('required')">{{ usernameWarning }}</span>
+                </div>
+              
+                <input
+                  [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+                  formControlName="email"
+                  type="email"
+                  placeholder="Email"
+                  class="input-line full-width"
+                  required
+                />
+                <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+                  <span class="errow"  *ngIf="registerForm.get('email')?.hasError('required')">{{ emailWarning }}</span>
+                  <span class="errow"  *ngIf="registerForm.get('email')?.hasError('email')">Invalid email format</span>
+                </div>
+              
+                <input
+                  [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+                  formControlName="password"
+                  type="password"
+                  placeholder="Password"
+                  class="input-line full-width"
+                  required
+                />
+                <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+                  <span class="errow" *ngIf="registerForm.get('password')?.hasError('required')">{{ passwordWarning }}</span>
+                  <span class="errow"  *ngIf="registerForm.get('password')?.hasError('minlength')">Password must be at least 8 characters</span>
+                  <span class="errow"  *ngIf="registerForm.get('password')?.hasError('pattern')">Password must contain uppercase, lowercase, digit, and special character</span>
+                </div>
+              
+                <input
+                  [class.is-invalid]="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched"
+                  formControlName="phoneNumber"
+                  type="text"
+                  placeholder="Phone Number"
+                  class="input-line full-width"
+                  required
+                />
+                <div *ngIf="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched">
+                  <span class="errow" *ngIf="registerForm.get('phoneNumber')?.hasError('required')">{{ PhoneWarning }}</span>
+                </div>
+              
+                <input
+                  [class.is-invalid]="registerForm.get('phoneNumberCountryCode')?.invalid && registerForm.get('phoneNumberCountryCode')?.touched"
+                  formControlName="phoneNumberCountryCode"
+                  type="text"
+                  placeholder="Phone Country Code"
+                  class="input-line full-width"
+                  required
+                />
+                <div *ngIf="registerForm.get('phoneNumberCountryCode')?.invalid && registerForm.get('phoneNumberCountryCode')?.touched">
+                  <span class="errow" *ngIf="registerForm.get('phoneNumberCountryCode')?.hasError('required')">{{ PhoneCountryCodeWarning }}</span>
+                </div>
+              
+                <input
+                  [class.is-invalid]="registerForm.get('CountryOfOrigin')?.invalid && registerForm.get('CountryOfOrigin')?.touched"
+                  formControlName="CountryOfOrigin"
+                  type="text"
+                  placeholder="Country of Origin"
+                  class="input-line full-width"
+                  required
+                />
+                <div *ngIf="registerForm.get('CountryOfOrigin')?.invalid && registerForm.get('CountryOfOrigin')?.touched">
+                  <span class="errow" *ngIf="registerForm.get('CountryOfOrigin')?.hasError('required')">{{ CountryWarning }}</span>
+                </div>
+              
+                <button class="opacity" type="submit">SUBMIT</button>
               </form>
+              
               <div class="register-forget opacity">
                   <a href="">NAZAD</a>
              
               </div>
-          </div>
+              
+            </div>
           
     
           <div class="circle circle-two"></div>
       </div>
       
       <div class="theme-btn-container"></div>
-      <div class="checking">
-    
-        <h1 class="registrationChecking">Before you can register, you must have all options correct!</h1>
-        <h1 class="registrationChecking">Email format: {{ 'user@' + 'mail.com' }}</h1>
-        <h1 class="registrationChecking">Password need to contain: {{ '!@#$%*' }}</h1>
-        <h1 class="registrationChecking">Username is already used!</h1>
-        <h1 class="registrationChecking">You have passed all checking!Create account and enyoj on our website!</h1>
-        <h1 class="registrationChecking"></h1>
-    
-    
-    
-      </div>
+      
   
   </section>
 
   
 </div>
 </div>
-
-<<<<<<< HEAD
-<div class='container'>
-   
-  <div class='window'>
-    <div class='overlay'></div>
-    <div class='content'>
-      <div class='welcome'>Hello There dear Student!</div>
-      <div class='subtitle'>Please write some informations!Before using our services you need to create an account.</div>
-      <div class='input-fields'>
-        <input type='text' placeholder='First Name' class='input-line full-width'>
-        <input type='text' placeholder='Last Name' class='input-line full-width'>
-        <input type='text' placeholder='Username' class='input-line full-width'>
-<input type='email' placeholder='Email' class='input-line full-width'>
-<input type='password' placeholder='Password' class='input-line full-width'>
-
-      </div>
-    
-      
-    
-      <div><button class='ghost-round full-width'>Create Account</button></div>
-    </div>
-
-  </div>
-  <div id="checking">
-    
-    <h1 class="registrationChecking">Before you can register, you must have all options correct!</h1>
-    <h1 class="registrationChecking">Email format: {{ 'user@' + 'mail.com' }}</h1>
-    <h1 class="registrationChecking">Password need to contain: {{ '!@#$%*' }}</h1>
-    <h1 class="registrationChecking">Username is already used!</h1>
-    <h1 class="registrationChecking">You have passed all checking!Create account and enyoj on our website!</h1>
-    <h1 class="registrationChecking"></h1>
-
-
-  </div>
-</div>
-=======
 </body>
->>>>>>> LoginBranch
+

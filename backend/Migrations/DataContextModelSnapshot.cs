@@ -17,7 +17,7 @@ namespace EduConnect.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -39,7 +39,7 @@ namespace EduConnect.Migrations
 
                     b.HasKey("PersonId");
 
-                    b.ToTable("Person");
+                    b.ToTable("Person", "Person");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonDetails", b =>
@@ -86,7 +86,7 @@ namespace EduConnect.Migrations
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("PersonDetails");
+                    b.ToTable("PersonDetails", "Person");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonEmail", b =>
@@ -113,7 +113,7 @@ namespace EduConnect.Migrations
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("PersonEmail");
+                    b.ToTable("PersonEmail", "Person");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonPassword", b =>
@@ -143,7 +143,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("PersonPassword");
+                    b.ToTable("PersonPassword", "Person");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonProfilePicture", b =>
@@ -172,7 +172,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("PersonProfilePicture");
+                    b.ToTable("PersonProfilePicture", "Person");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonSalt", b =>
@@ -201,7 +201,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("PersonSalt");
+                    b.ToTable("PersonSalt", "Person");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Student.Student", b =>
@@ -223,7 +223,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("Student");
+                    b.ToTable("Student", "Student");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Student.StudentDetails", b =>
@@ -258,166 +258,29 @@ namespace EduConnect.Migrations
                     b.HasIndex("StudentId")
                         .IsUnique();
 
-                    b.ToTable("StudentDetails");
+                    b.ToTable("StudentDetails", "Student");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Tutor.Tutor", b =>
                 {
+                    b.Property<Guid>("TutorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ModifiedAt")
+                        .HasColumnType("bigint");
+
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
+                    b.HasKey("TutorId");
 
-                    b.Property<long?>("ModifiedAt")
-                        .HasColumnType("bigint");
+                    b.HasIndex("PersonId");
 
-                    b.Property<Guid>("TutorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("PersonId");
-
-                    b.ToTable("Tutor");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorAvailability", b =>
-                {
-                    b.Property<Guid>("TutorAvailabilityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("DayOfWeek")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EndTime")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("ModifiedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("StartTime")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("TutorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("TutorAvailabilityId");
-
-                    b.HasIndex("TutorId");
-
-                    b.ToTable("TutorAvailability");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorCertification", b =>
-                {
-                    b.Property<Guid>("TutorCertificationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CertificateName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("CertificateScan")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ExpirationDate")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("IssueDate")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("IssuedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LinkToCertificate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("ModifiedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("TutorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("TutorCertificationId");
-
-                    b.HasIndex("TutorId");
-
-                    b.ToTable("TutorCertification");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorDetails", b =>
-                {
-                    b.Property<Guid>("TutorDetailsId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("MainAreaOfSpecialization")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("ModifiedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ShortBiography")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("TutorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("YearsOfExperience")
-                        .HasColumnType("int");
-
-                    b.HasKey("TutorDetailsId");
-
-                    b.HasIndex("TutorId");
-
-                    b.ToTable("TutorDetails");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorRating", b =>
-                {
-                    b.Property<Guid>("TutorRatingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ModifiedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("RatingScore")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TutorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("TutorRatingId");
-
-                    b.HasIndex("TutorId");
-
-                    b.ToTable("TutorRating");
+                    b.ToTable("Tutor", "Tutor");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonDetails", b =>
@@ -506,50 +369,6 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorAvailability", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Tutor.Tutor", "Tutor")
-                        .WithMany()
-                        .HasForeignKey("TutorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tutor");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorCertification", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Tutor.Tutor", "Tutor")
-                        .WithMany()
-                        .HasForeignKey("TutorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tutor");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorDetails", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Tutor.Tutor", "Tutor")
-                        .WithMany()
-                        .HasForeignKey("TutorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tutor");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorRating", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Tutor.Tutor", "Tutor")
-                        .WithMany()
-                        .HasForeignKey("TutorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tutor");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.Person", b =>

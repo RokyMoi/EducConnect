@@ -44,11 +44,11 @@ public class StudentRepository : IStudentRepository
     }
 
 
-    public async Task<StudentDTO> GetStudentInfoByUsername(string username)
+    public async Task<StudentDTO> GetStudentInfoByEmail(string Email)
     {
        
         var student = await _databaseContext.Student
-            .Where(s => s.Person.PersonDetails.Username == username)
+            .Where(s => s.Person.PersonEmail.Email == Email)
             .Include(s => s.Person)
                 .ThenInclude(p => p.PersonDetails)
             .Include(s => s.StudentDetails)
