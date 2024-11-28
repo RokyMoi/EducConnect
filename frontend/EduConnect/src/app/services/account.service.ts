@@ -52,4 +52,31 @@ export class AccountService {
     const response = this.http.post(ApiLinks.tutorRegister, requestBody);
     return response;
   }
+
+  //Method for verification of User email
+  verifyEmail(email: string, code: string) {
+    const requestBody = {
+      email: email,
+      verificationCode: code,
+    };
+
+    const response = this.http.post(
+      ApiLinks.tutorEmailVerification,
+      requestBody
+    );
+    return response;
+  }
+
+  //Method for resending verification code
+  resendVerificationCode(email: string) {
+    const requestBody = {
+      email: email,
+    };
+    const response = this.http.post(
+      ApiLinks.tutorEmailVerificationCodeResend,
+      requestBody
+    );
+
+    return response;
+  }
 }

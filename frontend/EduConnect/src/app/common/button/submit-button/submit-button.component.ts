@@ -11,6 +11,7 @@ export class SubmitButtonComponent {
   @Input() submitButtonText: string = 'Submit';
   @Input() isButtonEnabled: boolean = true;
 
+  
   @Output() buttonClick = new EventEmitter<Event>();
 
   handleButtonClick(event: Event) {

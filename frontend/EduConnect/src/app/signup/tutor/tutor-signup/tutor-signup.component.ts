@@ -16,18 +16,25 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { ProgressBarComponent } from '../../../common/output/progress-bar/progress-bar.component';
+import { VerifyCodeComponent } from '../verify-code/verify-code.component';
+import { CommonModule } from '@angular/common';
+import {
+  MatProgressSpinner,
+  ProgressSpinnerMode,
+} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-tutor-signup',
   imports: [
+    CommonModule,
     RouterModule,
-    HeaderTemplateComponent,
-    TextInputComponentComponent,
+    MatProgressSpinner,
     EmailInputComponent,
     PasswordInputComponent,
     SubmitButtonComponent,
     ReactiveFormsModule,
     ProgressBarComponent,
+    VerifyCodeComponent,
   ],
   standalone: true,
   templateUrl: './tutor-signup.component.html',
@@ -39,7 +46,9 @@ export class TutorSignupComponent {
   passwordWarning: string = '';
 
   passwordStrength: number = 0;
-  formNotValidText: string = '';
+  dataProcessingResult: string = '';
+  dataProcessingResultColor: string = 'yellow';
+
   signinForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [
@@ -80,11 +89,19 @@ export class TutorSignupComponent {
     90: 'Very strong',
     100: 'Extremely strong',
   };
+
+  //Variables for displaying verification code input component
+  isFloatingVisible: boolean = false;
   private AccountService = inject(AccountService);
   tutorSignupModel = {
     email: '',
     password: '',
   };
+
+  //Variable for loading spinner
+  isDataBeingProcessed: boolean = false;
+  spinnerColor: string = 'yellow';
+  spinnerMode: ProgressSpinnerMode = 'indeterminate';
 
   handleEmailInput(event: Event) {
     this.signinForm.controls.email.setValue(
@@ -137,11 +154,13 @@ export class TutorSignupComponent {
 
   handleSubmitButton($event: Event) {
     if (this.signinForm.invalid) {
-      this.formNotValidText =
+      this.dataProcessingResultColor = 'red';
+      this.dataProcessingResult =
         'Please input valid email and password to continue';
     }
     if (this.signinForm.valid) {
-      this.formNotValidText = '';
+      this.dataProcessingResult = 'Please hold while we register you';
+      this.dataProcessingResultColor = 'yellow';
       this.registerUserAsTutor();
     }
   }
@@ -155,18 +174,27 @@ export class TutorSignupComponent {
       this.signinForm.controls.email.value &&
       this.signinForm.controls.password.value
     ) {
+      this.isDataBeingProcessed = true;
       this.AccountService.registerUserAsTutor(
         this.signinForm.controls.email.value,
         this.signinForm.controls.password.value
       ).subscribe({
         next: (response) => {
+          this.dataProcessingResult = 'Registration successful';
+          this.dataProcessingResultColor = 'green';
+          
           console.log(response);
-          this.formNotValidText = (response as any).message;
+          this.isDataBeingProcessed = false;
+          (response as any).success === 'true'
+            ? this.toggleFloatingBox()
+            : null;
         },
         error: (error) => {
+          this.isDataBeingProcessed = false;
           console.log('Error occurred during registration: ', error);
           console.log(error.error.message);
-          this.formNotValidText = error.error.message;
+          this.dataProcessingResult = error.error.message;
+          this.dataProcessingResultColor = 'red';
         },
       });
     }
@@ -203,5 +231,10 @@ export class TutorSignupComponent {
 
     console.log(passwordStrength);
     return passwordStrength;
+  }
+
+  toggleFloatingBox() {
+    this.isFloatingVisible = !this.isFloatingVisible;
+    console.log('Is floating visible:', this.isFloatingVisible);
   }
 }

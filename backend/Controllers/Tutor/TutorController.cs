@@ -200,8 +200,10 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
 
             return Ok(new
             {
+                success = "true",
                 message = "You have successfully registered as a tutor on EduConnect, please verify your email address using the verification code sent to your email address",
-                data = tutorSignupResponseDTO
+                data = tutorSignupResponseDTO,
+                timestamp = DateTime.Now
             });
 
         }
@@ -390,7 +392,8 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
             //If verification code was found, the existing verification code will be deleted and a new one will be generated, and sent to the user
 
             //Check is the existing verification code already verified
-            if (verificationCodeFromDatabase.IsVerified) { 
+            if (verificationCodeFromDatabase.IsVerified)
+            {
                 return BadRequest(new
                 {
                     success = "false",
@@ -401,17 +404,19 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
             }
 
             //Check is the existing verification code expired
-            if (verificationCodeFromDatabase.ExpiryDateTime > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()) { 
-                return BadRequest(new { 
+            if (verificationCodeFromDatabase.ExpiryDateTime > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+            {
+                return BadRequest(new
+                {
                     success = "false",
                     message = "A valid verification code has already been sent your email address, please check your email inbox/spam",
                     data = new { },
                     timestamp = DateTime.Now
                 });
-                
+
             }
 
-            
+
             //Generate verification code
             var PersonVerificationCode = new PersonVerificationCode
             {
