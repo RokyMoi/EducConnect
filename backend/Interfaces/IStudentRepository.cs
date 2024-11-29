@@ -6,7 +6,7 @@ namespace EduConnect.Interfaces
     public interface IStudentRepository
     {
         Task<IEnumerable<StudentDTO>> GetAllStudents(); 
-        Task<StudentDTO> GetStudentInfoByUsername(string username);
+        Task<StudentDTO> GetStudentInfoByEmail(string email);
     }
 
 }

@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, Signal, signal } from '@angular/core';
 import { User } from '../_models/User';
 import { map } from 'rxjs';
 import ApiLinks from '../../assets/api/link.api';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -12,18 +13,39 @@ export class AccountService {
   baseUrl = 'http://localhost:5177/api/';
   CurrentUser = signal<User | null>(null);
 
+  router = inject(Router);
+  
+
+ 
+
   login(model: any) {
     return this.http
-      .post<User>(this.baseUrl + 'Student/student-login', model)
+      .post<User>(this.baseUrl + 'Student/student-login', model, { observe: 'response' })
       .pipe(
-        map((user) => {
-          if (user) {
-            localStorage.setItem('user', JSON.stringify(user));
-            this.CurrentUser.set(user);
+        map((response) => {
+          const userData = (response.body as any)?.data; 
+
+          if (userData) {
+            const loggedInUser: User = {
+              Username: userData.username,
+              Email:userData.Email,
+              Role: userData.role,
+              Token: userData.token
+            };
+
+           
+            this.CurrentUser.set(loggedInUser);
+
+     
+            localStorage.setItem('user', JSON.stringify(loggedInUser));
           }
+
+          return response; 
         })
       );
   }
+
+  
   register(model: any) {
     return this.http
       .post<User>(this.baseUrl + 'Student/student-register', model)
@@ -79,4 +101,8 @@ export class AccountService {
 
     return response;
   }
-}
+
+
+  
+  }
+

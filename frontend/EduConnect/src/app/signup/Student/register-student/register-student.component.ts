@@ -1,10 +1,12 @@
-import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, OnInit } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AccountService } from '../../../services/account.service';
+import { NgIf } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register-student',
-  imports: [FormsModule],
+  imports: [ReactiveFormsModule,NgIf],
   templateUrl: './register-student.component.html',
   styleUrl: './register-student.component.css',
   standalone: true,

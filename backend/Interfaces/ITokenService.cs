@@ -4,8 +4,8 @@ namespace EduConnect.Interfaces
 {
     public interface ITokenService
     {
-      
-            string CreateToken(PersonDetails person);  // Umesto AppUser, koristi Person
-       
+
+        Task<string> CreateTokenAsync(PersonEmail person);  
+
     }
 }
