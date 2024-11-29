@@ -10,8 +10,8 @@ import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { TextInputComponentComponent } from '../../input/text/text-input-component/text-input-component.component';
 @Component({
   selector: 'app-email-input',
-  standalone: true,
   imports: [TextInputComponentComponent, ReactiveFormsModule],
+  standalone: true,
   templateUrl: './email-input.component.html',
   styleUrl: './email-input.component.css',
 })
@@ -30,6 +30,4 @@ export class EmailInputComponent {
   handleTextInput(event: Event) {
     this.emailInput.emit(event);
   }
-
-  
 }

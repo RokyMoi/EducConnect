@@ -1,0 +1,27 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+:host {
+  --progress-bar-container-width: 100%;
+  --progress-bar-container-height: 12px;
+  --progress-bar-container-border-radius: 0px;
+  --progress-bar-container-margin-top: 5px;
+  --progress-bar-container-margin-bottom: 5px;
+  --progress-bar-width: 100%;
+  --progress-bar-border-radius: 12px;
+}
+.progress-bar-container {
+  width: var(--progress-bar-container-width);
+  height: var(--progress-bar-container-height);
+  border-radius: var(--progress-bar-container-border-radius);
+  margin-top: var(--progress-bar-container-margin-top);
+  margin-bottom: var(--progress-bar-container-margin-bottom);
+  overflow: hidden;
+}
+.progress-bar {
+  width: var(--progress-bar-width);
+  height: 100%;
+  border-radius: var(--progress-bar-border-radius);
+  transition: width ease-in-out 0.2s;
+}

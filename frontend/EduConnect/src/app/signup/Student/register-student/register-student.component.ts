@@ -1,5 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { AccountService } from '../../../services/account.service';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
@@ -7,12 +13,11 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-register-student',
   standalone: true,
-  imports: [ReactiveFormsModule,NgIf],
+  imports: [ReactiveFormsModule, NgIf],
   templateUrl: './register-student.component.html',
-  styleUrl: './register-student.component.css'
+  styleUrl: './register-student.component.css',
 })
 export class RegisterStudentComponent implements OnInit {
-
   private accountService = inject(AccountService);
   registerForm: FormGroup;
 
@@ -24,8 +29,8 @@ export class RegisterStudentComponent implements OnInit {
   PhoneWarning = 'Phone number is required';
   PhoneCountryCodeWarning = 'Country code is required';
   CountryWarning = 'Country of origin is required';
- 
- routerNav= inject(Router);
+
+  routerNav = inject(Router);
   constructor() {
     this.registerForm = new FormGroup({
       firstName: new FormControl('', Validators.required),
@@ -38,11 +43,11 @@ export class RegisterStudentComponent implements OnInit {
         Validators.pattern(/^(?=.*[A-Z])/),
         Validators.pattern(/^(?=.*[a-z])/),
         Validators.pattern(/^(?=.*\d)/),
-        Validators.pattern(/^(?=.*[@$!%*?&#])/)
+        Validators.pattern(/^(?=.*[@$!%*?&#])/),
       ]),
       phoneNumber: new FormControl('', Validators.required),
       phoneNumberCountryCode: new FormControl('', Validators.required),
-      CountryOfOrigin: new FormControl('', Validators.required)
+      CountryOfOrigin: new FormControl('', Validators.required),
     });
   }
 
@@ -57,12 +62,11 @@ export class RegisterStudentComponent implements OnInit {
       this.accountService.register(this.registerForm.value).subscribe({
         next: (response) => {
           console.log('Registration successful:', response);
-         this.routerNav.navigateByUrl("/student-dashboard");
-        
+          this.routerNav.navigateByUrl('/student-dashboard');
         },
         error: (err) => {
           console.error('Registration error:', err);
-        }
+        },
       });
     }
   }

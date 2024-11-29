@@ -7,8 +7,7 @@
 }
 
 button {
-  margin: 0 5%;
-  width: 90%;
+  width: 100%;
   background-color: blue;
   color: white;
   border: none;
@@ -18,12 +17,12 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+  text-align: center;
 }
 
 button:hover {
   background-color: rgb(2, 80, 176);
   color: white;
   box-shadow: 4px 6px 0 rgba(63, 63, 63, 0.135);
-  width: 100%;
   margin: 0;
 }

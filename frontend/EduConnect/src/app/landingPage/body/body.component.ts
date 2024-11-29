@@ -8,10 +8,10 @@ import {
 } from '@angular/router';
 @Component({
   selector: 'app-landing-page-body',
-  standalone: true,
   imports: [RouterLink, RouterOutlet, RouterLinkActive],
   templateUrl: './body.component.html',
   styleUrl: './body.component.css',
+  standalone: true,
 })
 export class BodyComponent {
   constructor(private router: Router) {}

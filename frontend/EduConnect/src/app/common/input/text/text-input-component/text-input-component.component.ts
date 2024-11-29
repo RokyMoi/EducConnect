@@ -22,7 +22,7 @@ export class TextInputComponentComponent {
   @Input() type: string = 'text';
   @Input() warning: string = '';
   @Input() value: string = '';
-
+  @Input() width: string = '100%';
   @Output() input = new EventEmitter<Event>();
 
   onInput(event: Event) {

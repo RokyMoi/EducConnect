@@ -11,6 +11,7 @@ namespace backend.DTOs.Person
         public PersonEmailDTO PersonEmailDTO { get; set; }
         public PersonPasswordDTO PersonPasswordDTO { get; set; }
         public PersonSaltDTO PersonSaltDTO { get; set; }
+        public PersonVerificationCodeDTO PersonVerificationCodeDTO { get; set; }
 
     }
 }
