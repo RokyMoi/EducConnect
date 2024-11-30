@@ -27,7 +27,6 @@ export class AccountService {
 
           if (userData) {
             const loggedInUser: User = {
-              Username: userData.username,
               Email:userData.Email,
               Role: userData.role,
               Token: userData.token

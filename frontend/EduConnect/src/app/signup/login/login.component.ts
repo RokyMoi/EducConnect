@@ -27,10 +27,11 @@ export class LoginComponent {
     this.accountService.login(this.model).subscribe({
       next: response => {
         const currentUser = this.accountService.CurrentUser(); 
-        console.log('Welcome:', currentUser?.Username);
-        this.warning = `Welcome ${currentUser?.Username}`;
         if(currentUser?.Role === "student"){
           this.routerNav.navigateByUrl("/student-dashboard")
+        }
+        if(currentUser?.Role === "tutor"){
+          this.routerNav.navigateByUrl("/tutor-dashboard")
         }
       },
       error: (err) => {

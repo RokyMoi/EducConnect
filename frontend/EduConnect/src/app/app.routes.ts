@@ -4,6 +4,7 @@ import { TutorSignupComponent } from './signup/tutor/tutor-signup/tutor-signup.c
 import { RegisterStudentComponent } from './signup/Student/register-student/register-student.component';
 import { LoginComponent } from './signup/login/login.component';
 import { StudentDashboardComponent } from './Student/student-dashboard/student-dashboard.component';
+import { TutorDashboardComponent } from './tutor/tutor-dashboard/tutor-dashboard.component';
 
 
 
@@ -15,5 +16,6 @@ export const routes: Routes = [
     {path: 'user-signin',component:LoginComponent},
     {path:'student-dashboard',component:StudentDashboardComponent},
     { path: '**', component:BodyComponent },
+    {path:'tutor-dashboard',component:TutorDashboardComponent}
 
 ];
