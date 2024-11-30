@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using backend.Enums;
 
 
 namespace EduConnect.Entities.Tutor;
@@ -15,7 +16,8 @@ public class Tutor
     public Person.Person Person { get; set; }
     public Guid PersonId { get; set; }
 
-    
+    public TutorRegistrationStepEnum TutorRegistrationStatus { get; set; }
+
     public long CreatedAt { get; set; }
 
     public long? ModifiedAt { get; set; }
