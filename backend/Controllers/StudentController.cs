@@ -43,41 +43,46 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-        [HttpPost("check-mail{checker}")]
-        public async Task<ActionResult> CheckEmail(string checker)
+        [HttpGet("get-all-emails")]
+public async Task<ActionResult> GetAllEmails()
+{
+    try
+    {
+       
+        var emails = await db.PersonEmail
+                             .Select(x => x.Email)
+                             .ToListAsync();
+
+        if (emails == null || !emails.Any())
         {
-            if (string.IsNullOrEmpty(checker))
+           
+            return NotFound(new
             {
-                return BadRequest("Email is required.");
-            }
-            var emailPerson = await db.PersonEmail.FirstOrDefaultAsync(x => x.Email == checker);
-            if (emailPerson != null)
-            {
-                
-                return BadRequest(new
-                {
-                    
-                    IsAvaiable=false,
-                    message="Email je vec zauzet",
-                    data =new { },
-                    timestamp=DateTime.Now,
-
-
-                });
-            }
-            else
-            {
-                return Ok(new
-                {
-                    IsAvaiable = true,
-                    message = "Email je slobodan",
-                    data = new { },
-                    timestamp = DateTime.Now,
-
-                });
-            }
-
+                message = "No emails found.",
+                data = new List<string>(), 
+                timestamp = DateTime.Now
+            });
         }
+
+      
+        return Ok(new
+        {
+            message = "Emails retrieved successfully.",
+            data = emails, 
+            timestamp = DateTime.Now
+        });
+    }
+    catch (Exception ex)
+    {
+      
+        return StatusCode(500, new
+        {
+            message = "An error occurred while fetching emails.",
+            error = ex.Message,
+            timestamp = DateTime.Now
+        });
+    }
+}
         [HttpPost("student-login")]
         public async Task<IActionResult> Login(LoginDTO login)
         {
@@ -171,7 +176,6 @@ namespace EduConnect.Controllers
             
             UserDTO
             {
-                Username = personDetails.Username,
                 Email= personEmail.Email,
                 Token = token,
                 Role=role
@@ -266,7 +270,6 @@ namespace EduConnect.Controllers
             });
             return new UserDTO
             {
-                Username = PersonDetails.Username,
                 Email = PersonEmail.Email,
                 Token = await _tokenService.CreateTokenAsync(PersonEmail),
                 Role = "student"

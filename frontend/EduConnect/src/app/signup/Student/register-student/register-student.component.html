@@ -59,6 +59,7 @@
                 <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
                   <span class="errow"  *ngIf="registerForm.get('email')?.hasError('required')">{{ emailWarning }}</span>
                   <span class="errow"  *ngIf="registerForm.get('email')?.hasError('email')">Invalid email format</span>
+                  <span class="errow"  *ngIf="registerForm.get('emails')?.hasError('emailExists')">Email is already used</span>
                 </div>
               
                 <input
@@ -110,7 +111,11 @@
                 <div *ngIf="registerForm.get('CountryOfOrigin')?.invalid && registerForm.get('CountryOfOrigin')?.touched">
                   <span class="errow" *ngIf="registerForm.get('CountryOfOrigin')?.hasError('required')">{{ CountryWarning }}</span>
                 </div>
-              
+              <div> 
+                <span class="errow"> 
+                   {{LoginErrorMessage}}
+                </span>
+              </div>
                 <button class="opacity" type="submit">SUBMIT</button>
               </form>
               

@@ -10,6 +10,8 @@ import { AccountService } from '../../../services/account.service';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 
+
+
 @Component({
   selector: 'app-register-student',
   standalone: true,
@@ -29,14 +31,19 @@ export class RegisterStudentComponent implements OnInit {
   PhoneWarning = 'Phone number is required';
   PhoneCountryCodeWarning = 'Country code is required';
   CountryWarning = 'Country of origin is required';
-
+  LoginErrorMessage='';
   routerNav = inject(Router);
   constructor() {
+  
     this.registerForm = new FormGroup({
       firstName: new FormControl('', Validators.required),
       lastName: new FormControl('', Validators.required),
       username: new FormControl('', Validators.required),
-      email: new FormControl('', [Validators.required, Validators.email]),
+     
+       email : new FormControl('', {
+    validators: [Validators.required, Validators.email],
+    updateOn: 'blur',
+  }),
       password: new FormControl('', [
         Validators.required,
         Validators.minLength(8),
@@ -45,9 +52,20 @@ export class RegisterStudentComponent implements OnInit {
         Validators.pattern(/^(?=.*\d)/),
         Validators.pattern(/^(?=.*[@$!%*?&#])/),
       ]),
-      phoneNumber: new FormControl('', Validators.required),
-      phoneNumberCountryCode: new FormControl('', Validators.required),
-      CountryOfOrigin: new FormControl('', Validators.required),
+      phoneNumber: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^\+?[1-9]\d{1,14}$/),
+      ]),
+    
+      phoneNumberCountryCode: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^\d+$/), 
+      ]),
+    
+      CountryOfOrigin: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[a-zA-Z\s]+$/), 
+      ])
     });
   }
 
@@ -66,6 +84,10 @@ export class RegisterStudentComponent implements OnInit {
         },
         error: (err) => {
           console.error('Registration error:', err);
+          this.LoginErrorMessage = err.error;
+          
+          
+          
         },
       });
     }

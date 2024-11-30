@@ -19,11 +19,14 @@ using backend.DTOs.Person;
 using backend.Interfaces.Tutor;
 using backend.Services;
 using backend.Entities.Person;
+using EduConnect.DTOs;
+using Newtonsoft.Json.Linq;
+using EduConnect.Interfaces;
 namespace backend.Controllers.Tutor
 {
     [ApiController]
     [Route("/tutor")]
-    public class TutorController(DataContext _databaseContext, IPersonRepository _personRepository, ITutorRepository _tutorRepository) : ControllerBase
+    public class TutorController(DataContext _databaseContext, ITokenService _tokenService, IPersonRepository _personRepository, ITutorRepository _tutorRepository) : ControllerBase
     {
 
         [HttpPost("signup")]
@@ -196,13 +199,31 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
             {
                 return BadRequest("Email address is not a registered email address");
             }
+            string role = "";
+            // Check if the user is a Student or Tutor by looking up the appropriate tables
+            var student = await _databaseContext.Student.FirstOrDefaultAsync(x => x.PersonId == Person.PersonId);
+            var tutor = await _databaseContext.Tutor.FirstOrDefaultAsync(x => x.PersonId == Person.PersonId);
 
-
+            if (student != null)
+            {
+                role = "student";  // User is a student
+            }
+            else if (tutor != null)
+            {
+                role = "tutor";  // User is a tutor
+            }
+            var token = await _tokenService.CreateTokenAsync(PersonEmail);
             return Ok(new
             {
                 success = "true",
                 message = "You have successfully registered as a tutor on EduConnect, please verify your email address using the verification code sent to your email address",
-                data = tutorSignupResponseDTO,
+                data = new UserDTO
+                {
+         
+                    Email = PersonEmail.Email,
+                    Token = token,
+                    Role = role
+                },
                 timestamp = DateTime.Now
             });
 
@@ -470,6 +491,7 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
                   + "The EduConnect Team\n\n"
                   + "P.S. Need help or have questions? Feel free to reach out to us at support@educonnect.com.\n"
           );
+
 
             //Check if the email was sent
             if (!emailResult)

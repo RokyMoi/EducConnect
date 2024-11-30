@@ -31,7 +31,6 @@ namespace EduConnect.Services
             var role = await GetRole(person);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name,person.Person.PersonDetails.Username),
                 new Claim(ClaimTypes.Email,person.Email),
                 new Claim(ClaimTypes.Role, role)
 
