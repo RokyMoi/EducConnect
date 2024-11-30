@@ -6,16 +6,12 @@ import { LoginComponent } from './signup/login/login.component';
 import { StudentDashboardComponent } from './Student/student-dashboard/student-dashboard.component';
 import { TutorDashboardComponent } from './tutor/tutor-dashboard/tutor-dashboard.component';
 
-
-
-
 export const routes: Routes = [
-    { path: '', component:BodyComponent },
-    { path: 'student-register', component: RegisterStudentComponent },
-    { path: 'tutor-signup', component: TutorSignupComponent },
-    {path: 'user-signin',component:LoginComponent},
-    {path:'student-dashboard',component:StudentDashboardComponent},
-    { path: '**', component:BodyComponent },
-    {path:'tutor-dashboard',component:TutorDashboardComponent}
-
+  { path: '', component: BodyComponent },
+  { path: 'student-register', component: RegisterStudentComponent },
+  { path: 'tutor-signup', component: TutorSignupComponent },
+  { path: 'user-signin', component: LoginComponent },
+  { path: 'student-dashboard', component: StudentDashboardComponent },
+  { path: 'tutor-dashboard', component: TutorDashboardComponent },
+  { path: '**', component: BodyComponent },
 ];
