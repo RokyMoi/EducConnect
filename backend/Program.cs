@@ -1,12 +1,17 @@
+using backend.Entities.Reference.Country;
+using backend.Extensions;
+using backend.Utilities;
 using EduConnect.Data;
 using EduConnect.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 
 namespace EduConnect
 {
     public class Program
     {
+
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +24,6 @@ namespace EduConnect
             builder.Services.AddApplicationServices(builder.Configuration);
             builder.Services.AddJWTAuthService(builder.Configuration);
             builder.Services.AddDatabaseConnectionServices(builder.Configuration, builder.Environment);
-
 
 
             builder.Services.AddControllers();

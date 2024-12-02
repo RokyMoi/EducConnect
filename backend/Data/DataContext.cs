@@ -1,4 +1,5 @@
 ﻿using backend.Entities.Person;
+using backend.Entities.Reference.Country;
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
 using EduConnect.Entities.Tutor;
@@ -21,5 +22,7 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<Student> Student { get; set; }
     public DbSet<StudentDetails> StudentDetails { get; set; }
+
+    public DbSet<Country> Country { get; set; }
 
 }
