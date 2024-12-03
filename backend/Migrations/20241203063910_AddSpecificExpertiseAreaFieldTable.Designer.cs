@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241203063910_AddSpecificExpertiseAreaFieldTable")]
+    partial class AddSpecificExpertiseAreaFieldTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -306,35 +309,6 @@ namespace EduConnect.Migrations
                     b.ToTable("GeneralExpertiseField", "Education");
                 });
 
-            modelBuilder.Entity("backend.Entities.Education.SpecificExpertiseArea", b =>
-                {
-                    b.Property<Guid>("SpecificExpertiseFieldId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("GeneralExpertiseFieldId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SpecificExpertiseFieldName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("SpecificExpertiseFieldId");
-
-                    b.HasIndex("GeneralExpertiseFieldId");
-
-                    b.ToTable("SpecificExpertiseArea", "Education");
-                });
-
             modelBuilder.Entity("backend.Entities.Person.PersonVerificationCode", b =>
                 {
                     b.Property<Guid>("PersonVerificationCodeId")
@@ -488,17 +462,6 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
-                });
-
-            modelBuilder.Entity("backend.Entities.Education.SpecificExpertiseArea", b =>
-                {
-                    b.HasOne("backend.Entities.Education.GeneralExpertiseField", "GeneralExpertiseField")
-                        .WithMany()
-                        .HasForeignKey("GeneralExpertiseFieldId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("GeneralExpertiseField");
                 });
 
             modelBuilder.Entity("backend.Entities.Person.PersonVerificationCode", b =>

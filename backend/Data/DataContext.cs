@@ -26,5 +26,6 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<Country> Country { get; set; }
     public DbSet<GeneralExpertiseField> GeneralExpertiseField { get; set; }
+    public DbSet<SpecificExpertiseArea> SpecificExpertiseArea { get; set; }
 
 }
