@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241203060916_SetTutorRegistrationStepEnumToNullable")]
+    partial class SetTutorRegistrationStepEnumToNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,31 +282,6 @@ namespace EduConnect.Migrations
                     b.HasIndex("PersonId");
 
                     b.ToTable("Tutor", "Tutor");
-                });
-
-            modelBuilder.Entity("backend.Entities.Education.GeneralExpertiseField", b =>
-                {
-                    b.Property<Guid>("ExpertiseGeneralFieldId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ExpertiseGeneralFieldDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExpertiseGeneralFieldName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("ModifiedAt")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("ExpertiseGeneralFieldId");
-
-                    b.ToTable("GeneralExpertiseField", "Education");
                 });
 
             modelBuilder.Entity("backend.Entities.Person.PersonVerificationCode", b =>

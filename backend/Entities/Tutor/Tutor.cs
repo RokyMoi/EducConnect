@@ -16,7 +16,7 @@ public class Tutor
     public Person.Person Person { get; set; }
     public Guid PersonId { get; set; }
 
-    public TutorRegistrationStepEnum TutorRegistrationStatus { get; set; }
+    public TutorRegistrationStepEnum? TutorRegistrationStatus { get; set; } = null;
 
     public long CreatedAt { get; set; }
 

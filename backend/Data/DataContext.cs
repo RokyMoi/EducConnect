@@ -1,4 +1,5 @@
-﻿using backend.Entities.Person;
+﻿using backend.Entities.Education;
+using backend.Entities.Person;
 using backend.Entities.Reference.Country;
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
@@ -24,5 +25,6 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<StudentDetails> StudentDetails { get; set; }
 
     public DbSet<Country> Country { get; set; }
+    public DbSet<GeneralExpertiseField> GeneralExpertiseField { get; set; }
 
 }
