@@ -4,11 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Person;
+using backend.DTOs.Tutor;
 using backend.Entities.Person;
 using backend.Interfaces.Person;
 using EduConnect.Data;
 using EduConnect.Entities.Person;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Identity.Client;
 
 namespace backend.Repositories.Person
 {
@@ -26,7 +29,7 @@ namespace backend.Repositories.Person
 
         public async Task<PersonEmailDTO> GetPersonEmailByEmail(string email)
         {
-            var personEmail = await _databaseContext.PersonEmail.Where(p => p.Email.Equals(email)).FirstOrDefaultAsync();
+            var personEmail = await _databaseContext.PersonEmail.Include(x => x.Person).Where(p => p.Email.Equals(email)).FirstOrDefaultAsync();
 
             if (personEmail == null)
             {
@@ -37,6 +40,7 @@ namespace backend.Repositories.Person
             {
                 PersonId = personEmail.PersonId,
                 PersonEmailId = personEmail.PersonEmailId,
+                Person = personEmail.Person,
                 Email = personEmail.Email,
 
 
@@ -251,6 +255,93 @@ namespace backend.Repositories.Person
                 Person = personEmail.Person,
                 Email = personEmail.Email,
             };
+        }
+
+        public async Task<TutorPersonDetailsDTO> GetTutorPersonInformationByPersonId(Guid personId)
+        {
+            var tutorPersonalInformation = await _databaseContext.Tutor.Where(x => x.PersonId == personId)
+            .GroupJoin(
+                _databaseContext.PersonDetails,
+                tutor => tutor.PersonId,
+                personDetails => personDetails.PersonId,
+                (tutor, personDetails) => new { tutor, personDetails }
+            )
+            .SelectMany(
+                group => group.personDetails.DefaultIfEmpty(),
+                (group, personDetails) => new
+                {
+                    Tutor = group.tutor,
+                    PersonDetails = personDetails
+                }
+            )
+            .FirstOrDefaultAsync();
+
+
+            return new TutorPersonDetailsDTO
+            {
+                PersonDetailsId = tutorPersonalInformation.PersonDetails == null ? Guid.Empty : tutorPersonalInformation.PersonDetails.PersonDetailsId,
+                PersonId = tutorPersonalInformation.Tutor.PersonId,
+                TutorId = tutorPersonalInformation.Tutor.TutorId,
+                FirstName = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.FirstName,
+                LastName = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.LastName,
+                Username = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.Username,
+                PhoneNumberCountryCode = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.PhoneNumberCountryCode,
+                PhoneNumber = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.PhoneNumber,
+                CountryOfOrigin = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.CountryOfOrigin,
+            };
+
+        }
+
+        public async Task<TutorUsernameDTO> GetTutorByUsername(string username)
+        {
+            var tutorUsername = await _databaseContext.PersonDetails.Where(x => x.Username.Equals(username)).FirstOrDefaultAsync();
+
+            if (tutorUsername == null)
+            {
+                return null;
+            }
+
+            var tutor = await _databaseContext.Tutor.Where(x => x.PersonId == tutorUsername.PersonId).FirstOrDefaultAsync();
+
+
+
+            return new TutorUsernameDTO
+            {
+                PersonId = tutorUsername.PersonId,
+                TutorId = tutor == null ? Guid.Empty : tutor.TutorId,
+                PersonDetailsId = tutorUsername.PersonDetailsId,
+                Username = tutorUsername.Username
+            };
+
+
+        }
+
+        public async Task<PersonDetailsDTO> CreateNewPersonDetails(PersonDetails newPersonDetails)
+        {
+            try
+            {
+                await _databaseContext.PersonDetails.AddAsync(newPersonDetails);
+                await _databaseContext.SaveChangesAsync();
+                return new PersonDetailsDTO
+                {
+                    PersonDetailsId = newPersonDetails.PersonDetailsId,
+                    PersonId = newPersonDetails.PersonId,
+                    FirstName = newPersonDetails.FirstName,
+                    LastName = newPersonDetails.LastName,
+                    Username = newPersonDetails.Username,
+                    PhoneNumberCountryCode = newPersonDetails.PhoneNumberCountryCode,
+                    PhoneNumber = newPersonDetails.PhoneNumber,
+                    CountryOfOrigin = newPersonDetails.CountryOfOrigin,
+                };
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.InnerException);
+                return null;
+
+
+            }
         }
     }
 }

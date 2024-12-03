@@ -14,20 +14,20 @@ public class PersonDetails
     [ForeignKey(nameof(PersonId))]
     public Person? Person { get; set; }  // Ovaj entitet može biti null
 
-    public required string FirstName { get; set; }
+    public string? FirstName { get; set; } = string.Empty;
 
-    public required string LastName { get; set; }
+    public string? LastName { get; set; } = string.Empty;
 
     public required string Username { get; set; }
 
-    public required string PhoneNumberCountryCode { get; set; }
+    public string? PhoneNumberCountryCode { get; set; } = string.Empty;
 
-    public required string PhoneNumber { get; set; }
+    public string? PhoneNumber { get; set; } = string.Empty;
 
-    public required string CountryOfOrigin { get; set; }
+    public string? CountryOfOrigin { get; set; } = string.Empty;
 
     public required long CreatedAt { get; set; }
 
-    public long? ModifiedAt { get; set; }
+    public long? ModifiedAt { get; set; } = null;
 }
 
