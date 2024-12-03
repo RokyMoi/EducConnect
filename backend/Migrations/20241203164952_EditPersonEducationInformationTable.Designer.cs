@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241203164952_EditPersonEducationInformationTable")]
+    partial class EditPersonEducationInformationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -335,57 +338,6 @@ namespace EduConnect.Migrations
                     b.ToTable("LearningSubcategory", "Learning");
                 });
 
-            modelBuilder.Entity("backend.Entities.Person.PersonEducationInformation", b =>
-                {
-                    b.Property<Guid>("PersonEducationInformationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EducationLevel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly?>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("FieldOfStudy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FinalGrade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InstitutionAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InstitutionName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InstitutionOfficialWebsite")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MinorFieldOfStudy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("PersonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateOnly?>("StartDate")
-                        .HasColumnType("date");
-
-                    b.HasKey("PersonEducationInformationId");
-
-                    b.HasIndex("PersonId");
-
-                    b.ToTable("PersonEducationInformation", "Person");
-                });
-
             modelBuilder.Entity("backend.Entities.Person.PersonVerificationCode", b =>
                 {
                     b.Property<Guid>("PersonVerificationCodeId")
@@ -550,17 +502,6 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("LearningCategory");
-                });
-
-            modelBuilder.Entity("backend.Entities.Person.PersonEducationInformation", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("backend.Entities.Person.PersonVerificationCode", b =>

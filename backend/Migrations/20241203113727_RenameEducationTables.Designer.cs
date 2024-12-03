@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241203113727_RenameEducationTables")]
+    partial class RenameEducationTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -281,34 +284,34 @@ namespace EduConnect.Migrations
                     b.ToTable("Tutor", "Tutor");
                 });
 
-            modelBuilder.Entity("backend.Entities.Learning.LearningCategory", b =>
+            modelBuilder.Entity("backend.Entities.Education.GeneralExpertiseArea", b =>
                 {
-                    b.Property<Guid>("LearningCategoryId")
+                    b.Property<Guid>("GeneralExpertiseAreaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("CreatedAt")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("LearningCategoryDescription")
+                    b.Property<string>("GeneralExpertiseAreaDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LearningCategoryName")
+                    b.Property<string>("GeneralExpertiseAreaName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("ModifiedAt")
                         .HasColumnType("bigint");
 
-                    b.HasKey("LearningCategoryId");
+                    b.HasKey("GeneralExpertiseAreaId");
 
-                    b.ToTable("LearningCategory", "Learning");
+                    b.ToTable("GeneralExpertiseArea", "Education");
                 });
 
-            modelBuilder.Entity("backend.Entities.Learning.LearningSubcategory", b =>
+            modelBuilder.Entity("backend.Entities.Education.SpecificExpertiseField", b =>
                 {
-                    b.Property<Guid>("LearningSubcategoryId")
+                    b.Property<Guid>("SpecificExpertiseFieldId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -318,72 +321,21 @@ namespace EduConnect.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("LearningCategoryId")
+                    b.Property<Guid>("GeneralExpertiseAreaId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("LearningSubcategoryName")
+                    b.Property<string>("SpecificExpertiseFieldName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("UpdatedAt")
                         .HasColumnType("bigint");
 
-                    b.HasKey("LearningSubcategoryId");
+                    b.HasKey("SpecificExpertiseFieldId");
 
-                    b.HasIndex("LearningCategoryId");
+                    b.HasIndex("GeneralExpertiseAreaId");
 
-                    b.ToTable("LearningSubcategory", "Learning");
-                });
-
-            modelBuilder.Entity("backend.Entities.Person.PersonEducationInformation", b =>
-                {
-                    b.Property<Guid>("PersonEducationInformationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EducationLevel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly?>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("FieldOfStudy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FinalGrade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InstitutionAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InstitutionName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InstitutionOfficialWebsite")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MinorFieldOfStudy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("PersonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateOnly?>("StartDate")
-                        .HasColumnType("date");
-
-                    b.HasKey("PersonEducationInformationId");
-
-                    b.HasIndex("PersonId");
-
-                    b.ToTable("PersonEducationInformation", "Person");
+                    b.ToTable("SpecificExpertiseField", "Education");
                 });
 
             modelBuilder.Entity("backend.Entities.Person.PersonVerificationCode", b =>
@@ -541,26 +493,15 @@ namespace EduConnect.Migrations
                     b.Navigation("Person");
                 });
 
-            modelBuilder.Entity("backend.Entities.Learning.LearningSubcategory", b =>
+            modelBuilder.Entity("backend.Entities.Education.SpecificExpertiseField", b =>
                 {
-                    b.HasOne("backend.Entities.Learning.LearningCategory", "LearningCategory")
+                    b.HasOne("backend.Entities.Education.GeneralExpertiseArea", "GeneralExpertiseArea")
                         .WithMany()
-                        .HasForeignKey("LearningCategoryId")
+                        .HasForeignKey("GeneralExpertiseAreaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LearningCategory");
-                });
-
-            modelBuilder.Entity("backend.Entities.Person.PersonEducationInformation", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Person");
+                    b.Navigation("GeneralExpertiseArea");
                 });
 
             modelBuilder.Entity("backend.Entities.Person.PersonVerificationCode", b =>

@@ -13,7 +13,7 @@ namespace backend.Controllers.Reference
     public class CountryController(ICountryRepository _countryRepository) : ControllerBase
     {
 
-        [HttpGet("/all")]
+        [HttpGet("/country/all")]
         public async Task<IActionResult> GetAllCountries()
         {
             var countryList = await _countryRepository.GetAllCountries();
@@ -54,7 +54,7 @@ namespace backend.Controllers.Reference
             });
         }
 
-        [HttpGet("/name/{countryName}")]
+        [HttpGet("/country/name/{countryName}")]
         public async Task<IActionResult> GetCountryByName([FromRoute] string countryName)
         {
             var country = await _countryRepository.GetCountryByOfficialNameOrName(countryName);
