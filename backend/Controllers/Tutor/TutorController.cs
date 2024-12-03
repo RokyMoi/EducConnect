@@ -56,7 +56,7 @@ namespace backend.Controllers.Tutor
 
 
             //Create new Person
-            var Person = new Person
+            var Person = new EduConnect.Entities.Person.Person
             {
                 PersonId = Guid.NewGuid(),
                 IsActive = false,
