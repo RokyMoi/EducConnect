@@ -308,7 +308,74 @@ namespace backend.Controllers.Person
             });
         }
 
+        //POST All method, (GET not used for security purposes, GET sends data to server using URL, while POST uses body)returns all PersonEducationInformation objects related to the given Person object
+        [HttpPost("all")]
+        public async Task<IActionResult> GetAllPersonEducationInformation(PersonEmailRequestDTO personEmailRequestDTO)
+        {
 
+            //Get PersonId by Email
+            var personEmail = await _personRepository.GetPersonEmailByEmail(personEmailRequestDTO.Email);
+
+            if (personEmail == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Email does not exist",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Get PersonEducationInformation object with the given PersonId
+            var personEducationInformationList = await _personEducationInformationRepository.GetAllPersonEducationInformationByPersonId(personEmail.PersonId);
+
+            if (personEducationInformationList == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "No education information found for account",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+
+            }
+
+            //Convert found List of PersonEducationInformationDTOs to List of PersonEducationInformationGetResponseDTOs
+            List<PersonEducationInformationGetResponseDTO> responseDTOList = new List<PersonEducationInformationGetResponseDTO>();
+            foreach (var personEducationInformation in personEducationInformationList)
+            {
+                PersonEducationInformationGetResponseDTO responseDTO = new PersonEducationInformationGetResponseDTO
+                {
+                    PersonEducationInformationId = personEducationInformation.PersonEducationInformationId,
+                    InstitutionName = personEducationInformation.InstitutionName,
+                    InstitutionOfficialWebsite = personEducationInformation.InstitutionOfficialWebsite,
+                    InstitutionAddress = personEducationInformation.InstitutionAddress,
+                    EducationLevel = personEducationInformation.EducationLevel,
+                    FieldOfStudy = personEducationInformation.FieldOfStudy,
+                    MinorFieldOfStudy = personEducationInformation.MinorFieldOfStudy,
+                    StartDate = personEducationInformation.StartDate,
+                    EndDate = personEducationInformation.EndDate,
+                    IsCompleted = personEducationInformation.IsCompleted,
+                    FinalGrade = personEducationInformation.FinalGrade,
+                    Description = personEducationInformation.Description,
+                };
+                responseDTOList.Add(responseDTO);
+            }
+
+
+            return Ok(new
+            {
+                success = "true",
+                message = "Successfully retrieved " + personEducationInformationList.Count + " entires for education information for the given account",
+                data = new
+                {
+                    PersonEducationInformation = responseDTOList,
+                }
+
+            });
+        }
     }
 
 
