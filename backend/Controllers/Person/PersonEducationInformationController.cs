@@ -33,7 +33,7 @@ namespace backend.Controllers.Person
             //Check if the person has already added education information
             List<PersonEducationInformationDTO> existingPersonEducationInformationList = await _personEducationInformationRepository.GetAllPersonEducationInformationByPersonId(personEmail.PersonId);
 
-            
+
             if (existingPersonEducationInformationList != null && existingPersonEducationInformationList.Count() > 4)
             {
                 return BadRequest(new
@@ -109,5 +109,161 @@ namespace backend.Controllers.Person
                 timestamp = DateTime.Now
             });
         }
+
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdatePersonEducationInformation(PersonEducationInformationUpdateRequestDTO updateRequestDTO)
+        {
+
+            //Assign values from the updateRequestDTO to the PersonEducationInformationUpdateDTO object
+            PersonEducationInformationUpdateDTO updateDTO = new PersonEducationInformationUpdateDTO
+            {
+                PersonEducationInformationId = updateRequestDTO.PersonEducationInformationId,
+                InstitutionName = updateRequestDTO.InstitutionName,
+                InstitutionOfficialWebsite = updateRequestDTO.InstitutionOfficialWebsite,
+                InstitutionAddress = updateRequestDTO.InstitutionAddress,
+                EducationLevel = updateRequestDTO.EducationLevel,
+                FieldOfStudy = updateRequestDTO.FieldOfStudy,
+                MinorFieldOfStudy = updateRequestDTO.MinorFieldOfStudy,
+                StartDate = updateRequestDTO.StartDate,
+                EndDate = updateRequestDTO.EndDate,
+                IsCompleted = updateRequestDTO.IsCompleted,
+                FinalGrade = updateRequestDTO.FinalGrade,
+                Description = updateRequestDTO.Description,
+            };
+
+            //Get the PersonEducationInformation object from the database with the given PersonEducationInformationId
+            var personEducationInformation = await _personEducationInformationRepository.GetPersonEducationInformationById(updateDTO.PersonEducationInformationId);
+            if (personEducationInformation == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Education information not found",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Create response object, to return with only the updated values in case of successful values update
+            PersonEducationInformationUpdateResponseDTO updateResponseDTO = new PersonEducationInformationUpdateResponseDTO() { };
+
+            //Set a flag variable to check if any value has been updated
+            bool isUpdated = false;
+            //Check InstitutionName
+            if (updateDTO.InstitutionName != personEducationInformation.InstitutionName)
+            {
+                isUpdated = true;
+                updateResponseDTO.InstitutionName = updateDTO.InstitutionName;
+
+            }
+
+            //Check InstitutionOfficialWebsite
+            if (updateDTO.InstitutionOfficialWebsite != personEducationInformation.InstitutionOfficialWebsite)
+            {
+                isUpdated = true;
+                updateResponseDTO.InstitutionOfficialWebsite = updateDTO.InstitutionOfficialWebsite;
+            }
+
+            //Check InstitutionAddress
+            if (updateDTO.InstitutionAddress != personEducationInformation.InstitutionAddress)
+            {
+                isUpdated = true;
+                updateResponseDTO.InstitutionAddress = updateDTO.InstitutionAddress;
+            }
+
+            //Check EducationLevel
+            if (updateDTO.EducationLevel != null && updateDTO.EducationLevel != personEducationInformation.EducationLevel)
+            {
+                isUpdated = true;
+                updateResponseDTO.EducationLevel = updateDTO.EducationLevel;
+            }
+
+            //Check FieldOfStudy
+            if (updateDTO.FieldOfStudy != null && updateDTO.FieldOfStudy != personEducationInformation.FieldOfStudy)
+            {
+                isUpdated = true;
+                updateResponseDTO.FieldOfStudy = updateDTO.FieldOfStudy;
+            }
+
+            //Check MinorFieldOfStudy
+            if (updateDTO.MinorFieldOfStudy != personEducationInformation.MinorFieldOfStudy)
+            {
+                isUpdated = true;
+                updateResponseDTO.MinorFieldOfStudy = updateDTO.MinorFieldOfStudy;
+            }
+
+            //Check StartDate
+            if (updateDTO.StartDate != personEducationInformation.StartDate)
+            {
+                isUpdated = true;
+                updateResponseDTO.StartDate = updateDTO.StartDate;
+            }
+            //Check EndDate
+            if (updateDTO.EndDate != personEducationInformation.EndDate)
+            {
+                isUpdated = true;
+                updateResponseDTO.EndDate = updateDTO.EndDate;
+            }
+            //Check IsCompleted
+            if (updateDTO.IsCompleted.HasValue && updateDTO.IsCompleted != personEducationInformation.IsCompleted)
+            {
+                isUpdated = true;
+                updateResponseDTO.IsCompleted = updateDTO.IsCompleted;
+            }
+
+            //Check FinalGrade 
+            if (updateDTO.FinalGrade != null && updateDTO.FinalGrade != personEducationInformation.FinalGrade)
+            {
+
+                isUpdated = true;
+                updateResponseDTO.FinalGrade = updateDTO.FinalGrade;
+            }
+
+            //Check Description
+            if (updateDTO.Description != null && updateDTO.Description != personEducationInformation.Description)
+            {
+                isUpdated = true;
+                updateResponseDTO.Description = updateDTO.Description;
+            }
+
+            //Check if the isUpdated flag is false, if so, return null
+            if (!isUpdated)
+            {
+                return BadRequest(new
+                {
+                    success = "false",
+                    message = "No new values were provided for update",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+            //Attempt to update PersonEducationInformation
+            var updateResult = await _personEducationInformationRepository.UpdatePersonEducationInformation(updateDTO);
+
+            if (updateResult == null)
+            {
+                return StatusCode(500, new
+                {
+                    success = "false",
+                    message = "Failed to update education information",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            return Ok(new
+            {
+                success = "true",
+                message = "Education information updated successfully",
+                data = new
+                {
+                    PersonEducationInformation = updateResponseDTO,
+                },
+                timestamp = DateTime.Now
+            });
+        }
+
+
+
     }
 }

@@ -19,7 +19,9 @@ namespace backend.DTOs.Person
         [Required]
         public string FieldOfStudy { get; set; }
         public string? MinorFieldOfStudy { get; set; } = null;
+        [RegularExpression(@"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$", ErrorMessage = "Invalid date format. Please use YYYY-MM-DD. (e.g., 2023-01-01)")]
         public DateOnly? StartDate { get; set; } = null;
+        [RegularExpression(@"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$", ErrorMessage = "Invalid date format. Please use YYYY-MM-DD. (e.g., 2023-01-01)")]
         public DateOnly? EndDate { get; set; } = null;
         [Required]
         public bool IsCompleted { get; set; }
