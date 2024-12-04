@@ -263,7 +263,53 @@ namespace backend.Controllers.Person
             });
         }
 
+        // Delete method, by Id in the parameters
+        [HttpDelete("{eduInfoId}")]
+        public async Task<IActionResult> DeletePersonEducationInformation([FromRoute] Guid eduInfoId)
+        {
+
+            //Check if PersonEducationInformation object with given Id exists
+            var personEducationInformation = await _personEducationInformationRepository.GetPersonEducationInformationById(eduInfoId);
+
+            //If PersonEducationInformation object with given Id does not exist, return NotFound
+            if (personEducationInformation == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Education information not found",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+
+            }
+
+            //Attempt to delete PersonEducationInformation object with the given Id
+            var deleteResult = await _personEducationInformationRepository.DeletePersonEducationInformationById(eduInfoId);
+
+            //If deleteResult is null, return InternalServerError
+            if (deleteResult == null)
+            {
+                return StatusCode(500, new
+                {
+                    success = "false",
+                    message = "Failed to delete education information, please try again later",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            return Ok(new
+            {
+                success = "true",
+                message = "Education information deleted successfully",
+                data = new { },
+                timestamp = DateTime.Now
+            });
+        }
 
 
     }
+
+
 }

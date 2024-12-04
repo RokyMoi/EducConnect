@@ -12,7 +12,8 @@ namespace backend.Interfaces.Person
         Task<List<PersonEducationInformationDTO>> GetAllPersonEducationInformationByPersonId(Guid personId);
         Task<PersonEducationInformationDTO> AddPersonEducationInformation(PersonEducationInformation newPersonEducationInformation);
         Task<PersonEducationInformationDTO> UpdatePersonEducationInformation(PersonEducationInformationUpdateDTO updatedPersonEducationInformation);
-        Task<PersonEducationInformationDTO> GetPersonEducationInformationById(Guid personEducationInformationId);       
+        Task<PersonEducationInformationDTO> GetPersonEducationInformationById(Guid personEducationInformationId);
+        Task<PersonEducationInformation> DeletePersonEducationInformationById(Guid personEducationInformationId);
 
     }
 }

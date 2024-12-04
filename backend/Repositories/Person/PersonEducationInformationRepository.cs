@@ -53,6 +53,28 @@ namespace backend.Repositories.Person
             }
         }
 
+        public async Task<PersonEducationInformation> DeletePersonEducationInformationById(Guid personEducationInformationId)
+        {
+            try
+            {
+                var personEducationInformationToDelete = await _databaseContext.PersonEducationInformation.FindAsync(personEducationInformationId);
+                if (personEducationInformationToDelete == null)
+                {
+                    throw new Exception("Person Education Information Not Found");
+                }
+                _databaseContext.PersonEducationInformation.Remove(personEducationInformationToDelete);
+                await _databaseContext.SaveChangesAsync();
+                return personEducationInformationToDelete;
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.InnerException);
+                return null;
+
+            }
+        }
+
         public async Task<List<PersonEducationInformationDTO>> GetAllPersonEducationInformationByPersonId(Guid personId)
         {
             var personEducationInformation = await _databaseContext.PersonEducationInformation.Where(x => x.PersonId == personId).ToListAsync();
