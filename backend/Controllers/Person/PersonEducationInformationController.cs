@@ -114,6 +114,22 @@ namespace backend.Controllers.Person
         public async Task<IActionResult> UpdatePersonEducationInformation(PersonEducationInformationUpdateRequestDTO updateRequestDTO)
         {
 
+            //Check if the PersonEmail with the email exists
+            var personEmail = await
+            _personRepository.
+            GetPersonEmailByEmail(updateRequestDTO.Email);
+
+            if (personEmail == null)
+            {
+                return Unauthorized(new
+                {
+                    success = "false",
+                    message = "Email does not exist",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+
+            }
             //Assign values from the updateRequestDTO to the PersonEducationInformationUpdateDTO object
             PersonEducationInformationUpdateDTO updateDTO = new PersonEducationInformationUpdateDTO
             {
@@ -149,6 +165,8 @@ namespace backend.Controllers.Person
 
             //Set a flag variable to check if any value has been updated
             bool isUpdated = false;
+
+
             //Check InstitutionName
             if (updateDTO.InstitutionName != personEducationInformation.InstitutionName)
             {
@@ -237,6 +255,8 @@ namespace backend.Controllers.Person
                     timestamp = DateTime.Now
                 });
             }
+
+            updateResponseDTO.PersonEducationInformationId = personEducationInformation.PersonEducationInformationId;
             //Attempt to update PersonEducationInformation
             var updateResult = await _personEducationInformationRepository.UpdatePersonEducationInformation(updateDTO);
 
@@ -264,9 +284,21 @@ namespace backend.Controllers.Person
         }
 
         // Delete method, by Id in the parameters
-        [HttpDelete("{eduInfoId}")]
-        public async Task<IActionResult> DeletePersonEducationInformation([FromRoute] Guid eduInfoId)
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeletePersonEducationInformation([FromQuery] Guid eduInfoId)
         {
+
+            if (eduInfoId == Guid.Empty)
+            {
+                return BadRequest(new
+                {
+                    success = "false",
+                    message = "Education information Id is required",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
 
             //Check if PersonEducationInformation object with given Id exists
             var personEducationInformation = await _personEducationInformationRepository.GetPersonEducationInformationById(eduInfoId);
@@ -376,6 +408,82 @@ namespace backend.Controllers.Person
 
             });
         }
+
+        //POST method, (GET not used for security purposes, GET sends data to server using URL, while POST uses body)returns PersonEducationInformation with given Id
+        [HttpPost("get")]
+        public async Task<IActionResult> GetPersonEducationInformationById(PersonEducationInformationGetRequestDTO requestDTO)
+        {
+
+            Console.WriteLine("RequestDTO: " + requestDTO.PersonEducationInformationId);
+            if (requestDTO.PersonEducationInformationId == Guid.Empty)
+            {
+                return BadRequest(new
+                {
+                    success = "false",
+                    message = "PersonEducationInformationId is required",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+
+            }
+
+            //Check does the PersonEmail with the given Email exist
+            var personEmail = await _personRepository.GetPersonEmailByEmail(requestDTO.Email);
+            if (personEmail == null)
+            {
+                return Unauthorized(new
+                {
+                    success = "false",
+                    message = "Email does not exist",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //Get PersonEducationInformation object with the given PersonId
+            var personEducationInformation = await _personEducationInformationRepository.GetPersonEducationInformationById(requestDTO.PersonEducationInformationId);
+
+            if (personEducationInformation == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "No education information found for account",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Convert PersonEducationInformation to PersonEducationInformationGetResponseDTO
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Successfully retrieved education information for the given account",
+                    data = new
+                    {
+                        PersonEducationInformation = new PersonEducationInformationGetResponseDTO
+                        {
+                            PersonEducationInformationId = personEducationInformation.PersonEducationInformationId,
+                            InstitutionName = personEducationInformation.InstitutionName,
+                            InstitutionOfficialWebsite = personEducationInformation.InstitutionOfficialWebsite,
+                            InstitutionAddress = personEducationInformation.InstitutionAddress,
+                            EducationLevel = personEducationInformation.EducationLevel,
+                            FieldOfStudy = personEducationInformation.FieldOfStudy,
+                            MinorFieldOfStudy = personEducationInformation.MinorFieldOfStudy,
+                            StartDate = personEducationInformation.StartDate,
+                            EndDate = personEducationInformation.EndDate,
+                            IsCompleted = personEducationInformation.IsCompleted,
+                            FinalGrade = personEducationInformation.FinalGrade,
+                            Description = personEducationInformation.Description,
+                        }
+                    }
+                }
+            );
+        }
+
     }
 
 
