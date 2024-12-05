@@ -15,7 +15,8 @@ export const routes: Routes = [
     { path: 'tutor-signup', component: TutorSignupComponent },
     {path: 'user-signin',component:LoginComponent},
     {path:'student-dashboard',component:StudentDashboardComponent},
-    { path: '**', component:BodyComponent },
-    {path:'tutor-dashboard',component:TutorDashboardComponent}
+    {path:'tutor-dashboard',component:TutorDashboardComponent},
+    { path: '**', component:BodyComponent }
+    
 
 ];

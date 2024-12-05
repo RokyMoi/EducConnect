@@ -21,13 +21,17 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
+                "src/assets",
+           "src/favicon.ico",
               {
+               
                 "glob": "**/*",
                 "input": "public"
                 
               }
             ],
             "styles": [
+         
               "src/styles.css"
             ],
             "scripts": []
@@ -86,9 +90,9 @@
               }
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.css",
-               "node_modules/bootstrap/dist/css/bootstrap.min.css"
-               
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
             ],
             "scripts": []
           }

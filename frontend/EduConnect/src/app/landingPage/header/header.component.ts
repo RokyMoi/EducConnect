@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AccountService } from '../../services/account.service';
 
 @Component({
   selector: 'app-landing-page-header',
@@ -8,5 +9,6 @@ import { Component } from '@angular/core';
   standalone: true,
 })
 export class HeaderComponent {
+  AccountService = inject(AccountService);
   title = 'EduConnect';
 }

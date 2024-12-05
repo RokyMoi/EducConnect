@@ -5,4 +5,12 @@
     <button class = "useServiceButton">
         Use EduConnect
     </button>
+    @if(AccountService.CurrentUser()){
+         @if(AccountService.CurrentUser()?.Role == "student"){
+
+         }
+         @if(AccountService.CurrentUser()?.Role == "tutor"){
+            
+         }
+    }
 </header>
