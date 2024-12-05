@@ -5,12 +5,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatCardModule } from '@angular/material/card';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 
 @Component({
   selector: 'app-for-you-page',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule, MatDividerModule, MatIconModule,MatToolbarModule],
+  imports: [MatCardModule, MatButtonModule, MatDividerModule, MatIconModule,MatToolbarModule,RouterLink,RouterLinkActive],
   templateUrl: './for-you-page.component.html',
   styleUrls: ['./for-you-page.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

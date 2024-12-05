@@ -1,0 +1,221 @@
+/* Global reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  body {
+    background: linear-gradient(145deg, #6a11cb, #2575fc);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 30px 0;
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  /* Header Section - Welcome User */
+  .header {
+  
+    text-align: center;
+    margin-bottom: 40px;
+    width: 90%;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: white;
+    text-transform: uppercase;
+  }
+  
+  .header p {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  /* Search and Filter Section */
+  .filters-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    max-width: 1100px;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    padding: 8px 15px;
+    border-radius: 50px;
+    width: 300px;
+    transition: all 0.3s ease;
+  }
+  
+  .search-bar input {
+    border: none;
+    outline: none;
+    padding: 8px;
+    font-size: 1rem;
+    background: transparent;
+    color: #333;
+    width: 100%;
+    border-radius: 30px;
+  }
+  
+  .search-bar input::placeholder {
+    color: #bbb;
+  }
+  
+  .search-bar i {
+    font-size: 1.2rem;
+    color: #888;
+    margin-left: 10px;
+  }
+  
+  .search-bar:hover {
+    background-color: #e2e2e2;
+  }
+  
+  .filters {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  .filter select {
+    padding: 10px;
+    font-size: 1rem;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+    transition: all 0.3s ease;
+  }
+  
+  .filter select:hover {
+    border-color: #4caf50;
+  }
+  
+  /* Course List Section */
+  .course-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
+  }
+  
+  .course-card {
+    background-color: #fff;
+    color: #333;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .course-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .course-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .course-card h3 {
+    font-size: 1.5rem;
+    margin-top: 15px;
+    color: #333;
+  }
+  
+  .course-card .category {
+    font-size: 1rem;
+    color: #777;
+    margin-bottom: 10px;
+  }
+  
+  .course-card .description {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 15px;
+  }
+  
+  .course-card .progress-bar {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    height: 8px;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .course-card .progress {
+    background-color: #4caf50;
+    height: 100%;
+    border-radius: 5px;
+  }
+  
+  .course-card .btn {
+    background-color: #2575fc;
+    color: white;
+    padding: 10px;
+    border-radius: 25px;
+    text-align: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border: none;
+  }
+  
+  .course-card .btn:hover {
+    background-color: #6a11cb;
+  }
+  
+  
+  .course-card:hover {
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+    transform: translateY(-25px);
+  }
+  
+  /* Media Queries for responsiveness */
+  @media (max-width: 768px) {
+    .filters-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .search-bar {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  
+    .filters {
+      width: 100%;
+      justify-content: flex-start;
+      gap: 15px;
+    }
+  }
+  
