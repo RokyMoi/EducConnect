@@ -6,6 +6,7 @@ import { LoginComponent } from './signup/login/login.component';
 import { StudentDashboardComponent } from './Student/student-dashboard/student-dashboard.component';
 import { TutorDashboardComponent } from './tutor/tutor-dashboard/tutor-dashboard.component';
 import { LearningComponent } from './Student/learning/learning.component';
+import { StudentProfileComponent } from './Student/student-profile/student-profile.component';
 
 
 
@@ -17,6 +18,7 @@ export const routes: Routes = [
     {path: 'user-signin',component:LoginComponent},
     {path:'student-dashboard',component:StudentDashboardComponent},
     {path:'tutor-dashboard',component:TutorDashboardComponent},
+    {path:'student-profile',component: StudentProfileComponent},
     {path:'learning-student',component: LearningComponent},
     { path: '**', component:BodyComponent }
     
