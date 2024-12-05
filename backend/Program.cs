@@ -1,3 +1,4 @@
+using backend.Data.DataSeeder;
 using backend.Entities.Reference.Country;
 using backend.Extensions;
 using backend.Utilities;
@@ -65,6 +66,29 @@ namespace EduConnect
             }
             var app = builder.Build();
 
+            //Seed database with work type data
+            using (var scope = app.Services.CreateScope())
+            {
+                //The following code block is used to seed the database with work and employment type data
+                //This code block uses async operations, but to not make the Main class async, GetAwaiter().GetResult() to execute the async operation, which is blocking in nature, and will block the Main method from executing the next line of code until the async operation is completed
+
+                try
+                {
+                    //Get the WorkType database seeder scoped service from the service container
+                    var workTypeSeeder = scope.ServiceProvider.GetRequiredService<WorkTypeDatabaseSeeder>();
+                    workTypeSeeder.SeedWorkTypeDataToDatabase().GetAwaiter().GetResult();
+
+                    //Get the EmploymentType database scoped seeder service from the service container
+                    var employmentTypeSeeder = scope.ServiceProvider.GetRequiredService<EmploymentTypeDatabaseSeeder>();
+                    employmentTypeSeeder.SeedEmploymentTypeDataToDatabase().GetAwaiter().GetResult();
+
+                }
+                catch (Exception ex)
+                {
+                    // Log and handle seeding errors
+                    Console.Error.WriteLine($"An error occurred during seeding: {ex.Message}");
+                }
+            }
 
 
             // Configure the HTTP request pipeline.

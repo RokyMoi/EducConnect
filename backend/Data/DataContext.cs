@@ -1,5 +1,6 @@
 ﻿using backend.Entities.Learning;
 using backend.Entities.Person;
+using backend.Entities.Reference;
 using backend.Entities.Reference.Country;
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
@@ -30,5 +31,9 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<LearningSubcategory> LearningSubCategory { get; set; }
 
     public DbSet<PersonEducationInformation> PersonEducationInformation { get; set; }
+
+    public DbSet<EmploymentType> EmploymentType { get; set; }
+    public DbSet<WorkType> WorkType { get; set; }
+    public DbSet<PersonCareerInformation> PersonCareerInformation { get; set; }
 
 }

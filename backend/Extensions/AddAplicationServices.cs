@@ -1,4 +1,6 @@
-﻿using backend.Extensions;
+﻿
+using backend.Data.DataSeeder;
+using backend.Extensions;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
 using backend.Interfaces.Tutor;
@@ -31,7 +33,8 @@ namespace EduConnect.Extensions
             services.AddScoped<IPersonEducationInformationRepository, PersonEducationInformationRepository>();
 
             services.AddScoped<CountryExtractor>();
-
+            services.AddScoped<WorkTypeDatabaseSeeder>();
+            services.AddScoped<EmploymentTypeDatabaseSeeder>();
             //ADD HOSTED SERVICES
             services.AddHostedService<CountrySeederHostedService>();
 
