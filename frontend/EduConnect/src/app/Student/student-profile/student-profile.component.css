@@ -24,10 +24,14 @@ body {
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
-    margin-top: 170px;
+    margin-top: 20%;
 }
   
-
+.RouterLinks{
+    display: flex;
+    justify-content: right;
+    flex-wrap: wrap;
+}
 
 .profile-header {
     background: linear-gradient(135deg, #4f6d7a, #1d2d6f);
@@ -235,7 +239,7 @@ body {
 @media (max-width: 768px) {
     .profile-container {
         width: 100%;
-        margin-top: 280px;
+        margin-top: 340px;
     }
 
     .profile-header {

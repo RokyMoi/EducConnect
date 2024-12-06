@@ -1,16 +1,50 @@
 <header>
     <p class = "headerLogo">
-        EduConnect
+        EduConnects
     </p>
-    <button class = "useServiceButton">
-        Use EduConnect
-    </button>
+   
     @if(AccountService.CurrentUser()){
-         @if(AccountService.CurrentUser()?.Role == "student"){
+         @if( AccountService.CurrentUser()?.Role === "student"){
+            <div class="RouterLinks">
+                <mat-icon class="IconAllDevices" >sms</mat-icon>
+            <mat-icon routerLink='/student-dashboard' class="iconComp">library_books</mat-icon>
+            <mat-icon  routerLink='/learning-student' class="iconComp">school</mat-icon> 
+            <div mat-card-avatar routerLink='/student-profile'  class="StudentPhoto iconComp" [style.background-image]="'url(https://material.angular.io/assets/img/examples/shiba1.jpg)'"></div>
+        </div>
+    }
 
-         }
+        <!---MOBILE SECTION -->
+       
          @if(AccountService.CurrentUser()?.Role == "tutor"){
-            
+              <!-- ADD TUTOR ROUTERLINKS--->
+               <div class="RouterLinks">
+
+
+
+
+
+               </div>
          }
     }
+    @else {
+        <div class="RouterLinks">
+        <button class = "useServiceButton">
+            Use EduConnect
+        </button>
+    </div>
+    }
 </header>
+
+
+<!---MOBILE SECTION FOR STUDENT -->
+@if(AccountService.CurrentUser()){
+    @if( AccountService.CurrentUser()?.Role === "student"){
+<div class="phoneMenu">
+    <mat-icon routerLink='/student-dashboard' class="icon">library_books</mat-icon>
+    <mat-icon   routerLink='/learning-student' class="icon">school</mat-icon> 
+  
+    <!-- Mobile Avatar Image -->
+    <div mat-card-avatar routerLink='/student-profile' class="StudentPhotoPhone" [style.background-image]="'url(https://material.angular.io/assets/img/examples/shiba1.jpg)'"></div>
+  </div>
+}
+}

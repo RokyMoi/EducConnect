@@ -7,12 +7,13 @@ import { StudentDashboardComponent } from './Student/student-dashboard/student-d
 import { TutorDashboardComponent } from './tutor/tutor-dashboard/tutor-dashboard.component';
 import { LearningComponent } from './Student/learning/learning.component';
 import { StudentProfileComponent } from './Student/student-profile/student-profile.component';
+import { roleGuardRedirectGuard } from './_guards/role-guard-redirect.guard';
 
 
 
 
 export const routes: Routes = [
-    { path: '', component:BodyComponent },
+    { path: '', component:BodyComponent,canActivate: [roleGuardRedirectGuard] },
     { path: 'student-register', component: RegisterStudentComponent },
     { path: 'tutor-signup', component: TutorSignupComponent },
     {path: 'user-signin',component:LoginComponent},

@@ -43,15 +43,7 @@ html, body {
   align-items: center; /* Horizontalno centriranje */
   /* Opcionalno pozadinska boja */
 }
-.StudentPhotoPhone{
-  visibility: 0%;
-  display: none;
-}
 
-
-.phoneMenu{
-    visibility: 0%;
-}
 .headerComp {
     position: relative; 
     
@@ -315,39 +307,5 @@ img.single-story-bg {
   margin-right: 5px;
   margin-bottom: 5px;
 }
-    .StudentPhotoPhone{
-      display: inline-block;
-        background-repeat: no-repeat;
-        background-size: cover;
-        width: 30px;
-        margin-right: 0;
-        margin-top: 5px;
-        height: 30px;
-    }
-    .phoneMenu{
-      display: flex;
-      justify-content: center;
-
-        width: 100%;
-        height: 7%;
-        background: linear-gradient(135deg, #4e0a8f, #1d4db4);
-
-        position: fixed;
-        z-index: 1;
-        bottom: 0;
-        gap:150px;
-       
-        
-      }
- 
-      .icon{
-        display: inline;
-        margin: 0px;
-       margin-top: 5px;
-      
-        color: white;
-        
-      }
-  
-
+   
 }
