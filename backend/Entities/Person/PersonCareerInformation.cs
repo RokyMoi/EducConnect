@@ -35,8 +35,8 @@ namespace backend.Entities.Person
         [ForeignKey(nameof(EmploymentTypeId))]
         public EmploymentType EmploymentType { get; set; }
         [Required]
-        public required long StartDate { get; set; }
-        public long? EndDate { get; set; }
+        public required DateOnly StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
         public string? JobDescription { get; set; } = string.Empty;
         public string? Responsibilities { get; set; } = string.Empty;
         public string? Achievements { get; set; } = string.Empty;
@@ -53,6 +53,9 @@ namespace backend.Entities.Person
 
         public string? AdditionalInformation { get; set; } = string.Empty;
 
+        [Required]
+        public required long CreatedAt { get; set; }
+        public long? UpdatedAt { get; set; }
 
 
 

@@ -31,6 +31,8 @@ namespace EduConnect.Extensions
             services.AddScoped<ITutorRepository, TutorRepository>();
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IPersonEducationInformationRepository, PersonEducationInformationRepository>();
+            services.AddScoped<IPersonCareerInformationRepository, PersonCareerInformationRepository>();
+            services.AddScoped<IReferenceRepository, ReferenceRepository>();
 
             services.AddScoped<CountryExtractor>();
             services.AddScoped<WorkTypeDatabaseSeeder>();
