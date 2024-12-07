@@ -150,5 +150,111 @@ namespace backend.Repositories.Person
             return careerInformationList;
 
         }
+
+        public async Task<PersonCareerInformationDTO> GetPersonCareerInformationById(Guid personCareerInformationId)
+        {
+            var careerInformation = await _dataContext.PersonCareerInformation.Where(p => p.PersonCareerInformationId == personCareerInformationId).FirstOrDefaultAsync();
+
+            if (careerInformation == null)
+            {
+                return null;
+            }
+
+            return new PersonCareerInformationDTO
+            {
+
+                PersonCareerInformationId = careerInformation.PersonCareerInformationId,
+                PersonId = careerInformation.PersonId,
+                CompanyName = careerInformation.CompanyName,
+                CompanyWebsite = careerInformation.CompanyWebsite,
+                JobTitle = careerInformation.JobTitle,
+                Position = careerInformation.Position,
+                CityOfEmployment = careerInformation.CityOfEmployment,
+                CountryOfEmployment = careerInformation.CountryOfEmployment,
+                EmploymentTypeId = careerInformation.EmploymentTypeId,
+                StartDate = careerInformation.StartDate,
+                EndDate = careerInformation.EndDate,
+                JobDescription = careerInformation.JobDescription,
+                Responsibilities = careerInformation.Responsibilities,
+                Achievements = careerInformation.Achievements,
+                Industry = careerInformation.Industry,
+                SkillsUsed = careerInformation.SkillsUsed,
+                WorkTypeId = careerInformation.WorkTypeId,
+                AdditionalInformation = careerInformation.AdditionalInformation
+            };
+        }
+
+        public async Task<PersonCareerInformationDTO> UpdatePersonCareerInformation(PersonCareerInformationDTO updateDTO)
+        {
+            //Get the PersonCareerInformation to update from the database
+            PersonCareerInformation personCareerInformation = await _dataContext.PersonCareerInformation.Where(p => p.PersonCareerInformationId == updateDTO.PersonCareerInformationId).FirstOrDefaultAsync();
+
+
+            if (personCareerInformation == null)
+            {
+                return null;
+            }
+
+            //Convert the parameter PersonCareerInformationDTO to a PersonCareerInformation object
+
+            personCareerInformation.PersonCareerInformationId = updateDTO.PersonCareerInformationId;
+            personCareerInformation.PersonId = updateDTO.PersonId;
+            personCareerInformation.CompanyName = updateDTO.CompanyName;
+            personCareerInformation.CompanyWebsite = updateDTO.CompanyWebsite;
+            personCareerInformation.JobTitle = updateDTO.JobTitle;
+            personCareerInformation.Position = updateDTO.Position;
+            personCareerInformation.CityOfEmployment = updateDTO.CityOfEmployment;
+            personCareerInformation.CountryOfEmployment = updateDTO.CountryOfEmployment;
+            personCareerInformation.EmploymentTypeId = updateDTO.EmploymentTypeId;
+            personCareerInformation.StartDate = updateDTO.StartDate;
+            personCareerInformation.EndDate = updateDTO.EndDate;
+            personCareerInformation.JobDescription = updateDTO.JobDescription;
+            personCareerInformation.Responsibilities = updateDTO.Responsibilities;
+            personCareerInformation.Achievements = updateDTO.Achievements;
+            personCareerInformation.Industry = updateDTO.Industry;
+            personCareerInformation.SkillsUsed = updateDTO.SkillsUsed;
+            personCareerInformation.WorkTypeId = updateDTO.WorkTypeId;
+            personCareerInformation.AdditionalInformation = updateDTO.AdditionalInformation;
+            personCareerInformation.UpdatedAt = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+
+
+            //Attempt to save the changes to the database
+            try
+            {
+                await _dataContext.SaveChangesAsync();
+
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.InnerException);
+                return null;
+            }
+
+            //Return the updated PersonCareerInformation object 
+            return new PersonCareerInformationDTO
+            {
+                PersonCareerInformationId = personCareerInformation.PersonCareerInformationId,
+                PersonId = personCareerInformation.PersonId,
+                CompanyName = personCareerInformation.CompanyName,
+                CompanyWebsite = personCareerInformation.CompanyWebsite,
+                JobTitle = personCareerInformation.JobTitle,
+                Position = personCareerInformation.Position,
+                CityOfEmployment = personCareerInformation.CityOfEmployment,
+                CountryOfEmployment = personCareerInformation.CountryOfEmployment,
+                EmploymentTypeId = personCareerInformation.EmploymentTypeId,
+                StartDate = personCareerInformation.StartDate,
+                EndDate = personCareerInformation.EndDate,
+                JobDescription = personCareerInformation.JobDescription,
+                Responsibilities = personCareerInformation.Responsibilities,
+                Achievements = personCareerInformation.Achievements,
+                Industry = personCareerInformation.Industry,
+                SkillsUsed = personCareerInformation.SkillsUsed,
+                WorkTypeId = personCareerInformation.WorkTypeId,
+                AdditionalInformation = personCareerInformation.AdditionalInformation,
+            };
+        }
     }
 }

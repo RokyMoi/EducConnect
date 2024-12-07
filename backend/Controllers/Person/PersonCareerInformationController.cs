@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Data.DataSeeder;
 using backend.DTOs.Person;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
@@ -131,5 +132,432 @@ namespace backend.Controllers.Person
 
             });
         }
+
+        [HttpPost("all")]
+        public async Task<IActionResult> GetPersonCareerInfromation(PersonEmailRequestDTO requestDTO)
+        {
+
+            //Check if the PersonEmail with the provided email value exists
+            PersonEmailDTO personEmail = await _personRepository.GetPersonEmailByEmail(requestDTO.Email);
+
+            if (personEmail == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Email does not exist",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+            }
+
+            //Get all career information with the PersonId taken from the PersonEmail
+            var careerInformationList = await _personCareerInformationRepository.GetAllPersonCareerInformationByPersonId(personEmail.PersonId);
+
+            if (careerInformationList == null || careerInformationList.Count == 0)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "No career information found for this account",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+
+            }
+
+            //Convert the list of career information to a list of PersonCareerInformationSaveResponseDTOs
+
+            List<PersonCareerInformationSaveResponseDTO> careerInformationListResponse = new List<PersonCareerInformationSaveResponseDTO>();
+            foreach (var careerInformation in careerInformationList)
+            {
+                careerInformationListResponse.Add(new PersonCareerInformationSaveResponseDTO
+                {
+                    PersonCareerInformationId = careerInformation.PersonCareerInformationId,
+                    CompanyName = careerInformation.CompanyName,
+                    CompanyWebsite = careerInformation.CompanyWebsite,
+                    JobTitle = careerInformation.JobTitle,
+                    Position = careerInformation.Position,
+                    CityOfEmployment = careerInformation.CityOfEmployment,
+                    CountryOfEmployment = careerInformation.CountryOfEmployment,
+                    EmploymentType = careerInformation.EmploymentTypeId,
+                    StartDate = careerInformation.StartDate,
+                    EndDate = careerInformation.EndDate,
+                    JobDescription = careerInformation.JobDescription,
+                    Responsibilities = careerInformation.Responsibilities,
+                    Achievements = careerInformation.Achievements,
+                    Industry = careerInformation.Industry,
+                    SkillsUsed = careerInformation.SkillsUsed,
+                    WorkType = careerInformation.WorkTypeId,
+                    AdditionalInformation = careerInformation.AdditionalInformation
+                });
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"{careerInformationListResponse.Count} records of career information for this account have been found",
+                    data = new
+                    {
+                        CareerInformation = careerInformationListResponse,
+                    },
+                    timestamp = DateTime.Now
+
+                }
+            );
+
+
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPersonCareerInformationById([FromQuery] Guid id)
+        {
+
+            if (id == Guid.Empty)
+            {
+                return BadRequest(new
+                {
+                    success = "false",
+                    message = "Invalid id",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+            }
+
+            //Get the career information with the provided id
+            var careerInformation = await _personCareerInformationRepository.GetPersonCareerInformationById(id);
+
+            if (careerInformation == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Career information not found",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+            };
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Career information found",
+                    data = new
+                    {
+                        careerInformation = new PersonCareerInformationSaveResponseDTO
+                        {
+                            PersonCareerInformationId = careerInformation.PersonCareerInformationId,
+                            CompanyName = careerInformation.CompanyName,
+                            CompanyWebsite = careerInformation.CompanyWebsite,
+                            JobTitle = careerInformation.JobTitle,
+                            Position = careerInformation.Position,
+                            CityOfEmployment = careerInformation.CityOfEmployment,
+                            CountryOfEmployment = careerInformation.CountryOfEmployment,
+                            EmploymentType = careerInformation.EmploymentTypeId,
+                            StartDate = careerInformation.StartDate,
+                            EndDate = careerInformation.EndDate,
+                            JobDescription = careerInformation.JobDescription,
+                            Responsibilities = careerInformation.Responsibilities,
+                            Achievements = careerInformation.Achievements,
+                            Industry = careerInformation.Industry,
+                            SkillsUsed = careerInformation.SkillsUsed,
+                            WorkType = careerInformation.WorkTypeId,
+                            AdditionalInformation = careerInformation.AdditionalInformation
+                        }
+                    },
+                    timestamp = DateTime.Now
+                }
+            );
+        }
+
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdatePersonCareerInformation(PersonCareerInformationUpdateRequestDTO updateRequestDTO)
+        {
+
+            //Check if the provided email value is connected to an existing PersonEmail object 
+            var personEmail = await _personRepository.GetPersonEmailByEmail(updateRequestDTO.Email);
+
+            if (personEmail == null)
+            {
+                return Unauthorized(new
+                {
+                    success = "false",
+                    message = "Email does not exist",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+            }
+
+
+            //Get the PersonCareerInformation object with the provided id
+            var careerInformation = await _personCareerInformationRepository.GetPersonCareerInformationById(updateRequestDTO.PersonCareerInformationId);
+
+            if (careerInformation == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Career information not found",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+            }
+
+            //Check if the career information is associated with the account
+
+            if (careerInformation.PersonId != personEmail.PersonId)
+            {
+                return Unauthorized(new
+                {
+                    success = "false",
+                    message = "Career information does not belong to the account",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+            }
+
+
+            //Update the career information
+
+            //Set flag isUpdated to keep track of whether any fields were updated
+            bool isUpdated = false;
+
+            //Check CompanyName 
+            if (updateRequestDTO.CompanyName != null && updateRequestDTO.CompanyName != careerInformation.CompanyName)
+            {
+
+                careerInformation.CompanyName = updateRequestDTO.CompanyName;
+                isUpdated = true;
+            }
+
+            //Check CompanyWebsite
+
+            if (updateRequestDTO.UpdateCompanyWebsite && updateRequestDTO.CompanyWebsite != careerInformation.CompanyWebsite)
+            {
+                careerInformation.CompanyWebsite = updateRequestDTO.CompanyWebsite;
+                isUpdated = true;
+            }
+
+            //Check JobTitle 
+            if (updateRequestDTO.JobTitle != null && updateRequestDTO.JobTitle != careerInformation.JobTitle)
+            {
+                careerInformation.JobTitle = updateRequestDTO.JobTitle;
+                isUpdated = true;
+            }
+
+            //Check Position
+            if (updateRequestDTO.UpdatePosition && updateRequestDTO.Position != careerInformation.Position)
+            {
+                careerInformation.Position = updateRequestDTO.Position;
+                isUpdated = true;
+            }
+
+            //Check CityOfEmployment
+            if (updateRequestDTO.CityOfEmployment != null && !updateRequestDTO.CityOfEmployment.Equals(careerInformation.CityOfEmployment))
+            {
+                careerInformation.CityOfEmployment = updateRequestDTO.CityOfEmployment;
+                isUpdated = true;
+            }
+
+            //Check CountryOfEmployment
+            if (updateRequestDTO.CountryOfEmployment != null && !updateRequestDTO.CountryOfEmployment.Equals(careerInformation.CountryOfEmployment))
+            {
+                careerInformation.CountryOfEmployment = updateRequestDTO.CountryOfEmployment;
+                isUpdated = true;
+            }
+
+            //Check EmploymentType
+            if (updateRequestDTO.EmploymentType != null && !updateRequestDTO.EmploymentType.Value.Equals(careerInformation.EmploymentTypeId))
+            {
+                //Check if the provided EmploymentType exists in the database
+                var employmentType = await _referenceRepository.GetEmploymentTypeByIdAsync(updateRequestDTO.EmploymentType.Value);
+                if (employmentType == null)
+                {
+                    return NotFound(
+                        new
+                        {
+                            success = "false",
+                            message = "Employment type not found, please select another one",
+                            data = new { },
+                            timestamp = DateTime.Now,
+                        }
+                    );
+                }
+                careerInformation.EmploymentTypeId = updateRequestDTO.EmploymentType.Value;
+                isUpdated = true;
+            }
+
+
+
+            //Check StartDate 
+            if (updateRequestDTO.StartDate != null && !updateRequestDTO.StartDate.Value.ToString().Equals(careerInformation.StartDate.ToString()))
+            {
+
+                careerInformation.StartDate = updateRequestDTO.StartDate.Value;
+                isUpdated = true;
+            }
+
+
+            //Check EndDate 
+            if (updateRequestDTO.UpdateEndDate && !updateRequestDTO.EndDate.Value.ToString().Equals(careerInformation.EndDate.Value.ToString()))
+            {
+                careerInformation.EndDate = updateRequestDTO.EndDate;
+                isUpdated = true;
+            }
+
+            //Check JobDescription
+            if (updateRequestDTO.UpdateJobDescription && updateRequestDTO.JobDescription != careerInformation.JobDescription)
+            {
+                careerInformation.JobDescription = updateRequestDTO.JobDescription;
+                isUpdated = true;
+            }
+
+            //Check Responsibilities
+            if (updateRequestDTO.UpdateResponsibilities && updateRequestDTO.Responsibilities != careerInformation.Responsibilities)
+            {
+                careerInformation.Responsibilities = updateRequestDTO.Responsibilities;
+                isUpdated = true;
+            }
+
+            //Check Achievements
+            if (updateRequestDTO.UpdateAchievements && updateRequestDTO.Achievements != careerInformation.Achievements)
+            {
+                careerInformation.Achievements = updateRequestDTO.Achievements;
+                isUpdated = true;
+            }
+
+            //Check Industry 
+            if (updateRequestDTO.Industry != null && updateRequestDTO.Industry != careerInformation.Industry)
+            {
+                careerInformation.Industry = updateRequestDTO.Industry;
+                isUpdated = true;
+            }
+
+            //Check SkillsUsed
+            if (updateRequestDTO.SkillsUsed != null && updateRequestDTO.SkillsUsed != careerInformation.SkillsUsed)
+            {
+                careerInformation.SkillsUsed = updateRequestDTO.SkillsUsed;
+                isUpdated = true;
+
+            }
+
+            //Check WorkType
+            if (updateRequestDTO.UpdateWorkType && updateRequestDTO.WorkType != careerInformation.WorkTypeId)
+            {
+
+                //Check if the provided WorkType exists in the database if it is not null in the request
+                if (updateRequestDTO.WorkType.HasValue)
+                {
+
+                    var workType = await _referenceRepository.GetWorkTypeByIdAsync(updateRequestDTO.WorkType.Value);
+                    if (workType == null)
+                    {
+                        return NotFound(
+                            new
+                            {
+                                success = "false",
+                                message = "Work type not found, please select another one",
+                                data = new { },
+                                timestamp = DateTime.Now,
+                            }
+                        );
+                    }
+                }
+                careerInformation.WorkTypeId = updateRequestDTO.WorkType;
+                isUpdated = true;
+            }
+
+            //Check AdditionalInformation
+            if (updateRequestDTO.UpdateAdditionalInformation && updateRequestDTO.AdditionalInformation != careerInformation.AdditionalInformation)
+            {
+                careerInformation.AdditionalInformation = updateRequestDTO.AdditionalInformation;
+                isUpdated = true;
+            }
+
+            //If no fields were updated, return a 400 Bad Request response
+
+            if (!isUpdated)
+            {
+                return BadRequest(new
+                {
+                    success = "false",
+                    message = "No fields were provided for update",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Convert from PersonCareerInformation object to PersonCareerInformationDTO
+            PersonCareerInformationDTO careerInformationDTO = new PersonCareerInformationDTO()
+            {
+                PersonCareerInformationId = careerInformation.PersonCareerInformationId,
+                PersonId = careerInformation.PersonId,
+                CompanyName = careerInformation.CompanyName,
+                CompanyWebsite = careerInformation.CompanyWebsite,
+                JobTitle = careerInformation.JobTitle,
+                Position = careerInformation.Position,
+                CityOfEmployment = careerInformation.CityOfEmployment,
+                CountryOfEmployment = careerInformation.CountryOfEmployment,
+                EmploymentTypeId = careerInformation.EmploymentTypeId,
+                StartDate = careerInformation.StartDate,
+                EndDate = careerInformation.EndDate,
+                JobDescription = careerInformation.JobDescription,
+                Responsibilities = careerInformation.Responsibilities,
+                Achievements = careerInformation.Achievements,
+                Industry = careerInformation.Industry,
+                SkillsUsed = careerInformation.SkillsUsed,
+                WorkTypeId = careerInformation.WorkTypeId,
+                AdditionalInformation = careerInformation.AdditionalInformation,
+            };
+
+            //Attempt to update the career information in the database 
+            var updateResult = await _personCareerInformationRepository.UpdatePersonCareerInformation(careerInformationDTO);
+
+            if (updateResult == null)
+            {
+                return StatusCode(500, new
+                {
+                    success = "false",
+                    message = "We failed to update your career information, please try again later",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+            return Ok(new
+            {
+                success = "true",
+                message = "Career information updated successfully",
+                data = new
+                {
+                    careerInformation = new PersonCareerInformationSaveResponseDTO
+                    {
+                        PersonCareerInformationId = updateResult.PersonCareerInformationId,
+                        CompanyName = updateResult.CompanyName,
+                        CompanyWebsite = updateResult.CompanyWebsite,
+                        JobTitle = updateResult.JobTitle,
+                        Position = updateResult.Position,
+                        CityOfEmployment = updateResult.CityOfEmployment,
+                        CountryOfEmployment = updateResult.CountryOfEmployment,
+                        EmploymentType = updateResult.EmploymentTypeId,
+                        StartDate = updateResult.StartDate,
+                        EndDate = updateResult.EndDate,
+                        JobDescription = updateResult.JobDescription,
+                        Responsibilities = updateResult.Responsibilities,
+                        Achievements = updateResult.Achievements,
+                        Industry = updateResult.Industry,
+                        SkillsUsed = updateResult.SkillsUsed,
+                        WorkType = updateResult.WorkTypeId,
+                        AdditionalInformation = updateResult.AdditionalInformation,
+                    }
+                },
+                timestamp = DateTime.Now
+            });
+        }
+
     }
+
+
 }

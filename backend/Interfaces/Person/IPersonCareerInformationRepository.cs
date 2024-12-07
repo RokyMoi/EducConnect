@@ -12,5 +12,9 @@ namespace backend.Interfaces.Person
 
         Task<PersonCareerInformationDTO>
         AddPersonCareerInformation(PersonCareerInformationCreateDTO newPersonCareerInformation);
+
+        Task<PersonCareerInformationDTO> GetPersonCareerInformationById(Guid personCareerInformationId);
+
+        Task<PersonCareerInformationDTO> UpdatePersonCareerInformation(PersonCareerInformationDTO updateDTO);
     }
 }

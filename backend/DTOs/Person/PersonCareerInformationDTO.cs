@@ -7,7 +7,7 @@ namespace backend.DTOs.Person
 {
     public class PersonCareerInformationDTO
     {
-        public Guid PersonCareerInformationId { get; set; }
+        public required Guid PersonCareerInformationId { get; set; }
 
         public Guid PersonId { get; set; }
         public string CompanyName { get; set; }
@@ -28,6 +28,6 @@ namespace backend.DTOs.Person
         public string SkillsUsed { get; set; }
         public int? WorkTypeId { get; set; }
         public string? AdditionalInformation { get; set; }
-        
+
     }
 }
