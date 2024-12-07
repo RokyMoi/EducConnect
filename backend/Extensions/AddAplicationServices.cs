@@ -33,6 +33,7 @@ namespace EduConnect.Extensions
             services.AddScoped<IPersonEducationInformationRepository, PersonEducationInformationRepository>();
             services.AddScoped<IPersonCareerInformationRepository, PersonCareerInformationRepository>();
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
+            services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
 
             services.AddScoped<CountryExtractor>();
             services.AddScoped<WorkTypeDatabaseSeeder>();
