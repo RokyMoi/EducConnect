@@ -36,4 +36,6 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<WorkType> WorkType { get; set; }
     public DbSet<PersonCareerInformation> PersonCareerInformation { get; set; }
 
+    public DbSet<PersonAvailability> PersonAvailibility { get; set; }
+
 }
