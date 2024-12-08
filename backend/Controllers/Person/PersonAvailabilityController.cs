@@ -381,5 +381,234 @@ namespace backend.Controllers.Person
 
 
         }
+        [HttpPut]
+        public async Task<IActionResult> UpdatePersonAvailabilityById(PersonAvailabilityUpdateRequestDTO requestDTO)
+        {
+
+            //Check if the PersonAvailabilityId is valid
+            if (requestDTO.PersonAvailabilityId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Invalid id",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
+
+
+            //Check StartTime 
+            TimeSpan newStartTime = TimeSpan.Zero;
+            if (!string.IsNullOrEmpty(requestDTO.StartTime) && !TimeSpan.TryParse(requestDTO.StartTime, out newStartTime))
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Invalid start time",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
+
+            //Check EndTime 
+            TimeSpan newEndTime = TimeSpan.Zero;
+            if (!string.IsNullOrEmpty(requestDTO.EndTime) && !TimeSpan.TryParse(requestDTO.EndTime, out newEndTime))
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Invalid end time",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
+
+
+
+            //Check if the new startTime is before the new endTime
+            if (!string.IsNullOrEmpty(requestDTO.StartTime) && !string.IsNullOrEmpty(requestDTO.EndTime) && newStartTime.CompareTo(newEndTime) >= 0)
+            {
+
+
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Start time must be before end time",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
+
+
+            //Check if the new startTime and the new endTime difference is at least 15 minutes
+            if (!string.IsNullOrEmpty(requestDTO.StartTime) && !string.IsNullOrEmpty(requestDTO.EndTime) && newEndTime.Subtract(newStartTime).Duration().TotalMinutes < 15)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Start time and end time difference must be at least 15 minutes",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
+
+
+            //Check if the new DayOfWeek is valid
+            if (requestDTO.DayOfWeek != null && !Enum.IsDefined(typeof(DayOfWeek), requestDTO.DayOfWeek))
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Invalid day of week",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
+            //Check if a PersonEmail associated with the email from the parameter PersonEmailRequestDTO exists in the database
+
+            var personEmail = await _personRepository.GetPersonEmailByEmail(requestDTO.Email);
+
+            if (personEmail == null)
+            {
+                return Unauthorized(
+                    new
+                    {
+                        success = "false",
+                        message = "Email does not exist",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
+
+
+
+            //Check if a PersonAvailability associated with the id from the parameter PersonAvailabilityUpdateRequestDTO exists in the database
+
+            var personAvailability = await _personAvailabilityRepository.GetPersonAvailabilityById(requestDTO.PersonAvailabilityId);
+
+            if (personAvailability == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Time availability not found",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+
+            }
+
+
+            //Check if the account is allowed to edit this information, by checking if the PersonId from PersonEmail matches the PersonId from PersonAvailability
+
+            if (personEmail.PersonId != personAvailability.PersonId)
+            {
+                return StatusCode(403, new
+                {
+                    success = "false",
+                    message = "You do not have permission to update this time availability",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+            }
+            //Add flag isUpdated for checking if the provided values are different from the current values
+            bool isUpdated = false;
+
+            //Check StartTime
+            if (!string.IsNullOrEmpty(requestDTO.StartTime) && newStartTime.CompareTo(personAvailability.StartTime) != 0)
+            {
+                isUpdated = true;
+                personAvailability.StartTime = newStartTime;
+            }
+
+            //Check EndTime
+            if (!string.IsNullOrEmpty(requestDTO.EndTime) && newEndTime.CompareTo(personAvailability.EndTime) != 0)
+            {
+                isUpdated = true;
+                personAvailability.EndTime = newEndTime;
+            }
+
+            //Check DayOfWeek
+            if (requestDTO.DayOfWeek.HasValue && requestDTO.DayOfWeek.Value.CompareTo((int)personAvailability.DayOfWeek) != 0)
+            {
+                isUpdated = true;
+                personAvailability.DayOfWeek = (DayOfWeek)requestDTO.DayOfWeek.Value;
+            }
+
+            //If no fields are updated, return a bad request
+            if (!isUpdated)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "No new values were provided for the  update",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
+
+            //Convert from PersonAvailability to PersonAvailabilityDTO
+
+            var personAvailabilityDTO = new PersonAvailabilityDTO
+            {
+                PersonAvailabilityId = personAvailability.PersonAvailabilityId,
+                PersonId = personAvailability.PersonId,
+                StartTime = personAvailability.StartTime,
+                EndTime = personAvailability.EndTime,
+                DayOfWeek = personAvailability.DayOfWeek,
+            };
+
+            //Attempt to update the PersonAvailability in the database
+
+            var updateResult = await _personAvailabilityRepository.UpdatePersonAvailabilityById(personAvailabilityDTO);
+
+            if (updateResult == null)
+            {
+                return StatusCode(500, new
+                {
+                    success = "false",
+                    message = "We failed to update the time availability, please try again later",
+                    data = new { },
+                    timestamp = DateTime.Now,
+                });
+            }
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Time availability updated successfully",
+                    data = new
+                    {
+                        timeAvailability = new
+                        PersonAvailabilitySaveResponseDTO
+                        {
+                            PersonAvailabilityId = updateResult.PersonAvailabilityId,
+                            DayOfWeek = updateResult.DayOfWeek,
+                            StartTime = updateResult.StartTime,
+                            EndTime = updateResult.EndTime,
+                        },
+                        isUpdated
+                    },
+                    timestamp = DateTime.Now,
+                }
+            );
+
+        }
     }
 }

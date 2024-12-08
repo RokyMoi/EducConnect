@@ -130,6 +130,35 @@ namespace backend.Repositories.Person
             };
         }
 
-        
+        public async Task<PersonAvailabilityDTO> UpdatePersonAvailabilityById(PersonAvailabilityDTO updateDTO)
+        {
+            var personAvailability = await _dataContext.PersonAvailibility.Where(p => p.PersonAvailabilityId == updateDTO.PersonAvailabilityId).FirstOrDefaultAsync();
+
+            if (personAvailability == null)
+            {
+                return null;
+            }
+
+            personAvailability.StartTime = updateDTO.StartTime;
+            personAvailability.EndTime = updateDTO.EndTime;
+            personAvailability.DayOfWeek = updateDTO.DayOfWeek;
+            personAvailability.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+
+            try
+            {
+                await _dataContext.SaveChangesAsync();
+
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error updating person availability");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.InnerException);
+                return null;
+            }
+            return updateDTO;
+        }
     }
 }

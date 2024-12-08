@@ -12,7 +12,7 @@ namespace backend.Interfaces.Person
         Task<PersonAvailabilityDTO> GetPersonAvailabilityById(Guid personAvailabilityId);
         Task<List<PersonAvailabilityDTO>> GetAllPersonAvailabilityByPersonId(Guid personId);
         Task<PersonAvailabilityDTO> DeletePersonAvailabilityById(Guid personAvailabilityId);
-
+        Task<PersonAvailabilityDTO> UpdatePersonAvailabilityById(PersonAvailabilityDTO updateDTO);
 
     }
 }
