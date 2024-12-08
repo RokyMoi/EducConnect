@@ -16,5 +16,7 @@ namespace backend.Interfaces.Person
         Task<PersonCareerInformationDTO> GetPersonCareerInformationById(Guid personCareerInformationId);
 
         Task<PersonCareerInformationDTO> UpdatePersonCareerInformation(PersonCareerInformationDTO updateDTO);
+
+        Task<PersonCareerInformationDTO> DeletePersonCareerInformationById(Guid personCareerInformationId);
     }
 }

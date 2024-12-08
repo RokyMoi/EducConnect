@@ -106,6 +106,54 @@ namespace backend.Repositories.Person
             };
         }
 
+        public async Task<PersonCareerInformationDTO> DeletePersonCareerInformationById(Guid personCareerInformationId)
+        {
+            var personCareerInformation = await _dataContext.PersonCareerInformation.Where(p => p.PersonCareerInformationId == personCareerInformationId).FirstOrDefaultAsync();
+
+            if (personCareerInformation == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                _dataContext.PersonCareerInformation.Remove(personCareerInformation);
+                await _dataContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error deleting person career information");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.InnerException);
+                return null;
+
+            }
+
+            return new PersonCareerInformationDTO
+            {
+                PersonCareerInformationId = personCareerInformation.PersonCareerInformationId,
+                PersonId = personCareerInformation.PersonId,
+                CompanyName = personCareerInformation.CompanyName,
+                CompanyWebsite = personCareerInformation.CompanyWebsite,
+                JobTitle = personCareerInformation.JobTitle,
+                Position = personCareerInformation.Position,
+                CityOfEmployment = personCareerInformation.CityOfEmployment,
+                CountryOfEmployment = personCareerInformation.CountryOfEmployment,
+                EmploymentTypeId = personCareerInformation.EmploymentTypeId,
+                StartDate = personCareerInformation.StartDate,
+                EndDate = personCareerInformation.EndDate,
+                JobDescription = personCareerInformation.JobDescription,
+                Responsibilities = personCareerInformation.Responsibilities,
+                Achievements = personCareerInformation.Achievements,
+                Industry = personCareerInformation.Industry,
+                SkillsUsed = personCareerInformation.SkillsUsed,
+                WorkTypeId = personCareerInformation.WorkTypeId,
+                AdditionalInformation = personCareerInformation.AdditionalInformation,
+            };
+
+        }
+
         public async Task<List<PersonCareerInformationDTO>> GetAllPersonCareerInformationByPersonId(Guid personId)
         {
             //Get all person career information by person id

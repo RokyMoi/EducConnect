@@ -130,6 +130,7 @@ namespace backend.Controllers.Person
                 });
 
             }
+
             //Assign values from the updateRequestDTO to the PersonEducationInformationUpdateDTO object
             PersonEducationInformationUpdateDTO updateDTO = new PersonEducationInformationUpdateDTO
             {
@@ -155,6 +156,17 @@ namespace backend.Controllers.Person
                 {
                     success = "false",
                     message = "Education information not found",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+            //Check if the PersonId from PersonEmail matches the PersonId from the PersonEducationInformation
+            if (personEmail.PersonId != personEducationInformation.PersonId)
+            {
+                return StatusCode(403, new
+                {
+                    success = "false",
+                    message = "You are not authorized to update this education information",
                     data = new { },
                     timestamp = DateTime.Now
                 });
@@ -283,25 +295,42 @@ namespace backend.Controllers.Person
             });
         }
 
-        // Delete method, by Id in the parameters
-        [HttpDelete("delete")]
-        public async Task<IActionResult> DeletePersonEducationInformation([FromQuery] Guid eduInfoId)
+        [HttpDelete]
+        public async Task<IActionResult> DeletePersonEducationInformation(PersonEducationInformationDeleteRequestDTO deleteDTO)
         {
-
-            if (eduInfoId == Guid.Empty)
+            if (deleteDTO.PersonEducationInformationId == Guid.Empty)
             {
-                return BadRequest(new
-                {
-                    success = "false",
-                    message = "Education information Id is required",
-                    data = new { },
-                    timestamp = DateTime.Now
-                });
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Invalid Id",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the PersonEmail associated with the email from the delete request body exists
+            var personEmail = await _personRepository.GetPersonEmailByEmail(deleteDTO.Email);
+
+            if (personEmail == null)
+            {
+                return Unauthorized(
+                    new
+                    {
+                        success = "false",
+                        message = "Email does not exist",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
             }
 
 
+
             //Check if PersonEducationInformation object with given Id exists
-            var personEducationInformation = await _personEducationInformationRepository.GetPersonEducationInformationById(eduInfoId);
+            var personEducationInformation = await _personEducationInformationRepository.GetPersonEducationInformationById(deleteDTO.PersonEducationInformationId);
 
             //If PersonEducationInformation object with given Id does not exist, return NotFound
             if (personEducationInformation == null)
@@ -315,9 +344,21 @@ namespace backend.Controllers.Person
                 });
 
             }
+            //Check if the PersonEmail associated with the email from the delete request body is the same as the PersonEmail associated with the PersonEducationInformation object
 
+            if (personEmail.PersonId != personEducationInformation.PersonId)
+            {
+                return StatusCode(403, new
+                {
+                    success = "false",
+                    message = "You are not authorized to delete this education information",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+
+            }
             //Attempt to delete PersonEducationInformation object with the given Id
-            var deleteResult = await _personEducationInformationRepository.DeletePersonEducationInformationById(eduInfoId);
+            var deleteResult = await _personEducationInformationRepository.DeletePersonEducationInformationById(deleteDTO.PersonEducationInformationId);
 
             //If deleteResult is null, return InternalServerError
             if (deleteResult == null)

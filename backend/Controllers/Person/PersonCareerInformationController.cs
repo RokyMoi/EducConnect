@@ -556,9 +556,118 @@ namespace backend.Controllers.Person
                 timestamp = DateTime.Now
             });
         }
-        
+
+        [HttpDelete]
+        public async Task<IActionResult> DeletePersonCareerInformation(PersonCareerInformationDeleteRequest deleteRequestDTO)
+        {
+
+            //Check if the PersonEducationInformationId is valid
+            if (deleteRequestDTO.PersonCareerInformationId == Guid.Empty)
+            {
+                return BadRequest(new
+                {
+                    success = "false",
+                    message = "Invalid Id",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Check if the PersonEmail associated with the email from the request body exists
+            var personEmail = await _personRepository.GetPersonEmailByEmail(deleteRequestDTO.Email);
+
+            if (personEmail == null)
+            {
+                return Unauthorized(
+                    new
+                    {
+                        success = "false",
+                        message = "Email does not exist",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the PersonCareerInformationId exists in the database
+
+            var personCareerInformation = await _personCareerInformationRepository.GetPersonCareerInformationById(deleteRequestDTO.PersonCareerInformationId);
+
+            if (personCareerInformation == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Career information not found",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Check if the PersonId from PersonEmail is authorized to delete the PersonCareerInformation
+            if (personEmail.PersonId != personCareerInformation.PersonId)
+            {
+                return StatusCode(403, new
+                {
+                    success = "false",
+                    message = "You are not authorized to delete this career information",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Delete the PersonCareerInformation from the database
+            var deleteResult = await _personCareerInformationRepository.DeletePersonCareerInformationById(deleteRequestDTO.PersonCareerInformationId);
+
+            if (deleteResult == null)
+            {
+                return StatusCode(500, new
+                {
+                    success = "false",
+                    message = "We failed to delete your career information, please try again later",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Career information deleted successfully",
+                    data = new
+                    {
+
+
+                        careerInformation = new PersonCareerInformationSaveResponseDTO
+                        {
+                            PersonCareerInformationId = deleteResult.PersonCareerInformationId,
+                            CompanyName = deleteResult.CompanyName,
+                            CompanyWebsite = deleteResult.CompanyWebsite,
+                            JobTitle = deleteResult.JobTitle,
+                            Position = deleteResult.Position,
+                            CityOfEmployment = deleteResult.CityOfEmployment,
+                            CountryOfEmployment = deleteResult.CountryOfEmployment,
+                            EmploymentType = deleteResult.EmploymentTypeId,
+                            StartDate = deleteResult.StartDate,
+                            EndDate = deleteResult.EndDate,
+                            JobDescription = deleteResult.JobDescription,
+                            Responsibilities = deleteResult.Responsibilities,
+                            Achievements = deleteResult.Achievements,
+                            Industry = deleteResult.Industry,
+                            SkillsUsed = deleteResult.SkillsUsed,
+                            WorkType = deleteResult.WorkTypeId,
+                            AdditionalInformation = deleteResult.AdditionalInformation,
+
+                        }
+
+                    },
+                    timestamp = DateTime.Now,
+                }
+            );
+        }
+
 
     }
-
-
 }
