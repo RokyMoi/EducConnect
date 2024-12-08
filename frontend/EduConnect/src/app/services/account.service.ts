@@ -61,6 +61,7 @@ export class AccountService {
   logout() {
     localStorage.removeItem('user');
     this.CurrentUser.set(null);
+    
   }
 
   //Method for registering a new user as a tutor

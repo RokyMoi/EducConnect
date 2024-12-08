@@ -1,3 +1,12 @@
+@if (accService.CurrentUser()) {
+    @if (accService.CurrentUser()?.Role === 'student') {
+        {{ruter.navigate(['/student-dashboard'])}}
+    }
+    @else if(accService.CurrentUser()?.Role === 'tutor'){
+        {{ruter.navigate(['/tutor-dashboard'])}}
+    }
+}
+@else{
 <body>
     <div class="hero">
         <h1>Welcome to EduConnect!</h1>
@@ -92,3 +101,4 @@
         </div>
     </div>
 </body>
+}
