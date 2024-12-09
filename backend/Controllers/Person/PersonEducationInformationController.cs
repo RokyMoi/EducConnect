@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using backend.DTOs.Person;
 using backend.Entities.Person;
 using backend.Interfaces.Person;
+using backend.Middleware;
+using backend.Middleware.Tutor;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers.Person
 {
     [ApiController]
     [Route("person/education")]
+    [CheckPersonLoginSignup]
+    [CheckTutorRegistration]
     public class PersonEducationInformationController(IPersonRepository _personRepository, IPersonEducationInformationRepository _personEducationInformationRepository) : ControllerBase
     {
         [HttpPost("add")]

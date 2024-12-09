@@ -4,6 +4,8 @@ using backend.Extensions;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
 using backend.Interfaces.Tutor;
+using backend.Middleware;
+using backend.Middleware.Tutor;
 using backend.Repositories.Person;
 using backend.Repositories.Reference;
 using backend.Repositories.Tutor;
@@ -38,6 +40,12 @@ namespace EduConnect.Extensions
             services.AddScoped<CountryExtractor>();
             services.AddScoped<WorkTypeDatabaseSeeder>();
             services.AddScoped<EmploymentTypeDatabaseSeeder>();
+            services.AddScoped<TutorRegistrationStatusDataSeeder>();
+            
+
+            //Add Middleware 
+            services.AddScoped<CheckTutorRegistrationAttribute>();
+            services.AddScoped<CheckPersonLoginSignupAttribute>();
             //ADD HOSTED SERVICES
             services.AddHostedService<CountrySeederHostedService>();
 

@@ -9,5 +9,6 @@ namespace backend.DTOs.Tutor
     {
         public Guid TutorId { get; set; }
         public Guid PersonId { get; set; }
+
     }
 }

@@ -90,6 +90,7 @@ export class AccountService {
 
   //Method for resending verification code
   resendVerificationCode(email: string) {
+    
     const requestBody = {
       email: email,
     };
@@ -100,6 +101,8 @@ export class AccountService {
 
     return response;
   }
+
+
 
 
   

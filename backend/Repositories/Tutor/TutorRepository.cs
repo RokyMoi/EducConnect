@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using backend.DTOs.Tutor;
 using backend.Interfaces.Tutor;
 using EduConnect.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories.Tutor
 {
@@ -27,5 +28,23 @@ namespace backend.Repositories.Tutor
             };
 
         }
+
+        public async Task<TutorDTO> GetTutorByPersonId(Guid personId)
+        {
+            var tutor = await _databaseContext.Tutor.Where(x => x.PersonId == personId).FirstOrDefaultAsync();
+
+            if (tutor == null)
+            {
+                return null;
+            }
+
+            return new TutorDTO
+            {
+                TutorId = tutor.TutorId,
+                PersonId = tutor.PersonId,
+            };
+        }
+
+
     }
 }

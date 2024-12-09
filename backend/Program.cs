@@ -82,6 +82,11 @@ namespace EduConnect
                     var employmentTypeSeeder = scope.ServiceProvider.GetRequiredService<EmploymentTypeDatabaseSeeder>();
                     employmentTypeSeeder.SeedEmploymentTypeDataToDatabase().GetAwaiter().GetResult();
 
+                    //Get the TutorRegistrationStatus database seeder scoped service from the service container
+                    var tutorRegistrationStatusSeeder = scope.ServiceProvider.GetRequiredService<TutorRegistrationStatusDataSeeder>();
+                    tutorRegistrationStatusSeeder.SeedTutorRegistrationStatusDataToDatabase().GetAwaiter().GetResult();
+
+
                 }
                 catch (Exception ex)
                 {

@@ -1,8 +1,12 @@
-﻿namespace EduConnect.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EduConnect.DTOs
 {
     public class LoginDTO
     {
-        public string Email{ get; set; }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
         public string Password { get; set; }
     }
 }

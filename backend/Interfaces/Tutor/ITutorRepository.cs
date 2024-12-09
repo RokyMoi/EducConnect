@@ -9,5 +9,7 @@ namespace backend.Interfaces.Tutor
     public interface ITutorRepository
     {
         public Task<TutorDTO> CreateTutor(EduConnect.Entities.Tutor.Tutor tutor);
+        public Task<TutorDTO> GetTutorByPersonId(Guid personId);
+
     }
 }

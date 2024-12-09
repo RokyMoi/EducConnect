@@ -24,6 +24,7 @@ using Newtonsoft.Json.Linq;
 using EduConnect.Interfaces;
 using backend.Interfaces.Reference;
 using backend.Entities.Reference.Country;
+using backend.Middleware.Tutor;
 namespace backend.Controllers.Tutor
 {
     [ApiController]
@@ -234,6 +235,8 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
         [HttpPost("verify")]
         public async Task<IActionResult> VerifyTutorEmail(TutorVerifyVerificationCodeRequestDTO verificationCodeRequestDTO, DataContext databaseContext)
         {
+
+
 
             //Check if the email exists
             var existingEmail = await _personRepository.GetPersonEmailByEmail(verificationCodeRequestDTO.Email);
@@ -697,6 +700,7 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
 
 
         }
+
 
     }
 }

@@ -13,7 +13,7 @@ namespace EduConnect.Services
 {
     public class TokenService : ITokenService
     {
-      
+
         private readonly IConfiguration _config;
         private readonly DataContext _db;
         public TokenService(IConfiguration config, DataContext db)
@@ -24,7 +24,8 @@ namespace EduConnect.Services
         public async Task<string> CreateTokenAsync(PersonEmail person)
         {
             var _secretKey = _config["Jwt:SecretKey"];
-            if (string.IsNullOrEmpty(_secretKey) || _secretKey.Length < 64) {
+            if (string.IsNullOrEmpty(_secretKey) || _secretKey.Length < 64)
+            {
                 throw new Exception("Invalid token key");
             }
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
@@ -55,7 +56,7 @@ namespace EduConnect.Services
                 throw new ArgumentNullException(nameof(person), "PersonDetails cannot be null.");
             }
 
-            if (person.PersonId == Guid.Empty) 
+            if (person.PersonId == Guid.Empty)
             {
                 throw new ArgumentException("Invalid PersonId.", nameof(person));
             }
@@ -74,6 +75,48 @@ namespace EduConnect.Services
 
             return "admin";
         }
+
+        public ClaimsPrincipal? ValidateToken(string token)
+        {
+            var secretKey = _config["Jwt:SecretKey"];
+
+            if (string.IsNullOrEmpty(secretKey) || secretKey.Length < 64)
+            {
+                throw new Exception("Invalid token key");
+            }
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var validationParameter = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = key,
+                ClockSkew = TimeSpan.Zero,
+
+            };
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, validationParameter, out _);
+                Console.WriteLine("Principal: " + principal.Claims.Where(x => x.Type == ClaimTypes.Email).FirstOrDefault().ToString());
+                Console.WriteLine("Token validation  successful.");
+                return principal;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Invalid token", ex);
+                return null;
+            }
+
+
+        }
     }
+
+
 }
 

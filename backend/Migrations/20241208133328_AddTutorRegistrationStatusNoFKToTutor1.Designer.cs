@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241208133328_AddTutorRegistrationStatusNoFKToTutor1")]
+    partial class AddTutorRegistrationStatusNoFKToTutor1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -271,43 +274,11 @@ namespace EduConnect.Migrations
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("TutorRegistrationStatusId")
-                        .HasColumnType("int");
-
                     b.HasKey("TutorId");
 
                     b.HasIndex("PersonId");
 
-                    b.HasIndex("TutorRegistrationStatusId");
-
                     b.ToTable("Tutor", "Tutor");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorRegistrationStatus", b =>
-                {
-                    b.Property<int>("TutorRegistrationStatusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TutorRegistrationStatusId"));
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("TutorRegistrationStatusId");
-
-                    b.ToTable("TutorRegistrationStatus", "Reference");
                 });
 
             modelBuilder.Entity("backend.Entities.Learning.LearningCategory", b =>
@@ -736,13 +707,7 @@ namespace EduConnect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduConnect.Entities.Tutor.TutorRegistrationStatus", "TutorRegistrationStatus")
-                        .WithMany()
-                        .HasForeignKey("TutorRegistrationStatusId");
-
                     b.Navigation("Person");
-
-                    b.Navigation("TutorRegistrationStatus");
                 });
 
             modelBuilder.Entity("backend.Entities.Learning.LearningSubcategory", b =>
