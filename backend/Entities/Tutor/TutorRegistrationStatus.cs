@@ -18,6 +18,7 @@ namespace EduConnect.Entities.Tutor
 
         public string Description { get; set; }
 
+        public bool IsSkippable { get; set; } = false;
         public long CreatedAt { get; set; }
 
         public long? UpdatedAt { get; set; }

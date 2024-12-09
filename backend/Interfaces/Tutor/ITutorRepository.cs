@@ -10,6 +10,9 @@ namespace backend.Interfaces.Tutor
     {
         public Task<TutorDTO> CreateTutor(EduConnect.Entities.Tutor.Tutor tutor);
         public Task<TutorDTO> GetTutorByPersonId(Guid personId);
+        public Task<TutorRegistrationStatusDTO> GetTutorRegistrationStatusByTutorId(Guid tutorId);
+        public Task<TutorRegistrationStatusDTO> GetTutorRegistrationStatusByPersonId(Guid personId);
+        public Task<TutorRegistrationStatusDTO> UpdateTutorRegistrationStatus(TutorRegistrationStatusDTO newStatus);
 
     }
 }

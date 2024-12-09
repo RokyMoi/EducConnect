@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using backend.Entities.Reference;
 using backend.Interfaces.Reference;
 using EduConnect.Data;
+using EduConnect.Entities.Tutor;
 using Microsoft.EntityFrameworkCore;
 namespace backend.Repositories.Reference
 {
@@ -22,6 +23,11 @@ namespace backend.Repositories.Reference
             return await _dataContext.EmploymentType.ToListAsync();
         }
 
+        public async Task<List<TutorRegistrationStatus>> GetAllTutorRegistrationStatusesAsync()
+        {
+            return await _dataContext.TutorRegistrationStatus.ToListAsync();
+        }
+
         public async Task<List<WorkType>> GetAllWorkTypesAsync()
         {
             return await _dataContext.WorkType.ToListAsync();
@@ -30,6 +36,12 @@ namespace backend.Repositories.Reference
         public async Task<EmploymentType?> GetEmploymentTypeByIdAsync(int id)
         {
             return await _dataContext.EmploymentType.Where(e => e.EmploymentTypeId == id).FirstOrDefaultAsync();
+
+        }
+
+        public async Task<TutorRegistrationStatus?> GetTutorRegistrationStatusByIdAsync(int id)
+        {
+            return await _dataContext.TutorRegistrationStatus.Where(x => x.TutorRegistrationStatusId == id).FirstOrDefaultAsync();
 
         }
 

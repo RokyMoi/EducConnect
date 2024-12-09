@@ -29,7 +29,7 @@ namespace backend.Controllers.Tutor
 {
     [ApiController]
     [Route("/tutor")]
-    public class TutorController(DataContext _databaseContext, ITokenService _tokenService, IPersonRepository _personRepository, ITutorRepository _tutorRepository, ICountryRepository _countryRepository) : ControllerBase
+    public class TutorController(DataContext _databaseContext, ITokenService _tokenService, IPersonRepository _personRepository, ITutorRepository _tutorRepository, ICountryRepository _countryRepository, IReferenceRepository _referenceRepository) : ControllerBase
     {
 
         [HttpPost("signup")]
@@ -115,12 +115,31 @@ namespace backend.Controllers.Tutor
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
+
+            //Get the first step in tutor registration (TutorRegistrationStatus with status 1)
+            var TutorRegistrationStatus = await _referenceRepository.GetTutorRegistrationStatusByIdAsync(1);
+
+            if (TutorRegistrationStatus == null)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "We are not able to register you at the moment. Please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
+
             //Create new Tutor 
             var Tutor = new EduConnect.Entities.Tutor.Tutor
             {
                 PersonId = Person.PersonId,
                 Person = Person,
                 TutorId = Guid.NewGuid(),
+                TutorRegistrationStatusId = TutorRegistrationStatus.TutorRegistrationStatusId,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
@@ -318,6 +337,17 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
                     timestamp = DateTime.Now
                 });
             }
+
+            Console.WriteLine(verificationCodeFromDatabase.PersonId);
+            //Update the Tutor registration status to 2
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(verificationCodeFromDatabase.PersonId);
+            var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(new TutorRegistrationStatusDTO
+            {
+                TutorId = tutor.TutorId,
+                PersonId = tutor.PersonId,
+                TutorRegistrationStatusId = 2
+
+            });
 
             return Ok(new
             {

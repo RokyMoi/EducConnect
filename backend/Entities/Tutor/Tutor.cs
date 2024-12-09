@@ -16,7 +16,7 @@ public class Tutor
     public Person.Person Person { get; set; }
     public Guid PersonId { get; set; }
 
-    public int? TutorRegistrationStatusId { get; set; }
+    public int TutorRegistrationStatusId { get; set; }
     [ForeignKey(nameof(TutorRegistrationStatusId))]
     public TutorRegistrationStatus TutorRegistrationStatus { get; set; }
 

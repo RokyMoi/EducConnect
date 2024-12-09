@@ -21,18 +21,18 @@ namespace backend.Data.DataSeeder
             //Ensure there is no existing data in the TutorRegistrationStatus table, so there is no duplicate data entries
             if (!await _dataContext.TutorRegistrationStatus.AnyAsync())
             {
-                //Define 9 objects where each object represents a different status of tutor registration completion
+                //Define 9 objects where each object represents a different status of tutor registration completion, each status has a state that defines is it skippable by the user or not
 
                 //Status definitions:
-                //1. Email and Password, User must enter a valid email and password 
-                //2. Email Verification, User must verify their email address
-                //3. Personal Information, User must enter their personal information
-                //4. Education, User must enter their education information
-                //5. Career, User must enter their career information
-                //6. Weekly schedule, User must enter their weekly schedule
-                //7. Tutoring and teaching information, User must enter information about their tutoring style and teaching preferences
-                //8. Financial Information, User must enter their financial information
-                //9. Registration Complete, User has completed their registration
+                //1. Email and Password, User must enter a valid email and password, not skippable
+                //2. Email Verification, User must verify their email address, not skippable
+                //3. Personal Information, User must enter their personal information, skippable
+                //4. Education, User must enter their education information, skippable
+                //5. Career, User must enter their career information,  skippable
+                //6. Weekly schedule, User must enter their weekly schedule, not skippable
+                //7. Tutoring and teaching information, User must enter information about their tutoring style and teaching preferences, skippable
+                //8. Financial Information, User must enter their financial information, not skippable
+                //9. Registration Complete, User has completed their registration, not skippable
 
                 List<EduConnect.Entities.Tutor.TutorRegistrationStatus> statusList = new List<EduConnect.Entities.Tutor.TutorRegistrationStatus>();
 
@@ -42,6 +42,7 @@ namespace backend.Data.DataSeeder
                     {
                         Name = "Email and Password",
                         Description = "Provide a valid email and password.",
+                        IsSkippable = false,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                         UpdatedAt = null
                     }
@@ -53,6 +54,7 @@ namespace backend.Data.DataSeeder
                     {
                         Name = "Email Verification",
                         Description = "Verify your email address.",
+                        IsSkippable = false,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
                 );
@@ -63,6 +65,7 @@ namespace backend.Data.DataSeeder
                     {
                         Name = "Personal Information",
                         Description = "Provide your personal information.",
+                        IsSkippable = true,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
 
                     });
@@ -73,6 +76,7 @@ namespace backend.Data.DataSeeder
                     {
                         Name = "Education",
                         Description = "Provide your education information.",
+                        IsSkippable = true,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
 
                     }
@@ -84,6 +88,7 @@ namespace backend.Data.DataSeeder
                     {
                         Name = "Career",
                         Description = "Provide your career information.",
+                        IsSkippable = true,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
                 );
@@ -94,6 +99,7 @@ namespace backend.Data.DataSeeder
                     {
                         Name = "Weekly Schedule",
                         Description = "Define your weekly work time and availability for communication with students.",
+                        IsSkippable = false,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
                 );
@@ -104,6 +110,7 @@ namespace backend.Data.DataSeeder
                     {
                         Name = "Tutoring and Teaching Information",
                         Description = "Please let us know how would you like to teach your subjects and tutor students",
+                        IsSkippable = true,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
                 );
@@ -114,6 +121,7 @@ namespace backend.Data.DataSeeder
                     {
                         Name = "Financial Information",
                         Description = "Provide your financial information.",
+                        IsSkippable = false,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
                 );
@@ -124,6 +132,7 @@ namespace backend.Data.DataSeeder
                     {
                         Name = "Registration Complete",
                         Description = "You have successfully competed your registration.",
+                        IsSkippable = false,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
                 );
@@ -136,4 +145,5 @@ namespace backend.Data.DataSeeder
             }
         }
     }
+
 }

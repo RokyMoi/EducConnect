@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.Entities.Reference;
+using EduConnect.Entities.Tutor;
 
 namespace backend.Interfaces.Reference
 {
@@ -12,5 +13,9 @@ namespace backend.Interfaces.Reference
         Task<List<EmploymentType>> GetAllEmploymentTypesAsync();
         Task<WorkType?> GetWorkTypeByIdAsync(int id);
         Task<List<WorkType>> GetAllWorkTypesAsync();
+
+        Task<List<TutorRegistrationStatus>> GetAllTutorRegistrationStatusesAsync();
+
+        Task<TutorRegistrationStatus?> GetTutorRegistrationStatusByIdAsync(int id);
     }
 }
