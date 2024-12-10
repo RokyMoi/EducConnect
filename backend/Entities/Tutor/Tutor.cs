@@ -12,9 +12,9 @@ public class Tutor
     [Key]
     public Guid TutorId { get; set; }
 
+    public Guid PersonId { get; set; }
     [ForeignKey(nameof(PersonId))]
     public Person.Person Person { get; set; }
-    public Guid PersonId { get; set; }
 
     public int TutorRegistrationStatusId { get; set; }
     [ForeignKey(nameof(TutorRegistrationStatusId))]

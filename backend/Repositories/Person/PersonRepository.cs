@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Person;
+using backend.DTOs.Person.PersonDetails;
+using backend.DTOs.Reference;
 using backend.DTOs.Tutor;
 using backend.Entities.Person;
 using backend.Interfaces.Person;
@@ -343,8 +345,106 @@ namespace backend.Repositories.Person
 
             }
         }
+
+        public async Task<PersonDetailsDTO> GetPersonDetailsByPersonId(Guid personId)
+        {
+            var personDetails = await _databaseContext.PersonDetails.Where(x => x.PersonId == personId).FirstOrDefaultAsync();
+
+            if (personDetails == null)
+            {
+                return null;
+            }
+
+            return new PersonDetailsDTO
+            {
+                PersonDetailsId = personDetails.PersonDetailsId,
+                PersonId = personDetails.PersonId,
+                FirstName = personDetails.FirstName,
+                LastName = personDetails.LastName,
+                Username = personDetails.Username,
+                PhoneNumberCountryCode = personDetails.PhoneNumberCountryCode,
+                PhoneNumber = personDetails.PhoneNumber,
+                CountryOfOrigin = personDetails.CountryOfOrigin,
+            };
+        }
+
+        public async Task<PersonPhoneNumberDTO> GetPersonByPhoneNumber(string nationalCallingCode, string phoneNumber)
+        {
+            var personPhoneNumber = await _databaseContext.PersonDetails.Where(x => x.PhoneNumberCountryCode.Equals(nationalCallingCode) && x.PhoneNumber.Equals(phoneNumber)).FirstOrDefaultAsync();
+
+            if (personPhoneNumber == null)
+            {
+                return null;
+            }
+
+            return new PersonPhoneNumberDTO
+            {
+                PersonId = personPhoneNumber.PersonId,
+                PersonDetailsId = personPhoneNumber.PersonDetailsId,
+                NationalCallingCode = personPhoneNumber.PhoneNumberCountryCode,
+                PhoneNumber = personPhoneNumber.PhoneNumber,
+            };
+        }
+
+        public async Task<PersonDetailsDTO> GetPersonByUsername(string username)
+        {
+            var personDetails = await _databaseContext.PersonDetails.Where(x => x.Username.Equals(username)).FirstOrDefaultAsync();
+
+            if (personDetails == null)
+            {
+                return null;
+            }
+
+            return new PersonDetailsDTO
+            {
+                PersonDetailsId = personDetails.PersonDetailsId,
+                PersonId = personDetails.PersonId,
+                FirstName = personDetails.FirstName,
+                LastName = personDetails.LastName,
+                Username = personDetails.Username,
+                PhoneNumberCountryCode = personDetails.PhoneNumberCountryCode,
+                PhoneNumber = personDetails.PhoneNumber,
+                CountryOfOrigin = personDetails.CountryOfOrigin,
+            };
+        }
+
+        public async Task<PersonDetailsDTO> UpdatePersonDetails(PersonDetailsUpdateDTO personDetails)
+        {
+            //Get the person details
+            var personDetailsToUpdate = _databaseContext.PersonDetails.Where(x => x.PersonDetailsId == personDetails.PersonDetailsId).FirstOrDefault();
+
+            if (personDetailsToUpdate == null)
+            {
+                return null;
+            }
+
+            //Update the person details
+            personDetailsToUpdate.FirstName = personDetails.FirstName;
+            personDetailsToUpdate.LastName = personDetails.LastName;
+            personDetailsToUpdate.Username = personDetails.Username;
+            personDetailsToUpdate.PhoneNumberCountryCode = personDetails.PhoneNumberCountryCode;
+            personDetailsToUpdate.PhoneNumber = personDetails.PhoneNumber;
+            personDetailsToUpdate.CountryOfOrigin = personDetails.CountryOfOrigin;
+            personDetailsToUpdate.ModifiedAt = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+            await _databaseContext.SaveChangesAsync();
+            return new PersonDetailsDTO
+            {
+                PersonDetailsId = personDetailsToUpdate.PersonDetailsId,
+                PersonId = personDetailsToUpdate.PersonId,
+                FirstName = personDetailsToUpdate.FirstName,
+                LastName = personDetailsToUpdate.LastName,
+                Username = personDetailsToUpdate.Username,
+                PhoneNumberCountryCode = personDetailsToUpdate.PhoneNumberCountryCode,
+                PhoneNumber = personDetailsToUpdate.PhoneNumber,
+                CountryOfOrigin = personDetailsToUpdate.CountryOfOrigin,
+            };
+        }
+
     }
 }
+
+
 
 
 

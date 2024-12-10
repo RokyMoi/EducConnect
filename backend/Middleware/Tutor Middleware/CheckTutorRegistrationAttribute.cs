@@ -119,7 +119,8 @@ namespace backend.Middleware.Tutor
                 .ToListAsync();
 
                 //Check if the tutor registration status is completed 
-                if (personEmailWithTutorAndStudent.Tutor.TutorRegistrationStatusId != allTutorRegistrationStatusList.Max(x => x.TutorRegistrationStatusId)){
+                if (personEmailWithTutorAndStudent.Tutor.TutorRegistrationStatusId != allTutorRegistrationStatusList.Max(x => x.TutorRegistrationStatusId))
+                {
                     context.Result = new JsonResult(
                         new
                         {
@@ -137,13 +138,13 @@ namespace backend.Middleware.Tutor
                             timestamp = DateTime.Now
                         }
                     )
-                    { 
+                    {
                         StatusCode = StatusCodes.Status422UnprocessableEntity
                     };
 
                     return;
-                    
-                 }
+
+                }
 
 
 

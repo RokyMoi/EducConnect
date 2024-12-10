@@ -151,6 +151,15 @@ namespace backend.Middleware
             }
 
 
+
+            //Set the email and personId into the context dictionary 
+            context.HttpContext.Items.Add("Email", claimEmail);
+            context.HttpContext.Items.Add("PersonId", userData.PersonId);
+
+
+            Console.WriteLine("Email from dictionary: " + context.HttpContext.Items["Email"]);
+            Console.WriteLine("PersonId from dictionary: " + context.HttpContext.Items["PersonId"]);
+
             await next();
         }
     }

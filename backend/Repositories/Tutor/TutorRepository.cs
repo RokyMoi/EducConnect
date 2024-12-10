@@ -52,6 +52,7 @@ namespace backend.Repositories.Tutor
             Console.WriteLine("PersonId from TutorRepository: " + personId);
             var tutorStatus = await _databaseContext.Tutor.Include(x => x.TutorRegistrationStatus).Where(x => x.PersonId == personId).FirstOrDefaultAsync();
 
+            Console.WriteLine("Is tutorStatus null: " + tutorStatus.GetType());
 
             if (tutorStatus == null)
             {

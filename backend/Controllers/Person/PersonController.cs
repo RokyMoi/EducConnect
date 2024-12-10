@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EduConnect.Data;
 using EduConnect.DTOs;
+using EduConnect.Entities.Person;
 using EduConnect.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,9 +21,9 @@ namespace backend.Controllers.Person
         public async Task<IActionResult> Login(LoginDTO login)
         {
             // Retrieve the person's email
-            var personEmail = await db.PersonEmail
-                .FirstOrDefaultAsync(x => x.Email == login.Email);
-
+            var personEmail = await db.PersonEmail.Include(x => x.Person).Where(x => x.Email == login.Email)
+                .FirstOrDefaultAsync();
+            Console.WriteLine("PersonEmail: " + personEmail.Email);
 
             if (personEmail == null)
             {
@@ -36,15 +37,11 @@ namespace backend.Controllers.Person
                 });
             }
 
-            var personDetails = await db.PersonDetails
-         .FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
+
 
             // Retrieve the corresponding person and password details
-            var person = await db.Person
-                .FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
-
             var personPassword = await db.PersonPassword
-                .FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+    .FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
 
             if (personPassword == null)
             {
@@ -79,8 +76,8 @@ namespace backend.Controllers.Person
             }
             string role = "";
             // Check if the user is a Student or Tutor by looking up the appropriate tables
-            var student = await db.Student.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
-            var tutor = await db.Tutor.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+            var student = await db.Student.FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
+            var tutor = await db.Tutor.FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
 
             if (student != null)
             {
@@ -116,7 +113,7 @@ namespace backend.Controllers.Person
                     {
                         Email = personEmail.Email,
                         Token = token,
-                        Role = role
+                        Role = role,
                     },
                     timestamp = DateTime.Now,
                 });

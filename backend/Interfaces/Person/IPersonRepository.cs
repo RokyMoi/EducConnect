@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Person;
+using backend.DTOs.Person.PersonDetails;
+using backend.DTOs.Reference;
 using backend.DTOs.Tutor;
 using backend.Entities.Person;
 using EduConnect.Entities.Person;
@@ -23,6 +25,10 @@ namespace backend.Interfaces.Person
         Task<TutorPersonDetailsDTO> GetTutorPersonInformationByPersonId(Guid personId);
         Task<TutorUsernameDTO> GetTutorByUsername(string username);
         Task<PersonDetailsDTO> CreateNewPersonDetails(PersonDetails newPersonDetails);
+        Task<PersonDetailsDTO> GetPersonDetailsByPersonId(Guid personId);
+        Task<PersonPhoneNumberDTO> GetPersonByPhoneNumber(string nationalCallingCode, string phoneNumber);
+        Task<PersonDetailsDTO> GetPersonByUsername(string username);
+        Task<PersonDetailsDTO> UpdatePersonDetails(PersonDetailsUpdateDTO personDetails);
 
     }
 }

@@ -1,26 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
-namespace backend.DTOs.Person
+namespace backend.DTOs.Person.PersonDetails
 {
-    public class PersonDetailsDTO
+    public class PersonDetailsSaveRequestDTO
     {
 
-        public Guid PersonDetailsId { get; set; }
-        public Guid PersonId { get; set; }
+        
 
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        [Required]
         public string Username { get; set; }
-
         public string? PhoneNumberCountryCode { get; set; }
         public string? PhoneNumber { get; set; }
         public string? CountryOfOrigin { get; set; }
+
     }
 }
-
-
-
-

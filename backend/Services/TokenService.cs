@@ -61,7 +61,10 @@ namespace EduConnect.Services
                 throw new ArgumentException("Invalid PersonId.", nameof(person));
             }
 
-            var tutor = await _db.Tutor.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+            Console.WriteLine("PersonId from TokenService: " + person.PersonId);
+            var tutor = await _db.Tutor.Where(x => x.PersonId == person.PersonId).FirstOrDefaultAsync();
+
+            Console.WriteLine(tutor != null ? $"Tutor found: {tutor.PersonId}" : "No tutor found");
             if (tutor != null)
             {
                 return "tutor";
