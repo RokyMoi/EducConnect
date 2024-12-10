@@ -1,8 +1,10 @@
 ﻿
 using EduConnect.Data;
 using EduConnect.DTOs;
+using EduConnect.Extensions;
 using EduConnect.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 public class StudentRepository : IStudentRepository
 {
@@ -82,4 +84,5 @@ public class StudentRepository : IStudentRepository
         }
         
     }
+    
 }

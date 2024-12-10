@@ -4,7 +4,9 @@ using EduConnect.DTOs;
 
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
+using EduConnect.Extensions;
 using EduConnect.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -43,6 +45,9 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
+        
+
+
         [HttpGet("get-all-emails")]
 public async Task<ActionResult> GetAllEmails()
 {

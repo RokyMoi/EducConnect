@@ -12,7 +12,7 @@ export class AccountService {
   http = inject(HttpClient);
   baseUrl = 'http://localhost:5177/api/';
   CurrentUser = signal<User | null>(null);
-
+  EmailUser = signal<String | null>(null);
   router = inject(Router);
   
 
@@ -24,19 +24,25 @@ export class AccountService {
       .pipe(
         map((response) => {
           const userData = (response.body as any)?.data; 
-
+          console.log('API Response:', userData);
           if (userData) {
             const loggedInUser: User = {
-              Email:userData.Email,
+              Email:userData.email,
               Role: userData.role,
               Token: userData.token
             };
 
-           
-            this.CurrentUser.set(loggedInUser);
 
-     
+           
+            console.log("Setting user in localStorage:", loggedInUser);
+
+            this.CurrentUser.set(loggedInUser);
+  
+            // Sačuvaj podatke u localStorage
             localStorage.setItem('user', JSON.stringify(loggedInUser));
+           
+            const storedUser = JSON.parse(localStorage.getItem('user')!);
+            console.log(storedUser.Email);  // Trebalo bi da prikaže email
           }
 
           return response; 
