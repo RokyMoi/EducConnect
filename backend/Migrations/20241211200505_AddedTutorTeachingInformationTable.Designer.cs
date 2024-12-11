@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241211200505_AddedTutorTeachingInformationTable")]
+    partial class AddedTutorTeachingInformationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -372,63 +375,6 @@ namespace EduConnect.Migrations
                     b.ToTable("TutorRegistrationStatus", "Reference");
                 });
 
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorTeachingInformation", b =>
-                {
-                    b.Property<Guid>("TutorTeachingInformationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ExpectedResponseTime")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PrimaryCommunicationTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PrimaryEngagementMethodId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SecondaryCommunicationTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SecondaryEngagementMethodId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SpecialConsiderations")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TeachingStyleTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("TutorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("TutorTeachingInformationId");
-
-                    b.HasIndex("PrimaryCommunicationTypeId");
-
-                    b.HasIndex("PrimaryEngagementMethodId");
-
-                    b.HasIndex("SecondaryCommunicationTypeId");
-
-                    b.HasIndex("SecondaryEngagementMethodId");
-
-                    b.HasIndex("TeachingStyleTypeId");
-
-                    b.HasIndex("TutorId")
-                        .IsUnique();
-
-                    b.ToTable("TutorTeachingInformation", "Tutor");
-                });
-
             modelBuilder.Entity("backend.Entities.Learning.LearningCategory", b =>
                 {
                     b.Property<Guid>("LearningCategoryId")
@@ -770,6 +716,57 @@ namespace EduConnect.Migrations
                     b.ToTable("WorkType", "Reference");
                 });
 
+            modelBuilder.Entity("backend.Entities.Tutor.TutorTeachingInformation", b =>
+                {
+                    b.Property<Guid>("TutorTeachingInformationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExpectedResponseTime")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PrimaryCommunicationTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PrimaryEngagementMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SecondaryCommunicationTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SecondaryEngagementMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SpecialConsiderations")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TeachingStyleTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TutorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TutorTeachingInformationId");
+
+                    b.HasIndex("PrimaryCommunicationTypeId");
+
+                    b.HasIndex("PrimaryEngagementMethodId");
+
+                    b.HasIndex("SecondaryCommunicationTypeId");
+
+                    b.HasIndex("SecondaryEngagementMethodId");
+
+                    b.HasIndex("TeachingStyleTypeId");
+
+                    b.HasIndex("TutorId");
+
+                    b.ToTable("TutorTeachingInformation");
+                });
+
             modelBuilder.Entity("EduConnect.Entities.Person.PersonDetails", b =>
                 {
                     b.HasOne("EduConnect.Entities.Person.Person", "Person")
@@ -866,53 +863,6 @@ namespace EduConnect.Migrations
                     b.Navigation("TutorRegistrationStatus");
                 });
 
-            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorTeachingInformation", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Reference.CommunicationType", "PrimaryCommunicationType")
-                        .WithMany()
-                        .HasForeignKey("PrimaryCommunicationTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EduConnect.Entities.Reference.EngagementMethod", "PrimaryEngagementMethod")
-                        .WithMany()
-                        .HasForeignKey("PrimaryEngagementMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EduConnect.Entities.Reference.CommunicationType", "SecondaryCommunicationType")
-                        .WithMany()
-                        .HasForeignKey("SecondaryCommunicationTypeId");
-
-                    b.HasOne("EduConnect.Entities.Reference.EngagementMethod", "SecondaryEngagementMethod")
-                        .WithMany()
-                        .HasForeignKey("SecondaryEngagementMethodId");
-
-                    b.HasOne("EduConnect.Entities.Reference.TutorTeachingStyleType", "TeachingStyleType")
-                        .WithMany()
-                        .HasForeignKey("TeachingStyleTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EduConnect.Entities.Tutor.Tutor", "Tutor")
-                        .WithMany()
-                        .HasForeignKey("TutorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PrimaryCommunicationType");
-
-                    b.Navigation("PrimaryEngagementMethod");
-
-                    b.Navigation("SecondaryCommunicationType");
-
-                    b.Navigation("SecondaryEngagementMethod");
-
-                    b.Navigation("TeachingStyleType");
-
-                    b.Navigation("Tutor");
-                });
-
             modelBuilder.Entity("backend.Entities.Learning.LearningSubcategory", b =>
                 {
                     b.HasOne("backend.Entities.Learning.LearningCategory", "LearningCategory")
@@ -980,6 +930,53 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("backend.Entities.Tutor.TutorTeachingInformation", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Reference.CommunicationType", "PrimaryCommunicationType")
+                        .WithMany()
+                        .HasForeignKey("PrimaryCommunicationTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Reference.EngagementMethod", "PrimaryEngagementMethod")
+                        .WithMany()
+                        .HasForeignKey("PrimaryEngagementMethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Reference.CommunicationType", "SecondaryCommunicationType")
+                        .WithMany()
+                        .HasForeignKey("SecondaryCommunicationTypeId");
+
+                    b.HasOne("EduConnect.Entities.Reference.EngagementMethod", "SecondaryEngagementMethod")
+                        .WithMany()
+                        .HasForeignKey("SecondaryEngagementMethodId");
+
+                    b.HasOne("EduConnect.Entities.Reference.TutorTeachingStyleType", "TeachingStyleType")
+                        .WithMany()
+                        .HasForeignKey("TeachingStyleTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Tutor.Tutor", "Tutor")
+                        .WithMany()
+                        .HasForeignKey("TutorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PrimaryCommunicationType");
+
+                    b.Navigation("PrimaryEngagementMethod");
+
+                    b.Navigation("SecondaryCommunicationType");
+
+                    b.Navigation("SecondaryEngagementMethod");
+
+                    b.Navigation("TeachingStyleType");
+
+                    b.Navigation("Tutor");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.Person", b =>

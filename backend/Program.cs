@@ -86,6 +86,18 @@ namespace EduConnect
                     var tutorRegistrationStatusSeeder = scope.ServiceProvider.GetRequiredService<TutorRegistrationStatusDataSeeder>();
                     tutorRegistrationStatusSeeder.SeedTutorRegistrationStatusDataToDatabase().GetAwaiter().GetResult();
 
+                    //Get the CommunicationType database seeder scoped service from the service container
+                    var communicationTypeSeeder = scope.ServiceProvider.GetRequiredService<CommunicationTypeDatabaseSeeder>();
+                    communicationTypeSeeder.SeedCommunicationTypeDataToDatabase().GetAwaiter().GetResult();
+
+                    //Get the EngagementMethod database seeder scoped service from the service container
+                    var engagementMethodSeeder = scope.ServiceProvider.GetRequiredService<EngagementMethodDatabaseSeeder>();
+                    engagementMethodSeeder.SeedEngagementMethodDataToDatabase().GetAwaiter().GetResult();
+
+                    //Get the TutorType database seeder scoped service from the service container
+                    var tutorTeachingStyleTypeDatabaseSeeder = scope.ServiceProvider.GetRequiredService<TutorTeachingStyleTypeDatabaseSeeder>();
+                    tutorTeachingStyleTypeDatabaseSeeder.SeedTutorTeachingStyleTypeDataToDatabase().GetAwaiter().GetResult();
+
 
                 }
                 catch (Exception ex)

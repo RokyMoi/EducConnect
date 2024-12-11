@@ -9,9 +9,7 @@ namespace backend.DTOs.Person.PersonAvailability
 {
     public class PersonAvailabilitySaveRequestDTO
     {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+
 
         [Required]
         public int DayOfWeek { get; set; }

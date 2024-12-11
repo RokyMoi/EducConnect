@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using backend.Entities.Reference;
 using backend.Interfaces.Reference;
 using EduConnect.Data;
+using EduConnect.Entities.Reference;
 using EduConnect.Entities.Tutor;
 using Microsoft.EntityFrameworkCore;
 namespace backend.Repositories.Reference
@@ -33,16 +34,31 @@ namespace backend.Repositories.Reference
             return await _dataContext.WorkType.ToListAsync();
         }
 
+        public async Task<CommunicationType?> GetCommunicationTypeByIdAsync(int id)
+        {
+            return await _dataContext.CommunicationType.Where(x => x.CommunicationTypeId == id).FirstOrDefaultAsync();
+        }
+
         public async Task<EmploymentType?> GetEmploymentTypeByIdAsync(int id)
         {
             return await _dataContext.EmploymentType.Where(e => e.EmploymentTypeId == id).FirstOrDefaultAsync();
 
         }
 
+        public async Task<EngagementMethod?> GetEngagementMethodByIdAsync(int id)
+        {
+            return await _dataContext.EngagementMethod.Where(x => x.EngagementMethodId == id).FirstOrDefaultAsync();
+        }
+
         public async Task<TutorRegistrationStatus?> GetTutorRegistrationStatusByIdAsync(int id)
         {
             return await _dataContext.TutorRegistrationStatus.Where(x => x.TutorRegistrationStatusId == id).FirstOrDefaultAsync();
 
+        }
+
+        public async Task<TutorTeachingStyleType?> GetTutorTeachingStyleTypeByIdAsync(int id)
+        {
+            return await _dataContext.TutorTeachingStyleType.Where(x => x.TutorTeachingStyleTypeId == id).FirstOrDefaultAsync();
         }
 
         public async Task<WorkType?> GetWorkTypeByIdAsync(int id)

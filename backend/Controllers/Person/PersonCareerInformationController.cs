@@ -6,6 +6,8 @@ using backend.Data.DataSeeder;
 using backend.DTOs.Person;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
+using backend.Interfaces.Tutor;
+using backend.Middleware;
 using EduConnect.Entities.Person;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,13 +15,66 @@ namespace backend.Controllers.Person
 {
     [ApiController]
     [Route("person/career")]
-    public class PersonCareerInformationController(IPersonRepository _personRepository, IPersonCareerInformationRepository _personCareerInformationRepository, IReferenceRepository _referenceRepository) : ControllerBase
+    [CheckPersonLoginSignup]
+    public class PersonCareerInformationController(IPersonRepository _personRepository, IPersonCareerInformationRepository _personCareerInformationRepository, IReferenceRepository _referenceRepository, ITutorRepository _tutorRepository) : ControllerBase
     {
 
 
-        [HttpPost("add")]
+        [HttpPost]
         public async Task<IActionResult> AddCareerInformation(PersonCareerInformationControllerSaveRequestDTO saveRequestDTO)
         {
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmailObject = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmailObject.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+            //If tutor is not null, check the TutorRegistrationStatus is below 3 (Personal Information, status before)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 3)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "It looks like you haven't completed your tutor registration yet. Please complete it to continue.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
 
             //Check if the PersonEmail exists
             PersonEmailDTO personEmail = await _personRepository.GetPersonEmailByEmail(saveRequestDTO.Email);
@@ -87,6 +142,24 @@ namespace backend.Controllers.Person
                 AdditionalInformation = saveRequestDTO.AdditionalInformation
             };
 
+            //If the person is a tutor, update the TutorRegistrationStatus to 4 (Education Information)
+            //Check if the person is a tutor, and update their TUtorRegistrationStatusId to 4
+            if (tutor != null)
+            {
+                var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 5);
+                if (updatedTutorRegistrationStatus == null)
+                {
+                    return BadRequest(
+                        new
+                        {
+                            success = "false",
+                            message = "Failed to update tutor registration status",
+                            data = new { },
+                            timestamp = DateTime.Now
+                        }
+                    );
+                }
+            }
             //Attempt to save the career information for the given person
             var saveResult = await _personCareerInformationRepository.AddPersonCareerInformation(createDTO);
 
@@ -100,6 +173,7 @@ namespace backend.Controllers.Person
                     timestamp = DateTime.Now,
                 });
             }
+
             return Ok(new
             {
                 success = "true",

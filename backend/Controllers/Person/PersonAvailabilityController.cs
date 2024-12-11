@@ -5,32 +5,76 @@ using System.Threading.Tasks;
 using backend.DTOs.Person;
 using backend.DTOs.Person.PersonAvailability;
 using backend.Interfaces.Person;
+using backend.Interfaces.Tutor;
+using backend.Middleware;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers.Person
 {
     [ApiController]
     [Route("person/availability")]
-    public class PersonAvailabilityController(IPersonRepository _personRepository, IPersonAvailabilityRepository _personAvailabilityRepository) : ControllerBase
+    [CheckPersonLoginSignup]
+    public class PersonAvailabilityController(IPersonRepository _personRepository, IPersonAvailabilityRepository _personAvailabilityRepository, ITutorRepository _tutorRepository) : ControllerBase
     {
-        [HttpPost("add")]
+        [HttpPost]
         public async Task<IActionResult> AddPersonAvailability(PersonAvailabilitySaveRequestDTO saveRequestDTO)
         {
 
-            //Verify the PersonEmail associated with the email from request exists
-
-            var personEmail = await _personRepository.GetPersonEmailByEmail(saveRequestDTO.Email);
-
-            if (personEmail == null)
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
             {
-                return Unauthorized(new
-                {
-                    success = "false",
-                    message = "Email does not exist",
-                    data = new { },
-                    timestamp = DateTime.Now,
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
             }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmailObject = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmailObject.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+            //If tutor is not null, check the TutorRegistrationStatus is below 5 (Personal Information, status before)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 5)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "It looks like you haven't completed your tutor registration yet. Please complete it to continue.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+
+
 
             Console.WriteLine("Is day of the week valid: " + Enum.IsDefined(typeof(DayOfWeek), saveRequestDTO.DayOfWeek));
             //Check if the day of the week is valid
@@ -109,7 +153,7 @@ namespace backend.Controllers.Person
             //Create a new PersonAvailabilityDTO
             var personAvailabilityDTO = new PersonAvailabilityDTO
             {
-                PersonId = personEmail.PersonId,
+                PersonId = personId,
                 DayOfWeek = (DayOfWeek)saveRequestDTO.DayOfWeek,
                 StartTime = startTime,
                 EndTime = endTime,
@@ -117,7 +161,24 @@ namespace backend.Controllers.Person
             };
 
 
-
+            //If the person is a tutor, update the TutorRegistrationStatus to 4 (Education Information)
+            //Check if the person is a tutor, and update their TUtorRegistrationStatusId to 4
+            if (tutor != null)
+            {
+                var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 6);
+                if (updatedTutorRegistrationStatus == null)
+                {
+                    return BadRequest(
+                        new
+                        {
+                            success = "false",
+                            message = "Failed to update tutor registration status",
+                            data = new { },
+                            timestamp = DateTime.Now
+                        }
+                    );
+                }
+            }
 
             //Add the PersonAvailabilityDTO to the database
             var addResult = await _personAvailabilityRepository.AddPersonAvailability(personAvailabilityDTO);
@@ -158,6 +219,62 @@ namespace backend.Controllers.Person
         [HttpGet]
         public async Task<IActionResult> GetPersonAvailabilityById([FromQuery] Guid id)
         {
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmailObject = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmailObject.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+            //If tutor is not null, check the TutorRegistrationStatus is below 5 (Personal Information, status before)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 5)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "It looks like you haven't completed your tutor registration yet. Please complete it to continue.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+
+
 
             if (id == Guid.Empty)
             {
@@ -211,6 +328,61 @@ namespace backend.Controllers.Person
         [HttpPost("all")]
         public async Task<IActionResult> GetAllPersonAvailabilityByEmail(PersonEmailRequestDTO requestDTO)
         {
+
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmailObject = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmailObject.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+            //If tutor is not null, check the TutorRegistrationStatus is below 5 (Personal Information, status before)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 5)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "It looks like you haven't completed your tutor registration yet. Please complete it to continue.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
 
 
             //Check if a PersonEmail associated with the email from the parameter PersonEmailRequestDTO exists in the database
@@ -281,6 +453,60 @@ namespace backend.Controllers.Person
         [HttpDelete]
         public async Task<IActionResult> DeletePersonAvailabilityById(PersonAvailabilityDeleteRequestDTO requestDTO)
         {
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmailObject = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmailObject.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+            //If tutor is not null, check the TutorRegistrationStatus is below 5 (Personal Information, status before)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 5)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "It looks like you haven't completed your tutor registration yet. Please complete it to continue.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+
 
             //Check if a PersonEmail associated with the email from the parameter PersonEmailRequestDTO exists in the database
 
@@ -384,6 +610,61 @@ namespace backend.Controllers.Person
         [HttpPut]
         public async Task<IActionResult> UpdatePersonAvailabilityById(PersonAvailabilityUpdateRequestDTO requestDTO)
         {
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmailObject = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmailObject.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+            //If tutor is not null, check the TutorRegistrationStatus is below 5 (Personal Information, status before)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 5)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "It looks like you haven't completed your tutor registration yet. Please complete it to continue.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+
 
             //Check if the PersonAvailabilityId is valid
             if (requestDTO.PersonAvailabilityId == Guid.Empty)

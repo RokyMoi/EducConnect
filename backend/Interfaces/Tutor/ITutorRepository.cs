@@ -12,7 +12,13 @@ namespace backend.Interfaces.Tutor
         public Task<TutorDTO> GetTutorByPersonId(Guid personId);
         public Task<TutorRegistrationStatusDTO> GetTutorRegistrationStatusByTutorId(Guid tutorId);
         public Task<TutorRegistrationStatusDTO> GetTutorRegistrationStatusByPersonId(Guid personId);
-        public Task<TutorRegistrationStatusDTO> UpdateTutorRegistrationStatus(TutorRegistrationStatusDTO newStatus);
+        public Task<TutorRegistrationStatusDTO> UpdateTutorRegistrationStatus(Guid personId, int tutorRegistrationStatusId);
+
+        public Task<TutorTeachingInformationDTO> CreateTutorTeachingInformation(TutorTeachingInformationDTO tutorTeachingInformation);
+
+        public Task<TutorTeachingInformationDTO?> GetTutorTeachingInformationByTutorId(Guid tutorId);
+
+        public Task<TutorTeachingInformationDTO?> UpdateTutorTeachingInformation(TutorTeachingInformationDTO updateDTO);
 
     }
 }

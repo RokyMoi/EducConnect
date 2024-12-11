@@ -8,9 +8,6 @@ namespace backend.DTOs.Person
 {
     public class PersonEducationInformationSaveRequestDTO
     {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
         public string? InstitutionName { get; set; } = null;
         public string? InstitutionOfficialWebsite { get; set; } = null;
         public string? InstitutionAddress { get; set; } = null;

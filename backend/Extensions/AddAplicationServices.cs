@@ -37,12 +37,16 @@ namespace EduConnect.Extensions
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
 
+
+            //Add Database Seeders as Scoped services
             services.AddScoped<CountryExtractor>();
             services.AddScoped<WorkTypeDatabaseSeeder>();
             services.AddScoped<EmploymentTypeDatabaseSeeder>();
             services.AddScoped<TutorRegistrationStatusDataSeeder>();
-            
 
+            services.AddScoped<CommunicationTypeDatabaseSeeder>();
+            services.AddScoped<EngagementMethodDatabaseSeeder>();
+            services.AddScoped<TutorTeachingStyleTypeDatabaseSeeder>();
             //Add Middleware 
             services.AddScoped<CheckTutorRegistrationAttribute>();
             services.AddScoped<CheckPersonLoginSignupAttribute>();

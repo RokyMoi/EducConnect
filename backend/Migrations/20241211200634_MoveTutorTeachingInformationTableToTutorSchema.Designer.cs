@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241211200634_MoveTutorTeachingInformationTableToTutorSchema")]
+    partial class MoveTutorTeachingInformationTableToTutorSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -378,14 +381,12 @@ namespace EduConnect.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ExpectedResponseTime")
-                        .HasColumnType("int");
+                    b.Property<string>("ExpectedResponseTime")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PrimaryCommunicationTypeId")
                         .HasColumnType("int");
@@ -408,9 +409,6 @@ namespace EduConnect.Migrations
                     b.Property<Guid>("TutorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
-
                     b.HasKey("TutorTeachingInformationId");
 
                     b.HasIndex("PrimaryCommunicationTypeId");
@@ -423,8 +421,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("TeachingStyleTypeId");
 
-                    b.HasIndex("TutorId")
-                        .IsUnique();
+                    b.HasIndex("TutorId");
 
                     b.ToTable("TutorTeachingInformation", "Tutor");
                 });

@@ -29,6 +29,43 @@ namespace backend.Repositories.Tutor
 
         }
 
+        public async Task<TutorTeachingInformationDTO> CreateTutorTeachingInformation(TutorTeachingInformationDTO tutorTeachingInformation)
+        {
+            //Convert the TutorTeachingInformationDTO to TutorTeachingInformation
+
+            EduConnect.Entities.Tutor.TutorTeachingInformation tutorTeachingInformationEntity = new EduConnect.Entities.Tutor.TutorTeachingInformation
+            {
+                Description = tutorTeachingInformation.Description,
+                TeachingStyleTypeId = tutorTeachingInformation.TeachingStyleTypeId,
+                PrimaryCommunicationTypeId = tutorTeachingInformation.PrimaryCommunicationTypeId,
+                SecondaryCommunicationTypeId = tutorTeachingInformation.SecondaryCommunicationTypeId,
+                PrimaryEngagementMethodId = tutorTeachingInformation.PrimaryEngagementMethodId,
+                SecondaryEngagementMethodId = tutorTeachingInformation.SecondaryEngagementMethodId,
+                ExpectedResponseTime = tutorTeachingInformation.ExpectedResponseTime,
+                SpecialConsiderations = tutorTeachingInformation.SpecialConsiderations,
+                TutorId = tutorTeachingInformation.TutorId,
+                CreatedAt = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+
+
+            };
+
+            try
+            {
+                await _databaseContext.TutorTeachingInformation.AddAsync(tutorTeachingInformationEntity);
+                await _databaseContext.SaveChangesAsync();
+                return tutorTeachingInformation;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error creating tutor teaching information");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.InnerException);
+                return null;
+            }
+
+        }
+
         public async Task<TutorDTO> GetTutorByPersonId(Guid personId)
         {
             var tutor = await _databaseContext.Tutor.Include(x => x.TutorRegistrationStatus).Where(x => x.PersonId == personId).FirstOrDefaultAsync();
@@ -93,19 +130,98 @@ namespace backend.Repositories.Tutor
             };
         }
 
-        public async Task<TutorRegistrationStatusDTO> UpdateTutorRegistrationStatus(TutorRegistrationStatusDTO newStatus)
+        public async Task<TutorTeachingInformationDTO?> GetTutorTeachingInformationByTutorId(Guid tutorId)
         {
-            var tutorStatus = await _databaseContext.Tutor.Where(x => x.TutorId == newStatus.TutorId).FirstOrDefaultAsync();
+            var tutorTeachingInformation = await _databaseContext.TutorTeachingInformation.Where(x => x.TutorId == tutorId).FirstOrDefaultAsync();
 
-            if (tutorStatus == null)
+            if (tutorTeachingInformation == null)
             {
                 return null;
             }
 
-            tutorStatus.TutorRegistrationStatusId = newStatus.TutorRegistrationStatusId;
+            return new TutorTeachingInformationDTO
+            {
+                TutorId = tutorTeachingInformation.TutorId,
+                Description = tutorTeachingInformation.Description,
+                TeachingStyleTypeId = tutorTeachingInformation.TeachingStyleTypeId,
+                PrimaryCommunicationTypeId = tutorTeachingInformation.PrimaryCommunicationTypeId,
+                SecondaryCommunicationTypeId = tutorTeachingInformation.SecondaryCommunicationTypeId,
+                PrimaryEngagementMethodId = tutorTeachingInformation.PrimaryEngagementMethodId,
+                SecondaryEngagementMethodId = tutorTeachingInformation.SecondaryEngagementMethodId,
+                ExpectedResponseTime = tutorTeachingInformation.ExpectedResponseTime,
+                SpecialConsiderations = tutorTeachingInformation.SpecialConsiderations,
+            };
+        }
+
+
+        public async Task<TutorRegistrationStatusDTO> UpdateTutorRegistrationStatus(Guid personId, int newStatusId)
+        {
+            var tutorStatus = await _databaseContext.Tutor.Where(x => x.PersonId == personId).FirstOrDefaultAsync();
+
+            var TutorRegistrationStatusWithId = await _databaseContext.TutorRegistrationStatus.Where(x => x.TutorRegistrationStatusId == newStatusId).FirstOrDefaultAsync();
+            if (tutorStatus == null || TutorRegistrationStatusWithId == null)
+            {
+                return null;
+            }
+
+            tutorStatus.TutorRegistrationStatusId = newStatusId;
 
             await _databaseContext.SaveChangesAsync();
-            return newStatus;
+            return new TutorRegistrationStatusDTO
+            {
+                TutorId = tutorStatus.TutorId,
+                PersonId = tutorStatus.PersonId,
+                TutorRegistrationStatusId = tutorStatus.TutorRegistrationStatusId,
+                TutorRegistrationStatusName = TutorRegistrationStatusWithId.Name,
+                TutorRegistrationStatusDescription = TutorRegistrationStatusWithId.Description,
+                IsSkippable = TutorRegistrationStatusWithId.IsSkippable
+            };
+        }
+
+        public async Task<TutorTeachingInformationDTO?> UpdateTutorTeachingInformation(TutorTeachingInformationDTO updateDTO)
+        {
+            var tutorTeachingInformation = await _databaseContext.TutorTeachingInformation.Where(x => x.TutorId == updateDTO.TutorId).FirstOrDefaultAsync();
+
+            if (tutorTeachingInformation == null)
+            {
+                return null;
+            }
+
+            tutorTeachingInformation.Description = updateDTO.Description;
+            tutorTeachingInformation.TeachingStyleTypeId = updateDTO.TeachingStyleTypeId;
+            tutorTeachingInformation.PrimaryCommunicationTypeId = updateDTO.PrimaryCommunicationTypeId;
+            tutorTeachingInformation.SecondaryCommunicationTypeId = updateDTO.SecondaryCommunicationTypeId;
+            tutorTeachingInformation.PrimaryEngagementMethodId = updateDTO.PrimaryEngagementMethodId;
+            tutorTeachingInformation.SecondaryEngagementMethodId = updateDTO.SecondaryEngagementMethodId;
+            tutorTeachingInformation.ExpectedResponseTime = updateDTO.ExpectedResponseTime;
+            tutorTeachingInformation.SpecialConsiderations = updateDTO.SpecialConsiderations;
+
+            try
+            {
+                await _databaseContext.SaveChangesAsync();
+                return new TutorTeachingInformationDTO
+                {
+                    TutorId = tutorTeachingInformation.TutorId,
+                    Description = tutorTeachingInformation.Description,
+                    TeachingStyleTypeId = tutorTeachingInformation.TeachingStyleTypeId,
+                    PrimaryCommunicationTypeId = tutorTeachingInformation.PrimaryCommunicationTypeId,
+                    SecondaryCommunicationTypeId = tutorTeachingInformation.SecondaryCommunicationTypeId,
+                    PrimaryEngagementMethodId = tutorTeachingInformation.PrimaryEngagementMethodId,
+                    SecondaryEngagementMethodId = tutorTeachingInformation.SecondaryEngagementMethodId,
+                    ExpectedResponseTime = tutorTeachingInformation.ExpectedResponseTime,
+                    SpecialConsiderations = tutorTeachingInformation.SpecialConsiderations,
+                };
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("Error updating tutor teaching information");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.InnerException);
+                return null;
+
+            }
+
+
         }
     }
 }

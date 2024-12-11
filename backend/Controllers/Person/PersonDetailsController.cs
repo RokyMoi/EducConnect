@@ -78,7 +78,7 @@ namespace backend.Controllers.Person
             //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
 
             var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
-            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+            Console.WriteLine("Is person a tutor: " + tutor != null);
             //If tutor is not null, check the TutorRegistrationStatus is below 2 (Email Verification, status before)
             if (tutor != null && tutor.TutorRegistrationStatusId < 2)
             {
@@ -191,6 +191,25 @@ namespace backend.Controllers.Person
                     );
                 }
             }
+
+            //Check if the person is a tutor, and update their TUtorRegistrationStatusId to 3 
+            if (tutor != null)
+            {
+                var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 3);
+                if (updatedTutorRegistrationStatus == null)
+                {
+                    return BadRequest(
+                        new
+                        {
+                            success = "false",
+                            message = "Failed to update tutor registration status",
+                            data = new { },
+                            timestamp = DateTime.Now
+                        }
+                    );
+                }
+            }
+
             //Save the person details to the database
             PersonDetails newPersonDetails = new PersonDetails
             {
@@ -210,6 +229,12 @@ namespace backend.Controllers.Person
 
             if (saveResult == null)
             {
+
+                //If the update failed, and the person is a tutor update their TUtorRegistrationStatusId to 2
+                if (tutor != null)
+                {
+                    var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 2);
+                }
                 return StatusCode(
                     500,
                     new
@@ -225,8 +250,25 @@ namespace backend.Controllers.Person
 
 
             return Ok(
-                saveResult
+                new
+                {
+                    success = "true",
+                    message = "Person details saved successfully",
+                    data = new
+                    {
+                        PersonDetailsId = saveResult.PersonDetailsId,
+                        FirstName = saveResult.FirstName,
+                        LastName = saveResult.LastName,
+                        Username = saveResult.Username,
+                        PhoneNumberCountryCode = saveResult.PhoneNumberCountryCode,
+                        PhoneNumber = saveResult.PhoneNumber,
+                        CountryOfOrigin = saveResult.CountryOfOrigin,
+                    },
+                    timestamp = DateTime.Now
+                }
             );
+
+
         }
 
         [HttpGet]
