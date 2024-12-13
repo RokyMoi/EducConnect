@@ -10,41 +10,49 @@ import { Router } from '@angular/router';
 })
 export class AccountService {
   http = inject(HttpClient);
-  baseUrl = 'http://localhost:5177/api/';
+  baseUrl = 'http://localhost:5177/';
   CurrentUser = signal<User | null>(null);
 
   router = inject(Router);
-  
-
- 
 
   login(model: any) {
     return this.http
-      .post<User>(this.baseUrl + 'Student/student-login', model, { observe: 'response' })
+      .post<User>(this.baseUrl + 'person/login', model, {
+        observe: 'response',
+      })
       .pipe(
         map((response) => {
-          const userData = (response.body as any)?.data; 
+          const userData = (response.body as any)?.data;
 
           if (userData) {
             const loggedInUser: User = {
-              Email:userData.Email,
+              Email: userData.Email,
               Role: userData.role,
-              Token: userData.token
+              Token: userData.token,
             };
 
-           
             this.CurrentUser.set(loggedInUser);
 
-     
             localStorage.setItem('user', JSON.stringify(loggedInUser));
+
+            //Set the authorization header
+            const token = response.headers.get('Authorization');
+            if (token) {
+              //Clear out the authorization header, if it exists in the local storage
+              localStorage.removeItem('Authorization');
+              localStorage.setItem(
+                'Authorization',
+                token.replace('Bearer ', '')
+              );
+            }
           }
 
-          return response; 
+          console.log(response.headers.get('Authorization'));
+          return response;
         })
       );
   }
 
-  
   register(model: any) {
     return this.http
       .post<User>(this.baseUrl + 'Student/student-register', model)
@@ -90,7 +98,6 @@ export class AccountService {
 
   //Method for resending verification code
   resendVerificationCode(email: string) {
-    
     const requestBody = {
       email: email,
     };
@@ -102,9 +109,13 @@ export class AccountService {
     return response;
   }
 
-
-
-
-  
+  //Method for setting access token
+  setAccessToken(token: string) {
+    localStorage.setItem('Authorization', token);
   }
 
+  //Method for getting access token
+  getAccessToken() {
+    return localStorage.getItem('Authorization');
+  }
+}

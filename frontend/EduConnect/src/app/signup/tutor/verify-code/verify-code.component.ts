@@ -8,6 +8,8 @@ import {
   ProgressSpinnerMode,
 } from '@angular/material/progress-spinner';
 import { AccountService } from '../../../services/account.service';
+import { User } from '../../../_models/User';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-verify-code',
@@ -28,7 +30,7 @@ export class VerifyCodeComponent {
   @Input() warningText: string = this.verificationCodeToCheck;
   @Input() warningTextColor: string = 'red';
   @Input() emailToVerify: string = '';
-
+  @Input() passwordForLogin: string = '';
   spinnerMode: ProgressSpinnerMode = 'indeterminate';
   spinnerColor: string = 'orange';
   isCheckActive: boolean = false;
@@ -43,9 +45,12 @@ export class VerifyCodeComponent {
     Validators.maxLength(8),
   ]);
 
+  loginResult: any;
   //AccountService injection, class for http request and response sending and receiving
   private AccountService = inject(AccountService);
 
+  //Router injection, class for navigation between pages
+  private routerNavigation = inject(Router);
   handleVerificationCodeValidation(): boolean {
     var isValid = true;
 
@@ -89,8 +94,32 @@ export class VerifyCodeComponent {
         next: (response) => {
           console.log(response);
           this.isCheckActive = false; // Hide the spinner on success
-          this.warningText = 'Verification successful, you can exit this screen and go to login page';
+          this.warningText =
+            'Verification successful, please wait while we log you in';
           this.warningTextColor = 'green';
+          this.dataProcessingResult = 'Verification successful';
+          const userToLogin = {
+            email: this.emailToVerify,
+            password: this.passwordForLogin,
+          };
+          console.log('User email to login: ' + userToLogin.email);
+          console.log('User password to login: ' + userToLogin.password);
+          this.AccountService.login(userToLogin).subscribe({
+            next: (loginResponse) => {
+              console.log('Login successful: ', loginResponse);
+              const currentUser = this.AccountService.CurrentUser();
+              if (currentUser?.Role === 'student') {
+                this.routerNavigation.navigateByUrl('/student-dashboard');
+              }
+              if (currentUser?.Role === 'tutor') {
+                this.routerNavigation.navigateByUrl('/tutor-dashboard');
+              }
+
+            },
+            error: (loginError) => {
+              console.error('Login failed: ', loginError);
+            },
+          });
         },
         error: (error) => {
           console.error('Error verifying code:', error);

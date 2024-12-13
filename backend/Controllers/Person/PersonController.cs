@@ -111,6 +111,9 @@ namespace backend.Controllers.Person
 
             var token = await _tokenService.CreateTokenAsync(personEmail);
 
+
+            //Add the token to the response authorization header
+            HttpContext.Response.Headers.Authorization = $"Bearer {token}";
             return
             Ok(
                 new

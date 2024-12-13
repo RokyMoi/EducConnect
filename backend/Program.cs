@@ -44,7 +44,8 @@ namespace EduConnect
                 {
                     policy.WithOrigins(frontendApplicationOrigin)  // Allow frontend origin
                           .AllowAnyHeader()                       // Allow any headers
-                          .AllowAnyMethod();                      // Allow any methods (GET, POST, etc.)
+                          .AllowAnyMethod()                      // Allow any methods (GET, POST, etc.)
+                          .WithExposedHeaders("Authorization"); // Expose the Authorization header
                 });
             });
 
