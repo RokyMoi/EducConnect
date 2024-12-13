@@ -1,4 +1,5 @@
 ﻿
+using backend.DTOs.Student;
 using EduConnect.Data;
 using EduConnect.DTOs;
 using EduConnect.Interfaces;
@@ -7,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 public class StudentRepository : IStudentRepository
 {
     private readonly DataContext _databaseContext;
-   
+
 
     public StudentRepository(DataContext databaseContext)
     {
         _databaseContext = databaseContext;
-       
+
     }
 
     public async Task<IEnumerable<StudentDTO>> GetAllStudents()
@@ -43,10 +44,26 @@ public class StudentRepository : IStudentRepository
         return studentDtos;
     }
 
+    public async Task<StudentEntityDTO> GetStudentByPersonId(Guid personId)
+    {
+        var student = await _databaseContext.Student.Where(x => x.PersonId == personId).FirstOrDefaultAsync();
+
+        if (student == null)
+        {
+            return null;
+        }
+
+        return new backend.DTOs.Student.StudentEntityDTO
+        {
+            PersonId = student.PersonId,
+            StudentId = student.StudentId,
+        };
+
+    }
 
     public async Task<StudentDTO> GetStudentInfoByEmail(string Email)
     {
-       
+
         var student = await _databaseContext.Student
             .Where(s => s.Person.PersonEmail.Email == Email)
             .Include(s => s.Person)
@@ -80,6 +97,6 @@ public class StudentRepository : IStudentRepository
 
             return studentDto;
         }
-        
+
     }
 }

@@ -141,6 +141,18 @@ namespace backend.Controllers.Tutor
             //Check SecondaryCommunicationTypeId
             if (saveRequestDTO.SecondaryCommunicationTypeId.HasValue)
             {
+                if (saveRequestDTO.SecondaryCommunicationTypeId == saveRequestDTO.PrimaryCommunicationTypeId)
+                {
+                    return BadRequest(
+                        new
+                        {
+                            success = "false",
+                            message = "Primary and secondary communication type cannot be the same",
+                            data = new { },
+                            timestamp = DateTime.Now
+                        }
+                    );
+                }
                 var secondaryCommunicationTypeId = await _referenceRepository.GetCommunicationTypeByIdAsync(saveRequestDTO.SecondaryCommunicationTypeId.Value);
                 if (secondaryCommunicationTypeId == null)
                 {
@@ -171,6 +183,18 @@ namespace backend.Controllers.Tutor
             //Check SecondaryEngagementMethodId
             if (saveRequestDTO.SecondaryEngagementMethodId.HasValue)
             {
+                if (saveRequestDTO.SecondaryEngagementMethodId == saveRequestDTO.PrimaryEngagementMethodId)
+                {
+                    return BadRequest(
+                        new
+                        {
+                            success = "false",
+                            message = "Primary and secondary engagement method cannot be the same",
+                            data = new { },
+                            timestamp = DateTime.Now
+                        }
+                    );
+                }
                 var secondaryEngagementMethod = await _referenceRepository.GetEngagementMethodByIdAsync(saveRequestDTO.SecondaryCommunicationTypeId.Value);
                 if (secondaryEngagementMethod == null)
                 {
@@ -200,7 +224,25 @@ namespace backend.Controllers.Tutor
                 );
             }
 
+
+            //Update TutorRegistrationStatus to 7
+            var tutorUpdateStatusResult = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 7);
+
+            if (tutorUpdateStatusResult == null)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "false",
+                        message = "We failed to update tutor registration status, please try again later",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
             //Save the data to the database
+
 
             var saveResult = await _tutorRepository.CreateTutorTeachingInformation(new TutorTeachingInformationDTO
             {

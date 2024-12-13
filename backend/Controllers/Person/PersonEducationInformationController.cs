@@ -21,6 +21,7 @@ namespace backend.Controllers.Person
         public async Task<IActionResult> AddEducationInformation(PersonEducationInformationSaveRequestDTO saveRequestDTO)
         {
 
+
             Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
 
             //Check if the email in the context dictionary is null

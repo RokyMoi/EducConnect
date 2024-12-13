@@ -153,12 +153,36 @@ namespace backend.Repositories.Tutor
             };
         }
 
+        public async Task<TutorTeachingInformationWithIncludedObjectsDTO?> GetTutorTeachingInformationWithIncludedObjectsByTutorId(Guid tutorId)
+        {
+            var tutorTeachingInformation = await _databaseContext.TutorTeachingInformation.Include(x => x.PrimaryCommunicationType).Include(x => x.SecondaryCommunicationType).Include(x => x.TeachingStyleType).Include(x => x.PrimaryEngagementMethod).Include(x => x.SecondaryEngagementMethod).Where(x => x.TutorId == tutorId).FirstOrDefaultAsync();
+
+            if (tutorTeachingInformation == null)
+            {
+                return null;
+            }
+            return new TutorTeachingInformationWithIncludedObjectsDTO
+            {
+                TutorTeachingInformationId = tutorTeachingInformation.TutorTeachingInformationId,
+                TutorId = tutorTeachingInformation.TutorId,
+                Description = tutorTeachingInformation.Description,
+                TutorTeachingStyleType = tutorTeachingInformation.TeachingStyleType,
+                PrimaryCommunicationType = tutorTeachingInformation.PrimaryCommunicationType,
+                SecondaryCommunicationType = tutorTeachingInformation.SecondaryCommunicationType,
+                PrimaryEngagementMethod = tutorTeachingInformation.PrimaryEngagementMethod,
+                SecondaryEngagementMethod = tutorTeachingInformation.SecondaryEngagementMethod,
+                ExpectedResponseTime = tutorTeachingInformation.ExpectedResponseTime,
+                SpecialConsiderations = tutorTeachingInformation.SpecialConsiderations,
+
+            };
+        }
 
         public async Task<TutorRegistrationStatusDTO> UpdateTutorRegistrationStatus(Guid personId, int newStatusId)
         {
             var tutorStatus = await _databaseContext.Tutor.Where(x => x.PersonId == personId).FirstOrDefaultAsync();
 
             var TutorRegistrationStatusWithId = await _databaseContext.TutorRegistrationStatus.Where(x => x.TutorRegistrationStatusId == newStatusId).FirstOrDefaultAsync();
+
             if (tutorStatus == null || TutorRegistrationStatusWithId == null)
             {
                 return null;

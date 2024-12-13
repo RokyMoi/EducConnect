@@ -7,6 +7,7 @@ namespace backend.DTOs.Person
 {
     public class PersonEducationInformationResponseDTO
     {
+        public Guid PersonEducationInformationId { get; set; }
         public string? InstitutionName { get; set; } = null;
         public string? InstitutionOfficialWebsite { get; set; } = null;
         public string? InstitutionAddress { get; set; } = null;

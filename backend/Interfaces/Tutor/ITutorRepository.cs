@@ -20,5 +20,7 @@ namespace backend.Interfaces.Tutor
 
         public Task<TutorTeachingInformationDTO?> UpdateTutorTeachingInformation(TutorTeachingInformationDTO updateDTO);
 
+        public Task<TutorTeachingInformationWithIncludedObjectsDTO?> GetTutorTeachingInformationWithIncludedObjectsByTutorId(Guid tutorId);
+
     }
 }
