@@ -20,6 +20,8 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<PersonProfilePicture> PersonProfilePicture { get; set; }
     public DbSet<PersonSalt> PersonSalt { get; set; }
     public DbSet<PersonVerificationCode> PersonVerificationCode { get; set; }
+
+    public DbSet<PersonPhoneNumber> PersonPhoneNumber { get; set; }
     public DbSet<Tutor> Tutor { get; set; }
 
     public DbSet<TutorRegistrationStatus> TutorRegistrationStatus { get; set; }
@@ -46,6 +48,8 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<EngagementMethod> EngagementMethod { get; set; }
 
     public DbSet<TutorTeachingInformation> TutorTeachingInformation { get; set; }
+
+
 
 
 }

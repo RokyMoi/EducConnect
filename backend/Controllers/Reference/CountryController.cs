@@ -35,8 +35,7 @@ namespace backend.Controllers.Reference
             {
                 var newCountryDTO = new CountryResponseDTO
                 {
-                    OfficialName = country.OfficialName,
-                    CommonName = country.CommonName,
+                    Name = country.Name,
                     NationalCallingCode = "+" + country.NationalCallingCode,
                     ShorthandCode = country.ISOAlpha2Code,
                     FlagEmoji = country.FlagEmoji
@@ -57,7 +56,7 @@ namespace backend.Controllers.Reference
         [HttpGet("/country/name/{countryName}")]
         public async Task<IActionResult> GetCountryByName([FromRoute] string countryName)
         {
-            var country = await _countryRepository.GetCountryByOfficialNameOrName(countryName);
+            var country = await _countryRepository.GetCountryByName(countryName);
 
             if (country == null)
             {
@@ -72,8 +71,7 @@ namespace backend.Controllers.Reference
 
             var countryResponseDTO = new CountryResponseDTO
             {
-                OfficialName = country.OfficialName,
-                CommonName = country.CommonName,
+                Name = country.Name,
                 NationalCallingCode = "+" + country.NationalCallingCode,
                 ShorthandCode = country.ISOAlpha2Code,
                 FlagEmoji = country.FlagEmoji

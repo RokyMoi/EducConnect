@@ -51,7 +51,7 @@ namespace backend.Controllers.Person
             var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
             Console.WriteLine("Tutor Id: " + tutor.PersonId);
             //If tutor is not null, check the TutorRegistrationStatus is below 5 (Personal Information, status before)
-            if (tutor != null && tutor.TutorRegistrationStatusId < 5)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 6)
             {
                 return UnprocessableEntity(
                     new
@@ -165,7 +165,7 @@ namespace backend.Controllers.Person
             //Check if the person is a tutor, and update their TUtorRegistrationStatusId to 4
             if (tutor != null)
             {
-                var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 6);
+                var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 8);
                 if (updatedTutorRegistrationStatus == null)
                 {
                     return BadRequest(

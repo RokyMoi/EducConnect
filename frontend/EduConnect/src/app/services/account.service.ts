@@ -118,4 +118,16 @@ export class AccountService {
   getAccessToken() {
     return localStorage.getItem('Authorization');
   }
+
+  //Method for checking has tutor finished their registration
+  getTutorRegistrationStatus(loginToken: string) {
+    return this.http.get(
+      ApiLinks.baseUrl + ApiLinks.getTutorRegistrationStatus,
+      {
+        headers: {
+          Authorization: `Bearer ${loginToken}`,
+        },
+      }
+    );
+  }
 }

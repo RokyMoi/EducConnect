@@ -28,20 +28,17 @@ namespace backend.Extensions
             {
 
 
+                Console.WriteLine(country.name);
 
 
-                var suffixes = new List<string>(country.idd.suffixes.ToObject<List<string>>());
-                string countryCallingCode = string.Concat(country.idd.root, suffixes.FirstOrDefault());
-                countryCallingCode = countryCallingCode.Substring(countryCallingCode.IndexOf('+') + 1);
+
                 var newCountry = new Country
                 {
                     CountryId = Guid.NewGuid(),
-                    OfficialName = country.name.official,
-                    CommonName = country.name.common,
-                    ISOAlpha2Code = country.cca2,
-                    NationalCallingCode = countryCallingCode,
-                    FlagUrl = country.flags.png,
-                    FlagEmoji = country.flag,
+                    Name = country.name,
+                    ISOAlpha2Code = country.code,
+                    NationalCallingCode = country.dial_code,
+                    FlagEmoji = country.emoji,
                 };
 
                 countryList.Add(newCountry);

@@ -280,9 +280,6 @@ namespace backend.Controllers.Person
                 FirstName = personDetails.FirstName,
                 LastName = personDetails.LastName,
                 Username = personDetails.Username,
-                PhoneNumberCountryCode = personDetails.PhoneNumberCountryCode,
-                PhoneNumber = personDetails.PhoneNumber,
-                CountryOfOrigin = personDetails.CountryOfOrigin,
 
             };
 
@@ -400,7 +397,7 @@ namespace backend.Controllers.Person
             var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
             Console.WriteLine("Is person a tutor: " + tutor != null);
             //If tutor is not null, check the TutorRegistrationStatus is below 6 (Email Verification, status before)
-            if (tutor != null && tutor.TutorRegistrationStatusId < 7)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 8)
             {
                 return UnprocessableEntity(
                     new

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Person.PersonDetails;
+using backend.DTOs.Person.PersonPhoneNumber;
+using backend.Entities.Reference.Country;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
 using backend.Interfaces.Tutor;
@@ -27,25 +29,7 @@ namespace backend.Controllers.Person
         [HttpPost]
         public async Task<IActionResult> CreatePersonDetails(PersonDetailsSaveRequestDTO saveRequestDTO)
         {
-            //Requirement for phone number and country code:
-            //Phone number is null and country code is null - Correct
-            //Phone number is not null and country code is not null - Correct
-            //Phone number is null and country code is not null - Incorrect
-            //Phone number is not null and country code is null - Incorrect
-            //Check if the above requirements are met
-            Console.WriteLine("Is country code empty or null: " + string.IsNullOrEmpty(saveRequestDTO.PhoneNumberCountryCode));
-            Console.WriteLine("Is phone number empty or null: " + string.IsNullOrEmpty(saveRequestDTO.PhoneNumber));
-            if (string.IsNullOrEmpty(saveRequestDTO.PhoneNumber) || string.IsNullOrEmpty(saveRequestDTO.PhoneNumberCountryCode))
-            {
-                return BadRequest(new
-                {
-                    success = "false",
-                    message = "Phone number and country code must be both provided, or both left empty",
-                    data = new { },
-                    timestamp = DateTime.Now
-                });
 
-            }
 
             Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
 
@@ -80,7 +64,7 @@ namespace backend.Controllers.Person
             var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
             Console.WriteLine("Is person a tutor: " + tutor != null);
             //If tutor is not null, check the TutorRegistrationStatus is below 2 (Email Verification, status before)
-            if (tutor != null && tutor.TutorRegistrationStatusId < 2)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 3)
             {
                 return UnprocessableEntity(
                     new
@@ -103,11 +87,12 @@ namespace backend.Controllers.Person
             }
 
             //Check if the country of origin is valid
-            if (!string.IsNullOrEmpty(saveRequestDTO.CountryOfOrigin))
+            Country countryOfOrigin = null;
+            if (saveRequestDTO.CountryOfOriginCountryId.HasValue && saveRequestDTO.CountryOfOriginCountryId != Guid.Empty)
             {
-                var country = await _countryRepository.GetCountryByOfficialNameOrName(saveRequestDTO.CountryOfOrigin);
+                countryOfOrigin = await _countryRepository.GetCountryById(saveRequestDTO.CountryOfOriginCountryId.Value);
 
-                if (country == null)
+                if (countryOfOrigin == null)
                 {
                     return BadRequest(new
                     {
@@ -119,25 +104,6 @@ namespace backend.Controllers.Person
                         timestamp = DateTime.Now
                     });
 
-                }
-            }
-
-            //Check if the national calling code is valid 
-            if (!string.IsNullOrEmpty(saveRequestDTO.PhoneNumberCountryCode))
-            {
-                var countryCallingCode = await _countryRepository.GetCountryByNationalCallingCode(saveRequestDTO.PhoneNumberCountryCode);
-
-                if (countryCallingCode == null)
-                {
-                    return BadRequest(new
-                    {
-                        success = "false",
-                        message = "National calling code does not exist",
-                        data = new
-                        {
-                        },
-                        timestamp = DateTime.Now
-                    });
                 }
             }
 
@@ -157,7 +123,7 @@ namespace backend.Controllers.Person
                 );
             }
 
-            //Check if the username and if not null phone number is already taken
+            //Check if the username and if not null is it already taken
             var existingUsername = await _personRepository.GetPersonByUsername(saveRequestDTO.Username);
 
             if (existingUsername != null)
@@ -173,29 +139,11 @@ namespace backend.Controllers.Person
                 );
             }
 
-            //Check if the phone number if not null, is already taken
-            if (!string.IsNullOrEmpty(saveRequestDTO.PhoneNumber))
-            {
-
-                var existingPhoneNumber = await _personRepository.GetPersonByPhoneNumber(saveRequestDTO.PhoneNumberCountryCode, saveRequestDTO.PhoneNumber);
-                if (existingPhoneNumber != null)
-                {
-                    return Conflict(
-                        new
-                        {
-                            success = "false",
-                            message = "Phone number is already taken",
-                            data = new { },
-                            timestamp = DateTime.Now
-                        }
-                    );
-                }
-            }
 
             //Check if the person is a tutor, and update their TUtorRegistrationStatusId to 3 
             if (tutor != null)
             {
-                var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 3);
+                var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 4);
                 if (updatedTutorRegistrationStatus == null)
                 {
                     return BadRequest(
@@ -210,7 +158,7 @@ namespace backend.Controllers.Person
                 }
             }
 
-            //Save the person details to the database
+            //Create new PersonDetails object
             PersonDetails newPersonDetails = new PersonDetails
             {
                 PersonDetailsId = Guid.NewGuid(),
@@ -218,11 +166,16 @@ namespace backend.Controllers.Person
                 FirstName = saveRequestDTO.FirstName,
                 LastName = saveRequestDTO.LastName,
                 Username = saveRequestDTO.Username,
-                PhoneNumberCountryCode = saveRequestDTO.PhoneNumberCountryCode,
-                PhoneNumber = saveRequestDTO.PhoneNumber,
-                CountryOfOrigin = saveRequestDTO.CountryOfOrigin,
+                CountryOfOriginCountryId = countryOfOrigin?.CountryId,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             };
+
+            //Create new PersonPhoneNumber object
+            PersonPhoneNumberSaveDTO? personPhoneNumberDTO = null;
+            PersonPhoneNumberDTO createdPersonPhoneNumber = null;
+
+
+
 
             var saveResult = await _personRepository.CreateNewPersonDetails(newPersonDetails);
 
@@ -233,7 +186,7 @@ namespace backend.Controllers.Person
                 //If the update failed, and the person is a tutor update their TUtorRegistrationStatusId to 2
                 if (tutor != null)
                 {
-                    var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 2);
+                    var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 3);
                 }
                 return StatusCode(
                     500,
@@ -256,13 +209,15 @@ namespace backend.Controllers.Person
                     message = "Person details saved successfully",
                     data = new
                     {
-                        PersonDetailsId = saveResult.PersonDetailsId,
-                        FirstName = saveResult.FirstName,
-                        LastName = saveResult.LastName,
-                        Username = saveResult.Username,
-                        PhoneNumberCountryCode = saveResult.PhoneNumberCountryCode,
-                        PhoneNumber = saveResult.PhoneNumber,
-                        CountryOfOrigin = saveResult.CountryOfOrigin,
+                        personDetails = new
+                        {
+                            personDetailsId = saveResult.PersonDetailsId,
+                            firstName = saveResult.FirstName,
+                            lastName = saveResult.LastName,
+                            username = saveResult.Username,
+                            countryOfOriginCountryId = saveResult.CountryOfOriginCountryId,
+                            countryOfOriginCountryName = countryOfOrigin?.Name,
+                        }
                     },
                     timestamp = DateTime.Now
                 }
@@ -303,8 +258,8 @@ namespace backend.Controllers.Person
 
             var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
             Console.WriteLine("Tutor Id: " + tutor.PersonId);
-            //If tutor is not null, check the TutorRegistrationStatus is below 2 (Email Verification, status before)
-            if (tutor != null && tutor.TutorRegistrationStatusId < 2)
+            //If tutor is not null, check the TutorRegistrationStatus is below 3 (Email Verification, status before)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 3)
             {
                 return UnprocessableEntity(
                     new
@@ -341,6 +296,25 @@ namespace backend.Controllers.Person
                 );
             }
 
+            //Get the Country data for the CountryOfOriginCountryId
+            Country countryOfOrigin = null;
+            if (personDetails.CountryOfOriginCountryId != Guid.Empty || personDetails.CountryOfOriginCountryId.HasValue)
+            {
+
+                countryOfOrigin = await _countryRepository.GetCountryById(personDetails.CountryOfOriginCountryId.Value);
+
+            }
+
+            //Get the PersonPhoneNumber from the database
+            var personPhoneNumber = await _personRepository.GetPersonPhoneNumberByPersonId(personId);
+
+
+            //Get the Country data for the NationalCallingCodeCountryId
+            Country countryByCallingCode = null;
+            if (personPhoneNumber != null)
+            {
+                countryByCallingCode = await _countryRepository.GetCountryById(personPhoneNumber.NationalCallingCodeCountryId);
+            }
             return Ok(
                 new
                 {
@@ -354,9 +328,15 @@ namespace backend.Controllers.Person
                             FirstName = personDetails.FirstName,
                             LastName = personDetails.LastName,
                             Username = personDetails.Username,
-                            PhoneNumberCountryCode = personDetails.PhoneNumberCountryCode,
-                            PhoneNumber = personDetails.PhoneNumber,
-                            CountryOfOrigin = personDetails.CountryOfOrigin,
+                            CountryOfOriginCountryId = personDetails.CountryOfOriginCountryId,
+                            CountryOfOriginCountryName = countryOfOrigin?.Name
+                        },
+                        PersonPhoneNumber = new
+                        {
+                            PhoneNumberId = personPhoneNumber?.PersonPhoneNumberId,
+                            NationalCallingCodeCountryId = personPhoneNumber?.NationalCallingCodeCountryId,
+                            NationalCallingCodeCountryName = countryByCallingCode?.Name,
+                            PhoneNumber = personPhoneNumber?.PhoneNumber
                         }
                     },
                     timestamp = DateTime.Now
@@ -365,310 +345,6 @@ namespace backend.Controllers.Person
 
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdatePersonDetails(PersonDetailsUpdateRequestDTO updateRequestDTO)
-        {
-            //Check if the email in the context dictionary is null
-            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        success = "error",
-                        message = "Something went wrong, please try again later.",
-                        data = new { },
-                        timestamp = DateTime.Now
-                    }
-                );
-            }
-
-            string email = HttpContext.Items["Email"].ToString();
-
-            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
-            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
-            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
-            {
-                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
-                personId = personEmail.PersonId;
-            }
-
-            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
-
-            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
-            Console.WriteLine("Tutor Id: " + tutor.PersonId);
-            //If tutor is not null, check the TutorRegistrationStatus is below 2 (Email Verification, status before)
-            if (tutor != null && tutor.TutorRegistrationStatusId < 2)
-            {
-                return UnprocessableEntity(
-                    new
-                    {
-
-                        success = "false",
-                        message = "It looks like you haven't completed your tutor registration yet. Please complete it to continue.",
-                        data = new
-                        {
-                            CurrentTutorRegistrationStatus = new
-                            {
-                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
-
-                            }
-                        },
-                        timestamp = DateTime.Now
-
-                    }
-                );
-            }
-
-            //Get the PersonDetails from the database
-            var personDetails = await _personRepository.GetPersonDetailsByPersonId(personId);
-
-            if (personDetails == null)
-            {
-                return NotFound(
-                    new
-                    {
-                        success = "false",
-                        message = "Person details for this account not found",
-                        data = new { },
-                        timestamp = DateTime.Now
-                    }
-                );
-            }
-
-            //Data validation from request, check if any of the fields are changed 
-
-            //Flag isUpdated to keep track of if any of the fields are changed
-            bool isUpdated = false;
-
-            //Check if FirstName is changed
-            if (!string.IsNullOrEmpty(updateRequestDTO.FirstName) && personDetails.FirstName != updateRequestDTO.FirstName)
-            {
-                personDetails.FirstName = updateRequestDTO.FirstName;
-                isUpdated = true;
-            }
-
-            //Check if LastName is changed
-            if (!string.IsNullOrEmpty(updateRequestDTO.LastName) && personDetails.LastName != updateRequestDTO.LastName)
-            {
-                personDetails.LastName = updateRequestDTO.LastName;
-                isUpdated = true;
-            }
-
-            //Check if Username is changed and is taken
-            if (!string.IsNullOrEmpty(updateRequestDTO.Username))
-            {
-
-                //Check if the username is taken
-                var personUsername = await _personRepository.GetPersonByUsername(updateRequestDTO.Username);
-                if (personUsername != null)
-                {
-                    return Conflict(
-                        new
-                        {
-                            success = "false",
-                            message = "Username is already taken",
-                            data = new { },
-                            timestamp = DateTime.Now
-                        }
-                    );
-                }
-
-                if (personDetails.Username != updateRequestDTO.Username)
-                {
-                    personDetails.Username = updateRequestDTO.Username;
-                    isUpdated = true;
-                }
-            }
-
-
-
-            //Check if the national calling code is valid 
-            if (!string.IsNullOrEmpty(updateRequestDTO.PhoneNumberCountryCode))
-            {
-                var countryCallingCode = await _countryRepository.GetCountryByNationalCallingCode(updateRequestDTO.PhoneNumberCountryCode);
-
-                if (countryCallingCode == null)
-                {
-                    return BadRequest(new
-                    {
-                        success = "false",
-                        message = "National calling code does not exist",
-                        data = new
-                        {
-                        },
-                        timestamp = DateTime.Now
-                    });
-                }
-
-                //Check if the PhoneNumberCountryCode has changed
-                if (personDetails.PhoneNumberCountryCode != updateRequestDTO.PhoneNumberCountryCode)
-                {
-                    personDetails.PhoneNumberCountryCode = updateRequestDTO.PhoneNumberCountryCode;
-                    isUpdated = true;
-                }
-            }
-
-            //Check phone number
-            //1. Check if the changed country code and changed phone number already exist in the database
-            if (!string.IsNullOrEmpty(updateRequestDTO.PhoneNumberCountryCode) && !string.IsNullOrEmpty(updateRequestDTO.PhoneNumber))
-            {
-                var existingPhoneNumberRecord = await _personRepository.GetPersonByPhoneNumber(updateRequestDTO.PhoneNumberCountryCode, updateRequestDTO.PhoneNumber);
-
-                if (existingPhoneNumberRecord != null)
-                {
-                    return Conflict(
-                        new
-                        {
-                            success = "false",
-                            message = "Phone number already exists",
-                            data = new { },
-                            timestamp = DateTime.Now
-                        }
-                    );
-                }
-            }
-
-            //2. Check if the existing phone number with changed country code already exist in the database
-            if (!string.IsNullOrEmpty(updateRequestDTO.PhoneNumberCountryCode) && !string.IsNullOrEmpty(personDetails.PhoneNumber))
-            {
-                var existingPhoneNumberRecord = await _personRepository.GetPersonByPhoneNumber(updateRequestDTO.PhoneNumberCountryCode, personDetails.PhoneNumber);
-
-                if (existingPhoneNumberRecord != null)
-                {
-                    return Conflict(
-                        new
-                        {
-                            success = "false",
-                            message = "Phone number already exists",
-                            data = new { },
-                            timestamp = DateTime.Now
-                        }
-                    );
-                }
-
-            }
-
-
-            //3. Check if the changed phone number with existing country code already exist in the database
-            if (!string.IsNullOrEmpty(personDetails.PhoneNumberCountryCode) && !string.IsNullOrEmpty(updateRequestDTO.PhoneNumber))
-            {
-                return Conflict(
-                    new
-                    {
-                        success = "false",
-                        message = "Phone number already exists",
-                        data = new { },
-                        timestamp = DateTime.Now
-                    }
-                );
-            }
-
-            //Check if the country code has changed
-            if (!string.IsNullOrEmpty(updateRequestDTO.PhoneNumberCountryCode) && updateRequestDTO.PhoneNumberCountryCode != personDetails.PhoneNumberCountryCode)
-            {
-                personDetails.PhoneNumberCountryCode = updateRequestDTO.PhoneNumberCountryCode;
-                isUpdated = true;
-            }
-
-            //Check if the phone number has changed
-            if (!string.IsNullOrEmpty(updateRequestDTO.PhoneNumber) && updateRequestDTO.PhoneNumber != personDetails.PhoneNumber)
-            {
-                personDetails.PhoneNumber = updateRequestDTO.PhoneNumber;
-                isUpdated = true;
-            }
-
-
-            //Check if the CountryOfOrigin has changed, if it has changed, then check if the country exists
-            Console.WriteLine("CountryOfOrigin: " + updateRequestDTO.CountryOfOrigin);
-            if (!string.IsNullOrEmpty(updateRequestDTO.CountryOfOrigin) && updateRequestDTO.CountryOfOrigin != personDetails.CountryOfOrigin)
-            {
-                var country = await _countryRepository.GetCountryByOfficialNameOrName(updateRequestDTO.CountryOfOrigin);
-                if (country == null)
-                {
-                    return NotFound(new
-                    {
-                        success = "false",
-                        message = "Country of origin does not exist",
-                        data = new
-                        {
-                        },
-                        timestamp = DateTime.Now
-                    });
-                }
-
-                personDetails.CountryOfOrigin = updateRequestDTO.CountryOfOrigin;
-                isUpdated = true;
-            }
-
-            //Check if no changes happened
-            if (!isUpdated)
-            {
-                return BadRequest(
-                    new
-                    {
-                        success = "false",
-                        message = "No new values to update were provided",
-                        data = new { },
-                        timestamp = DateTime.Now
-                    }
-                );
-            }
-
-            //Convert the person details to a DTO
-            var personDetailsDTO = new PersonDetailsUpdateDTO
-            {
-                PersonDetailsId = personDetails.PersonDetailsId,
-                PersonId = personDetails.PersonId,
-                FirstName = personDetails.FirstName,
-                LastName = personDetails.LastName,
-                Username = personDetails.Username,
-                PhoneNumberCountryCode = personDetails.PhoneNumberCountryCode,
-                PhoneNumber = personDetails.PhoneNumber,
-                CountryOfOrigin = personDetails.CountryOfOrigin
-            };
-            //Update the person details 
-            var updatedPersonDetails = await _personRepository.UpdatePersonDetails(personDetailsDTO);
-
-            if (updatedPersonDetails == null)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        success = "false",
-                        message = "We failed to update data, please try again later",
-                        data = new { },
-                        timestamp = DateTime.Now
-                    }
-                );
-            }
-
-            return Ok(
-                new
-                {
-                    success = "true",
-                    message = "Person details updated successfully",
-                    data = new
-                    {
-                        personDetails = new
-                        {
-                            personDetailsId = updatedPersonDetails.PersonDetailsId,
-                            firstName = updatedPersonDetails.FirstName,
-                            lastName = updatedPersonDetails.LastName,
-                            username = updatedPersonDetails.Username,
-                            phoneNumberCountryCode = updatedPersonDetails.PhoneNumberCountryCode,
-                            phoneNumber = updatedPersonDetails.PhoneNumber,
-                            countryOfOrigin = updatedPersonDetails.CountryOfOrigin
-                        }
-                    },
-                    timestamp = DateTime.Now
-                }
-            );
-
-
-
-        }
 
     }
 

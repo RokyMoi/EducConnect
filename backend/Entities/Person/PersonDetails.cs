@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using backend.Entities.Reference.Country;
 
 namespace EduConnect.Entities.Person;
 
@@ -20,11 +21,10 @@ public class PersonDetails
 
     public required string Username { get; set; }
 
-    public string? PhoneNumberCountryCode { get; set; } = string.Empty;
+    public Guid? CountryOfOriginCountryId { get; set; }
 
-    public string? PhoneNumber { get; set; } = string.Empty;
-
-    public string? CountryOfOrigin { get; set; } = string.Empty;
+    [ForeignKey("CountryOfOriginCountryId")]
+    public Country? Country { get; set; }
 
     public required long CreatedAt { get; set; }
 

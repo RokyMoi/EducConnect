@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Person;
 using backend.DTOs.Person.PersonDetails;
-using backend.DTOs.Reference;
+using backend.DTOs.Person.PersonPhoneNumber;
 using backend.DTOs.Tutor;
 using backend.Entities.Person;
 using EduConnect.Entities.Person;
@@ -26,9 +26,15 @@ namespace backend.Interfaces.Person
         Task<TutorUsernameDTO> GetTutorByUsername(string username);
         Task<PersonDetailsDTO> CreateNewPersonDetails(PersonDetails newPersonDetails);
         Task<PersonDetailsDTO> GetPersonDetailsByPersonId(Guid personId);
-        Task<PersonPhoneNumberDTO> GetPersonByPhoneNumber(string nationalCallingCode, string phoneNumber);
+
         Task<PersonDetailsDTO> GetPersonByUsername(string username);
         Task<PersonDetailsDTO> UpdatePersonDetails(PersonDetailsUpdateDTO personDetails);
+
+        Task<PersonPhoneNumberDTO> GetPersonByPhoneNumber(Guid nationalCallingCodeCountryId, string phoneNumber);
+
+        Task<PersonPhoneNumberDTO> CreateNewPersonPhoneNumber(PersonPhoneNumberSaveDTO personPhoneNumberDTO);
+
+        Task<PersonPhoneNumberDTO?> GetPersonPhoneNumberByPersonId(Guid personId);
 
     }
 }

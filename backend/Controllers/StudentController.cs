@@ -44,46 +44,46 @@ namespace EduConnect.Controllers
             return Ok(students);
         }
         [HttpGet("get-all-emails")]
-public async Task<ActionResult> GetAllEmails()
-{
-    try
-    {
-       
-        var emails = await db.PersonEmail
-                             .Select(x => x.Email)
-                             .ToListAsync();
-
-        if (emails == null || !emails.Any())
+        public async Task<ActionResult> GetAllEmails()
         {
-           
-            return NotFound(new
+            try
             {
-                message = "No emails found.",
-                data = new List<string>(), 
-                timestamp = DateTime.Now
-            });
+
+                var emails = await db.PersonEmail
+                                     .Select(x => x.Email)
+                                     .ToListAsync();
+
+                if (emails == null || !emails.Any())
+                {
+
+                    return NotFound(new
+                    {
+                        message = "No emails found.",
+                        data = new List<string>(),
+                        timestamp = DateTime.Now
+                    });
+                }
+
+
+                return Ok(new
+                {
+                    message = "Emails retrieved successfully.",
+                    data = emails,
+                    timestamp = DateTime.Now
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while fetching emails.",
+                    error = ex.Message,
+                    timestamp = DateTime.Now
+                });
+            }
         }
 
-      
-        return Ok(new
-        {
-            message = "Emails retrieved successfully.",
-            data = emails, 
-            timestamp = DateTime.Now
-        });
-    }
-    catch (Exception ex)
-    {
-      
-        return StatusCode(500, new
-        {
-            message = "An error occurred while fetching emails.",
-            error = ex.Message,
-            timestamp = DateTime.Now
-        });
-    }
-}
-       
         [HttpPost("student-register")]
         public async Task<ActionResult<UserDTO>> RegisterTutor(RegisterStudentDTO student)
         {
@@ -106,9 +106,7 @@ public async Task<ActionResult> GetAllEmails()
                 FirstName = student.FirstName,
                 LastName = student.LastName,
                 Username = student.Username,
-                PhoneNumberCountryCode = student.PhoneNumberCountryCode,
-                PhoneNumber = student.PhoneNumber,
-                CountryOfOrigin = student.CountryOfOrigin,
+                CountryOfOriginCountryId = Guid.Parse(student.CountryOfOrigin),
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
 
@@ -163,7 +161,7 @@ public async Task<ActionResult> GetAllEmails()
                 db.PersonPassword.Add(PersonPassword);
                 db.PersonSalt.Add(PersonSalt);
                 db.Student.Add(studentt);
-             
+
 
                 await db.SaveChangesAsync();
             });

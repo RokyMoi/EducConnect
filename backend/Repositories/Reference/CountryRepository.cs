@@ -68,9 +68,9 @@ namespace backend.Repositories.Reference
             return country;
         }
 
-        public Task<Country> GetCountryByOfficialNameOrName(string name)
+        public Task<Country> GetCountryByName(string name)
         {
-            var country = _databaseContext.Country.Where(x => x.OfficialName.Equals(name) || x.CommonName.Equals(name)).FirstOrDefaultAsync();
+            var country = _databaseContext.Country.Where(x => x.Name.Equals(name)).FirstOrDefaultAsync();
 
             if (country == null)
             {

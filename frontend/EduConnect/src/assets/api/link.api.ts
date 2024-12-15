@@ -7,4 +7,6 @@ export default class ApiLinks {
     ApiLinks.baseUrl + 'tutor/verify';
   public static readonly tutorEmailVerificationCodeResend =
     ApiLinks.baseUrl + 'tutor/resend-verification-code';
+
+  public static readonly getTutorRegistrationStatus = 'tutor/signup/status';
 }

@@ -10,7 +10,7 @@ namespace backend.Interfaces.Reference
     {
         public Task<Country> GetCountryById(Guid countryId);
         public Task<List<Country>> GetAllCountries();
-        public Task<Country> GetCountryByOfficialNameOrName(string name);
+        public Task<Country> GetCountryByName(string name);
         public Task<Country> GetCountryByShorthandCode(string isoAlpha2Code);
         public Task<Country> GetCountryByNationalCallingCode(string nationalCallingCode);
 

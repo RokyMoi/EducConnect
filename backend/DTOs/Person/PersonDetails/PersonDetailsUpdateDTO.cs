@@ -13,9 +13,6 @@ namespace backend.DTOs.Person.PersonDetails
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Username { get; set; }
-
-        public string? PhoneNumberCountryCode { get; set; }
-        public string? PhoneNumber { get; set; }
-        public string? CountryOfOrigin { get; set; }
+        public Guid? CountryOfOriginCountryId { get; set; }
     }
 }

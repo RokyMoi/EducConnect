@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241213235044_AddedRefactoredCountryEntity")]
+    partial class AddedRefactoredCountryEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,8 +51,8 @@ namespace EduConnect.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CountryOfOriginCountryId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CountryOfOrigin")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("CreatedAt")
                         .HasColumnType("bigint");
@@ -66,13 +69,17 @@ namespace EduConnect.Migrations
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumberCountryCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PersonDetailsId");
-
-                    b.HasIndex("CountryOfOriginCountryId");
 
                     b.HasIndex("PersonId")
                         .IsUnique();
@@ -647,38 +654,6 @@ namespace EduConnect.Migrations
                     b.ToTable("PersonEducationInformation", "Person");
                 });
 
-            modelBuilder.Entity("backend.Entities.Person.PersonPhoneNumber", b =>
-                {
-                    b.Property<Guid>("PersonPhoneNumberId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("NationalCallingCodeCountryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PersonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("PersonPhoneNumberId");
-
-                    b.HasIndex("NationalCallingCodeCountryId");
-
-                    b.HasIndex("PersonId")
-                        .IsUnique();
-
-                    b.ToTable("PersonPhoneNumber", "Person");
-                });
-
             modelBuilder.Entity("backend.Entities.Person.PersonVerificationCode", b =>
                 {
                     b.Property<Guid>("PersonVerificationCodeId")
@@ -792,17 +767,11 @@ namespace EduConnect.Migrations
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonDetails", b =>
                 {
-                    b.HasOne("backend.Entities.Reference.Country.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryOfOriginCountryId");
-
                     b.HasOne("EduConnect.Entities.Person.Person", "Person")
                         .WithOne("PersonDetails")
                         .HasForeignKey("EduConnect.Entities.Person.PersonDetails", "PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Country");
 
                     b.Navigation("Person");
                 });
@@ -993,25 +962,6 @@ namespace EduConnect.Migrations
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Person");
-                });
-
-            modelBuilder.Entity("backend.Entities.Person.PersonPhoneNumber", b =>
-                {
-                    b.HasOne("backend.Entities.Reference.Country.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("NationalCallingCodeCountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Country");
 
                     b.Navigation("Person");
                 });

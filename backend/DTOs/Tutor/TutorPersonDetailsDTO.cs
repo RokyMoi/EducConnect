@@ -19,7 +19,7 @@ namespace backend.DTOs.Tutor
 
         public string? PhoneNumberCountryCode { get; set; }
         public string? PhoneNumber { get; set; }
-        public string? CountryOfOrigin { get; set; }
+        public Guid? CountryOfOrigin { get; set; }
 
     }
 }

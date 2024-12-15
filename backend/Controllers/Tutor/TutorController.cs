@@ -25,6 +25,7 @@ using EduConnect.Interfaces;
 using backend.Interfaces.Reference;
 using backend.Entities.Reference.Country;
 using backend.Middleware.Tutor;
+using backend.Middleware;
 namespace backend.Controllers.Tutor
 {
     [ApiController]
@@ -541,6 +542,109 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
                 data = new { },
                 timestamp = DateTime.Now
             });
+
+        }
+
+        [HttpGet("signup/status")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> getTutorRegistrationStatus()
+        {
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personObjectEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personObjectEmail.PersonId;
+            }
+
+            if (personId == Guid.Empty)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+
+            //Check if the personId exists in the Tutor table
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    403,
+                    new
+                    {
+                        success = "false",
+                        message = "You are not a tutor",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Get the TutorRegistrationStatus data
+            var tutorRegistrationStatus = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+
+            if (tutorRegistrationStatus == null)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Convert the TutorRegistrationStatus to TutorRegistrationStatusResponseDTO
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Tutor registration status retrieved successfully",
+                    data = new
+                    {
+                        tutorRegistrationStatus = new
+                       TutorRegistrationStatusResponseDTO
+                        {
+                            TutorId = tutor.TutorId,
+                            TutorRegistrationStatusId = tutorRegistrationStatus.TutorRegistrationStatusId,
+                            Name = tutorRegistrationStatus.TutorRegistrationStatusName,
+                            Description = tutorRegistrationStatus.TutorRegistrationStatusDescription,
+                            IsSkippable = tutorRegistrationStatus.IsSkippable
+
+                        },
+                        timestamp = DateTime.Now,
+                    }
+                }
+            );
 
         }
 

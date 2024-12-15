@@ -26,6 +26,7 @@ namespace backend.Data.DataSeeder
                 //Status definitions:
                 //1. Email and Password, User must enter a valid email and password, not skippable
                 //2. Email Verification, User must verify their email address, not skippable
+                //3. Phone Number, User can enter their phone number, skippable
                 //3. Personal Information, User must enter their personal information, skippable
                 //4. Education, User must enter their education information, skippable
                 //5. Career, User must enter their career information,  skippable
@@ -34,10 +35,9 @@ namespace backend.Data.DataSeeder
                 //8. Financial Information, User must enter their financial information, not skippable
                 //9. Registration Complete, User has completed their registration, not skippable
 
-                List<EduConnect.Entities.Tutor.TutorRegistrationStatus> statusList = new List<EduConnect.Entities.Tutor.TutorRegistrationStatus>();
-
-                //Create Status 1: Email and Password
-                statusList.Add(
+                List<EduConnect.Entities.Tutor.TutorRegistrationStatus> statusList =
+                [
+                    //Create Status 1: Email and Password
                     new EduConnect.Entities.Tutor.TutorRegistrationStatus
                     {
                         Name = "Email and Password",
@@ -46,10 +46,8 @@ namespace backend.Data.DataSeeder
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                         UpdatedAt = null
                     }
-                );
-
-                //Create Status 2: Email Verification
-                statusList.Add(
+,
+                    //Create Status 2: Email Verification
                     new EduConnect.Entities.Tutor.TutorRegistrationStatus
                     {
                         Name = "Email Verification",
@@ -57,10 +55,16 @@ namespace backend.Data.DataSeeder
                         IsSkippable = false,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
-                );
-
-                //Create Status 3: Personal Information
-                statusList.Add(
+,
+                    //Create Status 3: Phone Number
+                    new EduConnect.Entities.Tutor.TutorRegistrationStatus
+                    {
+                        Name = "Phone Number",
+                        Description = "Provide your phone number.",
+                        IsSkippable = true,
+                        CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                    },
+                    //Create Status 4: Personal Information
                     new EduConnect.Entities.Tutor.TutorRegistrationStatus
                     {
                         Name = "Personal Information",
@@ -68,10 +72,8 @@ namespace backend.Data.DataSeeder
                         IsSkippable = true,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
 
-                    });
-
-                //Create Status 4: Education Information
-                statusList.Add(
+                    },
+                    //Create Status 5: Education Information
                     new EduConnect.Entities.Tutor.TutorRegistrationStatus
                     {
                         Name = "Education",
@@ -80,10 +82,8 @@ namespace backend.Data.DataSeeder
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
 
                     }
-                );
-
-                //Create Status 5: Career 
-                statusList.Add(
+,
+                    //Create Status 6: Career 
                     new EduConnect.Entities.Tutor.TutorRegistrationStatus
                     {
                         Name = "Career",
@@ -91,10 +91,8 @@ namespace backend.Data.DataSeeder
                         IsSkippable = true,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
-                );
-
-                //Create Status 6: Weekly Schedule
-                statusList.Add(
+,
+                    //Create Status 7: Weekly Schedule
                     new EduConnect.Entities.Tutor.TutorRegistrationStatus
                     {
                         Name = "Weekly Schedule",
@@ -102,10 +100,8 @@ namespace backend.Data.DataSeeder
                         IsSkippable = false,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
-                );
-
-                //Create Status 7: Tutoring and teaching information
-                statusList.Add(
+,
+                    //Create Status 8: Tutoring and teaching information
                     new EduConnect.Entities.Tutor.TutorRegistrationStatus
                     {
                         Name = "Tutoring and Teaching Information",
@@ -113,10 +109,8 @@ namespace backend.Data.DataSeeder
                         IsSkippable = true,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
-                );
-
-                //Create Status 8: Financial Information
-                statusList.Add(
+,
+                    //Create Status 9: Financial Information
                     new EduConnect.Entities.Tutor.TutorRegistrationStatus
                     {
                         Name = "Financial Information",
@@ -124,10 +118,8 @@ namespace backend.Data.DataSeeder
                         IsSkippable = false,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
-                );
-
-                //Create Status 9: Registration Complete
-                statusList.Add(
+,
+                    //Create Status 10: Registration Complete
                     new EduConnect.Entities.Tutor.TutorRegistrationStatus
                     {
                         Name = "Registration Complete",
@@ -135,7 +127,8 @@ namespace backend.Data.DataSeeder
                         IsSkippable = false,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     }
-                );
+,
+                ];
 
 
                 //Add above list of statuses to the database

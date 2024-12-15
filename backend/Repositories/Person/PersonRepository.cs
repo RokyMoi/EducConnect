@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Person;
 using backend.DTOs.Person.PersonDetails;
-using backend.DTOs.Reference;
+using backend.DTOs.Person.PersonPhoneNumber;
 using backend.DTOs.Tutor;
 using backend.Entities.Person;
 using backend.Interfaces.Person;
@@ -287,9 +287,7 @@ namespace backend.Repositories.Person
                 FirstName = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.FirstName,
                 LastName = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.LastName,
                 Username = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.Username,
-                PhoneNumberCountryCode = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.PhoneNumberCountryCode,
-                PhoneNumber = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.PhoneNumber,
-                CountryOfOrigin = tutorPersonalInformation.PersonDetails == null ? string.Empty : tutorPersonalInformation.PersonDetails.CountryOfOrigin,
+                CountryOfOrigin = tutorPersonalInformation.PersonDetails?.CountryOfOriginCountryId,
             };
 
         }
@@ -331,9 +329,7 @@ namespace backend.Repositories.Person
                     FirstName = newPersonDetails.FirstName,
                     LastName = newPersonDetails.LastName,
                     Username = newPersonDetails.Username,
-                    PhoneNumberCountryCode = newPersonDetails.PhoneNumberCountryCode,
-                    PhoneNumber = newPersonDetails.PhoneNumber,
-                    CountryOfOrigin = newPersonDetails.CountryOfOrigin,
+                    CountryOfOriginCountryId = newPersonDetails.CountryOfOriginCountryId,
                 };
             }
             catch (System.Exception ex)
@@ -362,29 +358,10 @@ namespace backend.Repositories.Person
                 FirstName = personDetails.FirstName,
                 LastName = personDetails.LastName,
                 Username = personDetails.Username,
-                PhoneNumberCountryCode = personDetails.PhoneNumberCountryCode,
-                PhoneNumber = personDetails.PhoneNumber,
-                CountryOfOrigin = personDetails.CountryOfOrigin,
+                CountryOfOriginCountryId = personDetails.CountryOfOriginCountryId,
             };
         }
 
-        public async Task<PersonPhoneNumberDTO> GetPersonByPhoneNumber(string nationalCallingCode, string phoneNumber)
-        {
-            var personPhoneNumber = await _databaseContext.PersonDetails.Where(x => x.PhoneNumberCountryCode.Equals(nationalCallingCode) && x.PhoneNumber.Equals(phoneNumber)).FirstOrDefaultAsync();
-
-            if (personPhoneNumber == null)
-            {
-                return null;
-            }
-
-            return new PersonPhoneNumberDTO
-            {
-                PersonId = personPhoneNumber.PersonId,
-                PersonDetailsId = personPhoneNumber.PersonDetailsId,
-                NationalCallingCode = personPhoneNumber.PhoneNumberCountryCode,
-                PhoneNumber = personPhoneNumber.PhoneNumber,
-            };
-        }
 
         public async Task<PersonDetailsDTO> GetPersonByUsername(string username)
         {
@@ -402,9 +379,7 @@ namespace backend.Repositories.Person
                 FirstName = personDetails.FirstName,
                 LastName = personDetails.LastName,
                 Username = personDetails.Username,
-                PhoneNumberCountryCode = personDetails.PhoneNumberCountryCode,
-                PhoneNumber = personDetails.PhoneNumber,
-                CountryOfOrigin = personDetails.CountryOfOrigin,
+                CountryOfOriginCountryId = personDetails.CountryOfOriginCountryId,
             };
         }
 
@@ -422,9 +397,7 @@ namespace backend.Repositories.Person
             personDetailsToUpdate.FirstName = personDetails.FirstName;
             personDetailsToUpdate.LastName = personDetails.LastName;
             personDetailsToUpdate.Username = personDetails.Username;
-            personDetailsToUpdate.PhoneNumberCountryCode = personDetails.PhoneNumberCountryCode;
-            personDetailsToUpdate.PhoneNumber = personDetails.PhoneNumber;
-            personDetailsToUpdate.CountryOfOrigin = personDetails.CountryOfOrigin;
+            personDetailsToUpdate.CountryOfOriginCountryId = personDetails.CountryOfOriginCountryId;
             personDetailsToUpdate.ModifiedAt = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
             await _databaseContext.SaveChangesAsync();
@@ -435,12 +408,84 @@ namespace backend.Repositories.Person
                 FirstName = personDetailsToUpdate.FirstName,
                 LastName = personDetailsToUpdate.LastName,
                 Username = personDetailsToUpdate.Username,
-                PhoneNumberCountryCode = personDetailsToUpdate.PhoneNumberCountryCode,
-                PhoneNumber = personDetailsToUpdate.PhoneNumber,
-                CountryOfOrigin = personDetailsToUpdate.CountryOfOrigin,
+                CountryOfOriginCountryId = personDetailsToUpdate.CountryOfOriginCountryId,
             };
         }
 
+
+        public async Task<PersonPhoneNumberDTO> CreateNewPersonPhoneNumber(PersonPhoneNumberSaveDTO personPhoneNumberDTO)
+        {
+            var newPersonPhoneNumber = new PersonPhoneNumber
+            {
+                PersonId = personPhoneNumberDTO.PersonId,
+                PersonPhoneNumberId = Guid.NewGuid(),
+                NationalCallingCodeCountryId = personPhoneNumberDTO.NationalCallingCodeCountryId,
+                PhoneNumber = personPhoneNumberDTO.PhoneNumber,
+            };
+
+            try
+            {
+                await _databaseContext.PersonPhoneNumber.AddAsync(newPersonPhoneNumber);
+                await _databaseContext.SaveChangesAsync();
+                return new PersonPhoneNumberDTO
+                {
+                    PersonPhoneNumberId = newPersonPhoneNumber.PersonPhoneNumberId,
+                    PersonId = newPersonPhoneNumber.PersonId,
+                    NationalCallingCodeCountryId = newPersonPhoneNumber.NationalCallingCodeCountryId,
+                    PhoneNumber = newPersonPhoneNumber.PhoneNumber,
+                };
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error creating new person phone number");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.InnerException);
+                return null;
+
+
+            }
+
+
+        }
+
+        public async Task<PersonPhoneNumberDTO> GetPersonByPhoneNumber(Guid nationalCallingCodeCountryId, string phoneNumber)
+        {
+
+            var personPhoneNumber = await _databaseContext.PersonPhoneNumber.Where(x => x.NationalCallingCodeCountryId == nationalCallingCodeCountryId && x.PhoneNumber.Equals(phoneNumber)).FirstOrDefaultAsync();
+
+            if (personPhoneNumber == null)
+            {
+                return null;
+            }
+
+            return new PersonPhoneNumberDTO
+            {
+
+                PersonPhoneNumberId = personPhoneNumber.PersonPhoneNumberId,
+                PersonId = personPhoneNumber.PersonId,
+                NationalCallingCodeCountryId = personPhoneNumber.NationalCallingCodeCountryId,
+                PhoneNumber = personPhoneNumber.PhoneNumber,
+            };
+        }
+
+        public async Task<PersonPhoneNumberDTO?> GetPersonPhoneNumberByPersonId(Guid personId)
+        {
+            var personPhoneNumber = await _databaseContext.PersonPhoneNumber.Where(x => x.PersonId == personId).FirstOrDefaultAsync();
+
+            if (personPhoneNumber == null)
+            {
+                return null;
+            }
+
+            return new PersonPhoneNumberDTO
+            {
+                PersonId = personPhoneNumber.PersonId,
+                PersonPhoneNumberId = personPhoneNumber.PersonPhoneNumberId,
+                NationalCallingCodeCountryId = personPhoneNumber.NationalCallingCodeCountryId,
+                PhoneNumber = personPhoneNumber.PhoneNumber,
+            };
+        }
     }
 }
 

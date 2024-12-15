@@ -36,7 +36,7 @@ namespace EduConnect.Extensions
             services.AddScoped<IPersonCareerInformationRepository, PersonCareerInformationRepository>();
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
-
+            services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
 
             //Add Database Seeders as Scoped services
             services.AddScoped<CountryExtractor>();

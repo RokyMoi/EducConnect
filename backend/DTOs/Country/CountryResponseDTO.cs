@@ -7,8 +7,7 @@ namespace backend.DTOs.Country
 {
     public class CountryResponseDTO
     {
-        public string OfficialName { get; set; }
-        public string CommonName { get; set; }
+        public string Name { get; set; }
         public string NationalCallingCode { get; set; }
         public string ShorthandCode { get; set; }
         public string FlagEmoji { get; set; }
