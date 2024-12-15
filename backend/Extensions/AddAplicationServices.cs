@@ -2,6 +2,7 @@
 using backend.Interfaces.Tutor;
 using backend.Repositories.Person;
 using backend.Repositories.Tutor;
+using EduConnect.Helpers;
 using EduConnect.Interfaces;
 using EduConnect.Services;
 
@@ -22,6 +23,7 @@ namespace EduConnect.Extensions
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<ITutorRepository, TutorRepository>();
+            services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
 
 
 
