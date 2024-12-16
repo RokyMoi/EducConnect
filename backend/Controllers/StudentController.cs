@@ -46,7 +46,7 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-        [AllowAnonymous]
+        
         [HttpPost("add-student-photo")]
         public async Task<ActionResult<PhotoDTO>> AddPhoto(IFormFile file)
         {
@@ -58,14 +58,14 @@ namespace EduConnect.Controllers
 
            
             var user = HttpContext.User;
-            var personEmailClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            var personEmailClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             if (personEmailClaim == null)
             {
                 return Unauthorized("User email claim not found.");
             }
 
      
-            var person = await db.PersonEmail.FirstOrDefaultAsync(x => x.Email == personEmailClaim.Value);
+            var person = await db.PersonEmail.FirstOrDefaultAsync(x => x.Email == personEmailClaim);
             if (person == null)
             {
                 return NotFound("Person not found.");
