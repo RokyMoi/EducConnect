@@ -24,5 +24,6 @@
     </h3>
     <button class="signinButton" routerLink="/user-signin">Sign in</button>
     <app-verify-code [emailToVerify]="this.signinForm.controls.email.value || 'email is null'"
+        [passwordForLogin]="this.signinForm.controls.password.value || 'password is null'"
         [toggleFloatingBox]="toggleFloatingBox.bind(this)" *ngIf="isFloatingVisible"></app-verify-code>
 </body>

@@ -48,19 +48,16 @@ namespace EduConnect.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CountryOfOrigin")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CountryOfOriginCountryId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("CreatedAt")
                         .HasColumnType("bigint");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("ModifiedAt")
@@ -69,19 +66,13 @@ namespace EduConnect.Migrations
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumberCountryCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PersonDetailsId");
+
+                    b.HasIndex("CountryOfOriginCountryId");
 
                     b.HasIndex("PersonId")
                         .IsUnique();
@@ -229,6 +220,65 @@ namespace EduConnect.Migrations
                     b.ToTable("PersonSalt", "Person");
                 });
 
+            modelBuilder.Entity("EduConnect.Entities.Reference.CommunicationType", b =>
+                {
+                    b.Property<int>("CommunicationTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommunicationTypeId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CommunicationTypeId");
+
+                    b.ToTable("CommunicationType", "Reference");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Reference.EngagementMethod", b =>
+                {
+                    b.Property<int>("EngagementMethodId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EngagementMethodId"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EngagementMethodId");
+
+                    b.ToTable("EngagementMethod", "Reference");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Reference.TutorTeachingStyleType", b =>
+                {
+                    b.Property<int>("TutorTeachingStyleTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TutorTeachingStyleTypeId"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TutorTeachingStyleTypeId");
+
+                    b.ToTable("TutorTeachingStyleType", "Reference");
+                });
+
             modelBuilder.Entity("EduConnect.Entities.Student.Student", b =>
                 {
                     b.Property<Guid>("StudentId")
@@ -301,11 +351,357 @@ namespace EduConnect.Migrations
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("TutorRegistrationStatusId")
+                        .HasColumnType("int");
+
                     b.HasKey("TutorId");
 
                     b.HasIndex("PersonId");
 
+                    b.HasIndex("TutorRegistrationStatusId");
+
                     b.ToTable("Tutor", "Tutor");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorRegistrationStatus", b =>
+                {
+                    b.Property<int>("TutorRegistrationStatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TutorRegistrationStatusId"));
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsSkippable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("TutorRegistrationStatusId");
+
+                    b.ToTable("TutorRegistrationStatus", "Reference");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorTeachingInformation", b =>
+                {
+                    b.Property<Guid>("TutorTeachingInformationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ExpectedResponseTime")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PrimaryCommunicationTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PrimaryEngagementMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SecondaryCommunicationTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SecondaryEngagementMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SpecialConsiderations")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TeachingStyleTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TutorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("TutorTeachingInformationId");
+
+                    b.HasIndex("PrimaryCommunicationTypeId");
+
+                    b.HasIndex("PrimaryEngagementMethodId");
+
+                    b.HasIndex("SecondaryCommunicationTypeId");
+
+                    b.HasIndex("SecondaryEngagementMethodId");
+
+                    b.HasIndex("TeachingStyleTypeId");
+
+                    b.HasIndex("TutorId")
+                        .IsUnique();
+
+                    b.ToTable("TutorTeachingInformation", "Tutor");
+                });
+
+            modelBuilder.Entity("backend.Entities.Learning.LearningCategory", b =>
+                {
+                    b.Property<Guid>("LearningCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("LearningCategoryDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LearningCategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("ModifiedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("LearningCategoryId");
+
+                    b.ToTable("LearningCategory", "Learning");
+                });
+
+            modelBuilder.Entity("backend.Entities.Learning.LearningSubcategory", b =>
+                {
+                    b.Property<Guid>("LearningSubcategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("LearningCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("LearningSubcategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("LearningSubcategoryId");
+
+                    b.HasIndex("LearningCategoryId");
+
+                    b.ToTable("LearningSubcategory", "Learning");
+                });
+
+            modelBuilder.Entity("backend.Entities.Person.PersonAvailability", b =>
+                {
+                    b.Property<Guid>("PersonAvailabilityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("PersonAvailabilityId");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("PersonAvailability", "Person");
+                });
+
+            modelBuilder.Entity("backend.Entities.Person.PersonCareerInformation", b =>
+                {
+                    b.Property<Guid>("PersonCareerInformationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Achievements")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AdditionalInformation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CityOfEmployment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyWebsite")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CountryOfEmployment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("EmploymentTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Industry")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JobDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Position")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Responsibilities")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SkillsUsed")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("WorkTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PersonCareerInformationId");
+
+                    b.HasIndex("EmploymentTypeId");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("WorkTypeId");
+
+                    b.ToTable("PersonCareerInformation", "Person");
+                });
+
+            modelBuilder.Entity("backend.Entities.Person.PersonEducationInformation", b =>
+                {
+                    b.Property<Guid>("PersonEducationInformationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EducationLevel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("FieldOfStudy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FinalGrade")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InstitutionAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InstitutionName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InstitutionOfficialWebsite")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MinorFieldOfStudy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("ModifiedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly?>("StartDate")
+                        .HasColumnType("date");
+
+                    b.HasKey("PersonEducationInformationId");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("PersonEducationInformation", "Person");
+                });
+
+            modelBuilder.Entity("backend.Entities.Person.PersonPhoneNumber", b =>
+                {
+                    b.Property<Guid>("PersonPhoneNumberId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("NationalCallingCodeCountryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("PersonPhoneNumberId");
+
+                    b.HasIndex("NationalCallingCodeCountryId");
+
+                    b.HasIndex("PersonId")
+                        .IsUnique();
+
+                    b.ToTable("PersonPhoneNumber", "Person");
                 });
 
             modelBuilder.Entity("backend.Entities.Person.PersonVerificationCode", b =>
@@ -340,13 +736,98 @@ namespace EduConnect.Migrations
                     b.ToTable("PersonVerificationCode", "Person");
                 });
 
+            modelBuilder.Entity("backend.Entities.Reference.Country.Country", b =>
+                {
+                    b.Property<Guid>("CountryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FlagEmoji")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ISOAlpha2Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NationalCallingCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CountryId");
+
+                    b.ToTable("Country", "Reference");
+                });
+
+            modelBuilder.Entity("backend.Entities.Reference.EmploymentType", b =>
+                {
+                    b.Property<int>("EmploymentTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmploymentTypeId"));
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("EmploymentTypeId");
+
+                    b.ToTable("EmploymentType", "Reference");
+                });
+
+            modelBuilder.Entity("backend.Entities.Reference.WorkType", b =>
+                {
+                    b.Property<int>("WorkTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkTypeId"));
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("WorkTypeId");
+
+                    b.ToTable("WorkType", "Reference");
+                });
+
             modelBuilder.Entity("EduConnect.Entities.Person.PersonDetails", b =>
                 {
+                    b.HasOne("backend.Entities.Reference.Country.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryOfOriginCountryId");
+
                     b.HasOne("EduConnect.Entities.Person.Person", "Person")
                         .WithOne("PersonDetails")
                         .HasForeignKey("EduConnect.Entities.Person.PersonDetails", "PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Country");
 
                     b.Navigation("Person");
                 });
@@ -435,6 +916,138 @@ namespace EduConnect.Migrations
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Tutor.TutorRegistrationStatus", "TutorRegistrationStatus")
+                        .WithMany()
+                        .HasForeignKey("TutorRegistrationStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+
+                    b.Navigation("TutorRegistrationStatus");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Tutor.TutorTeachingInformation", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Reference.CommunicationType", "PrimaryCommunicationType")
+                        .WithMany()
+                        .HasForeignKey("PrimaryCommunicationTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Reference.EngagementMethod", "PrimaryEngagementMethod")
+                        .WithMany()
+                        .HasForeignKey("PrimaryEngagementMethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Reference.CommunicationType", "SecondaryCommunicationType")
+                        .WithMany()
+                        .HasForeignKey("SecondaryCommunicationTypeId");
+
+                    b.HasOne("EduConnect.Entities.Reference.EngagementMethod", "SecondaryEngagementMethod")
+                        .WithMany()
+                        .HasForeignKey("SecondaryEngagementMethodId");
+
+                    b.HasOne("EduConnect.Entities.Reference.TutorTeachingStyleType", "TeachingStyleType")
+                        .WithMany()
+                        .HasForeignKey("TeachingStyleTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Tutor.Tutor", "Tutor")
+                        .WithMany()
+                        .HasForeignKey("TutorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PrimaryCommunicationType");
+
+                    b.Navigation("PrimaryEngagementMethod");
+
+                    b.Navigation("SecondaryCommunicationType");
+
+                    b.Navigation("SecondaryEngagementMethod");
+
+                    b.Navigation("TeachingStyleType");
+
+                    b.Navigation("Tutor");
+                });
+
+            modelBuilder.Entity("backend.Entities.Learning.LearningSubcategory", b =>
+                {
+                    b.HasOne("backend.Entities.Learning.LearningCategory", "LearningCategory")
+                        .WithMany()
+                        .HasForeignKey("LearningCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LearningCategory");
+                });
+
+            modelBuilder.Entity("backend.Entities.Person.PersonAvailability", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("backend.Entities.Person.PersonCareerInformation", b =>
+                {
+                    b.HasOne("backend.Entities.Reference.EmploymentType", "EmploymentType")
+                        .WithMany()
+                        .HasForeignKey("EmploymentTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Entities.Reference.WorkType", "WorkType")
+                        .WithMany()
+                        .HasForeignKey("WorkTypeId");
+
+                    b.Navigation("EmploymentType");
+
+                    b.Navigation("Person");
+
+                    b.Navigation("WorkType");
+                });
+
+            modelBuilder.Entity("backend.Entities.Person.PersonEducationInformation", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("backend.Entities.Person.PersonPhoneNumber", b =>
+                {
+                    b.HasOne("backend.Entities.Reference.Country.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("NationalCallingCodeCountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
 
                     b.Navigation("Person");
                 });

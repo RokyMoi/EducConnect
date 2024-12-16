@@ -22,11 +22,15 @@ using backend.Entities.Person;
 using EduConnect.DTOs;
 using Newtonsoft.Json.Linq;
 using EduConnect.Interfaces;
+using backend.Interfaces.Reference;
+using backend.Entities.Reference.Country;
+using backend.Middleware.Tutor;
+using backend.Middleware;
 namespace backend.Controllers.Tutor
 {
     [ApiController]
     [Route("/tutor")]
-    public class TutorController(DataContext _databaseContext, ITokenService _tokenService, IPersonRepository _personRepository, ITutorRepository _tutorRepository) : ControllerBase
+    public class TutorController(DataContext _databaseContext, ITokenService _tokenService, IPersonRepository _personRepository, ITutorRepository _tutorRepository, ICountryRepository _countryRepository, IReferenceRepository _referenceRepository) : ControllerBase
     {
 
         [HttpPost("signup")]
@@ -54,7 +58,7 @@ namespace backend.Controllers.Tutor
 
 
             //Create new Person
-            var Person = new Person
+            var Person = new EduConnect.Entities.Person.Person
             {
                 PersonId = Guid.NewGuid(),
                 IsActive = false,
@@ -112,12 +116,31 @@ namespace backend.Controllers.Tutor
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
+
+            //Get the first step in tutor registration (TutorRegistrationStatus with status 1)
+            var TutorRegistrationStatus = await _referenceRepository.GetTutorRegistrationStatusByIdAsync(1);
+
+            if (TutorRegistrationStatus == null)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "We are not able to register you at the moment. Please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
+
             //Create new Tutor 
             var Tutor = new EduConnect.Entities.Tutor.Tutor
             {
                 PersonId = Person.PersonId,
                 Person = Person,
                 TutorId = Guid.NewGuid(),
+                TutorRegistrationStatusId = 1,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
@@ -219,7 +242,7 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
                 message = "You have successfully registered as a tutor on EduConnect, please verify your email address using the verification code sent to your email address",
                 data = new UserDTO
                 {
-         
+
                     Email = PersonEmail.Email,
                     Token = token,
                     Role = role
@@ -232,6 +255,8 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
         [HttpPost("verify")]
         public async Task<IActionResult> VerifyTutorEmail(TutorVerifyVerificationCodeRequestDTO verificationCodeRequestDTO, DataContext databaseContext)
         {
+
+
 
             //Check if the email exists
             var existingEmail = await _personRepository.GetPersonEmailByEmail(verificationCodeRequestDTO.Email);
@@ -313,6 +338,11 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
                     timestamp = DateTime.Now
                 });
             }
+
+            Console.WriteLine(verificationCodeFromDatabase.PersonId);
+            //Update the Tutor registration status to 2
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(verificationCodeFromDatabase.PersonId);
+            var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(tutor.PersonId, 2);
 
             return Ok(new
             {
@@ -514,6 +544,291 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
             });
 
         }
+
+        [HttpGet("signup/status")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> getTutorRegistrationStatus()
+        {
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personObjectEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personObjectEmail.PersonId;
+            }
+
+            if (personId == Guid.Empty)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+
+            //Check if the personId exists in the Tutor table
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    403,
+                    new
+                    {
+                        success = "false",
+                        message = "You are not a tutor",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Get the TutorRegistrationStatus data
+            var tutorRegistrationStatus = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+
+            if (tutorRegistrationStatus == null)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Convert the TutorRegistrationStatus to TutorRegistrationStatusResponseDTO
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Tutor registration status retrieved successfully",
+                    data = new
+                    {
+                        tutorRegistrationStatus = new
+                       TutorRegistrationStatusResponseDTO
+                        {
+                            TutorId = tutor.TutorId,
+                            TutorRegistrationStatusId = tutorRegistrationStatus.TutorRegistrationStatusId,
+                            Name = tutorRegistrationStatus.TutorRegistrationStatusName,
+                            Description = tutorRegistrationStatus.TutorRegistrationStatusDescription,
+                            IsSkippable = tutorRegistrationStatus.IsSkippable
+
+                        },
+                        timestamp = DateTime.Now,
+                    }
+                }
+            );
+
+        }
+
+        // //Method for saving Tutor's personal information using Person.PersonDetail table
+        // [HttpPost("/tutor/signup/personal-info/add")]
+        // public async Task<IActionResult> AddTutorPersonalInformation(TutorPersonalInformationSaveRequestDTO personalInfoRequestDTO)
+        // {
+
+        //     //Requirement for phone number and country code:
+        //     //Phone number is null and country code is null - Correct
+        //     //Phone number is not null and country code is not null - Correct
+        //     //Phone number is null and country code is not null - Incorrect
+        //     //Phone number is not null and country code is null - Incorrect
+        //     //Check if the above requirements are met
+        //     Console.WriteLine("Is country code empty or null: " + string.IsNullOrEmpty(personalInfoRequestDTO.PhoneNumberCountryCode));
+        //     Console.WriteLine("Is phone number empty or null: " + string.IsNullOrEmpty(personalInfoRequestDTO.PhoneNumber));
+        //     if (string.IsNullOrEmpty(personalInfoRequestDTO.PhoneNumber) || string.IsNullOrEmpty(personalInfoRequestDTO.PhoneNumberCountryCode))
+        //     {
+        //         return BadRequest(new
+        //         {
+        //             success = "false",
+        //             message = "Phone number and country code must be both provided, or both left empty",
+        //             data = new { },
+        //             timestamp = DateTime.Now
+        //         });
+
+        //     }
+        //     //Check if the given email exists
+        //     var personEmail = await _personRepository.GetPersonEmailByEmail(personalInfoRequestDTO.TutorEmail);
+        //     if (personEmail == null)
+        //     {
+        //         return NotFound(new
+        //         {
+        //             success = "false",
+        //             message = "Email does not exist",
+        //             data = new { },
+        //             timestamp = DateTime.Now
+        //         });
+        //     }
+
+
+        //     //Check if the given email is already verified
+        //     var personEmailVerification = await _personRepository.GetPersonVerificationCodeByEmail(personEmail.Email);
+        //     if (personEmailVerification == null || personEmailVerification.IsVerified == false)
+        //     {
+        //         return BadRequest(new
+        //         {
+        //             success = "false",
+        //             message = "Please verify your email first",
+        //             data = new { },
+        //             timestamp = DateTime.Now
+        //         });
+        //     }
+
+        //     //Check if the personal information is already saved
+
+        //     var existingTutorPersonalInformation = await _personRepository.GetTutorPersonInformationByPersonId(personEmail.PersonId);
+
+
+        //     if (existingTutorPersonalInformation.PersonDetailsId != Guid.Empty)
+        //     {
+        //         return BadRequest(new
+        //         {
+        //             success = "false",
+        //             message = "Personal information is already saved for this account",
+        //             data = new
+        //             {
+        //             },
+        //             timestamp = DateTime.Now
+        //         });
+        //     }
+        //     //Check if the username is already taken
+
+        //     var existingUsername = await _personRepository.GetTutorByUsername(personalInfoRequestDTO.Username);
+
+        //     if (existingUsername != null)
+        //     {
+        //         return BadRequest(new
+        //         {
+        //             success = "false",
+        //             message = "Username is already taken",
+        //             data = new
+        //             {
+        //             },
+        //             timestamp = DateTime.Now
+        //         });
+
+        //     }
+
+        //     //Check if the country of origin is valid
+        //     if (!string.IsNullOrEmpty(personalInfoRequestDTO.CountryOfOrigin))
+        //     {
+        //         var country = await _countryRepository.GetCountryByOfficialNameOrName(personalInfoRequestDTO.CountryOfOrigin);
+
+        //         if (country == null)
+        //         {
+        //             return BadRequest(new
+        //             {
+        //                 success = "false",
+        //                 message = "Country of origin does not exist",
+        //                 data = new
+        //                 {
+        //                 },
+        //                 timestamp = DateTime.Now
+        //             });
+
+        //         }
+        //     }
+
+        //     //Check if the national calling code is valid 
+        //     if (!string.IsNullOrEmpty(personalInfoRequestDTO.PhoneNumberCountryCode))
+        //     {
+        //         var countryCallingCode = await _countryRepository.GetCountryByNationalCallingCode(personalInfoRequestDTO.PhoneNumberCountryCode);
+
+        //         if (countryCallingCode == null)
+        //         {
+        //             return BadRequest(new
+        //             {
+        //                 success = "false",
+        //                 message = "National calling code does not exist",
+        //                 data = new
+        //                 {
+        //                 },
+        //                 timestamp = DateTime.Now
+        //             });
+        //         }
+        //     }
+
+        //     //Create new PersonDetails object 
+        //     var newPersonDetails = new PersonDetails
+        //     {
+        //         PersonDetailsId = Guid.NewGuid(),
+        //         PersonId = personEmail.PersonId,
+        //         Person = personEmail.Person,
+        //         FirstName = personalInfoRequestDTO.FirstName,
+        //         LastName = personalInfoRequestDTO.LastName,
+        //         Username = personalInfoRequestDTO.Username,
+        //         PhoneNumberCountryCode = personalInfoRequestDTO.PhoneNumberCountryCode,
+        //         PhoneNumber = personalInfoRequestDTO.PhoneNumber,
+        //         CountryOfOrigin = personalInfoRequestDTO.CountryOfOrigin,
+        //         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+        //         ModifiedAt = null,
+        //     };
+
+        //     //Save new PersonDetails object to the database
+        //     var addingToDatabaseResult = await _personRepository.CreateNewPersonDetails(newPersonDetails);
+
+        //     if (addingToDatabaseResult == null)
+        //     {
+        //         return StatusCode(500, new
+        //         {
+        //             success = "false",
+        //             message = "Personal information could not be saved, please try again later",
+        //             data = new { },
+        //             timestamp = DateTime.Now
+        //         });
+        //     }
+        //     //Configure return object
+        //     var returnObjectDTO = new PersonSavePersonDetailsResponseDTO
+        //     {
+        //         FirstName = newPersonDetails.FirstName,
+        //         LastName = newPersonDetails.LastName,
+        //         Username = newPersonDetails.Username,
+        //         PhoneNumberCountryCode = newPersonDetails.PhoneNumberCountryCode,
+        //         PhoneNumber = newPersonDetails.PhoneNumber,
+        //         CountryOfOrigin = newPersonDetails.CountryOfOrigin,
+
+
+        //     };
+
+        //     return Ok(new
+        //     {
+        //         success = "true",
+        //         message = "Personal information has been saved",
+        //         data = new
+        //         {
+        //             PersonalInformation = returnObjectDTO,
+        //         },
+        //         timestamp = DateTime.Now
+        //     });
+
+
+        // }
+
 
     }
 }

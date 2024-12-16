@@ -1,4 +1,5 @@
 ﻿
+using backend.DTOs.Student;
 using EduConnect.Data;
 using EduConnect.DTOs;
 using EduConnect.Extensions;
@@ -9,12 +10,12 @@ using System.Security.Claims;
 public class StudentRepository : IStudentRepository
 {
     private readonly DataContext _databaseContext;
-   
+
 
     public StudentRepository(DataContext databaseContext)
     {
         _databaseContext = databaseContext;
-       
+
     }
 
     public async Task<IEnumerable<StudentDTO>> GetAllStudents()
@@ -35,8 +36,7 @@ public class StudentRepository : IStudentRepository
             LastName = s.Person.PersonDetails?.LastName,
             Username = s.Person.PersonDetails?.Username,
             Email = s.Person.PersonEmail?.Email,
-            PhoneNumber = s.Person.PersonDetails?.PhoneNumber,
-            CountryOfOrigin = s.Person.PersonDetails?.CountryOfOrigin,
+            CountryOfOrigin = s.Person.PersonDetails?.CountryOfOriginCountryId.ToString(),
             Biography = s.StudentDetails?.Biography,
             CurrentAcademicInstitution = s.StudentDetails?.CurrentAcademicInstitution,
             CurrentEducationLevel = s.StudentDetails?.CurrentEducationLevel,
@@ -45,10 +45,26 @@ public class StudentRepository : IStudentRepository
         return studentDtos;
     }
 
+    public async Task<StudentEntityDTO> GetStudentByPersonId(Guid personId)
+    {
+        var student = await _databaseContext.Student.Where(x => x.PersonId == personId).FirstOrDefaultAsync();
+
+        if (student == null)
+        {
+            return null;
+        }
+
+        return new backend.DTOs.Student.StudentEntityDTO
+        {
+            PersonId = student.PersonId,
+            StudentId = student.StudentId,
+        };
+
+    }
 
     public async Task<StudentDTO> GetStudentInfoByEmail(string Email)
     {
-       
+
         var student = await _databaseContext.Student
             .Where(s => s.Person.PersonEmail.Email == Email)
             .Include(s => s.Person)
@@ -72,8 +88,7 @@ public class StudentRepository : IStudentRepository
                 LastName = student.Person.PersonDetails?.LastName,
                 Username = student.Person.PersonDetails?.Username,
                 Email = student.Person.PersonEmail?.Email,
-                PhoneNumber = student.Person.PersonDetails?.PhoneNumber,
-                CountryOfOrigin = student.Person.PersonDetails?.CountryOfOrigin,
+                CountryOfOrigin = student.Person.PersonDetails?.CountryOfOriginCountryId.ToString(),
                 Biography = student.StudentDetails?.Biography,
                 CurrentAcademicInstitution = student.StudentDetails?.CurrentAcademicInstitution,
                 CurrentEducationLevel = student.StudentDetails?.CurrentEducationLevel,
@@ -82,7 +97,7 @@ public class StudentRepository : IStudentRepository
 
             return studentDto;
         }
-        
+
     }
     
 }

@@ -1,0 +1,13 @@
+<body>
+    <h1>
+        Enter your phone number
+    </h1>
+    <form [formGroup]="phoneNumberFormGroup">
+        <app-select-dropdown [options]="countries" [formControl]="phoneNumberFormGroup.controls.countryCode"
+            [label]="selectLabel" [placeholder]="countryCodeSelectPlaceholder"
+            (onChangeEvent)="handleCountryCodeSelect($event)"></app-select-dropdown>
+        <app-phone-number-input [label]="phoneNumberInputLabel"
+            [phoneNumberInputFormControl]="phoneNumberFormGroup.controls.phoneNumber"
+            (phoneNumberInput)="handlePhoneNumberInput($event)"></app-phone-number-input>
+    </form>
+</body>

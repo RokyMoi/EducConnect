@@ -9,7 +9,9 @@ namespace backend.DTOs.Person
     {
         public Guid PersonId { get; set; }
         public Guid PersonEmailId { get; set; }
+        public EduConnect.Entities.Person.Person? Person { get; set; }
         public string Email { get; set; }
+        public bool IsVerified { get; set; }
 
     }
 }

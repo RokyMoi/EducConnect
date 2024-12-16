@@ -1,12 +1,18 @@
+using backend.Data.DataSeeder;
+using backend.Entities.Reference.Country;
+using backend.Extensions;
+using backend.Utilities;
 using EduConnect.Data;
 using EduConnect.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 
 namespace EduConnect
 {
     public class Program
     {
+
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +25,6 @@ namespace EduConnect
             builder.Services.AddApplicationServices(builder.Configuration);
             builder.Services.AddJWTAuthService(builder.Configuration);
             builder.Services.AddDatabaseConnectionServices(builder.Configuration, builder.Environment);
-
 
 
             builder.Services.AddControllers();
@@ -39,7 +44,8 @@ namespace EduConnect
                 {
                     policy.WithOrigins(frontendApplicationOrigin)  // Allow frontend origin
                           .AllowAnyHeader()                       // Allow any headers
-                          .AllowAnyMethod();                      // Allow any methods (GET, POST, etc.)
+                          .AllowAnyMethod()                      // Allow any methods (GET, POST, etc.)
+                          .WithExposedHeaders("Authorization"); // Expose the Authorization header
                 });
             });
 
@@ -61,6 +67,46 @@ namespace EduConnect
             }
             var app = builder.Build();
 
+            //Seed database with work type data
+            using (var scope = app.Services.CreateScope())
+            {
+                //The following code block is used to seed the database with work and employment type data
+                //This code block uses async operations, but to not make the Main class async, GetAwaiter().GetResult() to execute the async operation, which is blocking in nature, and will block the Main method from executing the next line of code until the async operation is completed
+
+                try
+                {
+                    //Get the WorkType database seeder scoped service from the service container
+                    var workTypeSeeder = scope.ServiceProvider.GetRequiredService<WorkTypeDatabaseSeeder>();
+                    workTypeSeeder.SeedWorkTypeDataToDatabase().GetAwaiter().GetResult();
+
+                    //Get the EmploymentType database scoped seeder service from the service container
+                    var employmentTypeSeeder = scope.ServiceProvider.GetRequiredService<EmploymentTypeDatabaseSeeder>();
+                    employmentTypeSeeder.SeedEmploymentTypeDataToDatabase().GetAwaiter().GetResult();
+
+                    //Get the TutorRegistrationStatus database seeder scoped service from the service container
+                    var tutorRegistrationStatusSeeder = scope.ServiceProvider.GetRequiredService<TutorRegistrationStatusDataSeeder>();
+                    tutorRegistrationStatusSeeder.SeedTutorRegistrationStatusDataToDatabase().GetAwaiter().GetResult();
+
+                    //Get the CommunicationType database seeder scoped service from the service container
+                    var communicationTypeSeeder = scope.ServiceProvider.GetRequiredService<CommunicationTypeDatabaseSeeder>();
+                    communicationTypeSeeder.SeedCommunicationTypeDataToDatabase().GetAwaiter().GetResult();
+
+                    //Get the EngagementMethod database seeder scoped service from the service container
+                    var engagementMethodSeeder = scope.ServiceProvider.GetRequiredService<EngagementMethodDatabaseSeeder>();
+                    engagementMethodSeeder.SeedEngagementMethodDataToDatabase().GetAwaiter().GetResult();
+
+                    //Get the TutorType database seeder scoped service from the service container
+                    var tutorTeachingStyleTypeDatabaseSeeder = scope.ServiceProvider.GetRequiredService<TutorTeachingStyleTypeDatabaseSeeder>();
+                    tutorTeachingStyleTypeDatabaseSeeder.SeedTutorTeachingStyleTypeDataToDatabase().GetAwaiter().GetResult();
+
+
+                }
+                catch (Exception ex)
+                {
+                    // Log and handle seeding errors
+                    Console.Error.WriteLine($"An error occurred during seeding: {ex.Message}");
+                }
+            }
 
 
             // Configure the HTTP request pipeline.
