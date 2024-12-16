@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Country;
+using backend.Entities.Reference.Country;
 using backend.Interfaces.Reference;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -35,8 +36,9 @@ namespace backend.Controllers.Reference
             {
                 var newCountryDTO = new CountryResponseDTO
                 {
+                    CountryId = country.CountryId,
                     Name = country.Name,
-                    NationalCallingCode = "+" + country.NationalCallingCode,
+                    NationalCallingCode = country.NationalCallingCode,
                     ShorthandCode = country.ISOAlpha2Code,
                     FlagEmoji = country.FlagEmoji
                 };

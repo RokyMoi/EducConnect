@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { AccountService } from '../../services/account.service';
 import ITutorRegistrationStatus from '../../_models/Tutor/tutorRegistrationStatus.tutor';
+import { TutorRegistrationStatusService } from '../../services/tutor/tutor-status/tutor-status.service';
+import { User } from '../../_models/User';
 
 @Component({
   selector: 'app-tutor-dashboard',
@@ -9,27 +11,15 @@ import ITutorRegistrationStatus from '../../_models/Tutor/tutorRegistrationStatu
   styleUrl: './tutor-dashboard.component.css',
 })
 export class TutorDashboardComponent {
-  ngOnInit(): void {
-    this.getTutorRegistrationStatus();
-  }
-  AccountService = inject(AccountService);
-  tutorRegistrationStatus: ITutorRegistrationStatus = new ITutorRegistrationStatus;
-  //Check tutor registration status
-  getTutorRegistrationStatus() {
-    const token = localStorage.getItem('Authorization');
-    if (token) {
-      this.AccountService.getTutorRegistrationStatus(token).subscribe({
-        next: (response) => {
-          console.log(response);
-          let tutorRegistrationStatusResponse = (response as any).data
-            .tutorRegistrationStatus;
-          console.log(tutorRegistrationStatusResponse);
+  accountService = inject(AccountService);
+  tutorRegistrationStatusService = inject(TutorRegistrationStatusService);
+  tutorRegistrationStatus: ITutorRegistrationStatus | undefined;
+  tutorRegistrationStatusList: ITutorRegistrationStatus[] = [];
+  userToken: string = '';
 
-        },
-        error: (error) => {
-          console.log(error);
-        },
-      });
-    }
+  ngOnInit(): void {
+    this.accountService.checkAuthentication();
+    this.userToken = this.accountService.getAccessToken()!;
+    this.tutorRegistrationStatusService.checkTutorRegistrationStatus();
   }
 }

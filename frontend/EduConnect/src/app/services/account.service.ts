@@ -119,15 +119,34 @@ export class AccountService {
     return localStorage.getItem('Authorization');
   }
 
-  //Method for checking has tutor finished their registration
-  getTutorRegistrationStatus(loginToken: string) {
-    return this.http.get(
-      ApiLinks.baseUrl + ApiLinks.getTutorRegistrationStatus,
-      {
-        headers: {
-          Authorization: `Bearer ${loginToken}`,
-        },
-      }
+  /**
+   * Checks if the user is currently authenticated by verifying the presence of a token.
+   * @returns True if a token is found; otherwise, false.
+   */
+  isAuthenticated(): boolean {
+    const token = localStorage.getItem('Authorization');
+    return !!token;
+  }
+
+  /**
+   * Redirects the user to the login page if they are not authenticated.
+   */
+  checkAuthentication(): void {
+    if (!this.isAuthenticated()) {
+      window.alert('You must be logged in to access this page.');
+      this.router.navigate(['/user-signin']);
+    }
+  }
+
+  /**
+   * Logout user if a system critical error occurs
+   */
+  logoutOnError(): void {
+    window.alert(
+      'An unknown error has occurred during this operation, you will be logged out'
     );
+    localStorage.removeItem('Authorization');
+    this.CurrentUser.set(null);
+    this.router.navigate(['/user-signin']);
   }
 }

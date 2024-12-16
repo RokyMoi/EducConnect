@@ -7,6 +7,7 @@ namespace backend.DTOs.Country
 {
     public class CountryResponseDTO
     {
+        public Guid CountryId { get; set; }
         public string Name { get; set; }
         public string NationalCallingCode { get; set; }
         public string ShorthandCode { get; set; }

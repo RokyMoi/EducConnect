@@ -1,4 +1,4 @@
-export default interface TutorRegistrationStatus {
+export default interface ITutorRegistrationStatus {
   tutorId: string;
   tutorRegistrationStatusId: number;
   tutorRegistrationStatusName: string;
