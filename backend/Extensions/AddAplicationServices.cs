@@ -9,11 +9,11 @@ using backend.Middleware.Tutor;
 using backend.Repositories.Person;
 using backend.Repositories.Reference;
 using backend.Repositories.Tutor;
-<<<<<<< HEAD
+
 using EduConnect.Helpers;
-=======
+
 using backend.Services;
->>>>>>> e62e459ed1d7fa44c20fc57eae494a1e84df3398
+
 using EduConnect.Interfaces;
 using EduConnect.Services;
 
@@ -35,19 +35,18 @@ namespace EduConnect.Extensions
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<ITutorRepository, TutorRepository>();
-<<<<<<< HEAD
             services.AddScoped<IPhotoService, PhotoService>();
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
-=======
+
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IPersonEducationInformationRepository, PersonEducationInformationRepository>();
             services.AddScoped<IPersonCareerInformationRepository, PersonCareerInformationRepository>();
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
->>>>>>> e62e459ed1d7fa44c20fc57eae494a1e84df3398
 
-            //Add Database Seeders as Scoped services
+
+
             services.AddScoped<CountryExtractor>();
             services.AddScoped<WorkTypeDatabaseSeeder>();
             services.AddScoped<EmploymentTypeDatabaseSeeder>();

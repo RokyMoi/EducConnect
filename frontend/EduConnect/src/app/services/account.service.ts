@@ -12,7 +12,7 @@ export class AccountService {
   http = inject(HttpClient);
   baseUrl = 'http://localhost:5177/';
   CurrentUser = signal<User | null>(null);
-  EmailUser = signal<String | null>(null);
+
   router = inject(Router);
 
   login(model: any) {
@@ -22,36 +22,15 @@ export class AccountService {
       })
       .pipe(
         map((response) => {
-<<<<<<< HEAD
-          const userData = (response.body as any)?.data; 
-          console.log('API Response:', userData);
-          if (userData) {
-            const loggedInUser: User = {
-              Email:userData.email,
-=======
           const userData = (response.body as any)?.data;
 
           if (userData) {
             const loggedInUser: User = {
               Email: userData.Email,
->>>>>>> e62e459ed1d7fa44c20fc57eae494a1e84df3398
               Role: userData.role,
               Token: userData.token,
             };
 
-<<<<<<< HEAD
-
-           
-            console.log("Setting user in localStorage:", loggedInUser);
-
-            this.CurrentUser.set(loggedInUser);
-  
-            // Sačuvaj podatke u localStorage
-            localStorage.setItem('user', JSON.stringify(loggedInUser));
-           
-            const storedUser = JSON.parse(localStorage.getItem('user')!);
-            console.log(storedUser.Email);  // Trebalo bi da prikaže email
-=======
             this.CurrentUser.set(loggedInUser);
 
             localStorage.setItem('user', JSON.stringify(loggedInUser));
@@ -66,7 +45,6 @@ export class AccountService {
                 token.replace('Bearer ', '')
               );
             }
->>>>>>> e62e459ed1d7fa44c20fc57eae494a1e84df3398
           }
 
           console.log(response.headers.get('Authorization'));
@@ -91,7 +69,6 @@ export class AccountService {
   logout() {
     localStorage.removeItem('user');
     this.CurrentUser.set(null);
-    
   }
 
   //Method for registering a new user as a tutor

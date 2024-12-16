@@ -10,10 +10,9 @@ namespace EduConnect.Interfaces
         Task<IEnumerable<StudentDTO>> GetAllStudents();
         Task<StudentDTO> GetStudentInfoByEmail(string email);
 
-<<<<<<< HEAD
-=======
+
         Task<StudentEntityDTO> GetStudentByPersonId(Guid personId);
->>>>>>> e62e459ed1d7fa44c20fc57eae494a1e84df3398
+
     }
 
 }
