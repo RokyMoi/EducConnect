@@ -25,12 +25,15 @@ namespace EduConnect.Services
                     Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face"),
                     Folder = "profilePhotoPicture"
                 };
+              UploadResult = await _cloudinary.UploadAsync(UploadParams);
             }
+            return UploadResult;
         }
 
-        public Task<DeletionResult> DeletePhotoAsync(string publicID)
+        public async Task<DeletionResult> DeletePhotoAsync(string publicID)
         {
-            throw new NotImplementedException();
+            var DeleteParams = new DeletionParams(publicID);
+            return await _cloudinary.DestroyAsync(DeleteParams);
         }
     }
 }

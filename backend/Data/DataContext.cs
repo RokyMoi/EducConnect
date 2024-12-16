@@ -11,10 +11,12 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<Person> Person { get; set; }
     public DbSet<PersonDetails> PersonDetails { get; set; }
+
     public DbSet<PersonEmail> PersonEmail { get; set; }
     public DbSet<PersonPassword> PersonPassword { get; set; }
     public DbSet<PersonProfilePicture> PersonProfilePicture { get; set; }
     public DbSet<PersonSalt> PersonSalt { get; set; }
+    public DbSet<PersonPhoto> PersonPhoto { get; set; }
     public DbSet<PersonVerificationCode> PersonVerificationCode { get; set; }
     public DbSet<Tutor> Tutor { get; set; }
 

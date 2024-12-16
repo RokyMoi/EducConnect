@@ -10,12 +10,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace EduConnect.Controllers
 {
-    public class StudentController(DataContext db, ITokenService _tokenService, IStudentRepository _studentRepo) : MainController
+    public class StudentController(DataContext db, ITokenService _tokenService, IStudentRepository _studentRepo,IPhotoService _photoService) : MainController
     {
         [HttpGet("all-students")]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudents()
@@ -45,7 +46,61 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-        
+        [AllowAnonymous]
+        [HttpPost("add-student-photo")]
+        public async Task<ActionResult<PhotoDTO>> AddPhoto(IFormFile file)
+        {
+         
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("File is required.");
+            }
+
+           
+            var user = HttpContext.User;
+            var personEmailClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            if (personEmailClaim == null)
+            {
+                return Unauthorized("User email claim not found.");
+            }
+
+     
+            var person = await db.PersonEmail.FirstOrDefaultAsync(x => x.Email == personEmailClaim.Value);
+            if (person == null)
+            {
+                return NotFound("Person not found.");
+            }
+
+           
+            var result = await _photoService.AddPhotoAsync(file);
+            if (result.Error != null)
+            {
+                return BadRequest(result.Error.Message);
+            }
+
+          
+            var photo = new PersonPhoto
+            {
+                Url = result.SecureUrl.AbsoluteUri,
+                PublicId = result.PublicId,
+                PersonId = person.PersonId
+            };
+
+            
+            db.PersonPhoto.Add(photo);
+            if (await db.SaveChangesAsync() > 0)
+            {
+                return Ok(new
+                {
+                    message = "Photo has been added successfully!",
+                    data = HttpContext.User.Claims.Select(c => new { c.Type, c.Value }).ToList(),
+                timestamp = DateTime.UtcNow
+                });
+            }
+
+            return StatusCode(500, "An error occurred while saving the photo.");
+        }
+
 
 
         [HttpGet("get-all-emails")]
