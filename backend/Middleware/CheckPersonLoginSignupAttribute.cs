@@ -22,7 +22,6 @@ namespace backend.Middleware
             var serviceProvider = context.HttpContext.RequestServices;
 
 
-
             //Get TokenService as a required service, to use it's method of token validation
             var jwtValidator = serviceProvider.GetService(typeof(ITokenService)) as ITokenService;
 

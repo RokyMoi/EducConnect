@@ -11,6 +11,7 @@ export class PhoneNumberInputComponent {
   @Input() label: string = '';
   @Input() placeholder: string = 'Enter your phone number here...';
   @Input() phoneNumberInputFormControl: FormControl = new FormControl('');
+  @Input() warning: string = '';
 
   @Output() phoneNumberInput = new EventEmitter<Event>();
 

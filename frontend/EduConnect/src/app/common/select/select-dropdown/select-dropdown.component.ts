@@ -32,6 +32,7 @@ export class SelectDropdownComponent {
   @Input() placeholder: string = 'Select an option';
 
   @Input() formControl: FormControl = new FormControl();
+  @Input() warning: string = '';
 
   @Output() onChangeEvent = new EventEmitter<Event>();
   // The value that is written to the form control

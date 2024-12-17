@@ -17,4 +17,9 @@ export default class ApiLinks {
     ApiLinks.baseUrl + 'reference/tutor-registration-status/all';
   //Get all countries
   public static readonly getAllCountries = ApiLinks.baseUrl + 'country/all';
+
+  //Person controller
+  //Add phone number
+  public static readonly addPhoneNumber =
+    ApiLinks.baseUrl + 'person/phone-number';
 }

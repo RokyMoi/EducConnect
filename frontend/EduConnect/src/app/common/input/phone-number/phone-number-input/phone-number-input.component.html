@@ -2,5 +2,6 @@
     <label for="phoneNumberInput">{{label}}</label>
     <input type="tel" id="phoneNumberInput" [placeholder]="placeholder" [formControl]="phoneNumberInputFormControl"
         (input)="handleTextInput($event)" />
+        <p class = "warning">{{warning}}</p>
 
 </div>

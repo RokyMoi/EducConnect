@@ -1,9 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, Signal, signal } from '@angular/core';
 import { User } from '../_models/User';
-import { map } from 'rxjs';
+import { map, Subject } from 'rxjs';
 import ApiLinks from '../../assets/api/link.api';
 import { Router } from '@angular/router';
+import SuccessHttpResponseData from '../../../../../.history/frontend/EduConnect/src/app/_models/data/http.response.data/success.http.response.data_20241217014910';
+
+import ErrorHttpResponseData from '../_models/data/http.response.data/error.http.response.data';
 
 @Injectable({
   providedIn: 'root',
@@ -149,4 +152,55 @@ export class AccountService {
     this.CurrentUser.set(null);
     this.router.navigate(['/user-signin']);
   }
+
+  /**
+   * Send a request to the server to create a phone number for the logged-in user.
+   * @param countryCodeId - The ID of the country associated with the phone number.
+   * @param phoneNumber - The phone number to be created.
+   * @returns If successful - SuccessHttpResponseData object containing the response data.
+   * @return If unsuccessful - ErrorHttpResponseData object containing the error message.
+   */
+  createPhoneNumber(countryCode: string, phoneNumber: string) {
+    const requestBody = {
+      nationalCallingCodeCountryId: countryCode,
+      phoneNumber: phoneNumber,
+    };
+    const authorization = this.getAccessToken();
+    const resultSubject = new Subject<
+      SuccessHttpResponseData | ErrorHttpResponseData
+    >();
+    this.http
+      .post(ApiLinks.addPhoneNumber, requestBody, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .subscribe({
+        next: (response) => {
+          console.log('Phone number created successfully:', response);
+          const successResponse: SuccessHttpResponseData = {
+            success: 'true',
+            data: (response as any).data,
+            message: (response as any).message,
+          };
+          resultSubject.next(successResponse);
+          resultSubject.complete();
+        },
+        error: (error) => {
+          console.error('Error creating phone number:', error);
+          const errorResponse: ErrorHttpResponseData = {
+            success: 'false',
+            data: null,
+            message: error.error.message,
+            statusCode: error.status,
+            statusText: error.statusText,
+          };
+
+          resultSubject.next(errorResponse);
+          resultSubject.complete();
+        },
+      });
+      return resultSubject.toPromise();
+  }
+
 }
