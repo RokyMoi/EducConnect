@@ -1,10 +1,13 @@
 ﻿
+using backend.Entities.Person;
+using backend.Middleware;
 using EduConnect.Data;
 using EduConnect.DTOs;
 
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
 using EduConnect.Extensions;
+using EduConnect.Helpers;
 using EduConnect.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,39 +49,37 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-        
+       
         [HttpPost("add-student-photo")]
+        [CheckPersonLoginSignup]
+      
         public async Task<ActionResult<PhotoDTO>> AddPhoto(IFormFile file)
         {
-         
             if (file == null || file.Length == 0)
             {
                 return BadRequest("File is required.");
             }
 
-           
-            var user = HttpContext.User;
-            var personEmailClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var caller = new Caller(this.HttpContext);
+
+            var personEmailClaim = caller.Email;
             if (personEmailClaim == null)
             {
                 return Unauthorized("User email claim not found.");
             }
 
-     
             var person = await db.PersonEmail.FirstOrDefaultAsync(x => x.Email == personEmailClaim);
             if (person == null)
             {
                 return NotFound("Person not found.");
             }
 
-           
             var result = await _photoService.AddPhotoAsync(file);
             if (result.Error != null)
             {
                 return BadRequest(result.Error.Message);
             }
 
-          
             var photo = new PersonPhoto
             {
                 Url = result.SecureUrl.AbsoluteUri,
@@ -86,7 +87,6 @@ namespace EduConnect.Controllers
                 PersonId = person.PersonId
             };
 
-            
             db.PersonPhoto.Add(photo);
             if (await db.SaveChangesAsync() > 0)
             {
@@ -94,13 +94,12 @@ namespace EduConnect.Controllers
                 {
                     message = "Photo has been added successfully!",
                     data = HttpContext.User.Claims.Select(c => new { c.Type, c.Value }).ToList(),
-                timestamp = DateTime.UtcNow
+                    timestamp = DateTime.UtcNow
                 });
             }
 
             return StatusCode(500, "An error occurred while saving the photo.");
         }
-
 
 
         [HttpGet("get-all-emails")]
@@ -166,7 +165,7 @@ namespace EduConnect.Controllers
                 FirstName = student.FirstName,
                 LastName = student.LastName,
                 Username = student.Username,
-                CountryOfOriginCountryId = Guid.Parse(student.CountryOfOrigin),
+                CountryOfOriginCountryId = student.CountryOfOriginCountryId,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
 
@@ -205,6 +204,16 @@ namespace EduConnect.Controllers
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
+            var PhoneNumber = new PersonPhoneNumber
+            {
+                PersonId = Person.PersonId,
+                NationalCallingCodeCountryId = student.PhoneNumberCountryCodeCountryId,
+                PhoneNumber = student.PhoneNumber,
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                UpdatedAt = null
+
+
+            };
 
             var studentt = new Student
             {
@@ -213,6 +222,36 @@ namespace EduConnect.Controllers
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
+
+            //Check does PhoneNumberCountryCodeCountryId exist
+            var countryByCallingCode = await db.Country.Where(x => x.CountryId == student.PhoneNumberCountryCodeCountryId).FirstOrDefaultAsync();
+            if (countryByCallingCode == null) {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "National calling code does not exist",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    });
+            }
+
+            //Check does countryOfOrigin exist
+            var countryByCountryOfOriginCountryId = await db.Country.Where(
+                x => x.CountryId == student.CountryOfOriginCountryId
+            )
+            .FirstOrDefaultAsync();
+
+            if (countryByCountryOfOriginCountryId == null) { 
+                    return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Country does not exist",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    });
+            }
             await Task.Run(async () =>
             {
                 db.Person.Add(Person);
@@ -220,7 +259,9 @@ namespace EduConnect.Controllers
                 db.PersonDetails.Add(PersonDetails);
                 db.PersonPassword.Add(PersonPassword);
                 db.PersonSalt.Add(PersonSalt);
+                db.PersonPhoneNumber.Add(PhoneNumber);
                 db.Student.Add(studentt);
+                
 
 
                 await db.SaveChangesAsync();

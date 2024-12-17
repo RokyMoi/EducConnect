@@ -75,6 +75,35 @@ body {
 .errow{
     color:red;
 }
+select{
+    display: block;
+    padding: 9px;
+    width: 100%;
+    margin: 3px;
+
+    font-family: roboto;
+    
+  
+    outline: none;
+    background-color: #9191911f;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    font-size: 15px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+}
+select{
+    color: white;
+}
+option{
+    color:black;
+}
+.SelectionText{
+    font-family: roboto;
+    color:white;
+}
 .login-container form input {
     display: block;
     padding: 9px;

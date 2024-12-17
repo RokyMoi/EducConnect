@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-student-profile',
-  imports: [],
   templateUrl: './student-profile.component.html',
   styleUrl: './student-profile.component.css'
 })

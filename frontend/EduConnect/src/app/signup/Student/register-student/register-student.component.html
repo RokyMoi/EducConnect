@@ -76,41 +76,36 @@
                   <span class="errow"  *ngIf="registerForm.get('password')?.hasError('pattern')">Password must contain uppercase, lowercase, digit, and special character</span>
                 </div>
               
-                <input
-                  [class.is-invalid]="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched"
-                  formControlName="phoneNumber"
-                  type="text"
-                  placeholder="Phone Number"
-                  class="input-line full-width"
-                  required
-                />
+               
                 <div *ngIf="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched">
                   <span class="errow" *ngIf="registerForm.get('phoneNumber')?.hasError('required')">{{ PhoneWarning }}</span>
                 </div>
               
+                <label class="SelectionText" for="phoneNumberCountryCode">Select Country</label>
+                <select formControlName="phoneNumberCountryCode" required>
+                  <option value="" disabled selected>CountryCode</option>
+                  <option *ngFor="let country of countries" [value]="country.countryId">
+                    {{ country.nationalCallingCode }} {{ country.flagEmoji }}
+                  </option>
+
+                </select>
                 <input
-                  [class.is-invalid]="registerForm.get('phoneNumberCountryCode')?.invalid && registerForm.get('phoneNumberCountryCode')?.touched"
-                  formControlName="phoneNumberCountryCode"
-                  type="text"
-                  placeholder="Phone Country Code"
-                  class="input-line full-width"
-                  required
-                />
-                <div *ngIf="registerForm.get('phoneNumberCountryCode')?.invalid && registerForm.get('phoneNumberCountryCode')?.touched">
-                  <span class="errow" *ngIf="registerForm.get('phoneNumberCountryCode')?.hasError('required')">{{ PhoneCountryCodeWarning }}</span>
-                </div>
+                [class.is-invalid]="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched"
+                formControlName="phoneNumber"
+                type="text"
+                placeholder="Phone Number"
+                class="input-line full-width"
+                required
+              />
               
-                <input
-                  [class.is-invalid]="registerForm.get('CountryOfOrigin')?.invalid && registerForm.get('CountryOfOrigin')?.touched"
-                  formControlName="CountryOfOrigin"
-                  type="text"
-                  placeholder="Country of Origin"
-                  class="input-line full-width"
-                  required
-                />
-                <div *ngIf="registerForm.get('CountryOfOrigin')?.invalid && registerForm.get('CountryOfOrigin')?.touched">
-                  <span class="errow" *ngIf="registerForm.get('CountryOfOrigin')?.hasError('required')">{{ CountryWarning }}</span>
-                </div>
+                <label class="SelectionText" for="CountryOfOrigin">Select Country</label>
+                <select formControlName="CountryOfOrigin" required>
+                  <option value="" disabled selected>Select Country</option>
+                  <option *ngFor="let country of countries" [value]="country.countryId">
+                    {{ country.flagEmoji }} {{ country.name }}
+                  </option>
+                </select>
+             
               <div> 
                
                 <span class="errow"> 

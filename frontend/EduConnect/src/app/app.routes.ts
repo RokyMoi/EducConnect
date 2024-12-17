@@ -16,6 +16,8 @@ export const routes: Routes = [
   { path: 'student-register', component: RegisterStudentComponent },
   { path: 'tutor-signup', component: TutorSignupComponent },
   { path: 'user-signin', component: LoginComponent },
+  {path: 'student-profile', component: StudentProfileComponent},
+  {path: 'learning-student', component: LearningComponent},
   { path: 'student-dashboard', component: StudentDashboardComponent },
   { path: 'tutor-dashboard', component: TutorDashboardComponent },
   {
@@ -24,4 +26,5 @@ export const routes: Routes = [
   },
   { path: '**', component: BodyComponent },
 ];
+
 

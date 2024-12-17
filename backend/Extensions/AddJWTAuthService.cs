@@ -17,6 +17,8 @@ namespace EduConnect.Extensions
         var tokenKey = config["Jwt:SecretKey"] ?? throw new Exception("Token not found");
         options.TokenValidationParameters = new TokenValidationParameters
         {
+           
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey)),
             ValidateIssuer = false,
