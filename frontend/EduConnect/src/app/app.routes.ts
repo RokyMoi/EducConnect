@@ -6,6 +6,7 @@ import { LoginComponent } from './signup/login/login.component';
 import { StudentDashboardComponent } from './Student/student-dashboard/student-dashboard.component';
 import { TutorDashboardComponent } from './tutor/tutor-dashboard/tutor-dashboard.component';
 import { PhoneNumberComponent } from './signup/registration-step-process/phone-number/phone-number.component';
+import { PersonDetailsComponent } from './signup/registration-step-process/person-details/person-details/person-details.component';
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -17,6 +18,10 @@ export const routes: Routes = [
   {
     path: 'signup/phone-number',
     component: PhoneNumberComponent,
+  },
+  {
+    path: 'signup/personal-information',
+    component: PersonDetailsComponent,
   },
   { path: '**', component: BodyComponent },
 ];

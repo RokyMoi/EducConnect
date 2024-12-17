@@ -21,15 +21,25 @@
         <p class="valueWarningBox">{{selectedCountryCodeAndCountryName}}</p>
         <p class="textWarningBox">Phone number:</p>
         <p class="valueWarningBox">{{phoneNumberValue}}</p>
-        <div>
-            <app-submit-button class="submit-button-warning-box" [submitButtonText]="warningBoxYesButtonText"
+        <div *ngIf="!isDataTransmissionActive">
+            <app-submit-button *ngIf="!isDataTransmissionComplete" class="submit-button-warning-box"
+                [submitButtonText]="warningBoxYesButtonText"
                 [buttonBackgroundColor]="warningBoxYesButtonBackgroundColor" [buttonMargin]="warningBoxButtonMargin"
                 (buttonClick)="handleYesButton($event)">
             </app-submit-button>
-            <app-submit-button [submitButtonText]="warningBoxNoButtonText"
+            <app-submit-button *ngIf="!isDataTransmissionComplete" [submitButtonText]="warningBoxNoButtonText"
                 [buttonBackgroundColor]="warningBoxNoButtonBackgroundColor" (buttonClick)="handleNoButton($event)">
             </app-submit-button>
+            <app-submit-button *ngIf="isDataTransmissionComplete" [submitButtonText]="continueButtonText"
+                [buttonBackgroundColor]="continueButtonText" (buttonClick)="handleContinueButton($event)">
+            </app-submit-button>
         </div>
-        <p>{{saveOperationResult}}</p>
+
+        <div class="announcementDiv" *ngIf="isDataTransmissionActive">
+
+            <mat-progress-spinner [mode]="spinnerMode" class="spinner-color"
+                [style.stroke]="spinnerColor"></mat-progress-spinner>
+        </div>
+        <p [ngStyle]="{color: saveOperationResultTextColor}">{{saveOperationResult}}</p>
     </app-floating-warning-box>
 </body>

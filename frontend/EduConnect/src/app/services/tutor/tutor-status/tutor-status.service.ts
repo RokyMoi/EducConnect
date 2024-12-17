@@ -57,9 +57,16 @@ export class TutorRegistrationStatusService {
           //The tutor user has not completed the registration process, so the user will be redirected to the adequate registration step page
           console.log('User has not completed the registration process');
 
-          //If the user status is with Id 3, then route the user to enter their phone number
-          if (this.currentStatus?.tutorRegistrationStatusId === 3) {
+          //If the user status is with Id 2 (Email is verified), then route the user to enter their phone number
+          if (this.currentStatus?.tutorRegistrationStatusId === 2) {
             this.accountService.router.navigateByUrl('/signup/phone-number');
+          }
+
+          //If the user status is with Id 3 (User have entered their phone number), then route the user to enter their personal information
+          if (this.currentStatus?.tutorRegistrationStatusId === 3) {
+            this.accountService.router.navigateByUrl(
+              '/signup/personal-information'
+            );
           }
         }
       },

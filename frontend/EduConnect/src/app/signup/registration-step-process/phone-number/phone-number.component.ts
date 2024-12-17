@@ -19,6 +19,11 @@ import { FloatingWarningBoxComponent } from '../../../common/floating-warning-bo
 import { AccountService } from '../../../services/account.service';
 import SuccessHttpResponseData from '../../../../../../../.history/frontend/EduConnect/src/app/_models/data/http.response.data/success.http.response.data_20241217014910';
 import ErrorHttpResponseData from '../../../_models/data/http.response.data/error.http.response.data';
+
+import {
+  MatProgressSpinnerModule,
+  ProgressSpinnerMode,
+} from '@angular/material/progress-spinner';
 @Component({
   selector: 'app-phone-number',
   imports: [
@@ -28,6 +33,7 @@ import ErrorHttpResponseData from '../../../_models/data/http.response.data/erro
     PhoneNumberInputComponent,
     SubmitButtonComponent,
     FloatingWarningBoxComponent,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './phone-number.component.html',
   styleUrl: './phone-number.component.css',
@@ -68,11 +74,18 @@ export class PhoneNumberComponent implements OnInit {
   warningBoxNoButtonText: string = 'No';
   warningBoxNoButtonBackgroundColor: string = 'orange';
 
+  //Continue button variable modifications
+  continueButtonText: string = 'Continue';
   //Common button variable modifications
   warningBoxButtonMargin: string = '16px 0px';
 
   //Text to display once the data has been retrieved from the server
   saveOperationResult: string = '';
+  saveOperationResultTextColor: string = 'yellow';
+  isDataTransmissionActive: boolean = false;
+  spinnerMode: ProgressSpinnerMode = 'indeterminate';
+  spinnerColor: string = 'orange';
+  isDataTransmissionComplete: boolean = false;
 
   ngOnInit(): void {
     this.getCountries();
@@ -288,19 +301,36 @@ export class PhoneNumberComponent implements OnInit {
       'Phone number with no country code: ',
       phoneNumberWithNoCountryCode
     );
+
+    this.isDataTransmissionActive = true;
+    this.saveOperationResult = 'Saving phone number...';
+    this.saveOperationResultTextColor = 'blue';
     let response: any;
     //Send the filtered data
     this.accountService
       .createPhoneNumber(selectedCountryId, phoneNumberWithNoCountryCode)
       .then((result) => {
+        this.isDataTransmissionActive = false;
+        this.isDataTransmissionComplete = true;
         console.log('Result: ', result);
         response = result;
+        if ((result?.success as string) === 'true') {
+          this.saveOperationResultTextColor = 'green';
+        }
+        if ((result?.success as string) === 'false') {
+          this.saveOperationResultTextColor = 'red';
+        }
         this.saveOperationResult = result?.message as string;
       });
   }
   handleNoButton(event: Event) {
     console.log('No button clicked');
     this.toggleFloatingBox();
+  }
+
+  handleContinueButton(event: Event) {
+    console.log('Continue button clicked');
+    this.accountService.router.navigateByUrl('/signup/personal-information');
   }
 
   toggleFloatingBox() {

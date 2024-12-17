@@ -1,0 +1,33 @@
+<body>
+
+    <h1>
+        Enter your personal details
+    </h1>
+
+    <!--
+        Field to enter the first name of the user
+        It is optional field
+    -->
+    <app-text-input [label]="firstNameLabel" [placeholder]="firstNamePlaceholder"
+        [warning]="firstNameWarning"></app-text-input>
+    <!--
+        Field to enter the last name of the user
+        It is optional field
+    -->
+    <app-text-input [label]="lastNameLabel" [placeholder]="lastNamePlaceholder"
+        [warning]="lastNameWarning"></app-text-input>
+
+    <!--
+        Field to enter the username of the user
+        It is required field
+    -->
+    <app-text-input [label]="usernameLabel" [placeholder]="usernamePlaceholder"
+        [warning]="usernameWarning"></app-text-input>
+
+    <!--
+        Field to select the country of origin of the user
+        It is optional field
+    -->
+    <app-select-dropdown [options]="countries"></app-select-dropdown>
+
+</body>
