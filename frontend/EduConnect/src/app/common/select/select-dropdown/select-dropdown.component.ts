@@ -4,6 +4,7 @@ import {
   EventEmitter,
   forwardRef,
   Input,
+  OnInit,
   Output,
 } from '@angular/core';
 import {
@@ -24,14 +25,14 @@ import {
     },
   ],
 })
-export class SelectDropdownComponent {
+export class SelectDropdownComponent implements OnInit {
   @Input() options: { name: string; value: string }[] = [];
 
   @Input() label: string = 'Select an option';
 
   @Input() placeholder: string = 'Select an option';
 
-  @Input() formControl: FormControl = new FormControl();
+  @Input() formControl: FormControl = new FormControl('');
   @Input() warning: string = '';
 
   @Output() onChangeEvent = new EventEmitter<Event>();
@@ -42,6 +43,12 @@ export class SelectDropdownComponent {
   onChange: any = () => {};
   onTouched: any = () => {};
 
+  ngOnInit(): void {
+    if (this.options.length > 0) {
+      // Set the default value to the first option
+      this.formControl.setValue(this.options[0].name);
+    }
+  }
   writeValue(value: any): void {
     // Update the internal value when the form control value changes
     if (value !== undefined) {

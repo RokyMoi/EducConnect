@@ -18,8 +18,13 @@ export default class ApiLinks {
   //Get all countries
   public static readonly getAllCountries = ApiLinks.baseUrl + 'country/all';
 
-  //Person controller
+  //PersonPhoneNumber controller
   //Add phone number
   public static readonly addPhoneNumber =
     ApiLinks.baseUrl + 'person/phone-number';
+  
+  
+  //PersonDetails controller
+  //Add person details
+  public static readonly addPersonDetails = ApiLinks.baseUrl + 'person/details';
 }

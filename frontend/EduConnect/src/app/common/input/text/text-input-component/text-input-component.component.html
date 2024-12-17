@@ -1,5 +1,6 @@
 <div>
     <label [for]="inputId">{{label}}</label>
-    <input #textInput [id]="inputId" [placeholder]="placeholder" [type]="type" [style.width]="width">
+    <input #textInput [id]="inputId" [placeholder]="placeholder" [type]="type" [style.width]="width"
+        [formControl]="formControl">
     <p class="inputWarningText">{{warning}}</p>
 </div>

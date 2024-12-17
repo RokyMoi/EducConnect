@@ -15,9 +15,11 @@ namespace backend.DTOs.Person.PersonDetails
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         [Required]
+        [MinLength(2)]
+        [MaxLength(20)]
+        [RegularExpression(@"^(?=.*[a-zA-Z])[a-zA-Z0-9_.]+$",
+        ErrorMessage = "Username must contain at least one letter, and can contain only numbers, underscores, and periods.")]
         public string Username { get; set; }
-        public string? PhoneNumberCountryCode { get; set; }
-        public string? PhoneNumber { get; set; }
         public Guid? CountryOfOriginCountryId { get; set; }
 
     }

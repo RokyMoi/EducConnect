@@ -1,7 +1,7 @@
 <div>
     <label for="select">{{label}}</label>
     <select id="select" [formControl]="formControl" (input)="handleSelectChange($event)">
-        <option value="" disabled>{{placeholder}}</option>
+        <option value="">{{placeholder}}</option>
         <option *ngFor="let option of options" [value]="option.value">
             {{
             option.name

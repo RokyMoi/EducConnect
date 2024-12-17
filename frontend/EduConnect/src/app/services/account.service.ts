@@ -200,7 +200,65 @@ export class AccountService {
           resultSubject.complete();
         },
       });
-      return resultSubject.toPromise();
+    return resultSubject.toPromise();
   }
 
+  /**
+   * Send a request to the server to save the given person details for the logged-in user.
+   * @param firstName - The first name of the person - optional
+   * @param lastName - The last name of the person - optional
+   * @param username - The username of the person - required
+   * @param countryOfOriginCountryId - The country of origin of the person - optional
+   * @returns If successful - SuccessHttpResponseData object containing the response data.
+   * @return If unsuccessful - ErrorHttpResponseData object containing the error message.
+   */
+  createPersonDetails(
+    firstName: string = '',
+    lastName: string = '',
+    username: string,
+    countryOfOriginCountryId: string = ''
+  ) {
+    const authorization = this.getAccessToken();
+    const resultSubject = new Subject<
+      SuccessHttpResponseData | ErrorHttpResponseData
+    >();
+    const requestBody = {
+      firstName: firstName,
+      lastName: lastName,
+      username: username,
+      countryOfOriginCountryId: countryOfOriginCountryId,
+    };
+    this.http
+      .post(ApiLinks.addPersonDetails, requestBody, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .subscribe({
+        next: (response) => {
+          console.log('Person details saved:', response);
+          const successResponse: SuccessHttpResponseData = {
+            success: 'true',
+            data: (response as any).data,
+            message: (response as any).message,
+          };
+          resultSubject.next(successResponse);
+          resultSubject.complete();
+        },
+        error: (error) => {
+          console.error('Error creating phone number:', error);
+          const errorResponse: ErrorHttpResponseData = {
+            success: 'false',
+            data: null,
+            message: error.error.message,
+            statusCode: error.status,
+            statusText: error.statusText,
+          };
+
+          resultSubject.next(errorResponse);
+          resultSubject.complete();
+        },
+      });
+    return resultSubject.toPromise();
+  }
 }
