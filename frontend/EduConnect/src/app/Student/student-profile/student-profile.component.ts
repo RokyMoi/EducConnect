@@ -21,17 +21,26 @@ student:any;
     this.ruter.navigate(['/']);
   }
   GetStudentInformations() {
-    console.log(this.AccService.CurrentUser()?.Email);
-    const baseLink = `http://localhost:5177/api/Student/student/${this.AccService.CurrentUser()?.Email}`;
-    this.http.get(baseLink).subscribe({
-      next: (response) => {
-        this.student = response;
-        console.log("Fetched student data:", this.student);
-      },
-      error: (err) => {
-        console.error("Error fetching student data:", err);
-      }
-    })
     
-  }
+    const token = this.AccService.getAccessToken();
+
+   
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+    };
+
+    const baseLink = 'http://localhost:5177/api/Student/getCurrentStudentForProfile';
+
+   
+    this.http.get(baseLink, { headers }).subscribe({
+        next: (response) => {
+            this.student = response;
+            console.log("Fetched student data:", this.student);
+        },
+        error: (err) => {
+            console.error("Error fetching student data:", err);
+        }
+    });
 }
+}
+

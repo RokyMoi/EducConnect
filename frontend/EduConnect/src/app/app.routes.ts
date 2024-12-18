@@ -10,6 +10,8 @@ import { LearningComponent } from './Student/learning/learning.component';
 import { StudentProfileComponent } from './Student/student-profile/student-profile.component';
 
 import { PhoneNumberComponent } from './signup/registration-step-process/phone-number/phone-number.component';
+import { PhotoComponent } from './Photo/photo-comp/photo-comp.component';
+
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -20,6 +22,7 @@ export const routes: Routes = [
   {path: 'learning-student', component: LearningComponent},
   { path: 'student-dashboard', component: StudentDashboardComponent },
   { path: 'tutor-dashboard', component: TutorDashboardComponent },
+  { path: 'photouploadcomponent', component: PhotoComponent},
   {
     path: 'signup/phone-number',
     component: PhoneNumberComponent,

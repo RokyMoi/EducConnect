@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "bootstrap": "^5.3.3",
-    "ng2-file-upload": "^7.0.1"
+    "ng2-file-upload": "^7.0.1",
+    "ngx-file-drop": "^16.0.0"
   }
 }

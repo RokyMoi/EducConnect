@@ -7,6 +7,7 @@ import { User } from '../../_models/User';
 @Component({
   selector: 'app-tutor-dashboard',
   imports: [],
+  standalone: true,
   templateUrl: './tutor-dashboard.component.html',
   styleUrl: './tutor-dashboard.component.css',
 })

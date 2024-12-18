@@ -35,10 +35,12 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-        [HttpGet("student/{email}")]
-        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByEmail(string email)
+        [HttpGet("getCurrentStudentForProfile")]
+        [CheckPersonLoginSignup]
+        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByEmail()
         {
-            var students = await _studentRepo.GetStudentInfoByEmail(email);
+            var caller = new Caller(this.HttpContext);
+            var students = await _studentRepo.GetStudentInfoByEmail(caller.Email);
 
             if (students == null)
             {
@@ -49,10 +51,9 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-       
+
         [HttpPost("add-student-photo")]
         [CheckPersonLoginSignup]
-      
         public async Task<ActionResult<PhotoDTO>> AddPhoto(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -61,7 +62,6 @@ namespace EduConnect.Controllers
             }
 
             var caller = new Caller(this.HttpContext);
-
             var personEmailClaim = caller.Email;
             if (personEmailClaim == null)
             {
@@ -80,27 +80,48 @@ namespace EduConnect.Controllers
                 return BadRequest(result.Error.Message);
             }
 
-            var photo = new PersonPhoto
+            var existingUser = await db.PersonPhoto.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+            if (existingUser == null)
             {
-                Url = result.SecureUrl.AbsoluteUri,
-                PublicId = result.PublicId,
-                PersonId = person.PersonId
-            };
-
-            db.PersonPhoto.Add(photo);
-            if (await db.SaveChangesAsync() > 0)
-            {
-                return Ok(new
+                var photo = new PersonPhoto
                 {
-                    message = "Photo has been added successfully!",
-                    data = HttpContext.User.Claims.Select(c => new { c.Type, c.Value }).ToList(),
-                    timestamp = DateTime.UtcNow
-                });
+                    Url = result.SecureUrl.AbsoluteUri,
+                    PublicId = result.PublicId,
+                    PersonId = person.PersonId
+                };
+
+                db.PersonPhoto.Add(photo);
+
+                if (await db.SaveChangesAsync() > 0)
+                {
+                    return Ok(new
+                    {
+                        message = "Photo has been added successfully!",
+                        data = HttpContext.User.Claims.Select(c => new { c.Type, c.Value }).ToList(),
+                        timestamp = DateTime.UtcNow
+                    });
+                }
+            }
+            else
+            {
+                existingUser.Url = result.SecureUrl.AbsoluteUri;
+                existingUser.PublicId = result.PublicId;
+
+                db.PersonPhoto.Update(existingUser);
+
+                if (await db.SaveChangesAsync() > 0)
+                {
+                    return Ok(new
+                    {
+                        message = "Updated photo successfully",
+                        data = HttpContext.User.Claims.Select(c => new { c.Type, c.Value }).ToList(),
+                        timestamp = DateTime.UtcNow
+                    });
+                }
             }
 
             return StatusCode(500, "An error occurred while saving the photo.");
         }
-
 
         [HttpGet("get-all-emails")]
         public async Task<ActionResult> GetAllEmails()
