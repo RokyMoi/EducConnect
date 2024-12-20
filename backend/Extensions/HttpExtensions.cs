@@ -10,7 +10,7 @@ namespace EduConnect.Extensions
         public static void AddPaginationHeader<T>(this HttpResponse response,PagedList<T> data)
         {
             var paginationHeader = new PaginationHeader(data.CurrentPage, data.PageSize,data.TotalCount,data.TotalPages);
-            //Acces for client for pagination 
+            //Access for client for pagination 
             var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
             response.Headers.Append("Pagination",JsonSerializer.Serialize(paginationHeader,jsonOptions));
