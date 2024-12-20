@@ -16,6 +16,7 @@ using backend.Services;
 
 using EduConnect.Interfaces;
 using EduConnect.Services;
+using EduConnect.Repositories.MessageRepository;
 
 namespace EduConnect.Extensions
 {
@@ -44,7 +45,7 @@ namespace EduConnect.Extensions
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
-            services.AddScoped<IMessageRepository,IMessageRepository>();
+            services.AddScoped<IMessageRepository,MessageRepository>();
 
 
 
@@ -63,6 +64,7 @@ namespace EduConnect.Extensions
             services.AddHostedService<CountrySeederHostedService>();
 
 
+            services.AddAutoMapper(typeof(AutoMapperProfiles));
 
 
 

@@ -20,9 +20,9 @@ namespace EduConnect.Entities.Messenger
 
         /// navigation properties
 
-        public  int SenderId { get; set; }
+        public  Guid SenderId { get; set; }
         public Person.Person Sender { get; set; }
-        public int RecipientId { get; set; }
+        public Guid RecipientId { get; set; }
         public Person.Person Recipient { get; set; }
 
     }
