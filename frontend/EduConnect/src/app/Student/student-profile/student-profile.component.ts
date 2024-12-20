@@ -16,6 +16,7 @@ export class StudentProfileComponent implements OnInit{
   http = inject(HttpClient);
 student:any;
   ruter = inject(Router);
+  profilePicture:any;
   LogoutFromProfile(){
     this.AccService.logout();
     this.ruter.navigate(['/']);
@@ -29,10 +30,11 @@ student:any;
         'Authorization': `Bearer ${token}`,
     };
 
-    const baseLink = 'http://localhost:5177/api/Student/getCurrentStudentForProfile';
+    const LinkProfile = 'http://localhost:5177/api/Student/getCurrentStudentForProfile';
+    const ProfilePictureLink =`http://localhost:5177/Photo/GetCurrentUserProfilePicture`;
 
    
-    this.http.get(baseLink, { headers }).subscribe({
+    this.http.get(LinkProfile, { headers }).subscribe({
         next: (response) => {
             this.student = response;
             console.log("Fetched student data:", this.student);
@@ -40,6 +42,16 @@ student:any;
         error: (err) => {
             console.error("Error fetching student data:", err);
         }
+    });
+    this.http.get<{data: {url:string}}>(ProfilePictureLink,{headers}).subscribe({
+      next: (picture)=>{
+         this.profilePicture = picture.data.url;
+         console.log("Fetched data from PhotosPerson" + this.profilePicture);
+      },
+      error: err=> {
+        console.log("Error fetching profile picture data: " + err);
+      }
+
     });
 }
 }

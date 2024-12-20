@@ -7,6 +7,7 @@ using EduConnect.Entities.Person;
 using EduConnect.Entities.Reference;
 using EduConnect.Entities.Student;
 using Microsoft.EntityFrameworkCore;
+using EduConnect.Entities.Messenger;
 
 namespace EduConnect.Data;
 
@@ -28,6 +29,7 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<TutorRegistrationStatus> TutorRegistrationStatus { get; set; }
     public DbSet<Student> Student { get; set; }
+    public DbSet<Message> Message { get; set; }
     public DbSet<StudentDetails> StudentDetails { get; set; }
 
     public DbSet<Country> Country { get; set; }
@@ -51,7 +53,20 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<TutorTeachingInformation> TutorTeachingInformation { get; set; }
 
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
 
+        builder.Entity<Message>()
+             .HasOne(x => x.Recipient)
+             .WithMany(x => x.MessagesReceived)
+             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Message>()
+            .HasOne(x => x.Sender)
+            .WithMany(x => x.MessagesSent)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 
 
 }

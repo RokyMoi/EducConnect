@@ -17,6 +17,8 @@ namespace EduConnect.Entities.Person
         [ForeignKey(nameof(PersonId))]
         public Person Person { get; set; }
 
+        public string? ModifiedDate {  get; set; }
+
 
 
 

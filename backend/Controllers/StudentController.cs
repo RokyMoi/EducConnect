@@ -19,7 +19,7 @@ using System.Text;
 
 namespace EduConnect.Controllers
 {
-    public class StudentController(DataContext db, ITokenService _tokenService, IStudentRepository _studentRepo,IPhotoService _photoService) : MainController
+    public class StudentController(DataContext db, ITokenService _tokenService, IStudentRepository _studentRepo) : MainController
     {
         [HttpGet("all-students")]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudents()
@@ -51,77 +51,7 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-
-        [HttpPost("add-student-photo")]
-        [CheckPersonLoginSignup]
-        public async Task<ActionResult<PhotoDTO>> AddPhoto(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return BadRequest("File is required.");
-            }
-
-            var caller = new Caller(this.HttpContext);
-            var personEmailClaim = caller.Email;
-            if (personEmailClaim == null)
-            {
-                return Unauthorized("User email claim not found.");
-            }
-
-            var person = await db.PersonEmail.FirstOrDefaultAsync(x => x.Email == personEmailClaim);
-            if (person == null)
-            {
-                return NotFound("Person not found.");
-            }
-
-            var result = await _photoService.AddPhotoAsync(file);
-            if (result.Error != null)
-            {
-                return BadRequest(result.Error.Message);
-            }
-
-            var existingUser = await db.PersonPhoto.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
-            if (existingUser == null)
-            {
-                var photo = new PersonPhoto
-                {
-                    Url = result.SecureUrl.AbsoluteUri,
-                    PublicId = result.PublicId,
-                    PersonId = person.PersonId
-                };
-
-                db.PersonPhoto.Add(photo);
-
-                if (await db.SaveChangesAsync() > 0)
-                {
-                    return Ok(new
-                    {
-                        message = "Photo has been added successfully!",
-                        data = HttpContext.User.Claims.Select(c => new { c.Type, c.Value }).ToList(),
-                        timestamp = DateTime.UtcNow
-                    });
-                }
-            }
-            else
-            {
-                existingUser.Url = result.SecureUrl.AbsoluteUri;
-                existingUser.PublicId = result.PublicId;
-
-                db.PersonPhoto.Update(existingUser);
-
-                if (await db.SaveChangesAsync() > 0)
-                {
-                    return Ok(new
-                    {
-                        message = "Updated photo successfully",
-                        data = HttpContext.User.Claims.Select(c => new { c.Type, c.Value }).ToList(),
-                        timestamp = DateTime.UtcNow
-                    });
-                }
-            }
-
-            return StatusCode(500, "An error occurred while saving the photo.");
-        }
+ 
 
         [HttpGet("get-all-emails")]
         public async Task<ActionResult> GetAllEmails()
@@ -165,7 +95,7 @@ namespace EduConnect.Controllers
         }
 
         [HttpPost("student-register")]
-        public async Task<ActionResult<UserDTO>> RegisterTutor(RegisterStudentDTO student)
+        public async Task<IActionResult> RegisterTutor(RegisterStudentDTO student)
         {
             if (await isRegistered(student))
             {
@@ -287,12 +217,17 @@ namespace EduConnect.Controllers
 
                 await db.SaveChangesAsync();
             });
-            return new UserDTO
-            {
-                Email = PersonEmail.Email,
-                Token = await _tokenService.CreateTokenAsync(PersonEmail),
-                Role = "student"
-            };
+            Response.Headers["Authorization"] = await _tokenService.CreateTokenAsync(PersonEmail);
+            return Ok(new {
+            message = "User was sucessfully created",
+               data = new UserDTO
+               {
+                   Email = PersonEmail.Email,
+                   Token = await _tokenService.CreateTokenAsync(PersonEmail),
+                   Role = "student"
+              
+               },
+            });
         }
         private string GenerateSalt()
         {

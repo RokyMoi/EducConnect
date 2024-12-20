@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EduConnect.Entities.Messenger;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduConnect.Entities.Person
@@ -21,6 +22,9 @@ namespace EduConnect.Entities.Person
 
         public PersonDetails PersonDetails { get; set; }
         public PersonEmail PersonEmail { get; set; }
+
+        public List<Message> MessagesSent { get; set; }
+        public List<Message> MessagesReceived { get; set; }
     }
 }
 

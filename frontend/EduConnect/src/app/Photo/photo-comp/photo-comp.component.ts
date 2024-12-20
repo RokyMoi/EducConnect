@@ -39,7 +39,7 @@ export class PhotoComponent {
         'Authorization': `Bearer ${token}`
       });
 
-      const uploadReq = new HttpRequest('POST', 'http://localhost:5177/api/Student/add-student-photo', formData, {
+      const uploadReq = new HttpRequest('POST', 'http://localhost:5177/Photo/addPersonProfilePicture', formData, {
         headers: headers,
         reportProgress: true,
       });

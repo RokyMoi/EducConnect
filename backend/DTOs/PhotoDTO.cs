@@ -3,7 +3,7 @@
     public class PhotoDTO
     {
 
-       public string? personId {  get; set; }
+       public string? publicID {  get; set; }
         public string? Url { get; set; }
     }
       
