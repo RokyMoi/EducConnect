@@ -33,6 +33,7 @@ export class SubmitButtonComponent {
   buttonStyles: any = {};
 
   handleButtonClick(event: Event) {
+    console.log('Button clicked');
     this.buttonClick.emit(event);
   }
 

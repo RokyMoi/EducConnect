@@ -7,6 +7,7 @@ import { StudentDashboardComponent } from './Student/student-dashboard/student-d
 import { TutorDashboardComponent } from './tutor/tutor-dashboard/tutor-dashboard.component';
 import { PhoneNumberComponent } from './signup/registration-step-process/phone-number/phone-number.component';
 import { PersonDetailsComponent } from './signup/registration-step-process/person-details/person-details/person-details.component';
+import { EducationComponent } from './signup/registration-step-process/education/education/education.component';
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -22,6 +23,10 @@ export const routes: Routes = [
   {
     path: 'signup/personal-information',
     component: PersonDetailsComponent,
+  },
+  {
+    path: 'signup/education',
+    component: EducationComponent,
   },
   { path: '**', component: BodyComponent },
 ];

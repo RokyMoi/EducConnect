@@ -1,0 +1,36 @@
+<body>
+    <h1>
+        Enter information about your education
+    </h1>
+
+
+
+
+    <div class="education-log-grid">
+
+        <div class="education-log-grid-item" *ngFor="let educationLog of educationLogGroups; let i = index"
+            (click)="onLogClick(educationLog, i)">
+            <p *ngIf="educationLog.educationLevel !== '' && educationLog.fieldOfStudy !== '' ">
+                {{educationLog.isCompleted ? "Finished" : "Studying"}}
+                {{educationLog.fieldOfStudy}}
+                {{educationLog.institutionName ? 'at ' + educationLog.institutionName : ''}}
+                on
+                {{educationLog.educationLevel}} level
+            </p>
+
+            <p *ngIf="educationLog.educationLevel === '' && educationLog.fieldOfStudy === '' ">
+                New education log
+            </p>
+
+        </div>
+        <div class="education-log-grid-item" (click)="addNewEducationLog()">
+            Add
+        </div>
+    </div>
+
+    <app-education-log *ngIf="this.isEditModalOpen" [toggleFloatingBox]="this.toggleEducationLogVisibility.bind(this)"
+        [educationLog]="this.selectedGroup" [educationService]="educationService">
+
+    </app-education-log>
+
+</body>

@@ -1,0 +1,78 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+:host {
+  --label-font-size: 14px;
+  --label-left-padding: 10px;
+  --label-color: gray;
+  --selected-label-color: rgb(255, 0, 0);
+  --input-area-width: 25%;
+  --input-area-min-height: 50px;
+  --input-area-max-height: 100px;
+  --input-area-left-padding: 4px;
+  --input-area-border-style: 1px solid black;
+  --input-area-border-radius: 12px;
+  --input-area-margin: 1px 0px;
+  --input-area-font-size: 18px;
+  --warning-color: red;
+  --warning-font-size: 12px;
+  --warning-left-padding: 10px;
+}
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+label {
+  font-size: var(--label-font-size);
+  padding-left: var(--label-left-padding);
+  color: var(--label-color);
+}
+input {
+  min-width: 15px;
+  width: 15px;
+  max-width: 15px;
+  min-height: 50px;
+  height: 50px;
+  max-height: 50px;
+  padding-left: var(--input-area-left-padding);
+  border: var(--input-area-border-style);
+  border-radius: var(--input-area-border-radius);
+  margin: var(--input-area-margin);
+  font-size: var(--input-area-font-size);
+  cursor: pointer;
+}
+
+p {
+  color: var(--warning-color);
+  font-size: var(--warning-font-size);
+  height: 21px;
+}
+
+.options {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+.option-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.option-container:hover {
+  cursor: pointer;
+}
+
+.options label:hover {
+  cursor: pointer;
+  color: black;
+}
+
+.selected {
+  color: red !important;
+}

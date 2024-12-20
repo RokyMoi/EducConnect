@@ -83,13 +83,15 @@ namespace backend.Controllers.Person
 
             if (existingPersonEducationInformationList != null && existingPersonEducationInformationList.Count() > 4)
             {
-                return BadRequest(new
-                {
-                    success = "false",
-                    message = "Cannot add more than 5 education information per account",
-                    data = new { },
-                    timestamp = DateTime.Now
-                });
+                return StatusCode(
+                    403,
+                    new
+                    {
+                        success = "false",
+                        message = "Cannot add more than 5 education information per account",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    });
             }
 
             //Add education information 
@@ -446,26 +448,70 @@ namespace backend.Controllers.Person
         }
 
         //POST All method, (GET not used for security purposes, GET sends data to server using URL, while POST uses body)returns all PersonEducationInformation objects related to the given Person object
-        [HttpPost("all")]
-        public async Task<IActionResult> GetAllPersonEducationInformation(PersonEmailRequestDTO personEmailRequestDTO)
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllPersonEducationInformation()
         {
 
-            //Get PersonId by Email
-            var personEmail = await _personRepository.GetPersonEmailByEmail(personEmailRequestDTO.Email);
+            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
 
-            if (personEmail == null)
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
             {
-                return NotFound(new
-                {
-                    success = "false",
-                    message = "Email does not exist",
-                    data = new { },
-                    timestamp = DateTime.Now
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
             }
 
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+            //If tutor is not null, check the TutorRegistrationStatus is below 4 (Personal Information, status before)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 4)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "It looks like you haven't completed your tutor registration yet. Please complete it to continue.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+
+
+
             //Get PersonEducationInformation object with the given PersonId
-            var personEducationInformationList = await _personEducationInformationRepository.GetAllPersonEducationInformationByPersonId(personEmail.PersonId);
+            var personEducationInformationList = await _personEducationInformationRepository.GetAllPersonEducationInformationByPersonId(personId);
 
             if (personEducationInformationList == null)
             {

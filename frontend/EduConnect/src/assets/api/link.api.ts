@@ -22,9 +22,16 @@ export default class ApiLinks {
   //Add phone number
   public static readonly addPhoneNumber =
     ApiLinks.baseUrl + 'person/phone-number';
-  
-  
+
   //PersonDetails controller
   //Add person details
   public static readonly addPersonDetails = ApiLinks.baseUrl + 'person/details';
+
+  //PersonEducationInformation controller
+  //Add education information
+  public static readonly addEducationInformation =
+    ApiLinks.baseUrl + 'person/education';
+  //Get all education information
+  public static readonly getAllEducationInformation =
+    ApiLinks.baseUrl + 'person/education/all';
 }

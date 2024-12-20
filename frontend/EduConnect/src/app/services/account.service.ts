@@ -4,9 +4,11 @@ import { User } from '../_models/User';
 import { map, Subject } from 'rxjs';
 import ApiLinks from '../../assets/api/link.api';
 import { Router } from '@angular/router';
-import SuccessHttpResponseData from '../../../../../.history/frontend/EduConnect/src/app/_models/data/http.response.data/success.http.response.data_20241217014910';
 
 import ErrorHttpResponseData from '../_models/data/http.response.data/error.http.response.data';
+import EducationInformation from '../_models/person/education/educationInformation.education.person';
+import EducationInformationHttpRequest from '../_models/person/education/request.educationInformation.education.person';
+import SuccessHttpResponseData from '../_models/data/http.response.data/success.http.response.data';
 
 @Injectable({
   providedIn: 'root',
@@ -182,6 +184,7 @@ export class AccountService {
             success: 'true',
             data: (response as any).data,
             message: (response as any).message,
+            statusCode: (response as any).statusCode,
           };
           resultSubject.next(successResponse);
           resultSubject.complete();
@@ -241,6 +244,7 @@ export class AccountService {
             success: 'true',
             data: (response as any).data,
             message: (response as any).message,
+            statusCode: (response as any).statusCode,
           };
           resultSubject.next(successResponse);
           resultSubject.complete();
@@ -255,6 +259,89 @@ export class AccountService {
             statusText: error.statusText,
           };
 
+          resultSubject.next(errorResponse);
+          resultSubject.complete();
+        },
+      });
+    return resultSubject.toPromise();
+  }
+
+  createPersonEducationInformation(
+    educationInformation: EducationInformationHttpRequest
+  ) {
+    const authorization = this.getAccessToken();
+    const resultSubject = new Subject<
+      SuccessHttpResponseData | ErrorHttpResponseData
+    >();
+    this.http
+      .post(ApiLinks.addEducationInformation, educationInformation, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .subscribe({
+        next: (response) => {
+          console.log('Education information saved:', response);
+          const successResponse: SuccessHttpResponseData = {
+            success: 'true',
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+          resultSubject.next(successResponse);
+          resultSubject.complete();
+        },
+        error: (error) => {
+          console.error('Error saving education data:', error);
+          const errorResponse: ErrorHttpResponseData = {
+            success: 'false',
+            data: null,
+            message: error.error.message,
+            statusCode: error.status,
+            statusText: error.statusText,
+          };
+
+          resultSubject.next(errorResponse);
+          resultSubject.complete();
+        },
+      });
+
+    return resultSubject.toPromise();
+  }
+
+  getAllEducationInformation() {
+    const authorization = this.getAccessToken();
+    const resultSubject = new Subject<
+      SuccessHttpResponseData | ErrorHttpResponseData
+    >();
+
+    this.http
+      .get(ApiLinks.getAllEducationInformation, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .subscribe({
+        next: (response) => {
+          console.log('Education information saved:', response);
+          const successResponse: SuccessHttpResponseData = {
+            success: 'true',
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+          resultSubject.next(successResponse);
+          resultSubject.complete();
+        },
+        error: (error) => {
+          console.error('Error saving education data:', error);
+          const errorResponse: ErrorHttpResponseData = {
+            success: 'false',
+            data: null,
+            message: error.error.message,
+            statusCode: error.status,
+            statusText: error.statusText,
+          };
           resultSubject.next(errorResponse);
           resultSubject.complete();
         },

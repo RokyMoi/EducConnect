@@ -68,6 +68,11 @@ export class TutorRegistrationStatusService {
               '/signup/personal-information'
             );
           }
+
+          //If the user status is with Id 4 (User have entered their personal information), then route the user to enter their education information
+          if (this.currentStatus?.tutorRegistrationStatusId === 4) {
+            this.accountService.router.navigateByUrl('/signup/education');
+          }
         }
       },
     });

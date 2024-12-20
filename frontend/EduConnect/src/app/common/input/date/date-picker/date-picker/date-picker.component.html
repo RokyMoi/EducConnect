@@ -1,0 +1,6 @@
+<div>
+    <label [for]="inputId">{{label}}</label>
+    <input #textInput [id]="inputId" [placeholder]="placeholder" type="date" [style.width]="width"
+        [formControl]="formControl" [min]="minValue" [max]="maxValue">
+    <p class="inputWarningText">{{warning}}</p>
+</div>

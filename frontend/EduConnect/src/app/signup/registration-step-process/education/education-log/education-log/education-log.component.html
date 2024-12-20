@@ -1,0 +1,144 @@
+<div class="backdrop"></div>
+<div class="container" [class.no-scroll]="showWarningBox">
+    <button class="close-button" (click)="toggleFloatingBox()">X</button>
+    <h2>
+
+        Enter information about your education
+    </h2>
+    <form action="" [formGroup]="educationInformationFormControl">
+        <div class="row">
+            <app-text-input [label]="institutionNameLabel" [placeholder]="institutionNamePlaceholder"
+                [formControl]="educationInformationFormControl.controls.institutionName"
+                [warning]="institutionNameError"></app-text-input>
+        </div>
+        <div class="row">
+            <app-text-input [label]="institutionOfficialWebsiteLabel"
+                [placeholder]="institutionOfficialWebsitePlaceholder" [warning]="institutionOfficialWebsiteError"
+                [formControl]="educationInformationFormControl.controls.institutionOfficialWebsite">
+                >
+            </app-text-input>
+        </div>
+        <div class="row">
+            <app-text-input [label]="institutionAddressLabel" [placeholder]="institutionAddressPlaceholder"
+                [formControl]="educationInformationFormControl.controls.institutionAddress"
+                [warning]="institutionAddressError">
+            </app-text-input>
+        </div>
+        <div class="row">
+            <app-text-input [label]="educationLevelLabel" [placeholder]="educationLevelPlaceholder"
+                [formControl]="educationInformationFormControl.controls.educationLevel" [warning]="educationLevelError">
+            </app-text-input>
+        </div>
+        <div class="row">
+            <app-text-input [label]="fieldOfStudyLabel" [placeholder]="fieldOfStudyPlaceholder"
+                [formControl]="educationInformationFormControl.controls.fieldOfStudy" [warning]="fieldOfStudyError">
+            </app-text-input>
+        </div>
+        <div class="row">
+            <app-text-input [label]="minorFieldOfStudyLabel" [placeholder]="minorFieldOfStudyPlaceholder"
+                [formControl]="educationInformationFormControl.controls.minorFieldOfStudy"
+                [warning]="minorFieldOfStudyError">
+            </app-text-input>
+        </div>
+        <div class="row">
+            <app-date-picker [label]="startDateLabel" [placeholder]="startDatePlaceholder"
+                [formControl]="educationInformationFormControl.controls.startDate"
+                [warning]="startDateError"></app-date-picker>
+        </div>
+        <div class="row">
+            <app-date-picker [label]="endDateLabel" [placeholder]="endDatePlaceholder"
+                [formControl]="educationInformationFormControl.controls.endDate"
+                [warning]="endDateError"></app-date-picker>
+        </div>
+        <div class="row">
+            <app-two-option-picker [firstOptionText]="isCompletedFirstOptionText"
+                [secondOptionText]="isCompletedSecondOptionText"
+                [formControlGroup]="educationInformationFormControl.controls.isCompletedGroup"></app-two-option-picker>
+        </div>
+        <div class="row">
+            <app-text-input [label]="finalGradeLabel" [placeholder]="finalGradePlaceholder"
+                [formControl]="educationInformationFormControl.controls.finalGrade" [warning]="finalGradeError">
+            </app-text-input>
+        </div>
+        <div class="row">
+            <app-text-input [label]="descriptionLabel" [placeholder]="descriptionPlaceholder"
+                [formControl]="educationInformationFormControl.controls.description" [warning]="descriptionError">
+            </app-text-input>
+        </div>
+
+        <div class="row error-message-row">
+            <p [class.warning]="this.educationInformationFormControl.invalid"
+                [class.announcement]="this.educationInformationFormControl.valid">
+                {{formErrorMessage}}
+            </p>
+        </div>
+        <div class="row button-row">
+            <app-submit-button [submitButtonText]="'Discard data'" [buttonWidth]="'250px'"
+                [buttonBackgroundColor]="'red'" (buttonClick)="onDiscardData()" *ngIf="this.isCreateOrEditMode">
+
+            </app-submit-button>
+            <app-submit-button [submitButtonText]="'Save data'" [buttonWidth]="'250px'"
+                [buttonBackgroundColor]="'green'" (buttonClick)="onSaveData()" *ngIf="this.isCreateOrEditMode">
+
+            </app-submit-button>
+            <app-submit-button [submitButtonText]="discardButtonText" [buttonBackgroundColor]="discardButtonColor"
+                *ngIf="!this.isCreateOrEditMode && this.hasChanges" (buttonClick)="onDiscardChanges()">
+            </app-submit-button>
+            <app-submit-button [submitButtonText]="updateButtonText" [buttonBackgroundColor]="updateButtonColor"
+                *ngIf="!this.isCreateOrEditMode && this.hasChanges" (buttonClick)="onSaveChanges()">
+            </app-submit-button>
+            <app-submit-button [submitButtonText]="goBackButtonText" [buttonBackgroundColor]="goBackButtonColor"
+                *ngIf="!this.isCreateOrEditMode && !this.hasChanges" (buttonClick)="onGoBack()">
+            </app-submit-button>
+
+
+        </div>
+
+
+
+    </form>
+</div>
+<app-floating-warning-box *ngIf="showWarningBox" [warningTitle]="warningBoxTitle"
+    (toggleFloatingBox)="toggleWarningAnnouncementBox($event)">
+    <p [style.color]="warningBoxMessageColor" [style.font-size]="warningBoxMessageFontSize">
+        {{warningBoxMessage}}
+    </p>
+
+    <div class="announcementDiv" *ngIf="isDataTransmissionActive">
+
+        <mat-progress-spinner [mode]="spinnerMode" class="spinner-color"
+            [style.stroke]="spinnerColor"></mat-progress-spinner>
+    </div>
+    <div *ngIf="!isDataTransmissionActive">
+        <app-submit-button *ngIf="!isDataTransmissionComplete && isCreateOrEditMode"
+            [submitButtonText]="warningBoxYesButtonText" [buttonBackgroundColor]="warningBoxYesButtonColor"
+            [buttonMargin]="warningBoxButtonMargin" (buttonClick)="onConfirmButton()">
+        </app-submit-button>
+        <app-submit-button *ngIf="!isDataTransmissionComplete && isCreateOrEditMode"
+            [submitButtonText]="warningBoxNoButtonText" [buttonBackgroundColor]="warningBoxNoButtonColor"
+            [buttonMargin]="warningBoxButtonMargin" (buttonClick)="onCancelButton()">
+        </app-submit-button>
+        <app-submit-button *ngIf="isDataTransmissionComplete" [buttonBackgroundColor]="continueButtonColor"
+            [submitButtonText]="continueButtonText" [buttonMargin]="warningBoxButtonMargin"
+            (buttonClick)="handleContinueButton()">
+        </app-submit-button>
+        <app-submit-button *ngIf="isDataTransmissionComplete && !isResponseMaxLengthReachedError"
+            [buttonBackgroundColor]="editButtonColor" [submitButtonText]="editButtonText"
+            [buttonMargin]="warningBoxButtonMargin" (buttonClick)="handleEditButton()">
+
+
+        </app-submit-button>
+
+        <app-submit-button [submitButtonText]="discardChangesButtonText"
+            [buttonBackgroundColor]="discardChangesButtonColor" (buttonClick)="onYesDiscardData()"
+            [buttonMargin]="warningBoxButtonMargin">
+        </app-submit-button>
+
+        <app-submit-button [submitButtonText]="keepEditingButtonText" [buttonBackgroundColor]="keepEditingButtonColor"
+            (buttonClick)="onKeepEditing()" [buttonMargin]="warningBoxButtonMargin">
+
+        </app-submit-button>
+
+
+    </div>
+</app-floating-warning-box>
