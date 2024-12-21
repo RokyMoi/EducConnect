@@ -52,14 +52,52 @@ import { EducationService } from '../../../../../services/education/education-se
   styleUrl: './education-log.component.css',
 })
 export class EducationLogComponent implements OnInit {
-  @Input() toggleFloatingBox: () => void = () => {
-    console.log('Education service was called');
-  };
-  @Input() educationLog: EducationInformation | null = null;
-  @Input() educationService!: EducationService;
-  accountService = inject(AccountService);
+  @Input() toggleFloatingBox: () => void = () => {};
+  //Education information object that is passed from the parent component, if it is null, then it is a new education information object
+  @Input() educationInformation: EducationInformation | null = null;
+  referenceEducationInformation: EducationInformation | null = null;
+  @Input() isEditModalOpen: boolean = true;
 
+  //Flag to determine if the education information object have data added to it, or data updated
+  //True - Create mode
+  //False - Edit mode
+  isCreateOrEditMode: boolean = false;
+
+  //FormGroup for education information
+  educationInformationFormGroup = new FormGroup({
+    institutionName: new FormControl(),
+    institutionOfficialWebsite: new FormControl(),
+    institutionAddress: new FormControl(),
+    educationLevel: new FormControl('', [
+      Validators.required,
+      Validators.minLength(1),
+      Validators.maxLength(100),
+      Validators.pattern(/^(?=.*\p{L})[\p{L}\p{N}.]+(?: [\p{L}\p{N}.]+)*$/u),
+    ]),
+    fieldOfStudy: new FormControl('', [
+      Validators.required,
+      Validators.minLength(1),
+      Validators.maxLength(100),
+      Validators.pattern(/^(?=.*\p{L})[\p{L}\p{N}.]+(?: [\p{L}\p{N}.]+)*$/u),
+    ]),
+    minorFieldOfStudy: new FormControl(),
+    startDate: new FormControl(),
+    endDate: new FormControl(),
+    isCompletedFormGroup: new FormGroup({
+      firstOption: new FormControl(false),
+      secondOption: new FormControl(true),
+    }),
+    finalGrade: new FormControl(),
+    description: new FormControl(),
+  });
+
+  //Variable for error message that is displayed when the form is invalid, below the form
   formErrorMessage: string = '';
+  formErrorMessageColor: string = 'red';
+
+  hasChanges: boolean = false;
+
+  //Variables for the input component fields
 
   //Variables for institution name field
   institutionNameLabel: string = 'Institution name';
@@ -125,371 +163,489 @@ export class EducationLogComponent implements OnInit {
   descriptionPlaceholder: string =
     'Briefly describe your education or add any additional information here';
 
-  //Form control
-  educationInformationFormControl = new FormGroup({
-    institutionName: new FormControl(''),
-    institutionOfficialWebsite: new FormControl(''),
-    institutionAddress: new FormControl(''),
-    educationLevel: new FormControl(
-      '',
+  //Variables for submit button
+  submitButtonText: string = 'Save data';
+  submitButtonColor: string = 'green';
 
-      [Validators.required, Validators.pattern(/^(?=.*[a-zA-Z])[a-zA-Z0-9.]+$/)]
-    ),
-    fieldOfStudy: new FormControl('', [
-      Validators.required,
-      Validators.pattern(/^(?=.*[a-zA-Z])[a-zA-Z0-9.]+$/),
-    ]),
-    minorFieldOfStudy: new FormControl(''),
-    startDate: new FormControl(),
-    endDate: new FormControl(),
-    isCompletedGroup: new FormGroup({
-      firstOption: new FormControl(true),
-      secondOption: new FormControl(false),
-    }),
-    finalGrade: new FormControl(''),
-    description: new FormControl(''),
-  });
-
-  initialValues: Record<string, any> = {};
-  changedControls: string[] = [];
-
-  showWarningBox: boolean = false;
-  warningBoxTitle: string = '';
-  warningBoxMessage: string = '';
-  warningBoxYesButtonText: string = '';
-  warningBoxYesButtonColor: string = '';
-  warningBoxNoButtonText: string = '';
-  warningBoxNoButtonColor: string = '';
-  warningBoxButtonMargin: string = '15px 0px';
-  warningBoxMessageColor: string = 'red';
-  warningBoxMessageFontSize: string = '24px';
-
-  //Text to display once the data has been retrieved from the server
-  saveOperationResult: string = '';
-  saveOperationResultTextColor: string = 'yellow';
-  isDataTransmissionActive: boolean = false;
-  spinnerMode: ProgressSpinnerMode = 'indeterminate';
-  spinnerColor: string = 'orange';
-  isDataTransmissionComplete: boolean = false;
-
-  continueButtonText: string = 'Continue';
-  continueButtonColor: string = 'blue';
-
-  editButtonText: string = 'Edit';
-  editButtonColor: string = 'orange';
-  //This variable is used to determine if the user is currently performing an operation of saving or discarding data
-  //TRUE - saving data
-  //FALSE - discarding data
-  currentDataOperation: boolean = false;
-
-  //Variable used as a flag to determine is the education log new or is it an edit of an existing education log
-  //TRUE - new education log
-  //FALSE - edit of an existing education log
-  isCreateOrEditMode: boolean = false;
-
-  //Variables used for data update
-  updateButtonText: string = 'Save changes';
-  updateButtonColor: string = 'green';
-
-  //Variables used for discard changes
-  discardButtonText: string = 'Discard changes';
+  //Variables for discard button
+  discardButtonText: string = 'Discard data';
   discardButtonColor: string = 'red';
 
-  //Variables used for go back
+  //Variables for go back button
   goBackButtonText: string = 'Go back';
   goBackButtonColor: string = 'blue';
 
-  //Flag used to track if the user has made any changes to the form
-  hasChanges: boolean = false;
+  //Record of the initial values when the component is loaded
+  initialValues: Record<string, any> = {};
 
-  //Variables for warning box when there are changes
+  //Floating warning box used to control the operations with the data
+  floatingWarningBoxTitle: string = 'Warning';
+  floatingWarningBoxMessage: string = '';
+  floatingWarningBoxMessageColor: string = 'red';
+  showWarningBox: boolean = false;
+  confirmButtonText: string = 'Confirm';
+  confirmButtonColor: string = 'Green';
+  cancelButtonText: string = 'Cancel';
+  cancelButtonColor: string = 'Red';
+  warningBoxButtonMargin: string = '12px 0px';
 
-  //Variables for warning box buttons for discarding changes
-  discardChangesButtonText: string = 'Yes, discard changes';
-  discardChangesButtonColor: string = 'red';
+  //Flag to specify which operation is being performed
+  //True - save data
+  //False - discard data
+  currentDataOperation: boolean = true;
 
-  //Variables for warning box buttons for keeping editing
-  keepEditingButtonText: string = 'No, keep editing';
-  keepEditingButtonColor: string = 'blue';
+  isInstitutionNameChanged: boolean = false;
+  isInstitutionOfficialWebsiteChanged: boolean = false;
+  isInstitutionAddressChanged: boolean = false;
+  isEducationLevelChanged: boolean = false;
+  isFieldOfStudyChanged: boolean = false;
+  isMinorFieldOfStudyChanged: boolean = false;
+  isStartDateChanged: boolean = false;
+  isEndDateChanged: boolean = false;
+  isIsCompletedChanged: boolean = false;
+  isFinalGradeChanged: boolean = false;
+  isDescriptionChanged: boolean = false;
 
   ngOnInit(): void {
-    console.log('Selected education log: ', this.educationLog);
-    console.log('Is create or edit mode: ', this.isCreateOrEditMode);
-    if (this.educationLog) {
-      console.log('Edit mode');
+    console.log('Education information: ', this.educationInformation);
+    //Set the component mode
+    if (
+      this.educationInformation?.educationLevel !== '' &&
+      this.educationInformation?.fieldOfStudy !== '' &&
+      this.educationInformation
+    ) {
       this.isCreateOrEditMode = false;
       //Set the initial values of the form controls to the values of the selected education log
-      this.educationInformationFormControl.patchValue({
-        institutionName: this.educationLog.institutionName,
+      this.educationInformationFormGroup.patchValue({
+        institutionName: this.educationInformation.institutionName,
         institutionOfficialWebsite:
-          this.educationLog.institutionOfficialWebsite,
-        institutionAddress: this.educationLog.institutionAddress,
-        educationLevel: this.educationLog.educationLevel,
-        fieldOfStudy: this.educationLog.fieldOfStudy,
-        minorFieldOfStudy: this.educationLog.minorFieldOfStudy,
-        startDate: this.educationLog.startDate,
-        endDate: this.educationLog.endDate,
-        isCompletedGroup: {
-          firstOption: this.educationLog.isCompleted,
-          secondOption: !this.educationLog.isCompleted,
+          this.educationInformation.institutionOfficialWebsite,
+        institutionAddress: this.educationInformation.institutionAddress,
+        educationLevel: this.educationInformation.educationLevel,
+        fieldOfStudy: this.educationInformation.fieldOfStudy,
+        minorFieldOfStudy: this.educationInformation.minorFieldOfStudy,
+        startDate: this.educationInformation.startDate,
+        endDate: this.educationInformation.endDate,
+        isCompletedFormGroup: {
+          firstOption: this.educationInformation.isCompleted,
+          secondOption: !this.educationInformation.isCompleted,
         },
-        finalGrade: this.educationLog.finalGrade,
-        description: this.educationLog.description,
+        finalGrade: this.educationInformation.finalGrade,
+        description: this.educationInformation.description,
       });
-      console.log('Initial values: ', this.initialValues);
-      console.log(
-        this.educationInformationFormControl.controls.institutionOfficialWebsite
-          .value
-      );
     }
-    if (!this.educationLog) {
+    if (
+      this.educationInformation?.educationLevel === '' &&
+      this.educationInformation?.fieldOfStudy === ''
+    ) {
       this.isCreateOrEditMode = true;
     }
-    this.initialValues = this.educationInformationFormControl.getRawValue();
+    this.initialValues = this.educationInformationFormGroup.getRawValue();
+    console.log('Is create or edit mode: ', this.isCreateOrEditMode);
+    //Set the discard and submit button, (and go back button) visibility, and other options
+    this.setSubmitButtonOptions();
+    this.setDiscardButtonOptions();
 
-    //Track changes in the form controls
-    this.educationInformationFormControl.valueChanges.subscribe((changes) => {
-      this.changedControls = Object.keys(
-        this.educationInformationFormControl.value
-      ).filter((key) => {
-        if (
-          this.initialValues[key as keyof typeof this.initialValues] !==
-          changes[key as keyof typeof changes]
-        ) {
-          this.hasChanges = true;
-        }
-      });
+    console.log('Passed education information: ', this.educationInformation);
+    console.log('Form group values:', this.educationInformationFormGroup.value);
+    console.log('Initial values: ', this.initialValues);
+    this.referenceEducationInformation = this.educationInformation;
 
-      if (this.educationInformationFormControl.valid) {
-        this.formErrorMessage = 'You can save your data';
+    this.educationInformationFormGroup.valueChanges.subscribe((changes) => {
+      console.log(
+        'Form values changed:',
+        this.educationInformationFormGroup.value
+      );
+      if (
+        this.educationInformationFormGroup.controls.institutionName.value === ''
+      ) {
+        this.educationInformationFormGroup.controls.institutionName.setValue(
+          null
+        );
       }
-      if (this.educationInformationFormControl.invalid) {
-        this.formErrorMessage = 'Please resolve the errors before saving';
+      if (
+        this.educationInformationFormGroup.controls.institutionOfficialWebsite
+          .value === ''
+      ) {
+        this.educationInformationFormGroup.controls.institutionOfficialWebsite.setValue(
+          null,
+          {
+            emitEvent: false,
+          }
+        );
       }
+      if (
+        this.educationInformationFormGroup.controls.institutionAddress.value ===
+        ''
+      ) {
+        this.educationInformationFormGroup.controls.institutionAddress.setValue(
+          null,
+          {
+            emitEvent: false,
+          }
+        );
+      }
+      if (
+        this.educationInformationFormGroup.controls.minorFieldOfStudy.value ===
+        ''
+      ) {
+        this.educationInformationFormGroup.controls.minorFieldOfStudy.setValue(
+          null,
+          {
+            emitEvent: false,
+          }
+        );
+      }
+      if (
+        typeof this.educationInformationFormGroup.controls.startDate.value ===
+          'object' ||
+        (typeof this.educationInformationFormGroup.controls.startDate.value ===
+          'string' &&
+          this.educationInformationFormGroup.controls.startDate.value === '')
+      ) {
+        this.educationInformationFormGroup.controls.startDate.setValue(null, {
+          emitEvent: false,
+        });
+      }
+      if (
+        typeof this.educationInformationFormGroup.controls.endDate.value ===
+          'object' ||
+        (typeof this.educationInformationFormGroup.controls.endDate.value ===
+          'string' &&
+          this.educationInformationFormGroup.controls.endDate.value === '')
+      ) {
+        this.educationInformationFormGroup.controls.endDate.setValue(null, {
+          emitEvent: false,
+        });
+      }
+
+      if (this.educationInformationFormGroup.controls.finalGrade.value === '') {
+        this.educationInformationFormGroup.controls.finalGrade.setValue(null, {
+          emitEvent: false,
+        });
+      }
+      if (
+        this.educationInformationFormGroup.controls.description.value === ''
+      ) {
+        this.educationInformationFormGroup.controls.description.setValue(null, {
+          emitEvent: false,
+        });
+      }
+      console.log(
+        'Final grade value: ',
+        this.educationInformationFormGroup.controls.finalGrade.value
+      );
+      console.log(
+        'Initial value for isCompleted firstOption: ',
+        this.initialValues['isCompletedFormGroup'].firstOption
+      );
+      this.checkForChanges();
+      if (this.educationInformationFormGroup.invalid) {
+        this.formErrorMessage = 'Please resolve the errors, to continue';
+        this.formErrorMessageColor = 'red';
+      }
+      if (this.educationInformationFormGroup.valid) {
+        this.formErrorMessage = '';
+        this.formErrorMessageColor = '';
+      }
+      console.log('Has changes: ', this.hasChanges);
     });
 
-    //Track changes for the education level field
-    this.educationInformationFormControl.controls.educationLevel.valueChanges.subscribe(
-      (change) => {
-        this.trackEducationLevelErrors();
+    //Track changes in the form controls
+    //Check for the errors in the education level field
+    this.educationInformationFormGroup.controls.educationLevel.valueChanges.subscribe(
+      () => {
+        this.checkEducationLevel();
+      }
+    );
+
+    //Check for the errors in the field of study field
+    this.educationInformationFormGroup.controls.fieldOfStudy.valueChanges.subscribe(
+      () => {
+        this.checkFieldOfStudy();
       }
     );
   }
 
-  checkControlValueChanges() {}
-  onDiscardData() {
-    this.currentDataOperation = false;
-    console.log(this.initialValues);
-    console.log(this.educationInformationFormControl.value);
-
-    console.log(this.changedControls);
-
-    if (this.changedControls.length > 0) {
-      console.log('Data has been changed');
-      this.warningBoxTitle = 'You have unsaved changes';
-      this.warningBoxMessage =
-        'You have unsaved changes. Do you want to discard them?';
-      this.warningBoxYesButtonText = "No, don't discard";
-      this.warningBoxYesButtonColor = 'green';
-      this.warningBoxNoButtonText = 'Yes, discard data';
-      this.warningBoxNoButtonColor = 'red';
-
-      this.toggleWarningAnnouncementBox(new Event('click'));
+  //Sets the submit button options
+  //If the component is in create mode, the submit button will have following options: color - green, text - Save data
+  //If the component is in edit mode, the submit button will have following options: color - green, text - Save changes
+  setSubmitButtonOptions() {
+    if (this.isCreateOrEditMode) {
+      this.submitButtonText = 'Save data';
+      this.submitButtonColor = 'green';
     }
-    if (this.changedControls.length === 0) {
-      console.log('Data has not been changed');
-      this.toggleFloatingBox();
+    if (!this.isCreateOrEditMode) {
+      this.submitButtonText = 'Save changes';
+      this.submitButtonColor = 'green';
     }
   }
-
-  onSaveData() {
-    this.currentDataOperation = true;
-
-    console.log(this.educationInformationFormControl.value);
-    //Check if the form is valid
-    if (this.educationInformationFormControl.invalid) {
-      this.trackEducationLevelErrors();
-      this.trackFieldOfStudyErrors();
-      this.trackIsCompletedErrors();
-      this.formErrorMessage = 'Please resolve any errors before saving';
+  //Sets the discard button options
+  //If the component is in create mode, the discard button will have following options: color - red, text - Discard data
+  //If the component is in edit mode, the discard button will have following options: color - red, text - Discard changes
+  setDiscardButtonOptions() {
+    if (this.isCreateOrEditMode) {
+      this.discardButtonText = 'Discard data';
+      this.discardButtonColor = 'red';
     }
-    //Check if the form is valid
-    if (this.educationInformationFormControl.valid) {
-      this.formErrorMessage = 'You can save your data';
-      this.warningBoxTitle = 'Do you want to save your data?';
-      this.warningBoxMessage = 'Are you sure you want to save your data?';
-      this.warningBoxYesButtonText = 'Yes, save';
-      this.warningBoxYesButtonColor = 'green';
-      this.warningBoxNoButtonText = 'No, keep editing';
-      this.warningBoxNoButtonColor = 'red';
-      this.toggleWarningAnnouncementBox(new Event('click'));
+    if (!this.isCreateOrEditMode) {
+      this.discardButtonText = 'Discard changes';
+      this.discardButtonColor = 'red';
     }
   }
-  onKeepEditing() {
-    this.toggleWarningAnnouncementBox(new Event('click'));
-  }
-  toggleWarningAnnouncementBox($event: Event) {
-    this.showWarningBox = !this.showWarningBox;
-  }
-  onYesDiscardData() {
-    this.showWarningBox = false;
-    this.toggleFloatingBox();
-  }
 
-  trackEducationLevelErrors() {
-    //Store all the errors
-    const error =
-      this.educationInformationFormControl.controls.educationLevel.errors;
+  //Check if the education level field is valid
+  checkEducationLevel() {
+    console.log(
+      'Education level error:',
+      this.educationInformationFormGroup.controls.educationLevel.errors
+    );
+    const educationLevelError =
+      this.educationInformationFormGroup.controls.educationLevel.errors;
 
-    //Check if the errors exist
-    if (error) {
-      if (error['required']) {
+    if (educationLevelError) {
+      if (educationLevelError['required']) {
         this.educationLevelError = 'This field is required';
       }
-      if (error['pattern']) {
-        this.educationLevelError = 'Only letters and numbers are allowed';
+      if (educationLevelError['minlength']) {
+        this.educationLevelError =
+          'This field must be at least 2 characters long';
+      }
+      if (educationLevelError['maxlength']) {
+        this.educationLevelError =
+          'This field can only be up to 100 characters long';
+      }
+      if (educationLevelError['pattern']) {
+        this.educationLevelError =
+          'This field can only contain letters, numbers, and spaces but between other characters';
       }
     }
-
-    //Check if there are no errors, and remove the error message
-    if (!error) {
+    if (!educationLevelError) {
       this.educationLevelError = '';
     }
   }
 
-  trackFieldOfStudyErrors() {
-    //Store all the errors
-    const error =
-      this.educationInformationFormControl.controls.fieldOfStudy.errors;
+  //Check if the field of study field is valid
+  checkFieldOfStudy() {
+    console.log(
+      'Field of study error:',
+      this.educationInformationFormGroup.controls.fieldOfStudy.errors
+    );
+    const fieldOfStudyError =
+      this.educationInformationFormGroup.controls.fieldOfStudy.errors;
 
-    //Check if the errors exist
-    if (error) {
-      if (error['required']) {
+    if (fieldOfStudyError) {
+      if (fieldOfStudyError['required']) {
         this.fieldOfStudyError = 'This field is required';
       }
-      if (error['pattern']) {
-        this.fieldOfStudyError = 'Only letters and numbers are allowed';
+      if (fieldOfStudyError['minlength']) {
+        this.fieldOfStudyError =
+          'This field must be at least 2 characters long';
+      }
+      if (fieldOfStudyError['maxlength']) {
+        this.fieldOfStudyError =
+          'This field can only be up to 100 characters long';
+      }
+      if (fieldOfStudyError['pattern']) {
+        this.fieldOfStudyError =
+          'This field can only contain letters, numbers, and spaces but between other characters';
       }
     }
-
-    //Check if there are no errors, and remove the error message
-    if (!error) {
+    if (!fieldOfStudyError) {
       this.fieldOfStudyError = '';
     }
   }
 
-  trackIsCompletedErrors() {}
-
-  //
-  keepEditing() {
-    console.log('Keep editing');
-    this.toggleWarningAnnouncementBox(new Event('click'));
-  }
-
-  discardData() {
-    console.log('Discard data');
-    this.toggleWarningAnnouncementBox(new Event('click'));
-    this.toggleFloatingBox();
-  }
-  saveData() {
-    console.log('Save data');
-    const newEducationInformation: EducationInformationHttpRequest = {
-      institutionName: this.educationInformationFormControl.value
-        .institutionName as string,
-      institutionOfficialWebsite: this.educationInformationFormControl.value
-        .institutionOfficialWebsite as string,
-      institutionAddress: this.educationInformationFormControl.value
-        .institutionAddress as string,
-      educationLevel: this.educationInformationFormControl.value
-        .educationLevel as string,
-      fieldOfStudy: this.educationInformationFormControl.value
-        .fieldOfStudy as string,
-      minorFieldOfStudy: this.educationInformationFormControl.value
-        .minorFieldOfStudy as string,
-      startDate: DateHelper.toDateOnlyString(new Date()),
-      endDate: DateHelper.toDateOnlyString(new Date()),
-      isCompleted: true,
-      finalGrade: this.educationInformationFormControl.value
-        .finalGrade as string,
-      description: this.educationInformationFormControl.value
-        .description as string,
-    };
-
-    this.warningBoxMessage = 'Saving education data...';
-    this.warningBoxMessageColor = 'orange';
-    this.isDataTransmissionActive = true;
-
-    let saveResult = null;
-    this.accountService
-      .createPersonEducationInformation(newEducationInformation)
-      .then((result) => {
-        this.isDataTransmissionActive = false;
-        this.isDataTransmissionComplete = true;
-        console.log('Result: ', result);
-        saveResult = result;
-        if ((result?.success as string) === 'true') {
-          this.warningBoxMessage = 'Data saved successfully';
-          this.warningBoxMessageColor = 'green';
-        }
-        if ((result?.success as string) === 'false') {
-          this.warningBoxMessage = result?.message as string;
-          if (
-            result?.message ===
-            'Cannot add more than 5 education information per account'
-          ) {
-            this.isResponseMaxLengthReachedError = true;
-          }
-          this.warningBoxMessageColor = 'red';
-        }
-        this.saveOperationResult = result?.message as string;
-      });
-    console.log('Save result: ', saveResult);
-  }
-
-  onConfirmButton() {
-    console.log('Confirm button clicked');
-    console.log('Current data operation: ', this.currentDataOperation);
-
-    if (this.currentDataOperation) {
-      this.saveData();
+  checkForChanges() {
+    if (
+      this.educationInformationFormGroup.controls.institutionName.value !==
+      this.initialValues['institutionName']
+    ) {
+      this.hasChanges = true;
+      return;
     }
-    if (!this.currentDataOperation) {
-      this.keepEditing();
+    if (
+      this.educationInformationFormGroup.controls.institutionOfficialWebsite
+        .value !== this.initialValues['institutionOfficialWebsite']
+    ) {
+      this.hasChanges = true;
+      return;
     }
-  }
-
-  onCancelButton() {
-    console.log('Cancel button clicked');
-    console.log('Current data operation: ', this.currentDataOperation);
-    if (this.currentDataOperation) {
-      this.keepEditing();
+    if (
+      this.educationInformationFormGroup.controls.institutionAddress.value !==
+      this.initialValues['institutionAddress']
+    ) {
+      this.hasChanges = true;
+      return;
     }
-    if (!this.currentDataOperation) {
-      this.discardData();
+    if (
+      this.educationInformationFormGroup.controls.educationLevel.value !==
+      this.initialValues['educationLevel']
+    ) {
+      this.hasChanges = true;
+      return;
     }
+    if (
+      this.educationInformationFormGroup.controls.fieldOfStudy.value !==
+      this.initialValues['fieldOfStudy']
+    ) {
+      this.hasChanges = true;
+      return;
+    }
+    if (
+      this.educationInformationFormGroup.controls.minorFieldOfStudy.value !==
+      this.initialValues['minorFieldOfStudy']
+    ) {
+      this.hasChanges = true;
+      return;
+    }
+    if (
+      this.educationInformationFormGroup.controls.startDate.value !==
+      this.initialValues['startDate']
+    ) {
+      this.hasChanges = true;
+      return;
+    }
+    if (
+      this.educationInformationFormGroup.controls.endDate.value !==
+      this.initialValues['endDate']
+    ) {
+      this.hasChanges = true;
+      return;
+    }
+    if (
+      this.educationInformationFormGroup.controls.isCompletedFormGroup.controls
+        .firstOption.value !==
+      this.initialValues['isCompletedFormGroup'].firstOption
+    ) {
+      this.hasChanges = true;
+      return;
+    }
+    if (
+      this.educationInformationFormGroup.controls.finalGrade.value !==
+      this.initialValues['finalGrade']
+    ) {
+      this.hasChanges = true;
+      return;
+    }
+    if (
+      this.educationInformationFormGroup.controls.description.value !==
+      this.initialValues['description']
+    ) {
+      this.hasChanges = true;
+      return;
+    }
+    this.hasChanges = false;
   }
 
-  handleContinueButton() {
-    this.toggleWarningAnnouncementBox(new Event('click'));
-    this.toggleFloatingBox();
-  }
-
-  handleEditButton() {
-    this.toggleWarningAnnouncementBox(new Event('click'));
-  }
-
-  onDiscardChanges() {
-    console.log('Discard changes');
-    this.warningBoxTitle = 'Are you sure you want to discard changes?';
-    this.warningBoxMessage = 'Changes you have made will be discarded';
-    this.warningBoxMessageColor = 'red';
-    this.currentDataOperation = false;
-    this.toggleWarningAnnouncementBox(new Event('click'));
-  }
-  onSaveChanges() {
-    console.log('Save changes');
+  toggleWarningBox() {
+    console.log('Show warning box');
+    this.showWarningBox = !this.showWarningBox;
   }
   onGoBack() {
-    console.log('Go back');
+    this.toggleFloatingBox();
+  }
+
+  onDiscardButtonClick() {
+    this.toggleWarningBox();
+    this.currentDataOperation = false;
+    if (this.isCreateOrEditMode) {
+      this.floatingWarningBoxTitle = 'Discard date';
+      this.floatingWarningBoxMessage =
+        'All data you have added will be lost, are you sure you want to discard?';
+      this.floatingWarningBoxMessageColor = 'red';
+      this.confirmButtonColor = 'red';
+      this.confirmButtonText = 'Yes, discard';
+      this.cancelButtonText = 'No, keep editing';
+      this.cancelButtonColor = 'blue';
+    }
+    if (!this.isCreateOrEditMode) {
+      this.floatingWarningBoxTitle = 'Discard Changes';
+      this.floatingWarningBoxMessage =
+        'All changes will be lost, are you sure you want to discard?';
+      this.floatingWarningBoxMessageColor = 'red';
+      this.confirmButtonColor = 'red';
+      this.confirmButtonText = 'Yes, discard';
+      this.cancelButtonText = 'No, keep editing';
+      this.cancelButtonColor = 'blue';
+    }
+  }
+
+  onSaveButtonClick() {
+    if (this.educationInformationFormGroup.invalid) {
+      this.formErrorMessage = 'Please resolve any errors before saving';
+    }
+    if (this.educationInformationFormGroup.valid) {
+      console.log('Save button');
+      this.currentDataOperation = true;
+      this.toggleWarningBox();
+      if (this.isCreateOrEditMode) {
+        this.floatingWarningBoxTitle = 'Save data';
+        this.floatingWarningBoxMessage =
+          'Data you have added will be saved, are you sure you want to save?';
+        this.floatingWarningBoxMessageColor = 'green';
+        this.confirmButtonColor = 'green';
+        this.confirmButtonText = 'Yes, save';
+        this.cancelButtonText = 'No, keep editing';
+        this.cancelButtonColor = 'blue';
+      }
+      if (!this.isCreateOrEditMode) {
+        this.floatingWarningBoxTitle = 'Update changes';
+        this.floatingWarningBoxMessage =
+          'Changes you have made will be saved, are you sure you want to save?';
+        this.floatingWarningBoxMessageColor = 'green';
+        this.confirmButtonColor = 'green';
+        this.confirmButtonText = 'Yes, save changes';
+        this.cancelButtonText = 'No, keep editing';
+      }
+      if (this.isCreateOrEditMode) {
+        this.floatingWarningBoxTitle = 'Save data';
+        this.floatingWarningBoxMessage =
+          'Data you have added will be saved, are you sure you want to save?';
+        this.floatingWarningBoxMessageColor = 'green';
+        this.confirmButtonColor = 'green';
+        this.confirmButtonText = 'Yes, save';
+        this.cancelButtonText = 'No, keep editing';
+        this.cancelButtonColor = 'blue';
+      }
+      if (!this.isCreateOrEditMode) {
+        this.floatingWarningBoxTitle = 'Update changes';
+        this.floatingWarningBoxMessage =
+          'Changes you have made will be saved, are you sure you want to save?';
+        this.floatingWarningBoxMessageColor = 'green';
+        this.confirmButtonColor = 'green';
+        this.confirmButtonText = 'Yes, save changes';
+        this.cancelButtonText = 'No, keep editing';
+        this.cancelButtonColor = 'blue';
+        this.cancelButtonColor = 'blue';
+      }
+    }
+  }
+
+  onCancelButtonClick() {
+    this.toggleWarningBox();
+  }
+
+  onConfirmButtonClick() {
+    if (!this.currentDataOperation) {
+      this.toggleWarningBox();
+      this.toggleFloatingBox();
+    }
+    if (this.currentDataOperation) {
+      if (this.isCreateOrEditMode) {
+        this.createEducationInformation();
+      }
+      if (!this.isCreateOrEditMode) {
+        this.updateEducationInformation();
+      }
+    }
+  }
+
+  createEducationInformation() {
+    console.log('Saving data...');
+  }
+
+  updateEducationInformation() {
+    console.log('Updating data...');
   }
 }

@@ -6,7 +6,7 @@ export default interface EducationInformation {
   educationLevel: string;
   fieldOfStudy: string;
   minorFieldOfStudy?: string;
-  startDate: Date;
+  startDate?: Date;
   endDate?: Date;
   isCompleted: boolean;
   finalGrade?: string;

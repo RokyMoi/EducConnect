@@ -52,7 +52,6 @@ export class EducationComponent implements OnInit, OnDestroy {
     const newEducationInformation: EducationInformation = {
       educationLevel: '',
       fieldOfStudy: '',
-      startDate: new Date(),
       isCompleted: false,
     };
     this.selectedGroup = null;
@@ -118,4 +117,6 @@ export class EducationComponent implements OnInit, OnDestroy {
         console.error('Error while loading education information:', error);
       });
   }
+
+  
 }
