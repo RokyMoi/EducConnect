@@ -1,10 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { AccountService } from '../../services/account.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-student-profile',
+  standalone:true,
+  imports:[RouterLink],
   templateUrl: './student-profile.component.html',
   styleUrl: './student-profile.component.css'
 })

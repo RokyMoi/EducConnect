@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>User Profile</title> <!-- Ispravno zatvoreni title tag -->
+  <title>User Profile</title> 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 </head>
@@ -19,7 +19,7 @@
         <div class="avatar-container">
           <div [style.background-image]="'url('+ profilePicture+')'" class="avatar"></div>
           <div class="profile-actions">
-            <button class="action-btn edit-btn">Edit Profile</button>
+            <button routerLink="/settings" class="action-btn edit-btn">Edit Profile</button>
             <button (click)="LogoutFromProfile()" class="action-btn logout-btn">Logout</button>
           </div>
         </div>
@@ -41,7 +41,7 @@
         </div>
         <div class="stat">
           <strong>Joined On</strong>
-          <span class="stat-value">2020-10-12</span>
+          <span class="stat-value">{{student.CreatedAt}}</span>
         </div>
       </section>
 

@@ -10,7 +10,7 @@ namespace EduConnect.Interfaces
         void DeleteMessage(Message message);
 
         Task<Message?> GetMessage(int messageid);
-        Task<PagedList<MessageDto>> GetMessageForUser();
+        Task<PagedList<MessageDto>> GetMessageForUser(MessageParams messageParams);
         Task<IEnumerable<MessageDto>> GetMessageThread(string currentEmail,string recipientEmail);
         Task<bool> SaveAllAsync();
 
