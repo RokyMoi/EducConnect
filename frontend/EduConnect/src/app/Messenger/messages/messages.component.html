@@ -1,0 +1,5 @@
+<p>messages !</p>
+@for (messages of messageService.paginatedResult()?.items; track $index) {
+
+    <h3>{{messages}}</h3>
+}

@@ -3,6 +3,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-phone-number-input',
+  standalone:true,
   imports: [ReactiveFormsModule],
   templateUrl: './phone-number-input.component.html',
   styleUrl: './phone-number-input.component.css',

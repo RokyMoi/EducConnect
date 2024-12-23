@@ -12,6 +12,7 @@ import { StudentProfileComponent } from './Student/student-profile/student-profi
 import { PhoneNumberComponent } from './signup/registration-step-process/phone-number/phone-number.component';
 import { PhotoComponent } from './Photo/photo-comp/photo-comp.component';
 import { MainSettingsComponent } from './Settings/main-settings/main-settings.component';
+import { MessagesComponent } from './Messenger/messages/messages.component';
 
 
 export const routes: Routes = [
@@ -25,6 +26,7 @@ export const routes: Routes = [
   { path: 'student-dashboard', component: StudentDashboardComponent },
   { path: 'tutor-dashboard', component: TutorDashboardComponent },
   { path: 'photouploadcomponent', component: PhotoComponent},
+  {path: 'student-message',component: MessagesComponent},
  
   {
     path: 'signup/phone-number',

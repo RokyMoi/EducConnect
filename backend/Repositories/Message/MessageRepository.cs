@@ -27,15 +27,21 @@ namespace EduConnect.Repositories.MessageRepository
         }
 
         public async Task<PagedList<MessageDto>> GetMessageForUser(MessageParams messageParams)
+            //Get the last message sent - > We filter that by MessageSent(Date)
         {
             var query = context.Message.OrderByDescending(x => x.MessageSent).AsQueryable();
+        
             query = messageParams.Container switch
             {
                 "Inbox" => query.Where(x => x.Recipient.PersonEmail.Email == messageParams.Email),
-                "Outbox" => query.Where(x => x.Sender.PersonEmail.Email == messageParams.Email), 
-                ///Messages that are not seen are default case
-                _ => query.Where(x=> x.Recipient.PersonEmail.Email == messageParams.Email && x.DateRead == null )
+                "Outbox" => query.Where(x => x.Sender.PersonEmail.Email == messageParams.Email),
+                _ => query.Where(x => x.Recipient.PersonEmail.Email == messageParams.Email && x.DateRead == null)
             };
+
+            // Loguj trenutni upit za debag
+            Console.WriteLine($"Query for container {messageParams.Container}: {query.ToQueryString()}");
+
+            // Nastavi sa mapiranjem
             var messages = query.ProjectTo<MessageDto>(mapper.ConfigurationProvider);
 
             return await PagedList<MessageDto>.CreateASync(messages,messageParams.PageNumber,messageParams.PageSize);
@@ -72,6 +78,7 @@ namespace EduConnect.Repositories.MessageRepository
 
             return messages.Select(x => new MessageDto
             {
+                Id = x.Id,
                 SenderId = x.Sender.PersonId,
                 SenderEmail = x.Sender.PersonEmail.Email,
                 SenderPhotoUrl = x.Sender.PersonPhoto.FirstOrDefault(photo => photo.PersonId == x.Sender.PersonId)?.Url ?? "No User photo",

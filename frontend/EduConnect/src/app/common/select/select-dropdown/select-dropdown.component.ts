@@ -13,6 +13,7 @@ import {
 } from '@angular/forms';
 @Component({
   selector: 'app-select-dropdown',
+  standalone:true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './select-dropdown.component.html',
   styleUrl: './select-dropdown.component.css',

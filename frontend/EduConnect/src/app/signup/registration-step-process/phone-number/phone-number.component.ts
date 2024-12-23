@@ -13,6 +13,7 @@ import { HttpClient } from '@angular/common/http';
 import { PhoneNumberInputComponent } from '../../../common/input/phone-number/phone-number-input/phone-number-input.component';
 @Component({
   selector: 'app-phone-number',
+  standalone:true,
   imports: [
     ReactiveFormsModule,
     SelectDropdownComponent,

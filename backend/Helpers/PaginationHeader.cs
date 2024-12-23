@@ -1,10 +1,12 @@
 ﻿namespace EduConnect.Helpers
 {
-    public class PaginationHeader(int CurrentPage,int ItemsPerPage,int TotalItems,int TotalPages)
+    public class PaginationHeader(int currentPage,int itemsPerPage,int totalItems,int totalPages)
     {
-        public int CurrentPage { get; set; } = CurrentPage;
-        public int ItemsPerPage { get; set; }=ItemsPerPage;
-        public int TotalItems { get; set; }=TotalItems;
-        public int TotalPages { get; set; } = TotalPages;
+        /// Making a pagination header for response extension, to send to a client <summary>
+       //Response.AddPaginationHeader - > Extensions Folder
+        public int CurrentPage { get; set; } = currentPage;
+        public int ItemsPerPage { get; set; }=itemsPerPage;
+        public int TotalItems { get; set; }=totalItems;
+        public int TotalPages { get; set; } = totalPages;
     }
 }
