@@ -79,6 +79,7 @@ namespace backend.Repositories.Tutor
             {
                 TutorId = tutor.TutorId,
                 PersonId = tutor.PersonId,
+                TutorRegistrationStatusId = tutor.TutorRegistrationStatus.TutorRegistrationStatusId,
             };
         }
 

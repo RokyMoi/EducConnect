@@ -262,9 +262,11 @@ namespace backend.Controllers.Person
                     JobDescription = personCareerInformation.JobDescription,
                     Responsibilities = personCareerInformation.Responsibilities,
                     Achievements = personCareerInformation.Achievements,
+                    IndustryClassificationId = personCareerInformation.IndustryClassificationId,
                     Industry = personCareerInformation.Industry,
+                    Sector = personCareerInformation.Sector,
                     SkillsUsed = personCareerInformation.SkillsUsed,
-                    WorkType = personCareerInformation.WorkTypeId,
+                    WorkTypeId = personCareerInformation.WorkTypeId,
                     AdditionalInformation = personCareerInformation.AdditionalInformation,
 
 

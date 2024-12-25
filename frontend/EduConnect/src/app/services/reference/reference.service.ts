@@ -1,0 +1,75 @@
+import { inject, Injectable } from '@angular/core';
+import ApiLinks from '../../../assets/api/link.api';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map, of } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ReferenceService {
+  http = inject(HttpClient);
+  constructor() {}
+
+  getEmploymentTypes() {
+    return this.http.get(ApiLinks.getAllEmploymentTypes).pipe(
+      map((response) => {
+        return {
+          success: (response as any).success,
+          data: (response as any).data.employmentType,
+          message: (response as any).message,
+          statusCode: (response as any).statusCode,
+        };
+      }),
+      catchError((error) => {
+        return of({
+          success: (error as any).error.success,
+          data: (error as any).error.data,
+          message: (error as any).error.message,
+          statusCode: (error as any).status,
+        });
+      })
+    );
+  }
+
+  GetIndustryClassifications() {
+    return this.http.get(ApiLinks.getAllIndustryClassifications).pipe(
+      map((response) => {
+        return {
+          success: (response as any).success,
+          data: (response as any).data.industryClassification,
+          message: (response as any).message,
+          statusCode: (response as any).statusCode,
+        };
+      }),
+      catchError((error) => {
+        return of({
+          success: (error as any).error.success,
+          data: (error as any).error.data,
+          message: (error as any).error.message,
+          statusCode: (error as any).status,
+        });
+      })
+    );
+  }
+
+  GetWorkTypes() {
+    return this.http.get(ApiLinks.getAllWorkTypes).pipe(
+      map((response) => {
+        return {
+          success: (response as any).success,
+          data: (response as any).data.workType,
+          message: (response as any).message,
+          statusCode: (response as any).statusCode,
+        };
+      }),
+      catchError((error) => {
+        return of({
+          success: (error as any).error.success,
+          data: (error as any).error.data,
+          message: (error as any).error.message,
+          statusCode: (error as any).status,
+        });
+      })
+    );
+   }
+}

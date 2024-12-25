@@ -49,6 +49,7 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<TutorTeachingInformation> TutorTeachingInformation { get; set; }
 
+    public DbSet<IndustryClassification> IndustryClassification { get; set; }
 
 
 

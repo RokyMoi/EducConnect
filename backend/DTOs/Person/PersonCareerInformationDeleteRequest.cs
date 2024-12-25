@@ -8,9 +8,7 @@ namespace backend.DTOs.Person
 {
     public class PersonCareerInformationDeleteRequest
     {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+
 
         [Required]
         public Guid PersonCareerInformationId { get; set; }

@@ -1,5 +1,5 @@
 export default interface EducationInformation {
-  educationInformationId?: string;
+  personEducationInformationId?: string;
   institutionName?: string;
   institutionOfficialWebsite?: string;
   institutionAddress?: string;

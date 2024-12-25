@@ -26,6 +26,9 @@ using backend.Interfaces.Reference;
 using backend.Entities.Reference.Country;
 using backend.Middleware.Tutor;
 using backend.Middleware;
+using backend.DTOs.Tutor;
+using Microsoft.Extensions.ObjectPool;
+
 namespace backend.Controllers.Tutor
 {
     [ApiController]
@@ -829,6 +832,146 @@ P.S. Need help or have questions? Feel free to reach out to us at support@educon
 
         // }
 
+        [HttpPut("signup/status")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> UpdateTutorRegistrationStatus(TutorRegistrationStatusUpdateRequestDTO updateRequestDTO)
+        {
 
+            Console.WriteLine("Tutor registration status to update:", updateRequestDTO.tutorRegistrationStatusId);
+
+            if (updateRequestDTO.tutorRegistrationStatusId == null)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Tutor registration status is required",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personObjectEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personObjectEmail.PersonId;
+            }
+
+            if (personId == Guid.Empty)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the the tutorId from the updateRequestDTO matches the tutorId associated with the personId from the database
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+
+            if (tutor == null)
+            {
+                return Unauthorized(
+                    new
+                    {
+                        success = "false",
+                        message = "You are not a tutor",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the status to update is a valid one
+            var newTutorRegistrationStatus = await _referenceRepository.GetTutorRegistrationStatusByIdAsync(updateRequestDTO.tutorRegistrationStatusId);
+
+            if (newTutorRegistrationStatus == null)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Invalid tutor registration status",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the tutorRegistrationStatusId is below or equal to the current tutorRegistrationStatusId in the Tutor table 
+            if (updateRequestDTO.tutorRegistrationStatusId <= tutor.TutorRegistrationStatusId)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "You cannot update the tutor registration status to a status that is lower than or equal to the current status",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Update the tutor registration status
+            var updateResult = await _tutorRepository.UpdateTutorRegistrationStatus(personId, updateRequestDTO.tutorRegistrationStatusId);
+
+            if (updateResult == null)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            var tutorWithNewStatus = await _tutorRepository.GetTutorByPersonId(personId);
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Tutor registration status updated successfully",
+                    data = new
+                    {
+                        tutorId = tutorWithNewStatus.TutorId,
+                        tutorRegistrationStatusId = tutorWithNewStatus.TutorRegistrationStatusId,
+
+                    },
+                    timestamp = DateTime.Now
+                }
+            );
+
+
+        }
     }
 }

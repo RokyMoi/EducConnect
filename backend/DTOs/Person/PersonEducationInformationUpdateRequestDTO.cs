@@ -9,9 +9,7 @@ namespace backend.DTOs.Person
     public class PersonEducationInformationUpdateRequestDTO
     {
 
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+
         [Required]
         public Guid PersonEducationInformationId { get; set; }
 
@@ -21,7 +19,7 @@ namespace backend.DTOs.Person
         public string? EducationLevel { get; set; } = null;
         public string? FieldOfStudy { get; set; } = null;
         public string? MinorFieldOfStudy { get; set; } = null;
-        public DateOnly? StartDate { get; set; } = null;  
+        public DateOnly? StartDate { get; set; } = null;
         public DateOnly? EndDate { get; set; } = null;
         public bool? IsCompleted { get; set; } = null;
         public string? FinalGrade { get; set; } = null;

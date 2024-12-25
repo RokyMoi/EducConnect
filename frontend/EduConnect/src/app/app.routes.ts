@@ -8,6 +8,7 @@ import { TutorDashboardComponent } from './tutor/tutor-dashboard/tutor-dashboard
 import { PhoneNumberComponent } from './signup/registration-step-process/phone-number/phone-number.component';
 import { PersonDetailsComponent } from './signup/registration-step-process/person-details/person-details/person-details.component';
 import { EducationComponent } from './signup/registration-step-process/education/education/education.component';
+import { CareerSignupComponent } from './signup/registration-step-process/career/career-signup/career-signup/career-signup.component';
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -27,6 +28,10 @@ export const routes: Routes = [
   {
     path: 'signup/education',
     component: EducationComponent,
+  },
+  {
+    path: 'signup/career',
+    component: CareerSignupComponent,
   },
   { path: '**', component: BodyComponent },
 ];

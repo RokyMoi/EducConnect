@@ -2,7 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.DTOs.Reference.EmploymentType;
+using backend.DTOs.Reference.IndustryClassification;
 using backend.DTOs.Reference.Tutor;
+using backend.DTOs.Reference.WorkType;
+using backend.Entities.Reference;
 using backend.Interfaces.Reference;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,6 +61,135 @@ namespace backend.Controllers.Reference
             );
         }
 
+        [HttpGet("employment-type/all")]
+        public async Task<IActionResult> getAllEmploymentTypes()
+        {
+
+            var employmentTypes = await _referenceRepository.GetAllEmploymentTypesAsync();
+
+            if (employmentTypes == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No employment types found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            List<EmploymentTypeResponseDTO> employmentTypeResponseDTOs = [];
+
+            foreach (var item in employmentTypes)
+            {
+                employmentTypeResponseDTOs.Add(new EmploymentTypeResponseDTO
+                {
+                    EmploymentTypeId = item.EmploymentTypeId,
+                    Name = item.Name,
+                    Description = item.Description,
+                });
+            }
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Employment types retrieved successfully",
+                    data = new
+                    {
+                        employmentType = employmentTypeResponseDTOs
+                    },
+                    timestamp = DateTime.Now
+                });
+        }
+
+        [HttpGet("industry-classification/all")]
+        public async Task<IActionResult> GetAllIndustryClassifications()
+        {
+            var industryClassifications = await _referenceRepository.GetAllIndustryClassificationsAsync();
+
+            if (industryClassifications == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No industry classifications found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            List<IndustryClassificationResponseDTO> responseDTOList = new List<IndustryClassificationResponseDTO>();
+            foreach (IndustryClassification item in industryClassifications)
+            {
+                responseDTOList.Add(
+                    new IndustryClassificationResponseDTO
+                    {
+                        IndustryClassificationId = item.IndustryClassificationId,
+                        Industry = item.Industry,
+                        Sector = item.Sector,
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {responseDTOList.Count} records of industry classifications",
+                    data = new
+                    {
+                        industryClassification = responseDTOList,
+                    },
+                    timestamp = DateTime.Now,
+                }
+                );
+        }
+
+        [HttpGet("work-type/all")]
+        public async Task<IActionResult> GetAllWorkTypes()
+        {
+            var workTypes = await _referenceRepository.GetAllWorkTypesAsync();
+            if (workTypes == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No work types found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            List<WorkTypeResponseDTO> workTypeResponseDTOs = [];
+            foreach (WorkType item in workTypes)
+            {
+                workTypeResponseDTOs.Add(new WorkTypeResponseDTO
+                {
+                    WorkTypeId = item.WorkTypeId,
+                    Name = item.Name,
+                    Description = item.Description,
+                });
+
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Work types retrieved successfully",
+                    data = new
+                    {
+                        workType = workTypeResponseDTOs
+                    },
+                    timestamp = DateTime.Now
+                });
+        }
 
     }
 }

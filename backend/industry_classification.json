@@ -1,0 +1,358 @@
+[
+  {
+    "sector": "Unspecified",
+    "industry": "Unspecified"
+  },
+  {
+    "sector": "Energy",
+    "industry": "Oil & Gas Drilling"
+  },
+  {
+    "sector": "Energy",
+    "industry": "Oil & Gas Equipment & Services"
+  },
+  {
+    "sector": "Energy",
+    "industry": "Integrated Oil & Gas"
+  },
+  {
+    "sector": "Energy",
+    "industry": "Oil & Gas Exploration & Production"
+  },
+  {
+    "sector": "Energy",
+    "industry": "Oil & Gas Refining & Marketing"
+  },
+  {
+    "sector": "Energy",
+    "industry": "Oil & Gas Storage & Transportation"
+  },
+  {
+    "sector": "Energy",
+    "industry": "Coal & Consumable Fuels"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Commodity Chemicals"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Diversified Chemicals"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Fertilizers & Agricultural Chemicals"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Industrial Gases"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Specialty Chemicals"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Construction Materials"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Metal, Glass & Plastic Containers"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Paper & Plastic Packaging Products & Materials"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Aluminum"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Diversified Metals & Mining"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Copper"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Gold"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Precious Metals & Minerals"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Silver"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Steel"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Forest Products"
+  },
+  {
+    "sector": "Materials",
+    "industry": "Paper Products"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Aerospace & Defense"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Building Products"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Construction & Engineering"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Electrical Components & Equipment"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Heavy Electrical Equipment"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Industrial Conglomerates"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Construction Machinery & Heavy Transportation Equipment"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Agricultural & Farm Machinery"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Industrial Machinery & Supplies & Components"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Trading Companies & Distributors"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Commercial Printing"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Environmental & Facilities Services"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Office Services & Supplies"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Diversified Support Services"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Security & Alarm Services"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Human Resource & Employment Services"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Research & Consulting Services"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Data Processing & Outsourced Services"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Computer Software Development & Services"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Computer Hardware Development & Services"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Air Freight & Logistics"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Passenger Airlines"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Marine Transportation"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Rail Transportation"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Cargo Ground Transportation"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Passenger Ground Transportation"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Airport Services"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Highways & Railtracks"
+  },
+  {
+    "sector": "Industrials",
+    "industry": "Marine Ports & Services"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Automotive Parts & Equipment"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Tires & Rubber"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Automobile Manufacturers"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Motorcycle Manufacturers"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Consumer Electronics"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Home Furnishings"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Homebuilding"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Household Appliances"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Housewares & Specialties"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Leisure Products"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Apparel, Accessories & Luxury Goods"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Footwear"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Textiles"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Casinos & Gaming"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Hotels, Resorts & Cruise Lines"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Leisure Facilities"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Restaurants"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Education Services"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Specialized Consumer Services"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Distributors"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Broadline Retail"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Apparel Retail"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Computer & Electronics Retail"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Home Improvement Retail"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Other Specialty Retail"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Automotive Retail"
+  },
+  {
+    "sector": "Consumer Discretionary",
+    "industry": "Homefurnishing Retail"
+  },
+  {
+    "sector": "Consumer Staples",
+    "industry": "Drug Retail"
+  },
+  {
+    "sector": "Consumer Staples",
+    "industry": "Food Distributors"
+  },
+  {
+    "sector": "Consumer Staples",
+    "industry": "Food Retail"
+  },
+  {
+    "sector": "Consumer Staples",
+    "industry": "Consumer Staples Merchandise Retail"
+  },
+  {
+    "sector": "Consumer Staples",
+    "industry": "Brewers"
+  },
+  {
+    "sector": "Consumer Staples",
+    "industry": "Distillers & Vintners"
+  },
+  {
+    "sector": "Consumer Staples",
+    "industry": "Soft Drinks & Non-alcoholic Beverages"
+  },
+  {
+    "sector": "Consumer Staples",
+    "industry": "Food Products"
+  }
+]

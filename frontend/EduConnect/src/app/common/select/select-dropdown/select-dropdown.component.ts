@@ -6,6 +6,7 @@ import {
   Input,
   OnInit,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import {
   FormControl,
@@ -26,12 +27,16 @@ import {
   ],
 })
 export class SelectDropdownComponent implements OnInit {
-  @Input() options: { name: string; value: string }[] = [];
-
   @Input() label: string = 'Select an option';
 
   @Input() placeholder: string = 'Select an option';
 
+  @Input() options: { name: string; value: string }[] = [
+    {
+      name: this.placeholder,
+      value: '',
+    },
+  ];
   @Input() formControl: FormControl = new FormControl('');
   @Input() warning: string = '';
 
@@ -49,6 +54,7 @@ export class SelectDropdownComponent implements OnInit {
       this.formControl.setValue(this.options[0].name);
     }
   }
+
   writeValue(value: any): void {
     // Update the internal value when the form control value changes
     if (value !== undefined) {

@@ -24,5 +24,11 @@ namespace backend.Interfaces.Reference
         Task<CommunicationType?> GetCommunicationTypeByIdAsync(int id);
 
         Task<EngagementMethod?> GetEngagementMethodByIdAsync(int id);
+
+        public Task AddIndustryClassificationsToDatabase(List<IndustryClassification> industryClassifications);
+
+        public Task<List<IndustryClassification>> GetAllIndustryClassificationsAsync();
+
+        public Task<IndustryClassification?> GetIndustryClassificationByIdAsync(Guid id);
     }
 }

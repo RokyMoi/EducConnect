@@ -27,7 +27,6 @@ import { ErrorStateMatcher } from '@angular/material/core';
 import { AccountService } from '../../../../../services/account.service';
 import EducationInformation from '../../../../../_models/person/education/educationInformation.education.person';
 import DateHelper from '../../../../../helpers/date.helper/date.helper';
-import EducationInformationHttpRequest from '../../../../../_models/person/education/request.educationInformation.education.person';
 import { DatePickerComponent } from '../../../../../common/input/date/date-picker/date-picker/date-picker.component';
 import { TwoOptionPickerComponent } from '../../../../../common/input/two-option-picker/two-option-picker/two-option-picker.component';
 import {
@@ -35,6 +34,8 @@ import {
   ProgressSpinnerMode,
 } from '@angular/material/progress-spinner';
 import { EducationService } from '../../../../../services/education/education-service/education-service.service';
+import EducationInformationHttpSaveRequest from '../../../../../_models/person/education/educationInformationSaveRequst';
+import EducationInformationHttpUpdateRequest from '../../../../../_models/person/education/EducationInformationHttpUpdateRequest';
 
 @Component({
   selector: 'app-education-log',
@@ -57,6 +58,8 @@ export class EducationLogComponent implements OnInit {
   @Input() educationInformation: EducationInformation | null = null;
   referenceEducationInformation: EducationInformation | null = null;
   @Input() isEditModalOpen: boolean = true;
+
+  accountService: AccountService = inject(AccountService);
 
   //Flag to determine if the education information object have data added to it, or data updated
   //True - Create mode
@@ -194,6 +197,17 @@ export class EducationLogComponent implements OnInit {
   //False - discard data
   currentDataOperation: boolean = true;
 
+  //Text to display once the data has been retrieved from the server
+  spinnerMode: ProgressSpinnerMode = 'indeterminate';
+  spinnerColor: string = 'orange';
+  isDataTransmissionActive: boolean = false;
+  isDataTransmissionComplete: boolean = false;
+  continueButtonText: string = 'Continue';
+  continueButtonColor: string = 'blue';
+
+  //Flag variable used to specify if the number of the maximum number of records has been reached
+  isMaxNumberOfRecordsReached: boolean = false;
+
   isInstitutionNameChanged: boolean = false;
   isInstitutionOfficialWebsiteChanged: boolean = false;
   isInstitutionAddressChanged: boolean = false;
@@ -205,6 +219,13 @@ export class EducationLogComponent implements OnInit {
   isIsCompletedChanged: boolean = false;
   isFinalGradeChanged: boolean = false;
   isDescriptionChanged: boolean = false;
+
+  //Variables for the delete education information button
+  deleteButtonText: string = 'Delete this record';
+  deleteButtonColor: string = 'red';
+
+  //Flag variable used to specify if the delete operation is active
+  isDeleteOperation: boolean = false;
 
   ngOnInit(): void {
     console.log('Education information: ', this.educationInformation);
@@ -593,7 +614,7 @@ export class EducationLogComponent implements OnInit {
         this.floatingWarningBoxTitle = 'Update changes';
         this.floatingWarningBoxMessage =
           'Changes you have made will be saved, are you sure you want to save?';
-        this.floatingWarningBoxMessageColor = 'green';
+        this.floatingWarningBoxMessageColor = 'blue';
         this.confirmButtonColor = 'green';
         this.confirmButtonText = 'Yes, save changes';
         this.cancelButtonText = 'No, keep editing';
@@ -602,7 +623,7 @@ export class EducationLogComponent implements OnInit {
         this.floatingWarningBoxTitle = 'Save data';
         this.floatingWarningBoxMessage =
           'Data you have added will be saved, are you sure you want to save?';
-        this.floatingWarningBoxMessageColor = 'green';
+        this.floatingWarningBoxMessageColor = 'blue';
         this.confirmButtonColor = 'green';
         this.confirmButtonText = 'Yes, save';
         this.cancelButtonText = 'No, keep editing';
@@ -622,30 +643,203 @@ export class EducationLogComponent implements OnInit {
     }
   }
 
+  onDeleteButtonClick() {
+    console.log('Delete button');
+    this.floatingWarningBoxTitle = 'Delete record';
+    this.floatingWarningBoxMessage =
+      'Are you sure you want to delete this education data record, data will be permanently lost?';
+    this.isDeleteOperation = true;
+    this.confirmButtonColor = 'red';
+    this.confirmButtonText = 'Yes, delete';
+    this.cancelButtonText = "No, don't delete";
+    this.cancelButtonColor = 'blue';
+    this.toggleWarningBox();
+  }
+
   onCancelButtonClick() {
     this.toggleWarningBox();
   }
 
   onConfirmButtonClick() {
-    if (!this.currentDataOperation) {
+    if (!this.currentDataOperation && !this.isDeleteOperation) {
       this.toggleWarningBox();
       this.toggleFloatingBox();
     }
-    if (this.currentDataOperation) {
+
+    if (this.currentDataOperation && !this.isDeleteOperation) {
       if (this.isCreateOrEditMode) {
+        this.floatingWarningBoxMessage = 'Saving data...';
+        this.floatingWarningBoxMessageColor = 'orange';
+        this.isDataTransmissionActive = true;
+        this.isDataTransmissionComplete = false;
         this.createEducationInformation();
       }
       if (!this.isCreateOrEditMode) {
+        this.floatingWarningBoxMessage = 'Saving changes...';
+        this.floatingWarningBoxMessageColor = 'orange';
+        this.isDataTransmissionActive = true;
+        this.isDataTransmissionComplete = false;
         this.updateEducationInformation();
       }
+    }
+    if (this.isDeleteOperation) {
+      this.floatingWarningBoxMessage = 'Deleting record...';
+      this.floatingWarningBoxMessage = 'Saving changes...';
+      this.floatingWarningBoxMessageColor = 'orange';
+      this.isDataTransmissionActive = true;
+      this.isDataTransmissionComplete = false;
+      this.deleteEducationInformation();
     }
   }
 
   createEducationInformation() {
     console.log('Saving data...');
+    const newEducationInformationRequest: EducationInformationHttpSaveRequest =
+      {
+        institutionName:
+          this.educationInformationFormGroup.controls.institutionName.value,
+        institutionOfficialWebsite:
+          this.educationInformationFormGroup.controls.institutionOfficialWebsite
+            .value,
+        institutionAddress:
+          this.educationInformationFormGroup.controls.institutionAddress.value,
+        educationLevel: this.educationInformationFormGroup.controls
+          .educationLevel.value as string,
+        fieldOfStudy: this.educationInformationFormGroup.controls.fieldOfStudy
+          .value as string,
+        minorFieldOfStudy:
+          this.educationInformationFormGroup.controls.minorFieldOfStudy.value,
+        startDate: this.educationInformationFormGroup.controls.startDate.value,
+        endDate: this.educationInformationFormGroup.controls.endDate.value,
+        isCompleted: this.educationInformationFormGroup.controls
+          .isCompletedFormGroup.controls.firstOption.value as boolean,
+        finalGrade:
+          this.educationInformationFormGroup.controls.finalGrade.value,
+        description:
+          this.educationInformationFormGroup.controls.description.value,
+      };
+    this.continueButtonText = 'View all education information';
+    this.continueButtonColor = 'orange';
+    this.accountService
+      .createPersonEducationInformation(newEducationInformationRequest)
+      .subscribe((response) => {
+        if (response.success === 'true') {
+          console.log(
+            'Education information saved successfully: ',
+            response.data
+          );
+          this.isDataTransmissionActive = false;
+          this.isDataTransmissionComplete = true;
+          this.floatingWarningBoxMessage = 'Data saved successfully';
+          this.floatingWarningBoxMessageColor = 'green';
+        }
+        if (response.success !== 'true') {
+          console.log('Error saving education information: ', response.message);
+          this.isDataTransmissionActive = false;
+          this.isDataTransmissionComplete = true;
+          this.floatingWarningBoxMessage =
+            'Failed to add data, ' + response.message;
+          this.floatingWarningBoxMessageColor = 'red';
+          if (
+            response.message ===
+            'Cannot add more than 5 education information per account'
+          ) {
+            this.isMaxNumberOfRecordsReached = true;
+          }
+        }
+      });
   }
 
   updateEducationInformation() {
     console.log('Updating data...');
+    const updatedEducationInformationRequest: EducationInformationHttpUpdateRequest =
+      {
+        personEducationInformationId: this.educationInformation
+          ?.personEducationInformationId as string,
+        institutionName:
+          this.educationInformationFormGroup.controls.institutionName.value,
+        institutionOfficialWebsite:
+          this.educationInformationFormGroup.controls.institutionOfficialWebsite
+            .value,
+        institutionAddress:
+          this.educationInformationFormGroup.controls.institutionAddress.value,
+        educationLevel:
+          this.educationInformationFormGroup.controls.educationLevel.value,
+        fieldOfStudy:
+          this.educationInformationFormGroup.controls.fieldOfStudy.value,
+        minorFieldOfStudy:
+          this.educationInformationFormGroup.controls.minorFieldOfStudy.value,
+        startDate: this.educationInformationFormGroup.controls.startDate.value,
+        endDate: this.educationInformationFormGroup.controls.endDate.value,
+        isCompleted:
+          this.educationInformationFormGroup.controls.isCompletedFormGroup
+            .controls.firstOption.value,
+        finalGrade:
+          this.educationInformationFormGroup.controls.finalGrade.value,
+        description:
+          this.educationInformationFormGroup.controls.description.value,
+      };
+    this.accountService
+      .updateEducationInformation(updatedEducationInformationRequest)
+      .subscribe((response) => {
+        if (response.success === 'true') {
+          console.log(
+            'Education information saved successfully: ',
+            response.data
+          );
+          this.isDataTransmissionActive = false;
+          this.isDataTransmissionComplete = true;
+          this.floatingWarningBoxMessage = 'Changes applied successfully';
+          this.floatingWarningBoxMessageColor = 'green';
+          this.goBackButtonColor = 'orange';
+        }
+        if (response.success !== 'true') {
+          console.log('Error saving education information: ', response.message);
+          this.isDataTransmissionActive = false;
+          this.isDataTransmissionComplete = true;
+          this.floatingWarningBoxMessage =
+            'Failed to add data, ' + response.message;
+          this.floatingWarningBoxMessageColor = 'red';
+          if (
+            response.message ===
+            'Cannot add more than 5 education information per account'
+          ) {
+            this.isMaxNumberOfRecordsReached = true;
+          }
+        }
+      });
+  }
+
+  deleteEducationInformation() {
+    console.log('Deleting data...');
+    this.accountService
+      .deleteEducationInformation(
+        this.educationInformation?.personEducationInformationId as string
+      )
+      .subscribe((response) => {
+        if (response.success === 'true') {
+          console.log('Education information record deleted successfully');
+          this.isDataTransmissionActive = false;
+          this.isDataTransmissionComplete = true;
+          this.floatingWarningBoxMessage = 'Changes applied successfully';
+          this.floatingWarningBoxMessageColor = 'green';
+          this.goBackButtonColor = 'orange';
+        }
+        if (response.success !== 'true') {
+          console.log(
+            'Error deleting education information: ',
+            response.message
+          );
+          this.isDataTransmissionActive = false;
+          this.isDataTransmissionComplete = true;
+          this.floatingWarningBoxMessage =
+            'Failed to delete data, ' + response.message;
+          this.floatingWarningBoxMessageColor = 'red';
+        }
+      });
+  }
+  onSeeAllEducationInformationButtonClick() {
+    this.toggleWarningBox();
+    this.toggleFloatingBox();
   }
 }

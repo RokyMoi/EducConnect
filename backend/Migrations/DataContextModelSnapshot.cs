@@ -546,9 +546,8 @@ namespace EduConnect.Migrations
                     b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
 
-                    b.Property<string>("Industry")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("IndustryClassificationId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("JobDescription")
                         .HasColumnType("nvarchar(max)");
@@ -582,6 +581,8 @@ namespace EduConnect.Migrations
                     b.HasKey("PersonCareerInformationId");
 
                     b.HasIndex("EmploymentTypeId");
+
+                    b.HasIndex("IndustryClassificationId");
 
                     b.HasIndex("PersonId");
 
@@ -762,6 +763,31 @@ namespace EduConnect.Migrations
                     b.HasKey("EmploymentTypeId");
 
                     b.ToTable("EmploymentType", "Reference");
+                });
+
+            modelBuilder.Entity("backend.Entities.Reference.IndustryClassification", b =>
+                {
+                    b.Property<Guid>("IndustryClassificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Industry")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sector")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("IndustryClassificationId");
+
+                    b.ToTable("IndustryClassification", "Reference");
                 });
 
             modelBuilder.Entity("backend.Entities.Reference.WorkType", b =>
@@ -969,6 +995,12 @@ namespace EduConnect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("backend.Entities.Reference.IndustryClassification", "IndustryClassification")
+                        .WithMany()
+                        .HasForeignKey("IndustryClassificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("EduConnect.Entities.Person.Person", "Person")
                         .WithMany()
                         .HasForeignKey("PersonId")
@@ -980,6 +1012,8 @@ namespace EduConnect.Migrations
                         .HasForeignKey("WorkTypeId");
 
                     b.Navigation("EmploymentType");
+
+                    b.Navigation("IndustryClassification");
 
                     b.Navigation("Person");
 

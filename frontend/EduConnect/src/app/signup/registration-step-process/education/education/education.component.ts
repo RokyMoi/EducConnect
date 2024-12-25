@@ -13,6 +13,7 @@ import { AccountService } from '../../../../services/account.service';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { EducationService } from '../../../../services/education/education-service/education-service.service';
+import { TutorRegistrationStatusService } from '../../../../services/tutor/tutor-status/tutor-status.service';
 
 @Component({
   selector: 'app-education',
@@ -23,8 +24,14 @@ import { EducationService } from '../../../../services/education/education-servi
 export class EducationComponent implements OnInit, OnDestroy {
   accountService = inject(AccountService);
   educationService = inject(EducationService);
+  tutorService = inject(TutorRegistrationStatusService);
+  router = inject(Router);
+
+  isMaxNumberOfRecordsReached: boolean = false;
+
   private refreshSubscription: Subscription = new Subscription();
   ngOnInit(): void {
+    this.tutorService.checkTutorRegistrationStatus();
     console.log('Education component initialized');
     this.loadEducationInformation();
 
@@ -46,7 +53,10 @@ export class EducationComponent implements OnInit, OnDestroy {
   isEditModalOpen = false;
   selectedEducationLogIndex: number | null = null;
 
-  warningBoxTestTitle: string = 'This is a warning box';
+  //Variables for continue to the next step button
+  isStepCompleted: boolean = this.educationLogGroups.length > 0;
+  continueToNextStepButtonText = 'Continue to the Career Information step';
+  continueButtonColor: string = 'blue';
 
   addNewEducationLog() {
     const newEducationInformation: EducationInformation = {
@@ -71,7 +81,10 @@ export class EducationComponent implements OnInit, OnDestroy {
       'Selected log from the list: ',
       this.educationLogGroups[logIndex]
     );
-
+    console.log(
+      'Education information id:',
+      this.educationLogGroups[logIndex].personEducationInformationId
+    );
     this.selectedEducationLogIndex = logIndex;
     this.selectedGroup = log;
     this.toggleEducationLogVisibility();
@@ -102,6 +115,9 @@ export class EducationComponent implements OnInit, OnDestroy {
           this.educationLogGroups = educationInformationArray;
           this.gridItems = [...this.educationLogGroups];
           console.log('Education information loaded:', this.educationLogGroups);
+          this.isMaxNumberOfRecordsReached =
+            this.educationLogGroups.length >= 5;
+          this.isStepCompleted = this.educationLogGroups.length > 0;
         } else if (result?.success === 'false' && !result.data) {
           // No data found
           console.log('No education data found:', result.message);
@@ -118,5 +134,11 @@ export class EducationComponent implements OnInit, OnDestroy {
       });
   }
 
-  
+  routeToCareerInformation() {
+    if (this.isStepCompleted) {
+      this.router.navigateByUrl('/signup/career');
+    } else {
+      console.log('Please complete the Education step before proceeding.');
+    }
+  }
 }

@@ -17,6 +17,15 @@ export default class ApiLinks {
     ApiLinks.baseUrl + 'reference/tutor-registration-status/all';
   //Get all countries
   public static readonly getAllCountries = ApiLinks.baseUrl + 'country/all';
+  //Get all employment types
+  public static readonly getAllEmploymentTypes =
+    ApiLinks.baseUrl + 'reference/employment-type/all';
+  //Get all industry classifications
+  public static readonly getAllIndustryClassifications =
+    ApiLinks.baseUrl + 'reference/industry-classification/all';
+  //Get all work types
+  public static readonly getAllWorkTypes =
+    ApiLinks.baseUrl + 'reference/work-type/all';
 
   //PersonPhoneNumber controller
   //Add phone number
@@ -34,4 +43,22 @@ export default class ApiLinks {
   //Get all education information
   public static readonly getAllEducationInformation =
     ApiLinks.baseUrl + 'person/education/all';
+  //Update education information by id from the body
+  public static readonly updateEducationInformation =
+    ApiLinks.baseUrl + 'person/education';
+  //Delete education information by id
+  public static readonly deleteEducationInformation =
+    ApiLinks.baseUrl + 'person/education';
+
+  //PersonCareerInformation controller
+  //Get all career information by person id
+  public static readonly getAllCareerInformation =
+    ApiLinks.baseUrl + 'person/career/all';
+  //Add career information
+  public static readonly addCareerInformation =
+    ApiLinks.baseUrl + 'person/career';
+  public static readonly updateCareerInformation =
+    ApiLinks.baseUrl + 'person/career';
+  public static readonly deleteCareerInformation =
+    ApiLinks.baseUrl + 'person/career';
 }

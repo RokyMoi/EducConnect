@@ -72,13 +72,15 @@
             </p>
         </div>
         <div class="row button-row">
-
+            <app-submit-button *ngIf="!isCreateOrEditMode" [submitButtonText]="deleteButtonText"
+                [buttonBackgroundColor]="deleteButtonColor" (buttonClick)="onDeleteButtonClick()"></app-submit-button>
             <app-submit-button *ngIf="hasChanges" [submitButtonText]="discardButtonText"
                 [buttonBackgroundColor]="discardButtonColor" (buttonClick)="onDiscardButtonClick()"></app-submit-button>
             <app-submit-button *ngIf="hasChanges" [submitButtonText]="submitButtonText"
                 [buttonBackgroundColor]="submitButtonColor" (buttonClick)="onSaveButtonClick()"></app-submit-button>
             <app-submit-button *ngIf="!hasChanges" [submitButtonText]="goBackButtonText"
                 [buttonBackgroundColor]="goBackButtonColor" (buttonClick)="toggleFloatingBox()"></app-submit-button>
+
 
         </div>
 
@@ -89,10 +91,24 @@
 
 <app-floating-warning-box *ngIf="showWarningBox" [warningTitle]="floatingWarningBoxTitle"
     (toggleFloatingBox)="toggleFloatingBox()">
-    <p [style.color]="floatingWarningBoxMessageColor">{{floatingWarningBoxMessage}}</p>
-    <app-submit-button [buttonBackgroundColor]="confirmButtonColor" [submitButtonText]="confirmButtonText"
+    <p [style.color]="floatingWarningBoxMessageColor" [style.font-size]="'24px'">{{floatingWarningBoxMessage}}</p>
+    <div class="announcementDiv" *ngIf="isDataTransmissionActive">
+
+        <mat-progress-spinner [mode]="spinnerMode" class="spinner-color"
+            [style.stroke]="spinnerColor"></mat-progress-spinner>
+    </div>
+    <app-submit-button *ngIf="!isDataTransmissionComplete && !isDataTransmissionComplete"
+        [buttonBackgroundColor]="confirmButtonColor" [submitButtonText]="confirmButtonText"
         [buttonMargin]="warningBoxButtonMargin" (buttonClick)="onConfirmButtonClick()"></app-submit-button>
-    <app-submit-button [buttonBackgroundColor]="cancelButtonColor" [submitButtonText]="cancelButtonText"
+    <app-submit-button *ngIf="!isDataTransmissionComplete && !isDataTransmissionComplete"
+        [buttonBackgroundColor]="cancelButtonColor" [submitButtonText]="cancelButtonText"
         [buttonMargin]="warningBoxButtonMargin" (buttonClick)="onCancelButtonClick()"></app-submit-button>
+
+    <app-submit-button *ngIf="isDataTransmissionComplete" [buttonBackgroundColor]="continueButtonColor"
+        [submitButtonText]="continueButtonText" [buttonMargin]="warningBoxButtonMargin"
+        (buttonClick)="onSeeAllEducationInformationButtonClick()"></app-submit-button>
+    <app-submit-button *ngIf="isDataTransmissionComplete && !isMaxNumberOfRecordsReached"
+        [buttonBackgroundColor]="goBackButtonColor" [submitButtonText]="goBackButtonText"
+        [buttonMargin]="warningBoxButtonMargin" (buttonClick)="onGoBack()"></app-submit-button>
 
 </app-floating-warning-box>

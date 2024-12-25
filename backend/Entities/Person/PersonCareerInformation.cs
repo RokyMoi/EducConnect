@@ -41,7 +41,11 @@ namespace backend.Entities.Person
         public string? Responsibilities { get; set; } = string.Empty;
         public string? Achievements { get; set; } = string.Empty;
         [Required]
-        public required string Industry { get; set; }
+        public required Guid IndustryClassificationId { get; set; }
+
+        //Navigation property
+        [ForeignKey(nameof(IndustryClassificationId))]
+        public IndustryClassification IndustryClassification { get; set; }
         [Required]
         public required string SkillsUsed { get; set; }
 

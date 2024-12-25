@@ -1,14 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, Signal, signal } from '@angular/core';
 import { User } from '../_models/User';
-import { map, Subject } from 'rxjs';
+import { map, Subject, Observable, catchError, of } from 'rxjs';
 import ApiLinks from '../../assets/api/link.api';
 import { Router } from '@angular/router';
 
 import ErrorHttpResponseData from '../_models/data/http.response.data/error.http.response.data';
 import EducationInformation from '../_models/person/education/educationInformation.education.person';
-import EducationInformationHttpRequest from '../_models/person/education/request.educationInformation.education.person';
 import SuccessHttpResponseData from '../_models/data/http.response.data/success.http.response.data';
+import EducationInformationHttpSaveRequest from '../_models/person/education/educationInformationSaveRequst';
+import EducationInformationHttpSaveResponse from '../_models/person/education/educationInformationHttpSaveResponse';
+import EducationInformationHttpUpdateRequest from '../_models/person/education/EducationInformationHttpUpdateRequest';
+import CareerInformationHttpSaveRequest from '../_models/person/career/careerInformationHttpSaveRequest';
+import CareerInformationHttpUpdateRequest from '../_models/person/career/careerInformationHttpUpdateRequest';
 
 @Injectable({
   providedIn: 'root',
@@ -265,48 +269,50 @@ export class AccountService {
       });
     return resultSubject.toPromise();
   }
-
+  /**
+   *
+   * @param educationInformation - EducationInformationHttpSaveRequest object containing the education information to be saved
+   * @returns Observable of SuccessHttpResponseData or ErrorHttpResponseData
+   */
   createPersonEducationInformation(
-    educationInformation: EducationInformationHttpRequest
-  ) {
+    educationInformation: EducationInformationHttpSaveRequest
+  ): Observable<SuccessHttpResponseData | ErrorHttpResponseData> {
     const authorization = this.getAccessToken();
-    const resultSubject = new Subject<
-      SuccessHttpResponseData | ErrorHttpResponseData
-    >();
-    this.http
-      .post(ApiLinks.addEducationInformation, educationInformation, {
-        headers: {
-          Authorization: `Bearer ${authorization}`,
-        },
-      })
-      .subscribe({
-        next: (response) => {
-          console.log('Education information saved:', response);
-          const successResponse: SuccessHttpResponseData = {
-            success: 'true',
-            data: (response as any).data,
+    return this.http
+      .post<EducationInformationHttpSaveResponse>(
+        ApiLinks.addEducationInformation,
+        educationInformation,
+        {
+          headers: {
+            Authorization: `Bearer ${authorization}`,
+          },
+        }
+      )
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          return {
+            success: (response as any).success,
+            data: (response as any).data.personEducationInformation,
             message: (response as any).message,
             statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
           };
-          resultSubject.next(successResponse);
-          resultSubject.complete();
-        },
-        error: (error) => {
-          console.error('Error saving education data:', error);
-          const errorResponse: ErrorHttpResponseData = {
-            success: 'false',
-            data: null,
-            message: error.error.message,
-            statusCode: error.status,
-            statusText: error.statusText,
-          };
-
-          resultSubject.next(errorResponse);
-          resultSubject.complete();
-        },
-      });
-
-    return resultSubject.toPromise();
+          console.error(
+            'Error creating education information:',
+            failedResponse
+          );
+          return of(failedResponse);
+        })
+      );
   }
 
   getAllEducationInformation() {
@@ -347,5 +353,224 @@ export class AccountService {
         },
       });
     return resultSubject.toPromise();
+  }
+
+  /**
+   * Updates the education information for the authenticated user.
+   *
+   * @param educationInformation - The updated education information to be saved.
+   * @returns An observable that emits a `SuccessHttpResponseData` or `ErrorHttpResponseData` object, representing the success or failure of the update operation.
+   */
+  updateEducationInformation(
+    educationInformation: EducationInformationHttpUpdateRequest
+  ) {
+    const authorization = this.getAccessToken();
+    return this.http
+      .put(ApiLinks.updateEducationInformation, educationInformation, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          return {
+            success: (response as any).success,
+            data: (response as any).data.educationInformation,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error(
+            'Error creating education information:',
+            failedResponse
+          );
+          return of(failedResponse);
+        })
+      );
+  }
+
+  deleteEducationInformation(
+    educationInformationId: string
+  ): Observable<SuccessHttpResponseData | ErrorHttpResponseData> {
+    const authorization = this.getAccessToken();
+    const requestBody = {
+      personEducationInformationId: educationInformationId,
+    };
+    return this.http
+      .delete(ApiLinks.deleteEducationInformation, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+        body: requestBody,
+      })
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          return {
+            success: (response as any).success,
+            data: (response as any).data.educationInformation,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error(
+            'Error creating education information:',
+            failedResponse
+          );
+          return of(failedResponse);
+        })
+      );
+  }
+
+  getAllCareerInformation(): Observable<
+    SuccessHttpResponseData | ErrorHttpResponseData
+  > {
+    const authorization = this.getAccessToken();
+
+    return this.http
+      .get(ApiLinks.getAllCareerInformation, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data.careerInformation,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+        }),
+        catchError((error) => {
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  createCareerInformation(
+    careerInformation: CareerInformationHttpSaveRequest
+  ): Observable<SuccessHttpResponseData | ErrorHttpResponseData> {
+    const authorization = this.getAccessToken();
+    return this.http
+      .post(ApiLinks.addCareerInformation, careerInformation, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          return {
+            success: (response as any).success,
+            data: (response as any).data.careerInformation,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error('Error creating career information:', failedResponse);
+          return of(failedResponse);
+        })
+      );
+  }
+
+  updateCareerInformation(
+    careerInformation: CareerInformationHttpUpdateRequest
+  ) {
+    const authorization = this.getAccessToken();
+    return this.http
+      .put(ApiLinks.updateCareerInformation, careerInformation, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          return {
+            success: (response as any).success,
+            data: (response as any).data.careerInformation,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error('Error creating career information:', failedResponse);
+          return of(failedResponse);
+        })
+      );
+  }
+
+  deleteCareerInformation(careerInformationId: string) {
+    const requestBody = {
+      personCareerInformationId: careerInformationId,
+    };
+    const authorization = this.getAccessToken();
+    return this.http
+      .delete(ApiLinks.deleteCareerInformation, {
+        body: requestBody,
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          return {
+            success: (response as any).success,
+            data: (response as any).data.careerInformation,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error('Error creating career information:', failedResponse);
+          return of(failedResponse);
+        })
+      );
   }
 }

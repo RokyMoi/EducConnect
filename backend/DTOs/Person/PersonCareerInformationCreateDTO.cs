@@ -24,7 +24,7 @@ namespace backend.DTOs.Person
         public string? JobDescription { get; set; }
         public string? Responsibilities { get; set; }
         public string? Achievements { get; set; }
-        public string Industry { get; set; }
+        public Guid IndustryClassificationId { get; set; }
         public string SkillsUsed { get; set; }
         public int? WorkTypeId { get; set; }
         public string? AdditionalInformation { get; set; }

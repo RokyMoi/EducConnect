@@ -36,6 +36,10 @@ namespace backend.Repositories.Person
                 workType = await _dataContext.WorkType.Where(x => x.WorkTypeId == newPersonCareerInformation.WorkTypeId).FirstOrDefaultAsync();
             }
 
+            //Fetch IndustryClassification
+
+            IndustryClassification industryClassification = await _dataContext.IndustryClassification.Where(i => i.IndustryClassificationId == newPersonCareerInformation.IndustryClassificationId).FirstOrDefaultAsync();
+
             //Create a new PersonCareerInformation object
             PersonCareerInformation personCareerInformation = new PersonCareerInformation()
             {
@@ -55,7 +59,8 @@ namespace backend.Repositories.Person
                 JobDescription = newPersonCareerInformation.JobDescription,
                 Responsibilities = newPersonCareerInformation.Responsibilities,
                 Achievements = newPersonCareerInformation.Achievements,
-                Industry = newPersonCareerInformation.Industry,
+                IndustryClassificationId = newPersonCareerInformation.IndustryClassificationId,
+                IndustryClassification = industryClassification,
                 SkillsUsed = newPersonCareerInformation.SkillsUsed,
                 WorkTypeId = newPersonCareerInformation.WorkTypeId,
                 WorkType = workType,
@@ -98,7 +103,7 @@ namespace backend.Repositories.Person
                 JobDescription = personCareerInformation.JobDescription,
                 Responsibilities = personCareerInformation.Responsibilities,
                 Achievements = personCareerInformation.Achievements,
-                Industry = personCareerInformation.Industry,
+                IndustryClassificationId = personCareerInformation.IndustryClassificationId,
                 SkillsUsed = personCareerInformation.SkillsUsed,
                 WorkTypeId = personCareerInformation.WorkTypeId,
                 AdditionalInformation = personCareerInformation.AdditionalInformation,
@@ -146,7 +151,7 @@ namespace backend.Repositories.Person
                 JobDescription = personCareerInformation.JobDescription,
                 Responsibilities = personCareerInformation.Responsibilities,
                 Achievements = personCareerInformation.Achievements,
-                Industry = personCareerInformation.Industry,
+                IndustryClassificationId = personCareerInformation.IndustryClassificationId,
                 SkillsUsed = personCareerInformation.SkillsUsed,
                 WorkTypeId = personCareerInformation.WorkTypeId,
                 AdditionalInformation = personCareerInformation.AdditionalInformation,
@@ -157,7 +162,7 @@ namespace backend.Repositories.Person
         public async Task<List<PersonCareerInformationDTO>> GetAllPersonCareerInformationByPersonId(Guid personId)
         {
             //Get all person career information by person id
-            List<PersonCareerInformation> personCareerInformationList = await _dataContext.PersonCareerInformation.Where(p => p.PersonId == personId).ToListAsync();
+            List<PersonCareerInformation> personCareerInformationList = await _dataContext.PersonCareerInformation.Include(x => x.IndustryClassification).Where(p => p.PersonId == personId).ToListAsync();
 
             //If there is no career information for the given person, return null
             if (personCareerInformationList == null)
@@ -188,7 +193,9 @@ namespace backend.Repositories.Person
                     JobDescription = careerInformation.JobDescription,
                     Responsibilities = careerInformation.Responsibilities,
                     Achievements = careerInformation.Achievements,
-                    Industry = careerInformation.Industry,
+                    IndustryClassificationId = careerInformation.IndustryClassificationId,
+                    Industry = careerInformation.IndustryClassification.Industry,
+                    Sector = careerInformation.IndustryClassification.Sector,
                     SkillsUsed = careerInformation.SkillsUsed,
                     WorkTypeId = careerInformation.WorkTypeId,
                     AdditionalInformation = careerInformation.AdditionalInformation
@@ -225,7 +232,7 @@ namespace backend.Repositories.Person
                 JobDescription = careerInformation.JobDescription,
                 Responsibilities = careerInformation.Responsibilities,
                 Achievements = careerInformation.Achievements,
-                Industry = careerInformation.Industry,
+                IndustryClassificationId = careerInformation.IndustryClassificationId,
                 SkillsUsed = careerInformation.SkillsUsed,
                 WorkTypeId = careerInformation.WorkTypeId,
                 AdditionalInformation = careerInformation.AdditionalInformation
@@ -259,7 +266,7 @@ namespace backend.Repositories.Person
             personCareerInformation.JobDescription = updateDTO.JobDescription;
             personCareerInformation.Responsibilities = updateDTO.Responsibilities;
             personCareerInformation.Achievements = updateDTO.Achievements;
-            personCareerInformation.Industry = updateDTO.Industry;
+            personCareerInformation.IndustryClassificationId = updateDTO.IndustryClassificationId;
             personCareerInformation.SkillsUsed = updateDTO.SkillsUsed;
             personCareerInformation.WorkTypeId = updateDTO.WorkTypeId;
             personCareerInformation.AdditionalInformation = updateDTO.AdditionalInformation;
@@ -298,7 +305,7 @@ namespace backend.Repositories.Person
                 JobDescription = personCareerInformation.JobDescription,
                 Responsibilities = personCareerInformation.Responsibilities,
                 Achievements = personCareerInformation.Achievements,
-                Industry = personCareerInformation.Industry,
+                IndustryClassificationId = personCareerInformation.IndustryClassificationId,
                 SkillsUsed = personCareerInformation.SkillsUsed,
                 WorkTypeId = personCareerInformation.WorkTypeId,
                 AdditionalInformation = personCareerInformation.AdditionalInformation,

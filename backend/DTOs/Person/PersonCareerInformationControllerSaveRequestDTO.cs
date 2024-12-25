@@ -9,9 +9,7 @@ namespace backend.DTOs.Person
 {
     public class PersonCareerInformationControllerSaveRequestDTO
     {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+
 
         [Required]
         public string CompanyName { get; set; }
@@ -27,7 +25,7 @@ namespace backend.DTOs.Person
 
         public string CountryOfEmployment { get; set; }
         [Required]
-        public int EmploymentType { get; set; }
+        public int EmploymentTypeId { get; set; }
 
         [Required]
         public DateOnly StartDate { get; set; }
@@ -38,7 +36,7 @@ namespace backend.DTOs.Person
         public string? Responsibilities { get; set; } = string.Empty;
         public string? Achievements { get; set; } = string.Empty;
         [Required]
-        public required string Industry { get; set; }
+        public required Guid IndustryClassificationId { get; set; }
         [Required]
         public required string SkillsUsed { get; set; }
 

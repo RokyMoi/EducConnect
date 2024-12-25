@@ -3,7 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import ApiLinks from '../../../../assets/api/link.api';
 import ITutorRegistrationStatus from '../../../_models/Tutor/tutorRegistrationStatus.tutor';
 import { AccountService } from '../../account.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, catchError, of, map, Observable } from 'rxjs';
+import SuccessHttpResponseData from '../../../_models/data/http.response.data/success.http.response.data';
+import ErrorHttpResponseData from '../../../_models/data/http.response.data/error.http.response.data';
 
 @Injectable({
   providedIn: 'root',
@@ -57,24 +59,68 @@ export class TutorRegistrationStatusService {
           //The tutor user has not completed the registration process, so the user will be redirected to the adequate registration step page
           console.log('User has not completed the registration process');
 
-          //If the user status is with Id 2 (Email is verified), then route the user to enter their phone number
+          //If the user status is with Id 2 (Email is verified), then route the user to the next step, which is to enter their phone number (Id 3, Phone Number)
           if (this.currentStatus?.tutorRegistrationStatusId === 2) {
             this.accountService.router.navigateByUrl('/signup/phone-number');
           }
 
-          //If the user status is with Id 3 (User have entered their phone number), then route the user to enter their personal information
+          //If the user status is with Id 3 (User have entered their phone number), then route the user to the next step, which is to enter their personal information (Id 4, Personal information)
           if (this.currentStatus?.tutorRegistrationStatusId === 3) {
             this.accountService.router.navigateByUrl(
               '/signup/personal-information'
             );
           }
 
-          //If the user status is with Id 4 (User have entered their personal information), then route the user to enter their education information
+          //If the user status is with Id 4 (User have entered their personal information), then route the user to the next step which is to enter their education information (Id 5, Education)
           if (this.currentStatus?.tutorRegistrationStatusId === 4) {
             this.accountService.router.navigateByUrl('/signup/education');
+          }
+
+          //If the user status is with Id 5 (User have entered their education information), then route the user to the next step which is to enter their career information (Id 6, Career)
+          if (this.currentStatus?.tutorRegistrationStatusId === 5) {
+            this.accountService.router.navigateByUrl('/signup/career');
           }
         }
       },
     });
+  }
+
+  public getTutorRegistrationStatus(
+    authorization: string
+  ): Observable<SuccessHttpResponseData | ErrorHttpResponseData> {
+    return this.http
+      .get<ITutorRegistrationStatus>(
+        ApiLinks.getCurrentTutorRegistrationStatus,
+        {
+          headers: {
+            Authorization: `Bearer ${authorization}`,
+          },
+        }
+      )
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          return {
+            success: (response as any).success,
+            data: (response as any).data.tutorRegistrationStatus,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error(
+            'Error creating education information:',
+            failedResponse
+          );
+          return of(failedResponse);
+        })
+      );
   }
 }

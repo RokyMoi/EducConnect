@@ -38,8 +38,11 @@ namespace EduConnect.Extensions
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
 
+
             //Add Database Seeders as Scoped services
             services.AddScoped<CountryExtractor>();
+            services.AddScoped<ExtractIndustryClassification>();
+
             services.AddScoped<WorkTypeDatabaseSeeder>();
             services.AddScoped<EmploymentTypeDatabaseSeeder>();
             services.AddScoped<TutorRegistrationStatusDataSeeder>();
@@ -52,6 +55,7 @@ namespace EduConnect.Extensions
             services.AddScoped<CheckPersonLoginSignupAttribute>();
             //ADD HOSTED SERVICES
             services.AddHostedService<CountrySeederHostedService>();
+            services.AddHostedService<IndustryClassificationHostedService>();
 
 
 

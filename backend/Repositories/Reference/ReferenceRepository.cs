@@ -19,9 +19,36 @@ namespace backend.Repositories.Reference
             this._dataContext = dataContext;
         }
 
+        public async Task AddIndustryClassificationsToDatabase(List<IndustryClassification> industryClassifications)
+        {
+            try
+            {
+                var isDatabaseEmpty = await _dataContext.IndustryClassification.FirstOrDefaultAsync();
+                if (isDatabaseEmpty != null)
+                {
+                    return;
+                }
+
+                await _dataContext.IndustryClassification.AddRangeAsync(industryClassifications);
+                await _dataContext.SaveChangesAsync();
+                Console.WriteLine($"Successfully added {industryClassifications.Count} industry classifications to the database.");
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine($"An error occurred while adding industry classifications: {ex.Message}");
+
+            }
+        }
+
         public async Task<List<EmploymentType>> GetAllEmploymentTypesAsync()
         {
             return await _dataContext.EmploymentType.ToListAsync();
+        }
+
+        public async Task<List<IndustryClassification>> GetAllIndustryClassificationsAsync()
+        {
+            return await _dataContext.IndustryClassification.ToListAsync();
         }
 
         public async Task<List<TutorRegistrationStatus>> GetAllTutorRegistrationStatusesAsync()
@@ -48,6 +75,11 @@ namespace backend.Repositories.Reference
         public async Task<EngagementMethod?> GetEngagementMethodByIdAsync(int id)
         {
             return await _dataContext.EngagementMethod.Where(x => x.EngagementMethodId == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<IndustryClassification?> GetIndustryClassificationByIdAsync(Guid id)
+        {
+            return await _dataContext.IndustryClassification.Where(x => x.IndustryClassificationId == id).FirstOrDefaultAsync();
         }
 
         public async Task<TutorRegistrationStatus?> GetTutorRegistrationStatusByIdAsync(int id)

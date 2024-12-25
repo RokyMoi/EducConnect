@@ -14,7 +14,7 @@ namespace backend.DTOs.Person
         public string? Position { get; set; }
         public string CityOfEmployment { get; set; }
         public string CountryOfEmployment { get; set; }
-        public int EmploymentType { get; set; }
+        public int EmploymentTypeId { get; set; }
 
         public DateOnly StartDate { get; set; }
 
@@ -22,9 +22,13 @@ namespace backend.DTOs.Person
         public string? JobDescription { get; set; }
         public string? Responsibilities { get; set; }
         public string? Achievements { get; set; }
+        public Guid IndustryClassificationId { get; set; }
         public string Industry { get; set; }
+        public string Sector { get; set; }
+
+
         public string SkillsUsed { get; set; }
-        public int? WorkType { get; set; }
+        public int? WorkTypeId { get; set; }
         public string? AdditionalInformation { get; set; }
 
     }
