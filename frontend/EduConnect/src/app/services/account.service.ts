@@ -13,6 +13,8 @@ import EducationInformationHttpSaveResponse from '../_models/person/education/ed
 import EducationInformationHttpUpdateRequest from '../_models/person/education/EducationInformationHttpUpdateRequest';
 import CareerInformationHttpSaveRequest from '../_models/person/career/careerInformationHttpSaveRequest';
 import CareerInformationHttpUpdateRequest from '../_models/person/career/careerInformationHttpUpdateRequest';
+import { TimeAvailability } from '../_models/person/time-availabilty/time-availability';
+import { TimeAvailabilityHttpSaveRequest } from '../_models/person/time-availabilty/time-availability-http-save-request';
 
 @Injectable({
   providedIn: 'root',
@@ -562,6 +564,41 @@ export class AccountService {
         }),
         catchError((error) => {
           // Transform to ErrorHttpResponseData
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error('Error creating career information:', failedResponse);
+          return of(failedResponse);
+        })
+      );
+  }
+
+  //PersonAvailabilityController
+  createTimeAvailability(timeAvailability: TimeAvailabilityHttpSaveRequest) {
+    const authorization = this.getAccessToken();
+    return this.http
+      .post(ApiLinks.addTimeAvailability, timeAvailability, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          console.log('response', response);
+          return {
+            success: (response as any).success,
+            data: (response as any).data.timeAvailability,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          console.log('error', error);
           const failedResponse: ErrorHttpResponseData = {
             success: (error as any).error.success,
             data: (error as any).error.data,

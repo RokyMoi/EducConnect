@@ -30,7 +30,7 @@ namespace backend.Data.DataSeeder
                 //3. Personal Information, User must enter their personal information, skippable
                 //4. Education, User must enter their education information, skippable
                 //5. Career, User must enter their career information,  skippable
-                //6. Weekly schedule, User must enter their weekly schedule, not skippable
+                //6. Person availability, User must enter times when they are not and when they are available for communication, not skippable
                 //7. Tutoring and teaching information, User must enter information about their tutoring style and teaching preferences, skippable
                 //8. Financial Information, User must enter their financial information, not skippable
                 //9. Registration Complete, User has completed their registration, not skippable
@@ -95,7 +95,7 @@ namespace backend.Data.DataSeeder
                     //Create Status 7: Weekly Schedule
                     new EduConnect.Entities.Tutor.TutorRegistrationStatus
                     {
-                        Name = "Weekly Schedule",
+                        Name = "Availability",
                         Description = "Define your weekly work time and availability for communication with students.",
                         IsSkippable = false,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),

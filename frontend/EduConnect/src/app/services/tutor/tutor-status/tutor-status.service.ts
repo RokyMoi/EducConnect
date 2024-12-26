@@ -80,6 +80,11 @@ export class TutorRegistrationStatusService {
           if (this.currentStatus?.tutorRegistrationStatusId === 5) {
             this.accountService.router.navigateByUrl('/signup/career');
           }
+
+          //If the user status is with Id 6 (User have entered their career information), then route the user to the next step which is to enter their availability during the week (Id 7, Availability)
+          if (this.currentStatus?.tutorRegistrationStatusId === 6) {
+            this.accountService.router.navigateByUrl('/signup/availability');
+          }
         }
       },
     });

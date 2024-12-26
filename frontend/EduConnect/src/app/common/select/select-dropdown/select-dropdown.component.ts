@@ -39,6 +39,7 @@ export class SelectDropdownComponent implements OnInit {
   ];
   @Input() formControl: FormControl = new FormControl('');
   @Input() warning: string = '';
+  @Input() isSelectingValueRequired: boolean = false;
 
   @Output() onChangeEvent = new EventEmitter<Event>();
   // The value that is written to the form control
@@ -49,9 +50,13 @@ export class SelectDropdownComponent implements OnInit {
   onTouched: any = () => {};
 
   ngOnInit(): void {
-    if (this.options.length > 0) {
-      // Set the default value to the first option
-      this.formControl.setValue(this.options[0].name);
+    if (this.options.length === 0) {
+      this.options = [
+        {
+          name: this.placeholder,
+          value: '',
+        },
+      ];
     }
   }
 

@@ -130,6 +130,33 @@ namespace backend.Repositories.Person
             };
         }
 
+
+        /// <summary>
+        /// Checks if the given time interval is available for the specified person on the given day of the week.
+        /// </summary>
+        /// <param name="personId">The ID of the person to check availability for.</param>
+        /// <param name="dayOfWeek">The day of the week to check availability for.</param>
+        /// <param name="startTime">The start time of the interval to check.</param>
+        /// <param name="endTime">The end time of the interval to check.</param>
+        /// <returns>
+        /// <c>true</c> if the interval is available, <c>false</c> if the interval is not available, or <c>null</c> if the end time is less than or equal to the start time.
+        /// </returns>
+        public async Task<bool?> IsIntervalAvailable(Guid personId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan endTime)
+        {
+            if (endTime <= startTime)
+            {
+                return null;
+            }
+
+
+            var isOverlapping = await _dataContext.PersonAvailibility
+            .Where(x => x.PersonId == personId && x.DayOfWeek == dayOfWeek)
+            .AnyAsync(x => startTime < x.EndTime && endTime > x.StartTime);
+
+            return isOverlapping;
+        }
+
+
         public async Task<PersonAvailabilityDTO> UpdatePersonAvailabilityById(PersonAvailabilityDTO updateDTO)
         {
             var personAvailability = await _dataContext.PersonAvailibility.Where(p => p.PersonAvailabilityId == updateDTO.PersonAvailabilityId).FirstOrDefaultAsync();

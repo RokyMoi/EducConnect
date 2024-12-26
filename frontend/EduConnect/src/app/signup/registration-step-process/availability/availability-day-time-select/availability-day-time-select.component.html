@@ -1,0 +1,25 @@
+<div class='container'>
+
+    <div class='hero-container'>
+        <p>Add interval from when to when you are free on which day of the week</p>
+    </div>
+    <div class='option-container'>
+        <app-select-dropdown class="day-option" [options]="dayOfWeekOptions"
+            [formControl]="availabilityFormGroup.controls.dayOfWeek" [label]="dayOfWeekLabel"
+            [placeholder]="dayOfWeekPlaceholder" [warning]="dayOfWeekError"
+            [isSelectingValueRequired]="true"></app-select-dropdown>
+        <app-time-picker class="time-option" [formControl]="availabilityFormGroup.controls.startTime"
+            [label]="startTimeLabel" [placeholder]="startTimePlaceholder" [warning]="startTimeError"></app-time-picker>
+        <app-time-picker class="time-option" [formControl]="availabilityFormGroup.controls.endTime"
+            [label]="endTimeLabel" [placeholder]="endTimePlaceholder" [warning]="endTimeError"></app-time-picker>
+        <app-submit-button [submitButtonText]="addButtonText" [buttonBorderRadius]="'90px'" [buttonFontSize]="'36px'"
+            [buttonPadding]="'0px 18px'" (buttonClick)="addNewAvailabilityInterval()"></app-submit-button>
+    </div>
+    <div 
+    *ngIf="isResponseMessageVisible"
+    class="response-message-container">
+        <p [style.color]="responseMessageColor">
+            {{responseMessage}}
+        </p>
+    </div>
+</div>

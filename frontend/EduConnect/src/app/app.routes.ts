@@ -9,6 +9,7 @@ import { PhoneNumberComponent } from './signup/registration-step-process/phone-n
 import { PersonDetailsComponent } from './signup/registration-step-process/person-details/person-details/person-details.component';
 import { EducationComponent } from './signup/registration-step-process/education/education/education.component';
 import { CareerSignupComponent } from './signup/registration-step-process/career/career-signup/career-signup/career-signup.component';
+import { AvailabilitySignupComponent } from './signup/registration-step-process/availability/availability-signup/availability-signup.component';
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -32,6 +33,10 @@ export const routes: Routes = [
   {
     path: 'signup/career',
     component: CareerSignupComponent,
+  },
+  {
+    path: 'signup/availability',
+    component: AvailabilitySignupComponent,
   },
   { path: '**', component: BodyComponent },
 ];

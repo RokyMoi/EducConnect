@@ -92,9 +92,9 @@ namespace backend.Controllers.Person
             }
 
             //Check TimeSpan StartTime and EndTime
-            TimeSpan startTime;
+            TimeSpan parsedStartTime;
 
-            if (!TimeSpan.TryParse(saveRequestDTO.StartTime, out startTime))
+            if (!TimeSpan.TryParse(saveRequestDTO.StartTime, out parsedStartTime))
             {
                 return BadRequest(
                     new
@@ -106,8 +106,8 @@ namespace backend.Controllers.Person
                     }
                 );
             }
-            TimeSpan endTime;
-            if (!TimeSpan.TryParse(saveRequestDTO.EndTime, out endTime))
+            TimeSpan parsedEndTime;
+            if (!TimeSpan.TryParse(saveRequestDTO.EndTime, out parsedEndTime))
             {
                 return BadRequest(
                     new
@@ -122,7 +122,7 @@ namespace backend.Controllers.Person
 
 
             //Check if the start time is before the end time
-            if (startTime.CompareTo(endTime) >= 0)
+            if (parsedStartTime.CompareTo(parsedEndTime) >= 0)
             {
                 return BadRequest(
                     new
@@ -136,7 +136,7 @@ namespace backend.Controllers.Person
             }
 
             //Check if the start time and end time difference is less than 15 min
-            if (startTime.Subtract(endTime).Duration().Minutes < 15)
+            if (parsedStartTime.Subtract(parsedEndTime).Duration().Minutes < 15)
             {
                 return BadRequest(
                     new
@@ -149,23 +149,38 @@ namespace backend.Controllers.Person
                 );
             }
 
+            //Check if there is overlapping availability interval
+            var isOverlapping = await _personAvailabilityRepository.IsIntervalAvailable(personId, (DayOfWeek)saveRequestDTO.DayOfWeek, parsedStartTime, parsedEndTime);
 
+            Console.WriteLine("Is overlapping: " + isOverlapping);
+            //Check if the interval is available
+            if ((bool)isOverlapping)
+            {
+                return Conflict(
+                    new
+                    {
+                        success = "false",
+                        message = "You already have set this time as available",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    }
+                );
+            }
             //Create a new PersonAvailabilityDTO
             var personAvailabilityDTO = new PersonAvailabilityDTO
             {
                 PersonId = personId,
                 DayOfWeek = (DayOfWeek)saveRequestDTO.DayOfWeek,
-                StartTime = startTime,
-                EndTime = endTime,
+                StartTime = parsedStartTime,
+                EndTime = parsedEndTime,
 
             };
 
 
-            //If the person is a tutor, update the TutorRegistrationStatus to 4 (Education Information)
-            //Check if the person is a tutor, and update their TUtorRegistrationStatusId to 4
+            //If the person is a tutor, update the TutorRegistrationStatus to 7 (User Availability)
             if (tutor != null)
             {
-                var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 8);
+                var updatedTutorRegistrationStatus = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 7);
                 if (updatedTutorRegistrationStatus == null)
                 {
                     return BadRequest(
@@ -185,6 +200,18 @@ namespace backend.Controllers.Person
 
             if (addResult == null)
             {
+
+                //Check if the person is a tutor, if so, check do they have any other records in PersonAvailability table, if they do not have, update the TutorRegistrationStatus to the former registration status of  6 (Career)
+
+                if (tutor != null)
+                {
+
+                    var personAvailabilityList = await _personAvailabilityRepository.GetAllPersonAvailabilityByPersonId(personId);
+                    if (personAvailabilityList.Count == 0)
+                    {
+                        await _tutorRepository.UpdateTutorRegistrationStatus(personId, 6);
+                    }
+                }
                 return StatusCode(500,
                     new
                     {

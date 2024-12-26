@@ -26,7 +26,7 @@ import { FloatingWarningBoxComponent } from '../../../../../common/floating-warn
 import { ErrorStateMatcher } from '@angular/material/core';
 import { AccountService } from '../../../../../services/account.service';
 import EducationInformation from '../../../../../_models/person/education/educationInformation.education.person';
-import DateHelper from '../../../../../helpers/date.helper/date.helper';
+import DateHelper from '../../../../../helpers/date.helper';
 import { DatePickerComponent } from '../../../../../common/input/date/date-picker/date-picker/date-picker.component';
 import { TwoOptionPickerComponent } from '../../../../../common/input/two-option-picker/two-option-picker/two-option-picker.component';
 import {

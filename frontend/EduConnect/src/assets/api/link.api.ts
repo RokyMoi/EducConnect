@@ -61,4 +61,9 @@ export default class ApiLinks {
     ApiLinks.baseUrl + 'person/career';
   public static readonly deleteCareerInformation =
     ApiLinks.baseUrl + 'person/career';
+
+  //PersonTimeAvailability controller
+  //Add time availability
+  public static readonly addTimeAvailability =
+    ApiLinks.baseUrl + 'person/availability';
 }

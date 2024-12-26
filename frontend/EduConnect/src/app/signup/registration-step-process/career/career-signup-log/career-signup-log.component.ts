@@ -25,7 +25,7 @@ import { DatePickerComponent } from '../../../../common/input/date/date-picker/d
 import IndustryClassification from '../../../../_models/reference/industryClassification/industryClassification';
 import WorkType from '../../../../_models/reference/workType/workType';
 import { SubmitButtonComponent } from '../../../../common/button/submit-button/submit-button.component';
-import DateHelper from '../../../../helpers/date.helper/date.helper';
+import DateHelper from '../../../../helpers/date.helper';
 import { forkJoin, tap } from 'rxjs';
 import CareerInformationHttpSaveRequest from '../../../../_models/person/career/careerInformationHttpSaveRequest';
 import { ErrorStateMatcher } from '@angular/material/core';

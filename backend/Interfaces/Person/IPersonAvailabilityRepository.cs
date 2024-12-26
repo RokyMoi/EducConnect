@@ -13,6 +13,12 @@ namespace backend.Interfaces.Person
         Task<List<PersonAvailabilityDTO>> GetAllPersonAvailabilityByPersonId(Guid personId);
         Task<PersonAvailabilityDTO> DeletePersonAvailabilityById(Guid personAvailabilityId);
         Task<PersonAvailabilityDTO> UpdatePersonAvailabilityById(PersonAvailabilityDTO updateDTO);
+        Task<bool?> IsIntervalAvailable(
+            Guid personId,
+            DayOfWeek dayOfWeek,
+            TimeSpan startTime,
+            TimeSpan endTime
+        );
 
     }
 }

@@ -20,6 +20,5 @@ namespace backend.DTOs.Person.PersonAvailability
         public string EndTime { get; set; }
 
 
-
     }
 }
