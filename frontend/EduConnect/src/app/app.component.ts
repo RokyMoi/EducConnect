@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './landingPage/header/header.component';
 import { HttpClient } from '@angular/common/http';
 import { BodyComponent } from './landingPage/body/body.component';
@@ -30,6 +30,7 @@ export class AppComponent implements OnInit {
   users: any;
   isServerRunning = false;
   private AccountService = inject(AccountService);
+  router = inject(Router);
   constructor(private serverHealthCheckService: ServerHealthCheckService) {}
 
   ngOnInit(): void {
@@ -46,6 +47,9 @@ export class AppComponent implements OnInit {
         this.isServerRunning = true;
       }
     );
+  }
+  isThreadComponent(): boolean {
+    return this.router.url.includes('/studentMessageThread');
   }
 
   setCurrentUser() {
