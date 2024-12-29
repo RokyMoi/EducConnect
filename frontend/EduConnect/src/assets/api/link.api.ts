@@ -66,4 +66,13 @@ export default class ApiLinks {
   //Add time availability
   public static readonly addTimeAvailability =
     ApiLinks.baseUrl + 'person/availability';
+  //Get all time availability
+  public static readonly getAllTimeAvailability =
+    ApiLinks.baseUrl + 'person/availability/all';
+  //Update time availability
+  public static readonly updateTimeAvailability =
+    ApiLinks.baseUrl + 'person/availability';
+  //Delete time availability
+  public static readonly deleteTimeAvailability =
+    ApiLinks.baseUrl + 'person/availability';
 }

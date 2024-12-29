@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { SelectDropdownComponent } from '../../../../common/select/select-dropdown/select-dropdown.component';
 import { DatePickerComponent } from '../../../../common/input/date/date-picker/date-picker/date-picker.component';
 import { DayOfWeek } from '../../../../../enums/day-of-week.enum';
@@ -30,6 +30,8 @@ import { NgIf } from '@angular/common';
 export class AvailabilityDayTimeSelectComponent implements OnInit {
   @Input() accountService: AccountService | undefined;
 
+  @Output() triggerRefresh = new EventEmitter<void>();
+  
   dayOfWeekOptions = this.getDayOfWeekOptions();
 
   //Variables for the day of the week select dropdown component
@@ -51,8 +53,8 @@ export class AvailabilityDayTimeSelectComponent implements OnInit {
   addButtonText = '+';
 
   //Variables for the response message component
-  responseMessage = '';
-  responseMessageColor: string = 'green';
+  @Input() responseMessage = '';
+  @Input() responseMessageColor: string = 'green';
   isResponseMessageVisible: boolean = false;
 
   availabilityFormGroup = new FormGroup(
@@ -119,6 +121,7 @@ export class AvailabilityDayTimeSelectComponent implements OnInit {
           if (response.success === 'true') {
             this.responseMessage = 'Availability added successfully';
             this.responseMessageColor = 'green';
+            this.triggerDataRefresh();
           }
 
           if (response.success === 'false' && response.statusCode === 409) {
@@ -225,5 +228,9 @@ export class AvailabilityDayTimeSelectComponent implements OnInit {
       return { startTimeAfterEndTime: true };
     }
     return null;
+  }
+
+  triggerDataRefresh() {
+    this.triggerRefresh.emit();
   }
 }

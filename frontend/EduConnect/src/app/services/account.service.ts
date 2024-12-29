@@ -610,4 +610,111 @@ export class AccountService {
         })
       );
   }
+
+  getAllTimeAvailability() {
+    const authorization = this.getAccessToken();
+    return this.http
+      .get(ApiLinks.getAllTimeAvailability, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          console.log('response', response);
+          return {
+            success: (response as any).success,
+            data: (response as any).data.timeAvailability,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          console.log('error', error);
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error('Error creating career information:', failedResponse);
+          return of(failedResponse);
+        })
+      );
+  }
+
+  updateTimeAvailability(timeAvailability: TimeAvailability) {
+    const authorization = this.getAccessToken();
+    console.log('Token: ', authorization);
+    return this.http
+      .put(ApiLinks.updateTimeAvailability, timeAvailability, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          console.log('response', response);
+          return {
+            success: (response as any).success,
+            data: (response as any).data.timeAvailability,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          console.log('error', error);
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error('Error creating career information:', failedResponse);
+          return of(failedResponse);
+        })
+      );
+  }
+
+  deleteTimeAvailability(timeAvailabilityId: string) {
+    const authorization = this.getAccessToken();
+
+    return this.http
+      .delete(ApiLinks.deleteTimeAvailability, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+        body: {
+          personAvailabilityId: timeAvailabilityId,
+        },
+      })
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          console.log('response', response);
+          return {
+            success: (response as any).success,
+            data: (response as any).data.deletedTimeAvailability,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          console.log('error', error);
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error('Error creating career information:', failedResponse);
+          return of(failedResponse);
+        })
+      );
+  }
 }

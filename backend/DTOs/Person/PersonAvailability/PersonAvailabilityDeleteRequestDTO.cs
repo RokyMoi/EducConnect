@@ -8,9 +8,6 @@ namespace backend.DTOs.Person.PersonAvailability
 {
     public class PersonAvailabilityDeleteRequestDTO
     {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
 
         [Required]
         public Guid PersonAvailabilityId { get; set; }

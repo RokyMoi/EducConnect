@@ -120,7 +120,13 @@ namespace backend.Controllers.Person
                 );
             }
 
-
+            Console.WriteLine("Parsed Start Time: " + parsedStartTime);
+            Console.WriteLine("Parsed End Time: " + parsedEndTime);
+            Console.WriteLine("Start Time in minutes: " + parsedStartTime.TotalMinutes);
+            Console.WriteLine("End Time in minutes: " + parsedEndTime.TotalMinutes);
+            Console.WriteLine("Difference in minutes: " + Math.Abs(
+                parsedEndTime.TotalMinutes - parsedStartTime.TotalMinutes
+            ));
             //Check if the start time is before the end time
             if (parsedStartTime.CompareTo(parsedEndTime) >= 0)
             {
@@ -136,7 +142,9 @@ namespace backend.Controllers.Person
             }
 
             //Check if the start time and end time difference is less than 15 min
-            if (parsedStartTime.Subtract(parsedEndTime).Duration().Minutes < 15)
+            if (Math.Abs(
+                parsedEndTime.TotalMinutes - parsedStartTime.TotalMinutes
+            ) < 15)
             {
                 return BadRequest(
                     new
@@ -352,8 +360,8 @@ namespace backend.Controllers.Person
         }
 
 
-        [HttpPost("all")]
-        public async Task<IActionResult> GetAllPersonAvailabilityByEmail(PersonEmailRequestDTO requestDTO)
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllPersonAvailabilityByEmail()
         {
 
 
@@ -412,26 +420,11 @@ namespace backend.Controllers.Person
 
 
 
-            //Check if a PersonEmail associated with the email from the parameter PersonEmailRequestDTO exists in the database
-            var personEmail = await _personRepository.GetPersonEmailByEmail(requestDTO.Email);
-
-            if (personEmail == null)
-            {
-                return Unauthorized(
-                    new
-                    {
-                        success = "false",
-                        message = "Email does not exist",
-                        data = new { },
-                        timestamp = DateTime.Now,
-                    }
-                );
-            }
 
 
-            //Get all PersonAvailabilityDTOs associated with the PersonId from PersonEmail
+            //Get all PersonAvailabilityDTOs associated with the PersonId from the http context
 
-            var personAvailabilityDTOList = await _personAvailabilityRepository.GetAllPersonAvailabilityByPersonId(personEmail.PersonId);
+            var personAvailabilityDTOList = await _personAvailabilityRepository.GetAllPersonAvailabilityByPersonId(personId);
 
             if (personAvailabilityDTOList == null || personAvailabilityDTOList.Count == 0)
             {
@@ -535,22 +528,7 @@ namespace backend.Controllers.Person
 
 
 
-            //Check if a PersonEmail associated with the email from the parameter PersonEmailRequestDTO exists in the database
 
-            var personEmail = await _personRepository.GetPersonEmailByEmail(requestDTO.Email);
-
-            if (personEmail == null)
-            {
-                return Unauthorized(
-                    new
-                    {
-                        success = "false",
-                        message = "Email does not exist",
-                        data = new { },
-                        timestamp = DateTime.Now,
-                    }
-                );
-            }
 
 
             if (requestDTO.PersonAvailabilityId == Guid.Empty)
@@ -583,7 +561,7 @@ namespace backend.Controllers.Person
                 );
             }
 
-            if (personAvailability.PersonId != personEmail.PersonId)
+            if (personAvailability.PersonId != personId)
             {
                 return StatusCode(403,
                     new
@@ -635,6 +613,7 @@ namespace backend.Controllers.Person
 
         }
         [HttpPut]
+
         public async Task<IActionResult> UpdatePersonAvailabilityById(PersonAvailabilityUpdateRequestDTO requestDTO)
         {
 
@@ -785,22 +764,7 @@ namespace backend.Controllers.Person
                     }
                 );
             }
-            //Check if a PersonEmail associated with the email from the parameter PersonEmailRequestDTO exists in the database
 
-            var personEmail = await _personRepository.GetPersonEmailByEmail(requestDTO.Email);
-
-            if (personEmail == null)
-            {
-                return Unauthorized(
-                    new
-                    {
-                        success = "false",
-                        message = "Email does not exist",
-                        data = new { },
-                        timestamp = DateTime.Now,
-                    }
-                );
-            }
 
 
 
@@ -823,7 +787,7 @@ namespace backend.Controllers.Person
 
             //Check if the account is allowed to edit this information, by checking if the PersonId from PersonEmail matches the PersonId from PersonAvailability
 
-            if (personEmail.PersonId != personAvailability.PersonId)
+            if (personId != personAvailability.PersonId)
             {
                 return StatusCode(403, new
                 {
