@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messenger Contacts</title>
+</head>
+<body>
+
+    <div class="contacts-container" *ngIf="messagesArray.length > 0; else noMessages">
+        <button routerLink="/student-message-preview" class="modern-button">Message Preview V2</button> <button class="modern-button">Send a message</button>
+        <hr>
+        <div *ngFor="let message of messagesArray" >
+         {{InitiliazeUserForPhoto(message)}}
+            <div class="contact-card" (click)="OpenAThread(message)">
+                <div class="contact-avatar">
+                    <img [src]="photourl ? photourl: 'ddd'" alt="Recipient Avatar" />
+                  </div>
+                  
+                  <script>
+                    console.log('Sender photo URL:', message.senderPhotoUrl);
+                    console.log('Recipient photo URL:', message.recipientPhotoUrl);
+                  </script>
+                <div class="contact-info">
+                    <h3>{{ AccountService.CurrentUser()?.Email === message.senderEmail ? message.recipientEmail : message.senderEmail }}</h3>
+                    <p class="last-message">{{ message.content }}</p>
+                </div>
+                <div class="contact-time">
+                    <span>{{ timeAgo(message.messageSent) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- U slučaju da nema poruka -->
+    <ng-template #noMessages>
+        <h3>You don't have messages</h3>
+    </ng-template>
+</body>
+</html>

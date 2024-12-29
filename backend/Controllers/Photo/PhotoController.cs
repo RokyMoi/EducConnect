@@ -42,6 +42,52 @@ namespace EduConnect.Controllers.Photo
 
         }
         [CheckPersonLoginSignup]
+     
+        [HttpGet("GetPhotoForUser/{email}")]
+        public async Task<ActionResult> GetProfilePictureForCurrentUser(string email)
+        {
+            var person = await db.PersonEmail.FirstOrDefaultAsync(x => x.Email == email);
+
+            if (person == null)
+            {
+                return NotFound(new
+                {
+                    message = "Cannot find user from token.",
+                    timestamp = DateTime.UtcNow.ToString("o")
+                });
+            }
+
+            var photo = await db.PersonPhoto.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+
+            // Ako nema slike, koristi default sliku
+            if (photo == null)
+            {
+                return Ok(new
+                {
+                    message = "No profile picture found for this user, returning default.",
+                    data = new
+                    {
+                        url = "https://res.cloudinary.com/dsuwjnudy/image/upload/v1735186361/ivbfqfru35jp7m8aeosn.jpg"
+                    },
+                    timestamp = DateTime.UtcNow.ToString("o")
+                });
+            }
+
+            return Ok(new
+            {
+                message = "Profile picture for this user was successfully found.",
+                data = new
+                {
+                    url = photo.Url
+                },
+                timestamp = DateTime.UtcNow.ToString("o")
+            });
+        }
+
+
+
+
+        [CheckPersonLoginSignup]
         [HttpGet("GetCurrentUserProfilePicture")]
         public async Task<ActionResult> GetProfilePictureForCurrentUser()
         {
@@ -61,9 +107,13 @@ namespace EduConnect.Controllers.Photo
 
             if (photo == null)
             {
-                return NotFound(new
+                return Ok(new
                 {
-                    message = "No profile picture found for this user.",
+                    message = "No profile picture found for this user, returning default.",
+                    data = new
+                    {
+                        url = "https://res.cloudinary.com/dsuwjnudy/image/upload/v1735186361/ivbfqfru35jp7m8aeosn.jpg"
+                    },
                     timestamp = DateTime.UtcNow.ToString("o")
                 });
             }
@@ -73,11 +123,12 @@ namespace EduConnect.Controllers.Photo
                 message = "Profile picture for this user was successfully found.",
                 data = new
                 {
-                    url = photo.Url 
+                    url = photo.Url
                 },
                 timestamp = DateTime.UtcNow.ToString("o")
             });
         }
+
 
 
         [HttpPost("addPersonProfilePicture")]

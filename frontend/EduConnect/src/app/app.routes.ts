@@ -13,6 +13,8 @@ import { PhoneNumberComponent } from './signup/registration-step-process/phone-n
 import { PhotoComponent } from './Photo/photo-comp/photo-comp.component';
 import { MainSettingsComponent } from './Settings/main-settings/main-settings.component';
 import { MessagesComponent } from './Messenger/messages/messages.component';
+import { DirectMessagingsComponent } from './Messenger/direct-messagings/direct-messagings.component';
+import { StudentThreadMessageComponent } from './Messenger/student-thread-message/student-thread-message.component';
 
 
 export const routes: Routes = [
@@ -26,7 +28,9 @@ export const routes: Routes = [
   { path: 'student-dashboard', component: StudentDashboardComponent },
   { path: 'tutor-dashboard', component: TutorDashboardComponent },
   { path: 'photouploadcomponent', component: PhotoComponent},
-  {path: 'student-message',component: MessagesComponent},
+  {path: 'student-message-preview',component: MessagesComponent},
+  {path: 'direct-message',component: DirectMessagingsComponent},
+  {path: 'studentMessageThread/:id',component: StudentThreadMessageComponent},
  
   {
     path: 'signup/phone-number',

@@ -1,13 +1,14 @@
 <header>
-    <p class = "headerLogo">
-        EduConnects
-    </p>
+ 
    
     @if(AccountService.CurrentUser()){
          @if( AccountService.CurrentUser()?.Role === "student"){
+            <p routerLink='/student-dashboard' class = "headerLogo">
+                EduConnects
+            </p>
             <div class="RouterLinks">
-                <mat-icon class="IconAllDevices" >sms</mat-icon>
-            <mat-icon routerLink='/student-dashboard' class="iconComp">library_books</mat-icon>
+                <mat-icon routerLink="/direct-message" class="IconAllDevices" >sms</mat-icon>
+            <mat-icon  class="iconComp">shopping_cart_checkout</mat-icon>
             <mat-icon  routerLink='/learning-student' class="iconComp">school</mat-icon> 
             <div mat-card-avatar routerLink='/student-profile'  class="StudentPhoto iconComp" [style.background-image]="'url(' + profilePicture + ')'"></div>
         </div>
@@ -16,6 +17,9 @@
         <!---MOBILE SECTION -->
        
          @if(AccountService.CurrentUser()?.Role == "tutor"){
+            <p class = "headerLogo">
+                EduConnects
+            </p>
               <!-- ADD TUTOR ROUTERLINKS--->
                <div class="RouterLinks">
 
@@ -39,8 +43,9 @@
 <!---MOBILE SECTION FOR STUDENT -->
 @if(AccountService.CurrentUser()){
     @if( AccountService.CurrentUser()?.Role === "student"){
+      
 <div class="phoneMenu">
-    <mat-icon routerLink='/student-dashboard' class="icon">library_books</mat-icon>
+    <mat-icon routerLink='/student-dashboard' class="icon">shopping_cart_checkout</mat-icon>
     <mat-icon   routerLink='/learning-student' class="icon">school</mat-icon> 
   
     <!-- Mobile Avatar Image -->

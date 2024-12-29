@@ -25,9 +25,23 @@ namespace EduConnect.Repositories.MessageRepository
         {
            return await context.Message.FindAsync(messageid);
         }
+        public async Task<List<MessageDto>> GetLastMessagesForDirectMessaging(MessageParamsDirect messageParams)
+        {
+
+            var messages = await context.Message.ToListAsync();
+
+            var lastMessages = messages
+                .GroupBy(m => m.SenderEmail)
+                .Select(g => g.OrderByDescending(m => m.MessageSent).First())
+                .ToList();
+
+            var messageDtos = mapper.Map<List<MessageDto>>(lastMessages);
+
+            return messageDtos;
+        }
 
         public async Task<PagedList<MessageDto>> GetMessageForUser(MessageParams messageParams)
-            //Get the last message sent - > We filter that by MessageSent(Date)
+  
         {
             var query = context.Message.OrderByDescending(x => x.MessageSent).AsQueryable();
         
@@ -38,10 +52,8 @@ namespace EduConnect.Repositories.MessageRepository
                 _ => query.Where(x => x.Recipient.PersonEmail.Email == messageParams.Email && x.DateRead == null)
             };
 
-            // Loguj trenutni upit za debag
             Console.WriteLine($"Query for container {messageParams.Container}: {query.ToQueryString()}");
 
-            // Nastavi sa mapiranjem
             var messages = query.ProjectTo<MessageDto>(mapper.ConfigurationProvider);
 
             return await PagedList<MessageDto>.CreateASync(messages,messageParams.PageNumber,messageParams.PageSize);

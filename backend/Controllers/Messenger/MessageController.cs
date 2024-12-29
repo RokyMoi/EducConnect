@@ -19,7 +19,7 @@ namespace EduConnect.Controllers.Messenger
         private readonly IMessageRepository messageRepository;
         private readonly IMapper mapper;
 
-        public MessageController(DataContext context, IMessageRepository messageRepository,IMapper mapper)
+        public MessageController(DataContext context, IMessageRepository messageRepository, IMapper mapper)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.messageRepository = messageRepository ?? throw new ArgumentNullException(nameof(messageRepository));
@@ -31,7 +31,7 @@ namespace EduConnect.Controllers.Messenger
         [CheckPersonLoginSignup]
         public async Task<ActionResult<MessageDto>> CreateMessage(CreateMessageDto createMessageDto)
         {
-      
+
             if (string.IsNullOrWhiteSpace(createMessageDto.Content))
             {
                 return BadRequest(new
@@ -44,7 +44,7 @@ namespace EduConnect.Controllers.Messenger
             var caller = new Caller(this.HttpContext);
             var callerEmail = caller.Email?.ToLower();
 
-            
+
             if (callerEmail == createMessageDto.RecipientEmail.ToLower())
             {
                 return BadRequest(new
@@ -54,11 +54,11 @@ namespace EduConnect.Controllers.Messenger
                 });
             }
 
-       
+
             var senderMail = await context.PersonEmail.FirstOrDefaultAsync(x => x.Email == callerEmail);
             var recipientMail = await context.PersonEmail.FirstOrDefaultAsync(x => x.Email == createMessageDto.RecipientEmail.ToLower());
 
-          
+
             if (senderMail == null || recipientMail == null)
             {
                 return BadRequest(new
@@ -68,11 +68,11 @@ namespace EduConnect.Controllers.Messenger
                 });
             }
 
-          
+
             var sender = await context.Person.FirstOrDefaultAsync(x => x.PersonId == senderMail.PersonId);
             var recipient = await context.Person.FirstOrDefaultAsync(x => x.PersonId == recipientMail.PersonId);
 
-           
+
             if (sender == null || recipient == null)
             {
                 return BadRequest(new
@@ -82,11 +82,11 @@ namespace EduConnect.Controllers.Messenger
                 });
             }
 
-           
+
             var senderPhotoUrl = sender?.PersonPhoto?.FirstOrDefault()?.Url ?? "No User photo";
             var recipientPhotoUrl = recipient?.PersonPhoto?.FirstOrDefault()?.Url ?? "No User photo";
 
-           
+
             var message = new Message
             {
                 Sender = sender,
@@ -97,7 +97,7 @@ namespace EduConnect.Controllers.Messenger
                 MessageSent = DateTime.UtcNow
             };
 
-      
+
             messageRepository.AddMessage(message);
             var saveSuccess = await messageRepository.SaveAllAsync();
 
@@ -112,7 +112,7 @@ namespace EduConnect.Controllers.Messenger
             }
             else
             {
-               
+
                 return BadRequest(new
                 {
                     message = "Failed to save the message",
@@ -126,11 +126,26 @@ namespace EduConnect.Controllers.Messenger
         [HttpGet]
         [Route("GetMessageThread/{email}")]
         [CheckPersonLoginSignup]
-        public async Task<ActionResult<IEnumerable<MessageDto>>>GetMessageThread(string email)
+        public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessageThread(string email)
         {
-            var caller =new Caller(this.HttpContext);
+            var caller = new Caller(this.HttpContext);
             var currentEmail = caller.Email;
             return Ok(await messageRepository.GetMessageThread(currentEmail, email));
+        }
+        
+        [HttpGet("GetLastMessagesForDirectMessaging")]
+        [CheckPersonLoginSignup]
+
+        public async Task<ActionResult<IEnumerable<MessageDto>>> GetLastMessagesForDirectMessaging([FromQuery] MessageParamsDirect messageParams)
+        {
+            
+
+
+            var Caller = new Caller(this.HttpContext);
+            messageParams.Email = Caller.Email;
+            var messages = await messageRepository.GetLastMessagesForDirectMessaging(messageParams);
+
+            return messages;
         }
 
 

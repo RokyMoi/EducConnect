@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EduConnect.DTOs.Messenger;
+using EduConnect.Entities.Messenger;
+using Microsoft.EntityFrameworkCore;
 
 namespace EduConnect.Helpers
 {
@@ -29,5 +31,19 @@ namespace EduConnect.Helpers
             var items = await source.Skip((pageNumber-1) * pageSize).Take(pageSize).ToListAsync();
             return new PagedList<T>(items, count,pageNumber, pageSize);
         }
+
+        public static async Task<PagedList<T>> CreateAsync(
+     IQueryable<T> source, 
+     int pageNumber,
+     int pageSize)
+        {
+            var count = await source.CountAsync();  
+            var items = await source.Skip((pageNumber - 1) * pageSize)
+                                     .Take(pageSize)
+                                     .ToListAsync(); 
+
+            return new PagedList<T>(items, count, pageNumber, pageSize);
+        }
+
     }
 }
