@@ -15,6 +15,7 @@ import { MainSettingsComponent } from './Settings/main-settings/main-settings.co
 import { MessagesComponent } from './Messenger/messages/messages.component';
 import { DirectMessagingsComponent } from './Messenger/direct-messagings/direct-messagings.component';
 import { StudentThreadMessageComponent } from './Messenger/student-thread-message/student-thread-message.component';
+import { CourseLandingPageComponent } from './Courses/course-landing-page/course-landing-page.component';
 
 
 export const routes: Routes = [
@@ -31,6 +32,7 @@ export const routes: Routes = [
   {path: 'student-message-preview',component: MessagesComponent},
   {path: 'direct-message',component: DirectMessagingsComponent},
   {path: 'studentMessageThread/:id',component: StudentThreadMessageComponent},
+  {path: 'viewOfAllCourses',component:CourseLandingPageComponent},
  
   {
     path: 'signup/phone-number',
