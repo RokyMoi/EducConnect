@@ -5,11 +5,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../../services/account.service';
 import { NgClass, NgFor, NgForOf, NgIf } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-student-thread-message',
   standalone: true,
-  imports: [NgIf,NgFor,NgForOf,NgClass],
+  imports: [NgIf,NgFor,NgForOf,NgClass,FormsModule],
   templateUrl: './student-thread-message.component.html',
   styleUrls: ['./student-thread-message.component.css'],
 })
@@ -27,15 +29,16 @@ this.router.navigateByUrl("/direct-message");
   recipientEmail!: string;
   messages: Message[] = [];
     http = inject(HttpClient);
+    messageContent='';
       photourl="";
 
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    // Dohvati ID iz URL-a
+   
     this.threadId = this.route.snapshot.paramMap.get('id')!;
 
-    // Dohvati query parametre
+    
     this.route.queryParams.subscribe((params) => {
       this.senderEmail = params['senderEmail'];
       this.recipientEmail = params['recipientEmail'];
@@ -51,6 +54,20 @@ this.router.navigateByUrl("/direct-message");
         ? this.recipientEmail 
         : this.senderEmail;
     this.GetImageForUser(this.userForPhoto);
+    });
+  }
+  SendMessage() {
+    this.messageService.SendMessageToUser(this.recipientEmail, this.messageContent).subscribe({
+      next: (response) => {
+        this.loadMessages(this.recipientEmail);
+        this.messageContent = '';
+        
+        console.log('Message sent successfully:', response);
+      },
+      error: (error) => {
+        
+        console.error('Error sending message:', error);
+      }
     });
   }
   GetImageForUser(email:string): string{

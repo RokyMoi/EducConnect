@@ -3,16 +3,20 @@
     padding: 0;
     box-sizing: border-box;
 }
-
-html, body {
+html{
+    position: relative;
+}
+body {
     height: 100%;
     width: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f0f3f5;
     display: flex;
     justify-content: center;
+    z-index: 9999;
     align-items: center;
-    overflow: hidden;
+    overflow: hidden; 
+    position: relative;
 }
 
 .message-container {
@@ -27,6 +31,7 @@ html, body {
     animation: fadeIn 0.5s ease-out;
     overflow: hidden;
     position: relative;
+    z-index: 999;
 }
 
 .chat-header {
@@ -84,8 +89,9 @@ h3 {
 .messages {
     padding: 20px;
     flex-grow: 1;
-    overflow-y: auto;
     background-color: #f9f9f9;
+    overflow-y: auto; /* Skrol samo za poruke */
+    max-height: calc(100vh - 140px); /* Prilagodljiva visina */
 }
 
 .message {
@@ -121,10 +127,8 @@ h3 {
     border-radius: 15px;
     position: relative;
     font-size: 14px;
-    color: #333;
+    color: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
 }
 
 .message.sent .text-container,
@@ -135,7 +139,7 @@ h3 {
 
 .time {
     font-size: 12px;
-    color: #888;
+    color: #07ed1e;
     margin-top: 5px;
     text-align: right;
     display: block;
@@ -220,8 +224,8 @@ h3 {
     }
 
     .message-avatar-container {
-        width: 40px;
-        height: 40px;
+        width: 20px;
+        height: 20px;
     }
 
     .text-container {
@@ -235,12 +239,31 @@ h3 {
     #messageInput {
         padding: 10px 15px;
     }
+
+    .messages {
+        max-height: calc(100vh - 140px);
+    }
 }
 
 @media (max-width: 480px) {
+    html, body {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+    }
+
     .message-container {
         max-width: 100%;
+        height: 300px;
         border-radius: 0;
+    }
+
+    .chat-header {
+        padding: 10px;
+    }
+
+    h3 {
+        font-size: 16px;
     }
 
     .message-avatar-container {
@@ -248,12 +271,20 @@ h3 {
         height: 35px;
     }
 
-    .text-container {
-        width: 50%;
+    .messages {
+        max-height: calc(100vh - 110px); 
+        overflow-y: auto;
     }
 
     .chat-input {
-        padding: 10px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        padding: 10px 15px;
+        border-top: 1px solid #ddd;
+        box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
     }
 
     #sendButton {
@@ -264,3 +295,4 @@ h3 {
         padding: 8px 12px;
     }
 }
+

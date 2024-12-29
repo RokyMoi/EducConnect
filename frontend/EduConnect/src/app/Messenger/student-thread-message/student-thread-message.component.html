@@ -12,13 +12,12 @@
             <div class="header-left">
                 <div class="avatar-container">
                     
-                    <img [src]="photourl ? photourl : 'https://avatars.githubusercontent.com/u/1?v=4'" alt="User Avatar" class="avatar">
+                
+                        <img [src]="photourl" class="avatar" alt="Sender Avatar">
                  
-                         
-                   
                 </div>
                 <!-- Display the name of the other user -->
-                <h3>{{ accountService.CurrentUser()?.Email === senderEmail ? recipientEmail : senderEmail }}</h3>
+                <h3>{{ accountService.CurrentUser()?.Email === senderEmail ? recipientEmail: senderEmail }}</h3>
             </div>
             <div class="header-right">
                 <button id="backBtn" (click)="GetBackToDirectMessage()">
@@ -31,7 +30,7 @@
         <div class="messages">
             <div *ngFor="let message of messages" 
                  [ngClass]="{
-                    'message received': senderEmail !== accountService.CurrentUser()?.Email,
+                    'message received': senderEmail!== accountService.CurrentUser()?.Email,
                     'message sent': senderEmail === accountService.CurrentUser()?.Email
                 }">
                 
@@ -47,8 +46,8 @@
 
         <!-- Chat Input -->
         <div class="chat-input">
-            <input type="text" placeholder="Type a message..." id="messageInput">
-            <button id="sendButton">Send</button>
+            <input type="text" placeholder="Type a message..." id="messageInput" [(ngModel)]="messageContent">
+            <button id="sendButton" (click)="SendMessage()" [disabled]="!messageContent.trim()">Send</button>
         </div>
     </div>
 </body>

@@ -47,4 +47,19 @@ export class MessageService {
     
     return this.http.get<Message[]>(`http://localhost:5177/Messenger/GetMessageThread/${email}`, { headers });
   }
+  SendMessageToUser(email: string, content: string) {
+    let headers = new HttpHeaders();
+    const token = this.accService.getAccessToken();
+  
+    if (token) {
+      headers = headers.append('Authorization', `Bearer ${token}`);
+    } else {
+      console.error('No access token found.');
+    }
+  
+    return this.http.post<Message>("http://localhost:5177/Messenger/CreateMessageForUser", 
+      { recipientEmail: email, content: content }, 
+      { headers: headers });
+
+}
 }
