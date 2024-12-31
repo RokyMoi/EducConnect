@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Security.Cryptography;
@@ -10,6 +11,8 @@ namespace backend.Entities.Reference.Language
     [Table("Language", Schema = "Reference")]
     public class Language
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid LanguageId { get; set; }
 
         public string Name { get; set; }

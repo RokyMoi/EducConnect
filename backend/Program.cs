@@ -100,6 +100,15 @@ namespace EduConnect
                     tutorTeachingStyleTypeDatabaseSeeder.SeedTutorTeachingStyleTypeDataToDatabase().GetAwaiter().GetResult();
 
 
+                    //Get the LearningDifficultyLevel database seeder scoped service from the service container
+                    var learningDifficultyLevelDatabaseSeeder = scope.ServiceProvider.GetRequiredService<LearningDifficultyLevelDatabaseSeeder>();
+                    learningDifficultyLevelDatabaseSeeder.SeedLearningDifficultyLevelDataToDatabase().
+                    GetAwaiter().GetResult();
+
+                    //Get the Language database seeder scoped service from the service container
+                    var languageDatabaseSeeder = scope.ServiceProvider.GetRequiredService<LanguageDatabaseSeeder>();
+                    languageDatabaseSeeder.SeedLanguageDataToDatabase().GetAwaiter().GetResult();
+
                 }
                 catch (Exception ex)
                 {
