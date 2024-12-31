@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Entities.Learning;
 using backend.Entities.Reference;
 using EduConnect.Entities.Reference;
 using EduConnect.Entities.Tutor;
@@ -32,5 +33,13 @@ namespace backend.Interfaces.Reference
         public Task<List<IndustryClassification>> GetAllIndustryClassificationsAsync();
 
         public Task<IndustryClassification?> GetIndustryClassificationByIdAsync(Guid id);
+
+        public Task AddLearningCategoriesToDatabase(
+            List<LearningCategory> learningCategories
+        );
+
+        public Task AddLearningSubcategoriesToDatabase(
+            List<LearningSubcategory> learningSubcategories
+        );
     }
 }

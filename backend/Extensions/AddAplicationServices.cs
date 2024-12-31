@@ -42,6 +42,8 @@ namespace EduConnect.Extensions
             //Add Database Seeders as Scoped services
             services.AddScoped<CountryExtractor>();
             services.AddScoped<ExtractIndustryClassification>();
+            services.AddScoped<ExtractLearningCategoriesAndSubcategories>();
+
 
             services.AddScoped<WorkTypeDatabaseSeeder>();
             services.AddScoped<EmploymentTypeDatabaseSeeder>();
@@ -59,6 +61,7 @@ namespace EduConnect.Extensions
             //ADD HOSTED SERVICES
             services.AddHostedService<CountrySeederHostedService>();
             services.AddHostedService<IndustryClassificationHostedService>();
+            services.AddHostedService<LearningCategoryAndSubcategoryHostedService>();
 
 
 

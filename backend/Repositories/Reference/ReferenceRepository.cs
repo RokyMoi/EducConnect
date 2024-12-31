@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Entities.Learning;
 using backend.Entities.Reference;
 using backend.Interfaces.Reference;
 using EduConnect.Data;
@@ -38,6 +39,41 @@ namespace backend.Repositories.Reference
 
                 Console.WriteLine($"An error occurred while adding industry classifications: {ex.Message}");
 
+            }
+        }
+
+        public async Task AddLearningCategoriesToDatabase(List<LearningCategory> learningCategories)
+        {
+            try
+            {
+                await _dataContext.AddRangeAsync(
+                    learningCategories
+                );
+                await _dataContext.SaveChangesAsync();
+                Console.WriteLine($"Successfully added {learningCategories.Count} learning categories to the database.");
+
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine($"An error occurred while adding learning categories: {ex.Message}");
+            }
+        }
+
+        public async Task AddLearningSubcategoriesToDatabase(List<LearningSubcategory> learningSubcategories)
+        {
+
+
+            try
+            {
+                await _dataContext.AddRangeAsync(learningSubcategories);
+                await _dataContext.SaveChangesAsync();
+                Console.WriteLine($"Successfully added {learningSubcategories.Count} learning subcategories to the database.");
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine($"An error occurred while adding learning subcategories: {ex.Message}");
             }
         }
 

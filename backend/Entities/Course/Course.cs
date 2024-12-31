@@ -18,6 +18,8 @@ namespace EduConnect.Entities.Course
 
         public required string CourseName { get; set; }
 
+        public required string CourseSubject { get; set; }
+
         public required long CreatedAt { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
 
         public long? UpdatedAt { get; set; } = null;
