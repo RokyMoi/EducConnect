@@ -7,6 +7,9 @@ using EduConnect.Entities.Person;
 using EduConnect.Entities.Reference;
 using EduConnect.Entities.Student;
 using Microsoft.EntityFrameworkCore;
+using EduConnect.Entities.Course;
+using backend.Entities.Reference.Learning;
+using backend.Entities.Reference.Language;
 
 namespace EduConnect.Data;
 
@@ -51,6 +54,14 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<IndustryClassification> IndustryClassification { get; set; }
 
+    public DbSet<Course> Course { get; set; }
+
+    public DbSet<CourseDetails> CourseDetails { get; set; }
+
+
+    public DbSet<LearningDifficultyLevel> LearningDifficultyLevel { get; set; }
+
+    public DbSet<Language> Language { get; set; }
 
 
 }
