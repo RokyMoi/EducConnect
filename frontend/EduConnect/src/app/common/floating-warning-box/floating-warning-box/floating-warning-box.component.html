@@ -1,0 +1,13 @@
+<div class="backdrop" (click)="toggleFloatingBox()"></div>
+
+<div class="main">
+    <button class="close-button" (click)="toggleFloatingBox()">X</button>
+    <h2>
+        {{warningTitle}}
+    </h2>
+    <div class="content-container">
+
+        <ng-content class="content"></ng-content>
+    </div>
+
+</div>

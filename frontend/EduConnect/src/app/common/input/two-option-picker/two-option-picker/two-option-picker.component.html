@@ -1,0 +1,18 @@
+<div class="main-container">
+    <label [for]="inputId">{{label}}</label>
+    <div class="options" [formGroup]="formControlGroup">
+
+        <div class="option-container" [class.selected]="formControlGroup.controls['firstOption'].value">
+            <input id="firstOption" type='radio' [value]="firstOptionText"
+                [checked]="formControlGroup.controls['firstOption'].value" (change)="onRadioChange('firstOption')">
+            <label for="firstOption">{{firstOptionText}}</label>
+        </div>
+        <div class="option-container" [class.selected]="formControlGroup.controls['secondOption'].value">
+
+            <input id="secondOption" type='radio' [value]="secondOptionValue"
+                [checked]="formControlGroup.controls['secondOption'].value" (change)="onRadioChange('secondOption')">
+            <label for="secondOption">{{secondOptionText}}</label>
+        </div>
+    </div>
+    <p class="inputWarningText">{{warning}}</p>
+</div>

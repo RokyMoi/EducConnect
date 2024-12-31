@@ -1,3 +1,19 @@
-<button  (click)="handleButtonClick($event)">
-    {{submitButtonText}}
+<button 
+  (click)="handleButtonClick($event)"
+  [style.width]="buttonWidth"
+  [style.backgroundColor]="buttonBackgroundColor"
+  [style.color]="buttonTextColor"
+  [style.border]="buttonBorder"
+  [style.borderRadius]="buttonBorderRadius"
+  [style.padding]="buttonPadding"
+  [style.fontSize]="buttonFontSize"
+  [style.fontWeight]="buttonFontWeight"
+  [style.cursor]="buttonCursor"
+  [style.transition]="buttonTransition"
+  [style.textAlign]="buttonTextAlign"
+  [style.margin]="buttonMargin"
+  (mouseover)="handleMouseOver()"
+  (mouseleave)="handleMouseLeave()"
+>
+  {{ submitButtonText }}
 </button>

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using backend.Entities.Reference.Country;
 
 namespace EduConnect.Entities.Person;
 
@@ -14,20 +15,19 @@ public class PersonDetails
     [ForeignKey(nameof(PersonId))]
     public Person? Person { get; set; }  // Ovaj entitet može biti null
 
-    public required string FirstName { get; set; }
+    public string? FirstName { get; set; } = string.Empty;
 
-    public required string LastName { get; set; }
+    public string? LastName { get; set; } = string.Empty;
 
     public required string Username { get; set; }
 
-    public required string PhoneNumberCountryCode { get; set; }
+    public Guid? CountryOfOriginCountryId { get; set; }
 
-    public required string PhoneNumber { get; set; }
-
-    public required string CountryOfOrigin { get; set; }
+    [ForeignKey("CountryOfOriginCountryId")]
+    public Country? Country { get; set; }
 
     public required long CreatedAt { get; set; }
 
-    public long? ModifiedAt { get; set; }
+    public long? ModifiedAt { get; set; } = null;
 }
 

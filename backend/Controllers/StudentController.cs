@@ -44,145 +44,44 @@ namespace EduConnect.Controllers
             return Ok(students);
         }
         [HttpGet("get-all-emails")]
-public async Task<ActionResult> GetAllEmails()
-{
-    try
-    {
-       
-        var emails = await db.PersonEmail
-                             .Select(x => x.Email)
-                             .ToListAsync();
-
-        if (emails == null || !emails.Any())
+        public async Task<ActionResult> GetAllEmails()
         {
-           
-            return NotFound(new
+            try
             {
-                message = "No emails found.",
-                data = new List<string>(), 
-                timestamp = DateTime.Now
-            });
-        }
 
-      
-        return Ok(new
-        {
-            message = "Emails retrieved successfully.",
-            data = emails, 
-            timestamp = DateTime.Now
-        });
-    }
-    catch (Exception ex)
-    {
-      
-        return StatusCode(500, new
-        {
-            message = "An error occurred while fetching emails.",
-            error = ex.Message,
-            timestamp = DateTime.Now
-        });
-    }
-}
-        [HttpPost("student-login")]
-        public async Task<IActionResult> Login(LoginDTO login)
-        {
-            // Retrieve the person's email
-            var personEmail = await db.PersonEmail
-                .FirstOrDefaultAsync(x => x.Email== login.Email);
-                   var personDetails = await db.PersonDetails
-                .FirstOrDefaultAsync(x => x.PersonId== personEmail.PersonId);
+                var emails = await db.PersonEmail
+                                     .Select(x => x.Email)
+                                     .ToListAsync();
 
-            if (personEmail == null)
-            {
-                return NotFound(new {
-                    success = "false",
-                    message = "User not found",
-                    data = new { },
-                    timestamp = DateTime.Now,
-
-                });
-            }
-
-            // Retrieve the corresponding person and password details
-            var person = await db.Person
-                .FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
-
-            var personPassword = await db.PersonPassword
-                .FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
-
-            if (personPassword == null)
-            {
-                return BadRequest(
-                    new {
-                    success = "false",
-                    message = "Username or password invalid",
-                    data = new { },
-                    timestamp = DateTime.Now,
-                    }
-                );
-            }
-
-            // Hash the provided password using the same salt as the stored hash
-            using var hmac = new HMACSHA512(personPassword.Salt);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(login.Password));
-
-            // Compare the computed hash with the stored hash
-            for (int i = 0; i < computedHash.Length; i++)
-            {
-                if (computedHash[i] != personPassword.Hash[i])
+                if (emails == null || !emails.Any())
                 {
-                    return BadRequest(new
+
+                    return NotFound(new
                     {
-                        success = "false",
-                        message = "Username or password invalid",
-                        data = new { },
-                        timestamp = DateTime.Now,
+                        message = "No emails found.",
+                        data = new List<string>(),
+                        timestamp = DateTime.Now
                     });
                 }
-            }
-            string role = "";
-            // Check if the user is a Student or Tutor by looking up the appropriate tables
-            var student = await db.Student.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
-            var tutor = await db.Tutor.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
-
-            if (student != null)
-            {
-                role = "student";  // User is a student
-            }
-            else if (tutor != null)
-            {
-                role = "tutor";  // User is a tutor
-            }
-            else
-            {
-                return Unauthorized(new {
-                    success = "error",
-                    message = "Role undefined",
-                    data = new { },
-                    timestamp = DateTime.Now,
-                    });
-            }
 
 
-            var token = await _tokenService.CreateTokenAsync(personEmail);
-
-            return
-            Ok(
-                new
+                return Ok(new
                 {
-                    success = "true",
-                    message = "Login succesfull",
-                    data = new 
-            
-            UserDTO
-            {
-                Email= personEmail.Email,
-                Token = token,
-                Role=role
-            },
-                    timestamp = DateTime.Now,
+                    message = "Emails retrieved successfully.",
+                    data = emails,
+                    timestamp = DateTime.Now
                 });
-            
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while fetching emails.",
+                    error = ex.Message,
+                    timestamp = DateTime.Now
+                });
+            }
         }
 
         [HttpPost("student-register")]
@@ -207,9 +106,7 @@ public async Task<ActionResult> GetAllEmails()
                 FirstName = student.FirstName,
                 LastName = student.LastName,
                 Username = student.Username,
-                PhoneNumberCountryCode = student.PhoneNumberCountryCode,
-                PhoneNumber = student.PhoneNumber,
-                CountryOfOrigin = student.CountryOfOrigin,
+                CountryOfOriginCountryId = Guid.Parse(student.CountryOfOrigin),
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
 
@@ -264,7 +161,7 @@ public async Task<ActionResult> GetAllEmails()
                 db.PersonPassword.Add(PersonPassword);
                 db.PersonSalt.Add(PersonSalt);
                 db.Student.Add(studentt);
-             
+
 
                 await db.SaveChangesAsync();
             });
