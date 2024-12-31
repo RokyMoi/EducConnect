@@ -1,8 +1,19 @@
-import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  Input,
+  Output,
+} from '@angular/core';
+import {
+  FormControl,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { TextAreaResizeType } from '../../../../../enums/textarea-resize-types.enum';
 
 @Component({
+  standalone: true,
   selector: 'app-text-area-input-component',
   imports: [ReactiveFormsModule],
   templateUrl: './text-area-input-component.component.html',

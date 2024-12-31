@@ -14,6 +14,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 @Component({
+  standalone: true,
   selector: 'app-select-dropdown',
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './select-dropdown.component.html',

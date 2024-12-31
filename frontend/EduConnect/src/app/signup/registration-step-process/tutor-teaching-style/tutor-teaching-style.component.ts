@@ -26,6 +26,7 @@ import { TutorTeachingStyleSaveHttpRequestTutor } from '../../../_models/Tutor/t
 import { TutorRegistrationStatusService } from '../../../services/tutor/tutor-status/tutor-status.service';
 
 @Component({
+  standalone: true,
   selector: 'app-tutor-teaching-style',
   imports: [
     ReactiveFormsModule,

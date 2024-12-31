@@ -5,6 +5,7 @@ import { TutorRegistrationStatusService } from '../../services/tutor/tutor-statu
 import { User } from '../../_models/User';
 
 @Component({
+  standalone: true,
   selector: 'app-tutor-dashboard',
   imports: [],
   templateUrl: './tutor-dashboard.component.html',

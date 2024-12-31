@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
+  standalone: true,
   selector: 'app-floating-warning-box',
   imports: [],
   templateUrl: './floating-warning-box.component.html',
