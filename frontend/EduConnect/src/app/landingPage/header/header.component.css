@@ -5,7 +5,7 @@
 
 header {
   width: 100%;
-  min-height: 100px;
+  max-height: 80px;
   display: flex;
   flex-direction: row;
   background-color: rgb(2, 80, 176);
@@ -14,7 +14,11 @@ header {
   align-items: center;
   padding: 2%;
 }
-
+.RouterLinks{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
 .headerLogo {
   font-size: 32px;
   font-weight: 900;
@@ -35,4 +39,69 @@ header {
 
 .useServiceButton:hover {
   box-shadow: 2px 4px 5px 1px rgb(0, 0, 0);
+}
+
+
+.StudentPhoto {
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 40px; 
+  height: 40px; 
+  border-radius: 50%;  
+  margin-right: 0;
+  margin-top: 5px;
+}
+.iconComp{
+  margin-top: 5px;
+  font-size: 30px; 
+  width: 40px; 
+  height: 40px;
+}
+.IconAllDevices{
+  margin-top: 5px;
+  font-size: 30px; 
+  width: 40px; 
+  height: 40px;
+}
+.StudentPhotoPhone {
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 40px; 
+  height: 40px; 
+  border-radius: 50%;  
+  margin-right: 0;
+  margin-top: 5px;
+}
+
+/* Phone Menu Styles */
+.phoneMenu {
+  display: none; /* Hide by default */
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(135deg, #4e0a8f, #1d4db4);
+  position: fixed;
+  z-index: 1;
+  bottom: 0;
+  gap: 10px;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+.icon {
+  color:white;
+  font-size: 30px;
+  width: 40px;
+  height: 40px;
+}
+
+@media (max-width: 700px) {
+  .phoneMenu {
+    display: flex; 
+  }
+  .iconComp{
+  display: none;
+  }
 }

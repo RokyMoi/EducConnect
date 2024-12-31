@@ -1,0 +1,95 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>User Profile</title> <!-- Ispravno zatvoreni title tag -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- Main Profile Container -->
+  <div class="profile-container">
+
+    <!-- Profile Header Section -->
+    <header class="profile-header">
+      <div class="header-content">
+        <div class="avatar-container">
+          <div class="avatar"></div>
+          <div class="profile-actions">
+            <button class="action-btn edit-btn">Edit Profile</button>
+            <button (click)="LogoutFromProfile()" class="action-btn logout-btn">Logout</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Profile Main Content -->
+    <main class="profile-main">
+      <section class="profile-introduction">
+        <h2 class="username">Jane Doe</h2>
+        <p class="user-description" >Your description.</p>
+      </section>
+
+      <!-- Stats and Metrics -->
+      <section class="user-stats">
+        <div class="stat">
+          <strong>Courses Completed</strong>
+          <span class="stat-value">20</span>
+        </div>
+        <div class="stat">
+          <strong>Joined On</strong>
+          <span class="stat-value">2020-10-12</span>
+        </div>
+      </section>
+
+      <!-- Achievements Section -->
+      <section class="achievements">
+        <h3>Achievements</h3>
+        <div class="achievements-grid">
+          <div class="badge">Advanced User</div>
+          <div class="badge">Top Contributor</div>
+          <div class="badge">Expert Level</div>
+          <div class="badge">Champion</div>
+        </div>
+      </section>
+
+      <!-- Social Media Links Section -->
+      <section class="social-media">
+        <h3>Social Media</h3>
+        <div class="social-links">
+          <a href="#" class="social-link">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="social-link">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="social-link">
+            <i class="fab fa-facebook"></i>
+          </a>
+        </div>
+      </section>
+
+      <!-- Additional Profile Information -->
+      <section class="additional-info">
+        <h3>Contact Information</h3>
+        <div class="contact-info">
+          <div class="info-item">
+            <i class="fas fa-envelope"></i> jane.doe&#64;email.com
+          </div>
+          <div class="info-item">
+            <i class="fas fa-phone"></i> +1 234 567 890
+          </div>
+          <div class="info-item">
+            <i class="fas fa-location-arrow"></i> New York, USA
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+</body>
+</html>

@@ -5,6 +5,9 @@ import { RegisterStudentComponent } from './signup/Student/register-student/regi
 import { LoginComponent } from './signup/login/login.component';
 import { StudentDashboardComponent } from './Student/student-dashboard/student-dashboard.component';
 import { TutorDashboardComponent } from './tutor/tutor-dashboard/tutor-dashboard.component';
+import { LearningComponent } from './Student/learning/learning.component';
+import { StudentProfileComponent } from './Student/student-profile/student-profile.component';
+
 import { PhoneNumberComponent } from './signup/registration-step-process/phone-number/phone-number.component';
 import { PersonDetailsComponent } from './signup/registration-step-process/person-details/person-details/person-details.component';
 import { EducationComponent } from './signup/registration-step-process/education/education/education.component';
@@ -19,6 +22,10 @@ export const routes: Routes = [
   { path: 'user-signin', component: LoginComponent },
   { path: 'student-dashboard', component: StudentDashboardComponent },
   { path: 'tutor/dashboard', component: TutorDashboardComponent },
+  { path: 'student-register', component: RegisterStudentComponent },
+  { path: 'student-dashboard', component: StudentDashboardComponent },
+  { path: 'student-profile', component: StudentProfileComponent },
+  { path: 'learning-student', component: LearningComponent },
   {
     path: 'signup/phone-number',
     component: PhoneNumberComponent,

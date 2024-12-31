@@ -9,19 +9,22 @@ import {
 import { AccountService } from '../../../services/account.service';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
+import { VerifyCodeComponent } from "../../tutor/verify-code/verify-code.component";
 
 
 
 @Component({
   selector: 'app-register-student',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf],
+  imports: [ReactiveFormsModule, NgIf, VerifyCodeComponent],
   templateUrl: './register-student.component.html',
   styleUrl: './register-student.component.css',
 })
 export class RegisterStudentComponent implements OnInit {
   private accountService = inject(AccountService);
   registerForm: FormGroup;
+  isFloatingVisible: boolean = false;
+
 
   firstNameWarning = 'First name is required';
   LastNameWarning = 'Last name is required';
@@ -92,7 +95,10 @@ export class RegisterStudentComponent implements OnInit {
       });
     }
   }
-
+  toggleFloatingBox() {
+    this.isFloatingVisible = !this.isFloatingVisible;
+    console.log('Is floating visible:', this.isFloatingVisible);
+  }
   showValidationOnSubmit(): void {
     Object.keys(this.registerForm.controls).forEach((key) => {
       const control = this.registerForm.get(key);
@@ -100,5 +106,6 @@ export class RegisterStudentComponent implements OnInit {
         control.markAsTouched();
       }
     });
+    
   }
 }

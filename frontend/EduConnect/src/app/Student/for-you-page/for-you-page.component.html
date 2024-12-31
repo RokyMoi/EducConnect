@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<body>
+  <div class="OverLayPhoto">
+  
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<div class="OverLayPhoto">
+<h1 class="feedText"> FEED</h1>
+<mat-icon class="FeedIcon">library_books</mat-icon>
+<hr>
+
+
+
+
+<mat-card  class="container">
+  <div class="row">
+    <div  class="col-lg-12 layout-spacing">
+      <mat-card  class="statbox widget box box-shadow">
+        <mat-card-header style=" background: linear-gradient(135deg, #6a11cb, #2575fc);"class="widget-header">
+          <div  class="row">
+            <div  class="col-xl-12 col-md-12 col-sm-12 col-12">
+              <h4 style="color: white;font-size: 30px;margin-left: 10px;" class="pb-0 FontText">Tutors</h4>
+            </div>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content style=" background: linear-gradient(135deg, #6a11cb, #2575fc);" class="widget-content widget-content-area">
+          <div style=" background: linear-gradient(135deg, #6a11cb, #2575fc);"class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <div id="content_1" class="tabcontent story-area">
+                <div class="story-container-1">
+                 
+                  <button mat-icon-button class="arrow-leftTutors" (click)="prevImage()">
+                    <mat-icon>chevron_left</mat-icon>
+                  </button>
+          
+                  <div class="single-story">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar2.png" class="single-story-bg" />
+                    <div class="story-author">
+                      <img src="https://bootdey.com/img/Content/avatar/avatar2.png" />
+                      <p>John</p>
+                    </div>
+                  </div>
+
+              
+
+               
+
+                  <div class="single-story">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="single-story-bg" />
+                    <div class="story-author">
+                      <img src="https://bootdey.com/img/Content/avatar/avatar5.png" />
+                      <p>William</p>
+                    </div>
+                  </div>
+
+                  <div class="single-story">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar6.png" class="single-story-bg" />
+                    <div class="story-author">
+                      <img src="https://bootdey.com/img/Content/avatar/avatar6.png" />
+                      <p>Jonthy</p>
+                    </div>
+                  </div>
+
+                  <div class="single-story">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" class="single-story-bg" />
+                    <div class="story-author">
+                      <img src="https://bootdey.com/img/Content/avatar/avatar7.png" />
+                      <p>Steve</p>
+                    </div>
+                  </div>
+
+                  <div class="single-story">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar8.png" class="single-story-bg" />
+                    <div class="story-author">
+                      <img src="https://bootdey.com/img/Content/avatar/avatar8.png" />
+                      <p>Jenni</p>
+                    </div>
+                  </div>
+
+                  <div class="single-story">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="single-story-bg" />
+                    <div class="story-author">
+                      <img src="https://bootdey.com/img/Content/avatar/avatar1.png" />
+                      <p>Sagarika</p>
+                    </div>
+                  </div>
+
+
+                  <button mat-icon-button class="arrow-rightTutors" (click)="nextImage()">
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</mat-card>
+
+<div class="CoursePromotionHeader">
+  <!---Svaka kartica ovde ng for#-->
+  <mat-card class="course-promotion" appearance="outlined">
+
+    <mat-card-header class="headerComp">
+      <!-- Avatar Image -->
+      <div mat-card-avatar class="StudentPhoto" [style.background-image]="'url(https://material.angular.io/assets/img/examples/shiba1.jpg)'"></div>
+
+      <!-- Title and Subtitle -->
+      <mat-card-title class="FontText">Profesor Bakajlic</mat-card-title>
+      <mat-card-subtitle class="TutorSub FontText">Professional Developer</mat-card-subtitle>
+
+      <!-- Button to Open Course -->
+      <button mat-stroked-button class="ButtonCourse FontText">Otvori kurs</button>
+    </mat-card-header>
+
+    <hr>
+
+    <!-- Card Content -->
+    <mat-card-content class="contentDiv">
+      <p class="FontText">
+        The Shiba Inu is the smallest of the six original and distinct spitz breeds of dog from Japan.
+        A small, agile dog that copes very well with mountainous terrain, the Shiba Inu was originally bred for hunting.
+      </p>
+
+      <!-- Carousel Wrapper -->
+      <div class="carousel-wrapper">
+        <!-- Left Arrow -->
+        <button mat-icon-button class="arrow-left" (click)="prevImage()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <!-- Image Slider -->
+        <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba1.jpg" alt="Carousel Image">
+
+        <!-- Right Arrow -->
+        <button mat-icon-button class="arrow-right" (click)="nextImage()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </mat-card-content>
+
+    <!-- Card Actions: Like and Comment Icons -->
+    <mat-card-actions class="akcije">
+      <mat-icon class="LikeIt">thumb_up</mat-icon>
+  
+    </mat-card-actions>
+  </mat-card>
+</div>
+
+
+
+</div>
+</div>
+</body>
+</html>
