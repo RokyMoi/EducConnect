@@ -61,6 +61,6 @@ export class AvailabilitySignupComponent implements OnInit, OnDestroy {
   }
 
   routeToTheNextStep() {
-    this.accountService.router.navigateByUrl('tutor-registration-step-2');
+    this.accountService.router.navigateByUrl('signup/tutor/teaching-style');
   }
 }

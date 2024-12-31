@@ -71,5 +71,68 @@ export class ReferenceService {
         });
       })
     );
-   }
+  }
+
+  GetTutorTeachingStyleTypes() {
+    return this.http.get(ApiLinks.getAllTutorTeachingStyleTypes).pipe(
+      map((response) => {
+        return {
+          success: (response as any).success,
+          data: (response as any).data.tutorTeachingStyleType,
+          message: (response as any).message,
+          statusCode: (response as any).statusCode,
+        };
+      }),
+      catchError((error) => {
+        return of({
+          success: (error as any).error.success,
+          data: (error as any).error.data,
+          message: (error as any).error.message,
+          statusCode: (error as any).status,
+        });
+      })
+    );
+  }
+
+  GetCommunicationTypes() {
+    return this.http.get(ApiLinks.getAllCommunicationTypes).pipe(
+      map((response) => {
+        return {
+          success: (response as any).success,
+          data: (response as any).data.communicationType,
+          message: (response as any).message,
+          statusCode: (response as any).statusCode,
+        };
+      }),
+      catchError((error) => {
+        return of({
+          success: (error as any).error.success,
+          data: (error as any).error.data,
+          message: (error as any).error.message,
+          statusCode: (error as any).status,
+        });
+      })
+    );
+  }
+
+  GetEngagementMethods() {
+    return this.http.get(ApiLinks.getAllEngagementMethods).pipe(
+      map((response) => {
+        return {
+          success: (response as any).success,
+          data: (response as any).data.engagementMethod,
+          message: (response as any).message,
+          statusCode: (response as any).statusCode,
+        };
+      }),
+      catchError((error) => {
+        return of({
+          success: (error as any).error.success,
+          data: (error as any).error.data,
+          message: (error as any).error.message,
+          statusCode: (error as any).status,
+        });
+      })
+    );
+  }
 }

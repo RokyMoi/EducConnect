@@ -26,6 +26,15 @@ export default class ApiLinks {
   //Get all work types
   public static readonly getAllWorkTypes =
     ApiLinks.baseUrl + 'reference/work-type/all';
+  //Get all tutor teaching style types
+  public static readonly getAllTutorTeachingStyleTypes =
+    ApiLinks.baseUrl + 'reference/tutor-teaching-style-type/all';
+  //Get all communication types
+  public static readonly getAllCommunicationTypes =
+    ApiLinks.baseUrl + 'reference/communication-type/all';
+  //Get all engagement methods
+  public static readonly getAllEngagementMethods =
+    this.baseUrl + 'reference/engagement-method/all';
 
   //PersonPhoneNumber controller
   //Add phone number
@@ -75,4 +84,9 @@ export default class ApiLinks {
   //Delete time availability
   public static readonly deleteTimeAvailability =
     ApiLinks.baseUrl + 'person/availability';
+
+  //TutorTeachingInformation controller
+  //Add tutor teaching information
+  public static readonly addTutorTeachingInformation =
+    ApiLinks.baseUrl + 'tutor/teaching';
 }

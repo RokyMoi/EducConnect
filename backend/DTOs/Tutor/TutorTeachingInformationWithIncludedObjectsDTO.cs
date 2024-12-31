@@ -24,7 +24,7 @@ namespace backend.DTOs.Tutor
 
         public EngagementMethod? SecondaryEngagementMethod { get; set; }
 
-        public int? ExpectedResponseTime { get; set; }
+        public string? ExpectedResponseTime { get; set; }
 
         public string? SpecialConsiderations { get; set; }
 

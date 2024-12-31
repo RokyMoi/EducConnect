@@ -20,10 +20,12 @@ namespace backend.Interfaces.Reference
         Task<TutorRegistrationStatus?> GetTutorRegistrationStatusByIdAsync(int id);
 
         Task<TutorTeachingStyleType?> GetTutorTeachingStyleTypeByIdAsync(int id);
-
+        Task<List<TutorTeachingStyleType>> GetAllTutorTeachingStyleTypesAsync();
         Task<CommunicationType?> GetCommunicationTypeByIdAsync(int id);
 
+        Task<List<CommunicationType>> GetAllCommunicationTypesAsync();
         Task<EngagementMethod?> GetEngagementMethodByIdAsync(int id);
+        Task<List<EngagementMethod>> GetAllEngagementMethodsAsync();
 
         public Task AddIndustryClassificationsToDatabase(List<IndustryClassification> industryClassifications);
 

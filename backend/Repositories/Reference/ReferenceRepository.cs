@@ -41,9 +41,19 @@ namespace backend.Repositories.Reference
             }
         }
 
+        public async Task<List<CommunicationType>> GetAllCommunicationTypesAsync()
+        {
+            return await _dataContext.CommunicationType.ToListAsync();
+        }
+
         public async Task<List<EmploymentType>> GetAllEmploymentTypesAsync()
         {
             return await _dataContext.EmploymentType.ToListAsync();
+        }
+
+        public async Task<List<EngagementMethod>> GetAllEngagementMethodsAsync()
+        {
+            return await _dataContext.EngagementMethod.ToListAsync();
         }
 
         public async Task<List<IndustryClassification>> GetAllIndustryClassificationsAsync()
@@ -54,6 +64,11 @@ namespace backend.Repositories.Reference
         public async Task<List<TutorRegistrationStatus>> GetAllTutorRegistrationStatusesAsync()
         {
             return await _dataContext.TutorRegistrationStatus.ToListAsync();
+        }
+
+        public async Task<List<TutorTeachingStyleType>> GetAllTutorTeachingStyleTypesAsync()
+        {
+            return await _dataContext.TutorTeachingStyleType.ToListAsync();
         }
 
         public async Task<List<WorkType>> GetAllWorkTypesAsync()

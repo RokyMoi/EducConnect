@@ -24,11 +24,11 @@ namespace backend.DTOs.Tutor
         public int? PrimaryEngagementMethodId { get; set; }
 
         public int? SecondaryEngagementMethodId { get; set; }
-        
+
         [Required]
         public bool UpdateSecondaryEngagementMethodId { get; set; }
 
-        public int? ExpectedResponseTime { get; set; }
+        public string? ExpectedResponseTime { get; set; }
         [Required]
         public bool UpdateExpectedResponseTime { get; set; }
         public string? SpecialConsiderations { get; set; }

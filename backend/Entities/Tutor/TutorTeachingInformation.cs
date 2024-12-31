@@ -15,7 +15,7 @@ namespace EduConnect.Entities.Tutor
         [Key]
         public Guid TutorTeachingInformationId { get; set; }
 
-        
+
         public Guid TutorId { get; set; }
 
         [ForeignKey("TutorId")]
@@ -45,7 +45,7 @@ namespace EduConnect.Entities.Tutor
         [ForeignKey("SecondaryEngagementMethodId")]
         public EduConnect.Entities.Reference.EngagementMethod SecondaryEngagementMethod { get; set; }
 
-        public int? ExpectedResponseTime { get; set; }
+        public string? ExpectedResponseTime { get; set; }
 
         public string? SpecialConsiderations { get; set; }
 

@@ -109,6 +109,7 @@ namespace backend.Controllers.Tutor
             //Check it the provided values for foreign keys are valid 
 
             //Check TutorTeachingStyleType 
+            Console.WriteLine("Requested tutor teaching style type id: " + saveRequestDTO.TeachingStyleTypeId);
             var tutorTeachingStyleType = await _referenceRepository.GetTutorTeachingStyleTypeByIdAsync(saveRequestDTO.TeachingStyleTypeId);
 
             if (tutorTeachingStyleType == null)
@@ -210,19 +211,7 @@ namespace backend.Controllers.Tutor
 
             }
 
-            //Validate ExpectedResponseTime
-            if (saveRequestDTO.ExpectedResponseTime < 1)
-            {
-                return BadRequest(
-                    new
-                    {
-                        success = "false",
-                        message = "Expected response time must be at least 1 minute",
-                        data = new { },
-                        timestamp = DateTime.Now
-                    }
-                );
-            }
+
 
 
             //Update TutorRegistrationStatus to 7

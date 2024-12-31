@@ -191,5 +191,101 @@ namespace backend.Controllers.Reference
                 });
         }
 
+        [HttpGet("tutor-teaching-style-type/all")]
+        public async Task<IActionResult> GetAllTutorTeachingStyleTypes()
+        {
+            var tutorTeachingStyleTypes = await _referenceRepository.GetAllTutorTeachingStyleTypesAsync();
+            if (tutorTeachingStyleTypes == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No tutor teaching style types found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {tutorTeachingStyleTypes.Count} of tutor  teaching style types",
+                    data = new
+                    {
+                        tutorTeachingStyleType = tutorTeachingStyleTypes,
+                    },
+                    timestamp = DateTime.Now
+
+                }
+            );
+        }
+
+        [HttpGet("communication-type/all")]
+        public async Task<IActionResult> GetAllCommunicationTypes()
+        {
+
+            var communicationTypesList = await _referenceRepository.GetAllCommunicationTypesAsync();
+
+            if (communicationTypesList == null || communicationTypesList.Count == 0)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No communication types found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {communicationTypesList.Count} communication types",
+                    data = new
+                    {
+                        communicationType = communicationTypesList
+                    },
+                    timestamp = DateTime.Now
+
+
+                });
+        }
+
+        [HttpGet("engagement-method/all")]
+        public async Task<IActionResult> GetAllEngagementMethods()
+        {
+            var engagementMethodsList = await _referenceRepository.GetAllEngagementMethodsAsync();
+
+            if (engagementMethodsList == null || engagementMethodsList.Count == 0)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No engagement methods found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {engagementMethodsList.Count} engagement methods",
+                    data = new
+                    {
+                        engagementMethod = engagementMethodsList
+                    },
+                    timestamp = DateTime.Now
+                }
+            );
+        }
     }
 }

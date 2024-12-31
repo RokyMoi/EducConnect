@@ -15,6 +15,7 @@ import CareerInformationHttpSaveRequest from '../_models/person/career/careerInf
 import CareerInformationHttpUpdateRequest from '../_models/person/career/careerInformationHttpUpdateRequest';
 import { TimeAvailability } from '../_models/person/time-availabilty/time-availability';
 import { TimeAvailabilityHttpSaveRequest } from '../_models/person/time-availabilty/time-availability-http-save-request';
+import { TutorTeachingStyleSaveHttpRequestTutor } from '../_models/Tutor/tutor-teaching-style/tutor-teaching-style-save-http-request.tutor';
 
 @Injectable({
   providedIn: 'root',
@@ -699,6 +700,42 @@ export class AccountService {
           return {
             success: (response as any).success,
             data: (response as any).data.deletedTimeAvailability,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          } as SuccessHttpResponseData;
+        }),
+        catchError((error) => {
+          // Transform to ErrorHttpResponseData
+          console.log('error', error);
+          const failedResponse: ErrorHttpResponseData = {
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          };
+          console.error('Error creating career information:', failedResponse);
+          return of(failedResponse);
+        })
+      );
+  }
+
+  addTutorTeachingStyle(
+    tutorTeachingStyle: TutorTeachingStyleSaveHttpRequestTutor
+  ) {
+    const authorization = this.getAccessToken();
+    return this.http
+      .post(ApiLinks.addTutorTeachingInformation, tutorTeachingStyle, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          // Transform to SuccessHttpResponseData
+          console.log('response', response);
+          return {
+            success: (response as any).success,
+            data: (response as any).data.tutorTeachingInformation,
             message: (response as any).message,
             statusCode: (response as any).statusCode,
           } as SuccessHttpResponseData;

@@ -85,6 +85,20 @@ export class TutorRegistrationStatusService {
           if (this.currentStatus?.tutorRegistrationStatusId === 6) {
             this.accountService.router.navigateByUrl('/signup/availability');
           }
+
+          //If the user status is with Id 7 (User have entered their availability information), then route the user to the next step which is to enter their teaching style  (Id 8, Tutoring and Teaching Information)
+          if (this.currentStatus?.tutorRegistrationStatusId === 7) {
+            this.accountService.router.navigateByUrl(
+              '/signup/tutor/teaching-style'
+            );
+          }
+          //If the user status is with Id 8 (User have entered their tutoring information), then route the user to the next step which is considered a complete registration (Id 9, Registration Complete), or if it's 9, the user is already registered, and the user will be redirected to the tutor dashboard
+          if (
+            this.currentStatus?.tutorRegistrationStatusId === 8 ||
+            this.currentStatus?.tutorRegistrationStatusId === 9
+          ) {
+            this.accountService.router.navigateByUrl('/tutor/dashboard');
+          }
         }
       },
     });
