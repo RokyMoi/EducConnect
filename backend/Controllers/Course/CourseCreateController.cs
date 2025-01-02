@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Course.Basic;
+using backend.DTOs.Course.Language;
 using backend.Interfaces.Course;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
@@ -281,6 +282,209 @@ namespace backend.Controllers.Course
                     timestamp = DateTime.Now
                 }
             );
+        }
+
+        [HttpPost("language")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> AddLanguageSupportToCourse(CourseLanguageSupportSaveRequestDTO saveRequestDTO)
+        {
+
+            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to edit a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Check if the courseId from the saveRequestDTO is correct Guid
+            if (saveRequestDTO.CourseId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Course identification is required",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+
+            }
+
+            //Check if the languageId from the saveRequestDTO is correct Guid
+            if (saveRequestDTO.LanguageId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Language identification is required",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+
+            }
+
+            //Check if the course exists
+            var course = await _courseRepository.GetCourseById(saveRequestDTO.CourseId);
+
+            if (course == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course not found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the logged in Tutor is an owner of the course (Course.TutorId equals tutor.TutorId)
+            if (course.TutorId != tutor.TutorId)
+            {
+                return StatusCode(
+                    403,
+                    new
+                    {
+                        success = "false",
+                        message = "You must be the owner of the course to edit it.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+            //Check if the languageId from the saveRequestDTO exists in the database table Languages
+            var language = await _referenceRepository.GetLanguageByIdAsync(saveRequestDTO.LanguageId);
+
+            if (language == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Language not found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the language is already supported by the course 
+            var courseLanguage = await _courseRepository.GetCourseLanguageByCourseIdAndLanguageId(course.CourseId, saveRequestDTO.LanguageId);
+            Console.WriteLine("Course Language: " + courseLanguage);
+            if (courseLanguage != null)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "This language is already supported by the course.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Attempt to add the language to the course
+            try
+            {
+                await _courseRepository.CreateCourseLanguage(course.CourseId, saveRequestDTO.LanguageId);
+            }
+            catch (System.Exception)
+            {
+
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "false",
+                        message = "An error occurred while adding the language to the course.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Language added to course successfully.",
+                    data = new
+                    {
+
+                    },
+                    timestamp = DateTime.Now
+                }
+            );
+
         }
     }
 }

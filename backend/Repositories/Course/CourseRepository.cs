@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Course.Basic;
+using backend.DTOs.Course.Language;
+using backend.Entities.Course;
 using backend.Interfaces.Course;
 using EduConnect.Data;
 using EduConnect.Entities.Course;
@@ -29,19 +31,15 @@ namespace backend.Repositories.Course
                 CourseSubject = createDTO.CourseSubject,
                 CreatedAt = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
                 UpdatedAt = null
-
-
             };
 
             try
             {
                 await _dataContext.AddAsync(newCourse);
                 await _dataContext.SaveChangesAsync();
-
             }
             catch (System.Exception ex)
             {
-
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.InnerException);
                 return null;
@@ -96,6 +94,8 @@ namespace backend.Repositories.Course
             };
         }
 
+
+
         public async Task<CourseDTO?> GetCourseByCourseName(string courseName)
         {
             var course = await _dataContext.Course.Where(x => x.CourseName.Equals(courseName)).FirstOrDefaultAsync();
@@ -112,6 +112,74 @@ namespace backend.Repositories.Course
                 CourseName = course.CourseName,
                 CourseSubject = course.CourseSubject
             };
+        }
+
+        public async Task<CourseDTO?> GetCourseById(Guid courseId)
+        {
+            var course = await _dataContext.Course.Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
+            if (course == null)
+            {
+                return null;
+            }
+
+            return new CourseDTO
+            {
+                CourseId = course.CourseId,
+                TutorId = course.TutorId,
+                CourseName = course.CourseName,
+                CourseSubject = course.CourseSubject
+            };
+
+        }
+
+        public async Task<CourseLanguageDTO?> CreateCourseLanguage(Guid courseId, Guid languageId)
+        {
+            var newCourseLanguage = new CourseLanguage
+            {
+                CourseId = courseId,
+                LanguageId = languageId,
+                CreatedAt = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+                UpdatedAt = null
+
+            };
+
+            try
+            {
+                await _dataContext.AddAsync(newCourseLanguage);
+                await _dataContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error creating course language");
+                Console.WriteLine(ex);
+                throw new Exception(ex.Message);
+
+            }
+
+            return new CourseLanguageDTO
+            {
+                CourseId = newCourseLanguage.CourseId,
+                LanguageId = newCourseLanguage.LanguageId
+            };
+
+        }
+
+        public async Task<CourseLanguageDTO?> GetCourseLanguageByCourseIdAndLanguageId(Guid courseId, Guid languageId)
+        {
+            var courseLanguage = await _dataContext.CourseLanguage.Where(x => x.LanguageId == languageId && x.CourseId == courseId).FirstOrDefaultAsync();
+
+            if (courseLanguage == null)
+            {
+                return null;
+            }
+
+            return new CourseLanguageDTO
+            {
+                CourseId = courseLanguage.CourseId,
+                LanguageId = courseLanguage.LanguageId
+            };
+
         }
     }
 }

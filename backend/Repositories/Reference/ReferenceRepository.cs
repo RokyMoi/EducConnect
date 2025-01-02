@@ -7,6 +7,7 @@ using backend.DTOs.Reference.LearningSubcategory;
 using backend.Entities.Course;
 using backend.Entities.Learning;
 using backend.Entities.Reference;
+using backend.Entities.Reference.Language;
 using backend.Interfaces.Reference;
 using EduConnect.Data;
 using EduConnect.Entities.Reference;
@@ -150,6 +151,11 @@ namespace backend.Repositories.Reference
         public async Task<IndustryClassification?> GetIndustryClassificationByIdAsync(Guid id)
         {
             return await _dataContext.IndustryClassification.Where(x => x.IndustryClassificationId == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<Language?> GetLanguageByIdAsync(Guid id)
+        {
+            return await _dataContext.Language.Where(x => x.LanguageId == id).FirstOrDefaultAsync();
         }
 
         public async Task<LearningDifficultyLevelDTO?> GetLearningDifficultyLevelByIdAsync(int id)

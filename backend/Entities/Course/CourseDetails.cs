@@ -16,6 +16,10 @@ namespace EduConnect.Entities.Course
     {
         [Key]
         public Guid CourseId { get; set; }
+
+        [ForeignKey("CourseId")]
+        //Navigation property
+        public Course Course { get; set; }
         public string CourseDescription { get; set; }
 
         public double Price { get; set; }

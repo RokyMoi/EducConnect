@@ -7,6 +7,7 @@ using backend.DTOs.Reference.LearningSubcategory;
 using backend.Entities.Course;
 using backend.Entities.Learning;
 using backend.Entities.Reference;
+using backend.Entities.Reference.Language;
 using EduConnect.Entities.Reference;
 using EduConnect.Entities.Tutor;
 
@@ -54,5 +55,7 @@ namespace backend.Interfaces.Reference
         );
 
         public Task<CourseType?> GetCourseTypeByIdAsync(int id);
+
+        public Task<Language?> GetLanguageByIdAsync(Guid id);
     }
 }
