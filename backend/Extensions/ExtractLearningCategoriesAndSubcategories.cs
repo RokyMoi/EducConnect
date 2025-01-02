@@ -68,11 +68,14 @@ namespace backend.Extensions
             LearningCategoryListAndLearningSubcategoryListDTO learningCategoriesAndSubcategoriesToSave
         )
         {
+
+
             try
             {
                 await _referenceRepository.AddLearningCategoriesToDatabase(
                     learningCategoriesAndSubcategoriesToSave.LearningCategoriesList
                 );
+                
                 await _referenceRepository.AddLearningSubcategoriesToDatabase(
                     learningCategoriesAndSubcategoriesToSave.LearningSubcategoriesList
                 );

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.DTOs.Reference.LearningDifficultyLevel;
+using backend.DTOs.Reference.LearningSubcategory;
 using backend.Entities.Learning;
 using backend.Entities.Reference;
 using backend.Interfaces.Reference;
@@ -44,6 +46,12 @@ namespace backend.Repositories.Reference
 
         public async Task AddLearningCategoriesToDatabase(List<LearningCategory> learningCategories)
         {
+            //Check if the database is empty
+            var isDatabaseEmpty = await _dataContext.LearningCategory.FirstOrDefaultAsync();
+            if (isDatabaseEmpty != null)
+            {
+                return;
+            }
             try
             {
                 await _dataContext.AddRangeAsync(
@@ -62,7 +70,12 @@ namespace backend.Repositories.Reference
 
         public async Task AddLearningSubcategoriesToDatabase(List<LearningSubcategory> learningSubcategories)
         {
-
+            //Check if the database is empty
+            var isDatabaseEmpty = await _dataContext.LearningSubCategory.FirstOrDefaultAsync();
+            if (isDatabaseEmpty != null)
+            {
+                return;
+            }
 
             try
             {
@@ -131,6 +144,41 @@ namespace backend.Repositories.Reference
         public async Task<IndustryClassification?> GetIndustryClassificationByIdAsync(Guid id)
         {
             return await _dataContext.IndustryClassification.Where(x => x.IndustryClassificationId == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<LearningDifficultyLevelDTO?> GetLearningDifficultyLevelByIdAsync(int id)
+        {
+            var learningDifficultyLevel = await _dataContext.LearningDifficultyLevel.Where(x => x.LearningDifficultyLevelId == id).FirstOrDefaultAsync();
+            if (learningDifficultyLevel == null)
+            {
+                return null;
+            }
+
+            return new LearningDifficultyLevelDTO
+            {
+                LearningDifficultyLevelId = learningDifficultyLevel.LearningDifficultyLevelId,
+                Name = learningDifficultyLevel.Name,
+                Description = learningDifficultyLevel.Description,
+            };
+        }
+
+        public async Task<LearningSubcategoryDTO?> GetLearningSubcategoryByIdAsync(Guid id)
+        {
+            var learningSubcategory = await _dataContext.LearningSubCategory.Where(x => x.LearningSubcategoryId == id).FirstOrDefaultAsync();
+
+            if (learningSubcategory == null)
+            {
+                return null;
+            }
+
+            return new LearningSubcategoryDTO
+            {
+                LearningSubcategoryId = learningSubcategory.LearningSubcategoryId,
+                LearningCategoryId = learningSubcategory.LearningCategoryId,
+                LearningSubcategoryName = learningSubcategory.LearningSubcategoryName,
+                Description = learningSubcategory.Description,
+
+            };
         }
 
         public async Task<TutorRegistrationStatus?> GetTutorRegistrationStatusByIdAsync(int id)

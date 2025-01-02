@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250101234607_SetPriceAsFloatInCourseDetails")]
+    partial class SetPriceAsFloatInCourseDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,18 +58,23 @@ namespace EduConnect.Migrations
             modelBuilder.Entity("EduConnect.Entities.Course.CourseDetails", b =>
                 {
                     b.Property<Guid>("CourseId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CourseDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CourseTypeId")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("CourseEndsAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CourseStartsAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<long>("CreatedAt")
                         .HasColumnType("bigint");
+
+                    b.Property<int>("EstimatedDurationToCompleteTheCourseInHours")
+                        .HasColumnType("int");
 
                     b.Property<int>("LearningDifficultyLevelId")
                         .HasColumnType("int");
@@ -74,15 +82,13 @@ namespace EduConnect.Migrations
                     b.Property<Guid>("LearningSubcategoryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
 
                     b.Property<long?>("UpdatedAt")
                         .HasColumnType("bigint");
 
                     b.HasKey("CourseId");
-
-                    b.HasIndex("CourseTypeId");
 
                     b.HasIndex("LearningDifficultyLevelId");
 
@@ -494,27 +500,6 @@ namespace EduConnect.Migrations
                     b.ToTable("TutorTeachingInformation", "Tutor");
                 });
 
-            modelBuilder.Entity("backend.Entities.Course.CourseType", b =>
-                {
-                    b.Property<int>("CourseTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseTypeId"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CourseTypeId");
-
-                    b.ToTable("CourseType", "Reference");
-                });
-
             modelBuilder.Entity("backend.Entities.Learning.LearningCategory", b =>
                 {
                     b.Property<Guid>("LearningCategoryId")
@@ -537,7 +522,7 @@ namespace EduConnect.Migrations
 
                     b.HasKey("LearningCategoryId");
 
-                    b.ToTable("LearningCategory", "Reference");
+                    b.ToTable("LearningCategory", "Learning");
                 });
 
             modelBuilder.Entity("backend.Entities.Learning.LearningSubcategory", b =>
@@ -566,7 +551,7 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("LearningCategoryId");
 
-                    b.ToTable("LearningSubcategory", "Reference");
+                    b.ToTable("LearningSubcategory", "Learning");
                 });
 
             modelBuilder.Entity("backend.Entities.Person.PersonAvailability", b =>
@@ -968,9 +953,9 @@ namespace EduConnect.Migrations
 
             modelBuilder.Entity("EduConnect.Entities.Course.CourseDetails", b =>
                 {
-                    b.HasOne("backend.Entities.Course.CourseType", "CourseType")
+                    b.HasOne("EduConnect.Entities.Course.Course", "Course")
                         .WithMany()
-                        .HasForeignKey("CourseTypeId")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -986,7 +971,7 @@ namespace EduConnect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CourseType");
+                    b.Navigation("Course");
 
                     b.Navigation("LearningDifficultyLevel");
 

@@ -109,6 +109,10 @@ namespace EduConnect
                     var languageDatabaseSeeder = scope.ServiceProvider.GetRequiredService<LanguageDatabaseSeeder>();
                     languageDatabaseSeeder.SeedLanguageDataToDatabase().GetAwaiter().GetResult();
 
+                    //Get the CourseType database seeder scoped service from the service container
+                    var courseTypeDatabaseSeeder = scope.ServiceProvider.GetRequiredService<CourseTypeDatabaseSeeder>();
+                    courseTypeDatabaseSeeder.SeedCourseTypeDataToDatabase().GetAwaiter().GetResult();
+
                 }
                 catch (Exception ex)
                 {

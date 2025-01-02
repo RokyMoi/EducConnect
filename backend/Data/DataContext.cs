@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using EduConnect.Entities.Course;
 using backend.Entities.Reference.Learning;
 using backend.Entities.Reference.Language;
+using backend.Entities.Course;
 
 namespace EduConnect.Data;
 
@@ -62,6 +63,8 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<LearningDifficultyLevel> LearningDifficultyLevel { get; set; }
 
     public DbSet<Language> Language { get; set; }
+
+    public DbSet<CourseType> CourseType { get; set; }
 
 
 }

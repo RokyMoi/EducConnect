@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250102113028_UpdateCourseAndHelperTables")]
+    partial class UpdateCourseAndHelperTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,9 +68,6 @@ namespace EduConnect.Migrations
                     b.Property<int>("CourseTypeId")
                         .HasColumnType("int");
 
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("LearningDifficultyLevelId")
                         .HasColumnType("int");
 
@@ -76,9 +76,6 @@ namespace EduConnect.Migrations
 
                     b.Property<double>("Price")
                         .HasColumnType("float");
-
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
 
                     b.HasKey("CourseId");
 
@@ -512,7 +509,7 @@ namespace EduConnect.Migrations
 
                     b.HasKey("CourseTypeId");
 
-                    b.ToTable("CourseType", "Reference");
+                    b.ToTable("CourseType");
                 });
 
             modelBuilder.Entity("backend.Entities.Learning.LearningCategory", b =>

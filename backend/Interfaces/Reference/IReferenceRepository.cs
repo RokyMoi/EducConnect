@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.DTOs.Reference.LearningDifficultyLevel;
+using backend.DTOs.Reference.LearningSubcategory;
 using backend.Entities.Learning;
 using backend.Entities.Reference;
 using EduConnect.Entities.Reference;
@@ -40,6 +42,14 @@ namespace backend.Interfaces.Reference
 
         public Task AddLearningSubcategoriesToDatabase(
             List<LearningSubcategory> learningSubcategories
+        );
+
+        public Task<LearningDifficultyLevelDTO?> GetLearningDifficultyLevelByIdAsync(
+            int id
+        );
+
+        public Task<LearningSubcategoryDTO?> GetLearningSubcategoryByIdAsync(
+            Guid id
         );
     }
 }

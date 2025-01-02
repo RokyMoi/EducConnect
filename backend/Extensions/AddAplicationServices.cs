@@ -54,6 +54,7 @@ namespace EduConnect.Extensions
             services.AddScoped<TutorTeachingStyleTypeDatabaseSeeder>();
             services.AddScoped<LearningDifficultyLevelDatabaseSeeder>();
             services.AddScoped<LanguageDatabaseSeeder>();
+            services.AddScoped<CourseTypeDatabaseSeeder>();
 
             //Add Middleware 
             services.AddScoped<CheckTutorRegistrationAttribute>();

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace backend.Entities.Learning
 {
-    [Table("LearningCategory", Schema = "Learning")]
+    [Table("LearningCategory", Schema = "Reference")]
     public class LearningCategory
     {
         [Key]

@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250102113222_AddCreatedAtUpdatedAtToCourseDetails")]
+    partial class AddCreatedAtUpdatedAtToCourseDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -512,7 +515,7 @@ namespace EduConnect.Migrations
 
                     b.HasKey("CourseTypeId");
 
-                    b.ToTable("CourseType", "Reference");
+                    b.ToTable("CourseType");
                 });
 
             modelBuilder.Entity("backend.Entities.Learning.LearningCategory", b =>
