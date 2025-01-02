@@ -48,6 +48,7 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<PersonAvailability> PersonAvailibility { get; set; }
 
     public DbSet<CommunicationType> CommunicationType { get; set; }
+    public DbSet<IndustryClassification> IndustryClassification { get; set; }
 
     public DbSet<EngagementMethod> EngagementMethod { get; set; }
 
