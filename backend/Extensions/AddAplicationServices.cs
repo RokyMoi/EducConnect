@@ -9,9 +9,14 @@ using backend.Middleware.Tutor;
 using backend.Repositories.Person;
 using backend.Repositories.Reference;
 using backend.Repositories.Tutor;
+
+using EduConnect.Helpers;
+
 using backend.Services;
+
 using EduConnect.Interfaces;
 using EduConnect.Services;
+using EduConnect.Repositories.MessageRepository;
 
 namespace EduConnect.Extensions
 {
@@ -31,15 +36,19 @@ namespace EduConnect.Extensions
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<ITutorRepository, TutorRepository>();
+            services.AddScoped<IPhotoService, PhotoService>();
+            services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IPersonEducationInformationRepository, PersonEducationInformationRepository>();
             services.AddScoped<IPersonCareerInformationRepository, PersonCareerInformationRepository>();
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
+            services.AddScoped<IMessageRepository,MessageRepository>();
 
 
-            //Add Database Seeders as Scoped services
+
             services.AddScoped<CountryExtractor>();
             services.AddScoped<ExtractIndustryClassification>();
 
@@ -58,6 +67,7 @@ namespace EduConnect.Extensions
             services.AddHostedService<IndustryClassificationHostedService>();
 
 
+            services.AddAutoMapper(typeof(AutoMapperProfiles));
 
 
 

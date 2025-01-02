@@ -1,0 +1,50 @@
+<div class="layout">
+    <div class="topbar">
+      <button routerLink="/direct-message" class="simple-button">BACK</button>
+      <button class="modern-button" (click)="setContainerAndLoad('Inbox')">Inbox</button>
+      <button class="modern-button" (click)="setContainerAndLoad('Outbox')">Outbox</button>
+      <button class="modern-button" (click)="setContainerAndLoad('Unread')">Unread Messages</button>
+    </div>
+    @if (messageService.paginatedResultForMessaging()?.items) {
+      <div class="content">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>Message</th>
+              <th>From/To</th>
+              <th>Sent/Received</th>
+  
+              <th>Remove</th>
+            </tr>
+          </thead>
+          <tbody>
+              @for (messages of messageService.paginatedResultForMessaging()?.items; track $index) {
+                {{InitiliazeUserForPhoto(messages)}}
+             <tr >
+                  <td><h3>{{messages.content}}</h3></td>
+  
+                  <td>
+                  <div>
+                      <img [src]="photourl">
+                      <strong> {{Container == 'Outbox' ? messages.recipientEmail:messages.senderEmail }}</strong>
+                  </div>
+                   </td>
+  
+              <td>
+                  {{timeAgo(messages.messageSent)}}
+              </td>
+              <td>
+               <button class="simple-button">Remove</button>
+              </td>
+          </tr>
+              }
+          </tbody>
+        </table>
+      </div>
+}
+@else {
+    <h3>You dont have messages</h3>
+}
+  </div>
+
+

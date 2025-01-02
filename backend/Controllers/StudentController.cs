@@ -1,13 +1,19 @@
 ﻿
+using backend.Entities.Person;
+using backend.Middleware;
 using EduConnect.Data;
 using EduConnect.DTOs;
 
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
+using EduConnect.Extensions;
+using EduConnect.Helpers;
 using EduConnect.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -29,10 +35,12 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-        [HttpGet("student/{email}")]
-        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByEmail(string email)
+        [HttpGet("getCurrentStudentForProfile")]
+        [CheckPersonLoginSignup]
+        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByEmail()
         {
-            var students = await _studentRepo.GetStudentInfoByEmail(email);
+            var caller = new Caller(this.HttpContext);
+            var students = await _studentRepo.GetStudentInfoByEmail(caller.Email);
 
             if (students == null)
             {
@@ -43,6 +51,8 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
+ 
+
         [HttpGet("get-all-emails")]
         public async Task<ActionResult> GetAllEmails()
         {
@@ -85,7 +95,7 @@ namespace EduConnect.Controllers
         }
 
         [HttpPost("student-register")]
-        public async Task<ActionResult<UserDTO>> RegisterTutor(RegisterStudentDTO student)
+        public async Task<IActionResult> RegisterTutor(RegisterStudentDTO student)
         {
             if (await isRegistered(student))
             {
@@ -106,7 +116,7 @@ namespace EduConnect.Controllers
                 FirstName = student.FirstName,
                 LastName = student.LastName,
                 Username = student.Username,
-                CountryOfOriginCountryId = Guid.Parse(student.CountryOfOrigin),
+                CountryOfOriginCountryId = student.CountryOfOriginCountryId,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
 
@@ -145,6 +155,16 @@ namespace EduConnect.Controllers
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
+            var PhoneNumber = new PersonPhoneNumber
+            {
+                PersonId = Person.PersonId,
+                NationalCallingCodeCountryId = student.PhoneNumberCountryCodeCountryId,
+                PhoneNumber = student.PhoneNumber,
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                UpdatedAt = null
+
+
+            };
 
             var studentt = new Student
             {
@@ -153,6 +173,36 @@ namespace EduConnect.Controllers
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
+
+            //Check does PhoneNumberCountryCodeCountryId exist
+            var countryByCallingCode = await db.Country.Where(x => x.CountryId == student.PhoneNumberCountryCodeCountryId).FirstOrDefaultAsync();
+            if (countryByCallingCode == null) {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "National calling code does not exist",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    });
+            }
+
+            //Check does countryOfOrigin exist
+            var countryByCountryOfOriginCountryId = await db.Country.Where(
+                x => x.CountryId == student.CountryOfOriginCountryId
+            )
+            .FirstOrDefaultAsync();
+
+            if (countryByCountryOfOriginCountryId == null) { 
+                    return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Country does not exist",
+                        data = new { },
+                        timestamp = DateTime.Now,
+                    });
+            }
             await Task.Run(async () =>
             {
                 db.Person.Add(Person);
@@ -160,17 +210,24 @@ namespace EduConnect.Controllers
                 db.PersonDetails.Add(PersonDetails);
                 db.PersonPassword.Add(PersonPassword);
                 db.PersonSalt.Add(PersonSalt);
+                db.PersonPhoneNumber.Add(PhoneNumber);
                 db.Student.Add(studentt);
+                
 
 
                 await db.SaveChangesAsync();
             });
-            return new UserDTO
-            {
-                Email = PersonEmail.Email,
-                Token = await _tokenService.CreateTokenAsync(PersonEmail),
-                Role = "student"
-            };
+            Response.Headers["Authorization"] = await _tokenService.CreateTokenAsync(PersonEmail);
+            return Ok(new {
+            message = "User was sucessfully created",
+               data = new UserDTO
+               {
+                   Email = PersonEmail.Email,
+                   Token = await _tokenService.CreateTokenAsync(PersonEmail),
+                   Role = "student"
+              
+               },
+            });
         }
         private string GenerateSalt()
         {

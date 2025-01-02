@@ -26,6 +26,7 @@ import {
 } from '@angular/material/progress-spinner';
 @Component({
   selector: 'app-phone-number',
+  standalone:true,
   imports: [
     ReactiveFormsModule,
     SelectDropdownComponent,

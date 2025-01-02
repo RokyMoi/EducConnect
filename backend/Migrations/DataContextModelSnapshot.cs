@@ -22,6 +22,53 @@ namespace EduConnect.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("EduConnect.Entities.Messenger.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DateRead")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("MessageSent")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("RecipientDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RecipientEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RecipientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("SenderDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipientId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Message");
+                });
+
             modelBuilder.Entity("EduConnect.Entities.Person.Person", b =>
                 {
                     b.Property<Guid>("PersonId")
@@ -135,6 +182,34 @@ namespace EduConnect.Migrations
                     b.HasIndex("PersonId");
 
                     b.ToTable("PersonPassword", "Person");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Person.PersonPhoto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ModifiedDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PublicId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("PersonPhoto");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.PersonProfilePicture", b =>
@@ -816,6 +891,25 @@ namespace EduConnect.Migrations
                     b.ToTable("WorkType", "Reference");
                 });
 
+            modelBuilder.Entity("EduConnect.Entities.Messenger.Message", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Person.Person", "Recipient")
+                        .WithMany("MessagesReceived")
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Person.Person", "Sender")
+                        .WithMany("MessagesSent")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Recipient");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("EduConnect.Entities.Person.PersonDetails", b =>
                 {
                     b.HasOne("backend.Entities.Reference.Country.Country", "Country")
@@ -848,6 +942,17 @@ namespace EduConnect.Migrations
                 {
                     b.HasOne("EduConnect.Entities.Person.Person", "Person")
                         .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Person.PersonPhoto", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
+                        .WithMany("PersonPhoto")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1063,11 +1168,17 @@ namespace EduConnect.Migrations
 
             modelBuilder.Entity("EduConnect.Entities.Person.Person", b =>
                 {
+                    b.Navigation("MessagesReceived");
+
+                    b.Navigation("MessagesSent");
+
                     b.Navigation("PersonDetails")
                         .IsRequired();
 
                     b.Navigation("PersonEmail")
                         .IsRequired();
+
+                    b.Navigation("PersonPhoto");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Student.Student", b =>

@@ -1,0 +1,178 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    padding: 20px;
+}
+
+/* Main Container */
+.contacts-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* Contact Card */
+.contact-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.contact-card:hover {
+    background-color: #e9eff1;
+    transform: translateY(-5px);
+    cursor: pointer;
+}
+
+.contact-avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.contact-info {
+    flex-grow: 1;
+}
+
+.contact-info h3 {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+}
+
+.contact-info .last-message {
+    font-size: 14px;
+    color: #777;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.modern-button {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease-in-out;
+    text-transform: uppercase;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    outline: none;
+    margin-right: 10px;
+  }
+  
+  .modern-button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  .modern-button:active {
+    transform: scale(0.95);
+  }
+  button{
+    margin:5px
+  }
+  .modern-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: width 0.4s, left 0.4s;
+    transform: translate(-50%, -50%);
+  }
+  
+  .modern-button:hover::after {
+    width: 100%;
+    left: 0;
+  }
+  
+  .simple-button {
+    background-color: #ff6347;
+    color: white;
+    font-size: 14px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  
+  .simple-button:hover {
+    background-color: #ff4500;
+    transform: scale(1.05);
+  }
+  
+  .simple-button:active {
+    transform: scale(0.95);
+  }
+  
+
+
+.contact-time {
+    font-size: 12px;
+    color: #bbb;
+    text-align: right;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .contacts-container {
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    .contact-card {
+        padding: 10px;
+    }
+
+    .contact-avatar img {
+        width: 45px;
+        height: 45px;
+    }
+
+    .contact-info h3 {
+        font-size: 14px;
+    }
+
+    .contact-info .last-message {
+        font-size: 12px;
+    }
+
+    .contact-time {
+        font-size: 10px;
+    }
+}
