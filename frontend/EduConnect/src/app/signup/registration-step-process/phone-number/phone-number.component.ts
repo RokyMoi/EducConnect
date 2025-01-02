@@ -17,8 +17,8 @@ import { ErrorStateMatcher } from '@angular/material/core';
 import { SubmitButtonComponent } from '../../../common/button/submit-button/submit-button.component';
 import { FloatingWarningBoxComponent } from '../../../common/floating-warning-box/floating-warning-box/floating-warning-box.component';
 import { AccountService } from '../../../services/account.service';
-import SuccessHttpResponseData from '../../../../../../../.history/frontend/EduConnect/src/app/_models/data/http.response.data/success.http.response.data_20241217014910';
 import ErrorHttpResponseData from '../../../_models/data/http.response.data/error.http.response.data';
+import SuccessHttpResponseData from '../../../_models/data/http.response.data/success.http.response.data';
 
 import {
   MatProgressSpinnerModule,

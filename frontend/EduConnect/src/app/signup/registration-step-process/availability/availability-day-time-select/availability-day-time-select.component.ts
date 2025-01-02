@@ -17,6 +17,7 @@ import { TimeAvailabilityHttpSaveRequest } from '../../../../_models/person/time
 import { NgIf } from '@angular/common';
 @Component({
   selector: 'app-availability-day-time-select',
+  standalone:true,
   imports: [
     SelectDropdownComponent,
     DatePickerComponent,

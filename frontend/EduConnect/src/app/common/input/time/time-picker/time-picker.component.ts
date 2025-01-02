@@ -17,6 +17,7 @@ import {
 
 @Component({
   selector: 'app-time-picker',
+  standalone:true,
   imports: [ReactiveFormsModule],
   templateUrl: './time-picker.component.html',
   styleUrl: './time-picker.component.css',
