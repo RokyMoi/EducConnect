@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Reference.LearningDifficultyLevel;
 using backend.DTOs.Reference.LearningSubcategory;
+using backend.Entities.Course;
 using backend.Entities.Learning;
 using backend.Entities.Reference;
 using EduConnect.Entities.Reference;
@@ -51,5 +52,7 @@ namespace backend.Interfaces.Reference
         public Task<LearningSubcategoryDTO?> GetLearningSubcategoryByIdAsync(
             Guid id
         );
+
+        public Task<CourseType?> GetCourseTypeByIdAsync(int id);
     }
 }

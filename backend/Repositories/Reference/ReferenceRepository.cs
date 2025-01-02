@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Reference.LearningDifficultyLevel;
 using backend.DTOs.Reference.LearningSubcategory;
+using backend.Entities.Course;
 using backend.Entities.Learning;
 using backend.Entities.Reference;
 using backend.Interfaces.Reference;
@@ -128,6 +129,11 @@ namespace backend.Repositories.Reference
         public async Task<CommunicationType?> GetCommunicationTypeByIdAsync(int id)
         {
             return await _dataContext.CommunicationType.Where(x => x.CommunicationTypeId == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<CourseType?> GetCourseTypeByIdAsync(int id)
+        {
+            return await _dataContext.CourseType.Where(x => x.CourseTypeId == id).FirstOrDefaultAsync();
         }
 
         public async Task<EmploymentType?> GetEmploymentTypeByIdAsync(int id)

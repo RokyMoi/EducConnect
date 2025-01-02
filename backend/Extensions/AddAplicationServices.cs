@@ -1,11 +1,13 @@
 ﻿
 using backend.Data.DataSeeder;
 using backend.Extensions;
+using backend.Interfaces.Course;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
 using backend.Interfaces.Tutor;
 using backend.Middleware;
 using backend.Middleware.Tutor;
+using backend.Repositories.Course;
 using backend.Repositories.Person;
 using backend.Repositories.Reference;
 using backend.Repositories.Tutor;
@@ -37,7 +39,7 @@ namespace EduConnect.Extensions
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
-
+            services.AddScoped<ICourseRepository, CourseRepository>();
 
             //Add Database Seeders as Scoped services
             services.AddScoped<CountryExtractor>();
