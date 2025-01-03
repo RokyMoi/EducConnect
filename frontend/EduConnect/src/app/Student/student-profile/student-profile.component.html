@@ -30,18 +30,19 @@
     <main class="profile-main">
       <section class="profile-introduction">
         <h2 class="username"><p>{{student?.firstName}} {{ student?.lastName }}</p></h2>
-        <p class="user-description" ></p>
+        <label class="username">About me:</label>
+        <p class="user-description" >{{student?.biography}}</p>
       </section>
 
       <!-- Stats and Metrics -->
       <section class="user-stats">
         <div class="stat">
-          <strong>Courses Completed</strong>
+          <strong>Courses Enrolled</strong>
           <span class="stat-value">20</span>
         </div>
         <div class="stat">
           <strong>Joined On</strong>
-          <span class="stat-value">{{student.CreatedAt}}</span>
+          <span class="stat-value">{{student?.createdAt}}</span>
         </div>
       </section>
 

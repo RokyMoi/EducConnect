@@ -166,7 +166,7 @@ namespace EduConnect.Controllers
 
             };
 
-            var studentt = new Student
+            var studentt = new Entities.Student.Student
             {
                 PersonId = Person.PersonId,
                 StudentId = Guid.NewGuid(),

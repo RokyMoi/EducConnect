@@ -22,6 +22,8 @@ import { EducationComponent } from './signup/registration-step-process/education
 import { CareerSignupComponent } from './signup/registration-step-process/career/career-signup/career-signup/career-signup.component';
 import { AvailabilitySignupComponent } from './signup/registration-step-process/availability/availability-signup/availability-signup.component';
 import { TutorTeachingStyleComponent } from './signup/registration-step-process/tutor-teaching-style/tutor-teaching-style.component';
+import { Component } from '@angular/core';
+import { DynamicFormComponent } from './SetingsStudent/dynamic-form/dynamic-form.component';
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -33,7 +35,7 @@ export const routes: Routes = [
   {path: 'learning-student', component: LearningComponent},
   { path: 'student-dashboard', component: StudentDashboardComponent },
   { path: 'tutor-dashboard', component: TutorDashboardComponent },
-  { path: 'photouploadcomponent', component: PhotoComponent},
+  {path: 'dynamicForm',component: DynamicFormComponent},
   {path: 'student-message-preview',component: MessagesComponent},
   {path: 'direct-message',component: DirectMessagingsComponent},
   {path: 'studentMessageThread/:id',component: StudentThreadMessageComponent},

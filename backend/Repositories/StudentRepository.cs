@@ -4,6 +4,7 @@ using EduConnect.Data;
 using EduConnect.DTOs;
 using EduConnect.Extensions;
 using EduConnect.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -92,7 +93,9 @@ public class StudentRepository : IStudentRepository
                 Biography = student.StudentDetails?.Biography,
                 CurrentAcademicInstitution = student.StudentDetails?.CurrentAcademicInstitution,
                 CurrentEducationLevel = student.StudentDetails?.CurrentEducationLevel,
-                MainAreaOfSpecialization = student.StudentDetails?.MainAreaOfSpecialisation
+                MainAreaOfSpecialization = student.StudentDetails?.MainAreaOfSpecialisation,
+                CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(student.CreatedAt).UtcDateTime.ToString()
+
             };
 
             return studentDto;

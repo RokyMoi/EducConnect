@@ -132,20 +132,26 @@ namespace EduConnect.Controllers.Messenger
             var currentEmail = caller.Email;
             return Ok(await messageRepository.GetMessageThread(currentEmail, email));
         }
-        
+
         [HttpGet("GetLastMessagesForDirectMessaging")]
         [CheckPersonLoginSignup]
-
         public async Task<ActionResult<IEnumerable<MessageDto>>> GetLastMessagesForDirectMessaging([FromQuery] MessageParamsDirect messageParams)
         {
-            
+            var caller = new Caller(this.HttpContext);
+            messageParams.Email = caller.Email;
 
+            if (string.IsNullOrWhiteSpace(messageParams.Email))
+                return BadRequest("Invalid email for the caller.");
 
-            var Caller = new Caller(this.HttpContext);
-            messageParams.Email = Caller.Email;
-            var messages = await messageRepository.GetLastMessagesForDirectMessaging(messageParams);
-
-            return messages;
+            try
+            {
+                var messages = await messageRepository.GetLastMessagesForDirectMessaging(messageParams);
+                return Ok(messages);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
 
