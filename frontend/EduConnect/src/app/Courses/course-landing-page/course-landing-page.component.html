@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyCourses</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+    <button routerLink="/student-dashboard" class="search-button" style="margin: 20px">Go Back to Feed</button>
+    </div>
+  
+    <div class="search-filter-container">
+       
+      <input type="text" class="search-bar" placeholder="Search courses..." />
+      <select class="category-selector">
+        <option value="all">All Categories</option>
+        <option value="web-dev">Web Development</option>
+        <option value="data-science">Data Science</option>
+        <option value="design">Design</option>
+        <option value="marketing">Marketing</option>
+      </select>
+      <button class="search-button">
+      sreach
+      </button>
+    </div>
+  </header>
+
+  <div class="courses-grid">
+    
+    <div class="course-card">
+      <img class="course-image" src="https://via.placeholder.com/300x200/3498db/ffffff?text=Angular" alt="Course Image">
+      <div class="course-info">
+        <h3 class="course-title">Learn Angular from Scratch</h3>
+        <div class="course-actions">
+          <button class="btn open-course">Open Course</button>
+          <button class="btn add-to-wishlist">Add to Wishlist</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

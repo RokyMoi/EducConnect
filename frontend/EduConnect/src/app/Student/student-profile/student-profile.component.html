@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>User Profile</title> <!-- Ispravno zatvoreni title tag -->
+  <title>User Profile</title> 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 </head>
@@ -17,9 +17,9 @@
     <header class="profile-header">
       <div class="header-content">
         <div class="avatar-container">
-          <div class="avatar"></div>
+          <div [style.background-image]="'url('+ profilePicture+')'" class="avatar"></div>
           <div class="profile-actions">
-            <button class="action-btn edit-btn">Edit Profile</button>
+            <button routerLink="/settings" class="action-btn edit-btn">Edit Profile</button>
             <button (click)="LogoutFromProfile()" class="action-btn logout-btn">Logout</button>
           </div>
         </div>
@@ -29,8 +29,8 @@
     <!-- Profile Main Content -->
     <main class="profile-main">
       <section class="profile-introduction">
-        <h2 class="username">Jane Doe</h2>
-        <p class="user-description" >Your description.</p>
+        <h2 class="username"><p>{{student?.firstName}} {{ student?.lastName }}</p></h2>
+        <p class="user-description" ></p>
       </section>
 
       <!-- Stats and Metrics -->
@@ -41,7 +41,7 @@
         </div>
         <div class="stat">
           <strong>Joined On</strong>
-          <span class="stat-value">2020-10-12</span>
+          <span class="stat-value">{{student.CreatedAt}}</span>
         </div>
       </section>
 
@@ -77,13 +77,13 @@
         <h3>Contact Information</h3>
         <div class="contact-info">
           <div class="info-item">
-            <i class="fas fa-envelope"></i> jane.doe&#64;email.com
+            <i class="fas fa-envelope"></i> {{student?.email}}
           </div>
           <div class="info-item">
-            <i class="fas fa-phone"></i> +1 234 567 890
+            <i class="fas fa-phone"></i> {{student?.phoneNumber ? student?.phoneNumber : "Nema broja" }}
           </div>
           <div class="info-item">
-            <i class="fas fa-location-arrow"></i> New York, USA
+            <i class="fas fa-location-arrow"></i> {{student?.countryOfOrigin}}
           </div>
         </div>
       </section>

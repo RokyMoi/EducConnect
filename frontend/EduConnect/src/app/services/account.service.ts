@@ -38,7 +38,7 @@ export class AccountService {
 
           if (userData) {
             const loggedInUser: User = {
-              Email: userData.Email,
+              Email: userData.email,
               Role: userData.role,
               Token: userData.token,
             };
@@ -67,7 +67,7 @@ export class AccountService {
 
   register(model: any) {
     return this.http
-      .post<User>(this.baseUrl + 'Student/student-register', model)
+      .post<User>(this.baseUrl + 'api/Student/student-register', model)
       .pipe(
         map((user) => {
           if (user) {
@@ -81,7 +81,6 @@ export class AccountService {
   logout() {
     localStorage.removeItem('user');
     this.CurrentUser.set(null);
-    
   }
 
   //Method for registering a new user as a tutor

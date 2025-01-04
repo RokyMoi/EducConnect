@@ -1,0 +1,156 @@
+/* Styles for Create Course Component */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+  color: #000;
+}
+
+.create-course-container {
+  position: relative;
+  display: flex;
+  height: 100vh;
+  visibility: visible;
+  margin-bottom: 100px;
+  overflow-y: scroll;
+}
+
+.sidebar {
+  width: 25%;
+  height: 100%;
+}
+
+.toggle {
+  width: 0;
+}
+
+.course-form {
+  flex: 1;
+  padding: 40px;
+  background-color: white; /* Secondary white color */
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.course-form h1 {
+  color: #1e90ff; /* Primary blue color */
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #4b0082; /* Purple */
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.btn-submit {
+  background-color: #1e90ff; /* Primary blue color */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background-color: #4682b4; /* Slightly darker blue */
+}
+
+.toggle-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 100;
+  transition: all 0.3s ease-in-out;
+}
+
+.toggle-button.active {
+  left: calc(25% + 10px);
+  transform: rotate(180deg);
+}
+
+@media screen and (max-width: 1024px) and (min-width: 768px) {
+  .sidebar {
+    width: 30%;
+  }
+  .toggle {
+    width: 0;
+  }
+  .toggle-button.active {
+    left: calc(30% + 10px);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .create-course-container {
+    flex-direction: column;
+    overflow-y: scroll;
+  }
+  .sidebar {
+    width: 100%;
+    height: 50% !important;
+  }
+  .toggle {
+    height: 0% !important;
+  }
+
+  .toggle-button {
+    left: 10px;
+    top: 10px;
+    transform: rotate(90deg);
+  }
+
+  .toggle-button.active {
+    position: absolute;
+    top: calc(50% + 10px);
+    left: 10px;
+    z-index: 100;
+    transition: all 0.3s ease-in-out;
+    transform: rotate(-90deg);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .sidebar {
+    width: 100%;
+    height: 100% !important;
+  }
+  .toggle {
+    height: 0% !important;
+  }
+
+  .course-form {
+    flex: 1;
+    padding: 40px;
+    background-color: white; /* Secondary white color */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    display: block;
+  }
+  .course-form.hidden {
+    display: none;
+  }
+  .toggle-button {
+    position: absolute;
+    top: 10px;
+  }
+
+  .toggle-button.active {
+    position: absolute;
+    top: 10px;
+    left: 90%;
+    z-index: 100;
+    transition: all 0.3s ease-in-out;
+    transform: rotate(-90deg);
+  }
+}

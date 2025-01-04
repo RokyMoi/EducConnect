@@ -131,7 +131,20 @@ button{
   display: none;
 }
 
-
+.moderna{
+  background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  margin-left: 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
 
 

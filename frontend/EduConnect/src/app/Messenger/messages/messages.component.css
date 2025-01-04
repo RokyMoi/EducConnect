@@ -1,0 +1,116 @@
+.modern-button {
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+  text-transform: uppercase;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  outline: none;
+  margin-right: 10px;
+}
+
+.modern-button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.modern-button:active {
+  transform: scale(0.95);
+}
+
+.modern-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: width 0.4s, left 0.4s;
+  transform: translate(-50%, -50%);
+}
+
+.modern-button:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+.simple-button {
+  background-color: #ff6347;
+  color: white;
+  font-size: 14px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.simple-button:hover {
+  background-color: #ff4500;
+  transform: scale(1.05);
+}
+
+.simple-button:active {
+  transform: scale(0.95);
+}
+
+.layout {
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.topbar {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+}
+
+.content {
+  margin-top: 20px;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.modern-table th, .modern-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.modern-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.modern-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.modern-table td img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+h3 {
+  font-size: 16px;
+  color: #333;
+  margin: 0;
+}
+
+strong {
+  font-weight: bold;
+}
