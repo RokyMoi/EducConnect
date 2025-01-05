@@ -35,6 +35,8 @@ export default class ApiLinks {
   //Get all engagement methods
   public static readonly getAllEngagementMethods =
     this.baseUrl + 'reference/engagement-method/all';
+  public static readonly getAllLearningCategoriesAndSubcategories =
+    ApiLinks.baseUrl + 'reference/learning-category-subcategory/all';
 
   //PersonPhoneNumber controller
   //Add phone number

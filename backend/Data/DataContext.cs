@@ -35,7 +35,7 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<Country> Country { get; set; }
 
     public DbSet<LearningCategory> LearningCategory { get; set; }
-    public DbSet<LearningSubcategory> LearningSubCategory { get; set; }
+    public DbSet<EduConnect.Entities.Learning.LearningSubcategory> LearningSubCategory { get; set; }
 
     public DbSet<PersonEducationInformation> PersonEducationInformation { get; set; }
 

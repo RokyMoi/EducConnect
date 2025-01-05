@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.DTOs.LearningCategory;
 using backend.DTOs.Reference.EmploymentType;
 using backend.DTOs.Reference.IndustryClassification;
+using backend.DTOs.Reference.LearningSubcategory;
 using backend.DTOs.Reference.Tutor;
 using backend.DTOs.Reference.WorkType;
 using backend.Entities.Reference;
@@ -282,6 +284,69 @@ namespace backend.Controllers.Reference
                     data = new
                     {
                         engagementMethod = engagementMethodsList
+                    },
+                    timestamp = DateTime.Now
+                }
+            );
+        }
+
+        [HttpGet("learning-category-subcategory/all")]
+        public async Task<IActionResult> GetAllLearningCategoriesAndSubcategories()
+        {
+
+            var learningCategoriesAndSubcategories = await _referenceRepository.GetAllLearningCategoriesAndSubcategories();
+
+
+            if (learningCategoriesAndSubcategories == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No learning categories and subcategories found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+
+            }
+
+            var learningCategoriesDTOList = new List<LearningCategoryDTO>();
+            foreach (var category in learningCategoriesAndSubcategories.LearningCategoriesList)
+            {
+                learningCategoriesDTOList.Add(
+                    new LearningCategoryDTO
+                    {
+                        LearningCategoryId = category.LearningCategoryId,
+                        LearningCategoryName = category.LearningCategoryName,
+                        LearningCategoryDescription = category.LearningCategoryDescription
+                    }
+                );
+            }
+
+            var learningSubcategoriesDTOList = new List<LearningSubcategoryDTO>();
+            foreach (var subcategory in learningCategoriesAndSubcategories.LearningSubcategoriesList)
+            {
+                learningSubcategoriesDTOList.Add(
+                    new LearningSubcategoryDTO
+                    {
+                        LearningSubcategoryId = subcategory.LearningSubcategoryId,
+                        LearningSubcategoryName = subcategory.LearningSubcategoryName,
+                        LearningCategoryId = subcategory.LearningCategoryId,
+                        Description = subcategory.Description
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {learningCategoriesAndSubcategories.LearningCategoriesList.Count} learning categories and {learningCategoriesAndSubcategories.LearningSubcategoriesList} subcategories",
+                    data = new
+                    {
+                        learningCategories = learningCategoriesDTOList,
+                        learningSubcategories = learningSubcategoriesDTOList
                     },
                     timestamp = DateTime.Now
                 }

@@ -28,7 +28,7 @@ body {
 
 .course-form {
   flex: 1;
-  padding: 40px;
+  padding: 60px 40px;
   background-color: white; /* Secondary white color */
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
 }

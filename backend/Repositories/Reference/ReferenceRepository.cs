@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.DTOs.Learning;
 using backend.DTOs.Reference.LearningDifficultyLevel;
 using backend.DTOs.Reference.LearningSubcategory;
 using backend.Entities.Course;
@@ -70,7 +71,7 @@ namespace backend.Repositories.Reference
             }
         }
 
-        public async Task AddLearningSubcategoriesToDatabase(List<LearningSubcategory> learningSubcategories)
+        public async Task AddLearningSubcategoriesToDatabase(List<EduConnect.Entities.Learning.LearningSubcategory> learningSubcategories)
         {
             //Check if the database is empty
             var isDatabaseEmpty = await _dataContext.LearningSubCategory.FirstOrDefaultAsync();
@@ -110,6 +111,23 @@ namespace backend.Repositories.Reference
         public async Task<List<IndustryClassification>> GetAllIndustryClassificationsAsync()
         {
             return await _dataContext.IndustryClassification.ToListAsync();
+        }
+
+        public async Task<LearningCategoryListAndLearningSubcategoryListDTO?> GetAllLearningCategoriesAndSubcategories()
+        {
+            var learningCategories = await _dataContext.LearningCategory.ToListAsync();
+            var learningSubcategories = await _dataContext.LearningSubCategory.ToListAsync();
+
+            if (learningCategories == null || learningCategories.Count() < 1 || learningSubcategories == null || learningSubcategories.Count() < 1)
+            {
+                return null;
+            }
+
+            return new LearningCategoryListAndLearningSubcategoryListDTO
+            {
+                LearningCategoriesList = learningCategories,
+                LearningSubcategoriesList = learningSubcategories
+            };
         }
 
         public async Task<List<TutorRegistrationStatus>> GetAllTutorRegistrationStatusesAsync()

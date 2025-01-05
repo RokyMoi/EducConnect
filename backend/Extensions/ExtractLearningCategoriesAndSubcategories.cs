@@ -27,7 +27,7 @@ namespace backend.Extensions
 
             var learningCategoriesList = new List<LearningCategory>();
 
-            var learningSubcategoriesList = new List<LearningSubcategory>();
+            var learningSubcategoriesList = new List<EduConnect.Entities.Learning.LearningSubcategory>();
 
             foreach (var category in learningCategories)
             {
@@ -41,7 +41,7 @@ namespace backend.Extensions
                 learningCategoriesList.Add(newLearningCategory);
                 foreach (var subcategory in category.Subcategories)
                 {
-                    LearningSubcategory newLearningSubcategory = new()
+                    EduConnect.Entities.Learning.LearningSubcategory newLearningSubcategory = new()
                     {
                         LearningSubcategoryId = Guid.NewGuid(),
                         LearningCategoryId = newLearningCategory.LearningCategoryId,
@@ -75,7 +75,7 @@ namespace backend.Extensions
                 await _referenceRepository.AddLearningCategoriesToDatabase(
                     learningCategoriesAndSubcategoriesToSave.LearningCategoriesList
                 );
-                
+
                 await _referenceRepository.AddLearningSubcategoriesToDatabase(
                     learningCategoriesAndSubcategoriesToSave.LearningSubcategoriesList
                 );

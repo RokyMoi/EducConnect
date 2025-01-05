@@ -1,0 +1,21 @@
+body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 36px;
+  color: blue;
+  font-weight: bold;
+  margin-bottom: 2%;
+}
+form {
+  width: 100%;
+  margin-top: 2%;
+}
+
+.text-input {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}

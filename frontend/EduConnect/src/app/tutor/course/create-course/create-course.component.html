@@ -21,31 +21,16 @@
             </svg>
         </span>
 
-        <!-- <aside class="sidebar" [ngClass]="{'toggle': !showSidebar}" [style.height]="sidebarHeight">
-            <h2 style="color: rgb(2, 80, 176); font-size: 1.2rem; margin-bottom: 20px;">{{sidebarTitle}}</h2>
-            <ul class="option-list" style="list-style-type: none; padding: 0;">
-                <li class="option" *ngFor="let item of courseCreationSteps; let i=index"
-                    [class.active]="i === selectedOption" (click)="selectOption(i)">
-                    {{item.title}}
-                </li>
 
-            </ul>
-        </aside> -->
-        <app-left-side-bar class="sidebar" [ngClass]="{'toggle': !showSidebar}" [style.height]="sidebarHeight"
-            [sidebarOptions]="courseCreationSteps" [selectedOption]="selectedOption" [sidebarPadding]="sidebarPadding">
+        <app-left-side-bar class="sidebar" [ngClass]="{'toggle': !showSidebar}" [sidebarTitle]="sidebarTitle"
+            [style.height]="sidebarHeight" [sidebarOptions]="courseCreationSteps" [selectedOption]="selectedOption"
+            [sidebarPadding]="sidebarPadding">
 
         </app-left-side-bar>
         <main class="course-form" [ngClass]="{'hidden': showSidebar}">
-            <h1>Create a New Course</h1>
-            <form>
-                <label for="course-title">Course Title</label>
-                <input type="text" id="course-title" placeholder="Enter course title" />
 
-                <label for="course-description">Description</label>
-                <textarea id="course-description" placeholder="Enter course description"></textarea>
+            <app-course-basic-information [referenceService]="referenceService"></app-course-basic-information>
 
-                <button type="submit" class="btn-submit">Next Step</button>
-            </form>
         </main>
     </div>
 

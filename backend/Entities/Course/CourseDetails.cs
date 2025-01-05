@@ -27,7 +27,7 @@ namespace EduConnect.Entities.Course
         public Guid LearningSubcategoryId { get; set; }
 
         //Navigation property
-        public LearningSubcategory LearningSubcategory { get; set; }
+        public EduConnect.Entities.Learning.LearningSubcategory LearningSubcategory { get; set; }
 
         public int LearningDifficultyLevelId { get; set; }
 

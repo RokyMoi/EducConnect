@@ -1,0 +1,22 @@
+<body>
+
+    <p class="title">{{componentTitle}}</p>
+    <form action="" [formGroup]="courseBasicInformationFormGroup">
+
+        <app-text-input [formControl]="courseBasicInformationFormGroup.controls.courseName" [label]="courseNameLabel"
+            [placeholder]="courseNamePlaceholder"></app-text-input>
+
+        <app-text-input [formControl]="courseBasicInformationFormGroup.controls.courseSubject"
+            [label]="courseSubjectLabel" [placeholder]="courseSubjectPlaceholder" [warning]="courseSubjectErrorMessage">
+
+
+        </app-text-input>
+
+        <app-text-area-input-component [label]="courseDescriptionLabel" [placeholder]="courseDescriptionPlaceholder"
+            [formControl]="courseBasicInformationFormGroup.controls.courseDescription"
+            [warning]="courseDescriptionErrorMessage">
+
+        </app-text-area-input-component>
+        
+    </form>
+</body>

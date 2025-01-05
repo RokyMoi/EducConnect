@@ -2,20 +2,31 @@ import { NgClass, NgFor } from '@angular/common';
 import {
   Component,
   HostListener,
+  inject,
   OnDestroy,
   OnInit,
   Renderer2,
 } from '@angular/core';
 import { LeftSideBarComponent } from '../../../common/side-bar/left-side-bar/left-side-bar.component';
+import { CourseBasicInformationComponent } from '../course-basic-information/course-basic-information.component';
+import { AccountService } from '../../../services/account.service';
+import { ReferenceService } from '../../../services/reference/reference.service';
 
 @Component({
   standalone: true,
   selector: 'app-create-course',
-  imports: [NgFor, NgClass, LeftSideBarComponent],
+  imports: [
+    NgFor,
+    NgClass,
+    LeftSideBarComponent,
+    CourseBasicInformationComponent,
+  ],
   templateUrl: './create-course.component.html',
   styleUrl: './create-course.component.css',
 })
 export class CreateCourseComponent {
+  accountService = inject(AccountService);
+  referenceService = inject(ReferenceService);
   sidebarTitle: string = 'Steps';
   courseCreationSteps = [
     {
