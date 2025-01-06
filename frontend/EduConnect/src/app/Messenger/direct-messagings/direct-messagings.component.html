@@ -9,8 +9,8 @@
 
     <div class="contacts-container" >
         <button routerLink="/student-message-preview" class="modern-button">Message Preview V2</button>
-         <button class="modern-button" (click)="OpenModule()">List of users</button>
-         <app-send-message *ngIf="emitterStatus" (FormStatus)="HandleThis($event)"></app-send-message>
+         <button class="modern-button" (click)="OpenModule()">List of users</button>         <!-- <app-send-message *ngIf="emitterStatus" (FormStatus)="HandleThis($event)"></app-send-message>
+ -->
         <hr>
         @if(messagesArray.length > 0){
         <div *ngFor="let message of messagesArray" >

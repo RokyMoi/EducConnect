@@ -25,6 +25,47 @@ namespace EduConnect.Controllers.Messenger
             this.messageRepository = messageRepository ?? throw new ArgumentNullException(nameof(messageRepository));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+        [HttpGet("GetUserForChatList")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> GetPersonListChat()
+        {
+            var caller = new Caller(this.HttpContext);
+            var CurrentUserEmail = caller.Email;
+            var defaultPhotoUrl = "https://res.cloudinary.com/dsuwjnudy/image/upload/v1735186361/ivbfqfru35jp7m8aeosn.jpg";
+
+            var personDetails = await context.PersonDetails.ToListAsync();
+            var personEmails = await context.PersonEmail.ToListAsync();
+            var personPhotos = await context.PersonPhoto.ToListAsync();
+
+            var personListChats = new List<PersonListChat>();
+
+            foreach (var person in personDetails)
+            {
+                var email = personEmails.FirstOrDefault(e => e.PersonId == person.PersonId);
+                var photo = personPhotos.FirstOrDefault(p => p.PersonId == person.PersonId);
+
+                if (email != null && email.Email != CurrentUserEmail)
+                {
+                    var personChat = new PersonListChat
+                    {
+                        FirstName = person.FirstName,
+                        LastName = person.LastName,
+                        Email = email.Email,
+                        PhotoLink = photo?.Url ?? defaultPhotoUrl
+                    };
+
+                    personListChats.Add(personChat);
+                }
+            }
+
+            var distinctPersonListChats = personListChats
+                .GroupBy(p => p.Email)
+                .Select(group => group.First())
+                .ToList();
+
+            return Ok(distinctPersonListChats);
+        }
+
 
         [HttpPost]
         [Route("CreateMessageForUser")]

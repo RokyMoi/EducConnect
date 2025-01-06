@@ -20,7 +20,7 @@ export class StudentThreadMessageComponent implements OnInit,OnDestroy {
   userForPhoto:any;
   accountService = inject(AccountService);
 GetBackToDirectMessage() {
-this.router.navigateByUrl("/direct-message");
+window.history.back();
 }
   messageService = inject(MessageService);
 

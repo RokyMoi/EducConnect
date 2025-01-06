@@ -90,8 +90,9 @@ h3 {
     padding: 20px;
     flex-grow: 1;
     background-color: #f9f9f9;
-    overflow-y: auto; /* Skrol samo za poruke */
-    max-height: calc(100vh - 140px); /* Prilagodljiva visina */
+    overflow-y: auto;
+    min-height: 70vh;
+    max-height: calc(100vh - 140px); 
 }
 
 .message {

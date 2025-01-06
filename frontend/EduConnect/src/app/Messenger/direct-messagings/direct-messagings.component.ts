@@ -19,7 +19,8 @@ HandleThis($event: boolean) {
 this.emitterStatus = $event;
 }
 OpenModule() {
-this.emitterStatus=true;
+// this.emitterStatus=true;
+this.router.navigateByUrl("/ListOfUsers");
 }
   constructor(private router: Router) {}
   emitterStatus:boolean=false;
