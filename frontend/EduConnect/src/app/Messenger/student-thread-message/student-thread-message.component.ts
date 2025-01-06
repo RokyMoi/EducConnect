@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Message } from '../../_models/messenger/message';
 import { MessageService } from '../../services/message.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './student-thread-message.component.html',
   styleUrls: ['./student-thread-message.component.css'],
 })
-export class StudentThreadMessageComponent implements OnInit {
+export class StudentThreadMessageComponent implements OnInit,OnDestroy {
   router = inject(Router);
   userForPhoto:any;
   accountService = inject(AccountService);
@@ -33,6 +33,9 @@ this.router.navigateByUrl("/direct-message");
       photourl="";
 
   constructor(private route: ActivatedRoute) {}
+  ngOnDestroy(): void {
+    this.messageService.StopHubConnection();
+  }
 
   ngOnInit(): void {
    
@@ -47,28 +50,33 @@ this.router.navigateByUrl("/direct-message");
       console.log('Sender Email:', this.senderEmail);
       console.log('Recipient Email:', this.recipientEmail);
 
-    
-      this.loadMessages(this.recipientEmail);
+      var currentUser = this.accountService.CurrentUser();
+      if( currentUser?.Email == this.senderEmail){
+        this.messageService.ceateHubConnection(currentUser, this.recipientEmail);
+      }
+      if(currentUser?.Email == this.recipientEmail){
+        this.messageService.ceateHubConnection(currentUser, this.senderEmail);
+      
+      }
+      // this.loadMessages(this.recipientEmail);
       const currentUserEmail = this.accountService.CurrentUser()?.Email;
       this.userForPhoto = (currentUserEmail === this.senderEmail) 
         ? this.recipientEmail 
         : this.senderEmail;
+
+      
+
     this.GetImageForUser(this.userForPhoto);
     });
   }
   SendMessage() {
-    this.messageService.SendMessageToUser(this.recipientEmail, this.messageContent).subscribe({
-      next: (response) => {
-        this.loadMessages(this.recipientEmail);
-        this.messageContent = '';
-        
-        console.log('Message sent successfully:', response);
-      },
-      error: (error) => {
-        
-        console.error('Error sending message:', error);
-      }
-    });
+    this.messageService.SendMessageToUser(this.recipientEmail, this.messageContent)
+      .then(() => {
+        this.messageContent = ''; 
+      })
+      .catch(error => {
+        console.error("Error sending message:", error);
+      });
   }
   GetImageForUser(email:string): string{
       let headers = new HttpHeaders();
@@ -110,20 +118,22 @@ this.router.navigateByUrl("/direct-message");
   }
   
 
-  loadMessages(email:string): void {
+  // loadMessages(email:string): void {
     
 
-    if (!email) {
-      console.error('Error: Recipient email was not set');
-      return;
-    }
+  //   if (!email) {
+  //     console.error('Error: Recipient email was not set');
+  //     return;
+  //   }
 
-    this.messageService.getMessageThread(email).subscribe({
-      next: (response) => {
-        this.messages = response;
-        console.log('Messages loaded:', this.messages);
-      },
-      error: (err) => console.error('Error loading messages:', err),
-    });
-  }
+  //   this.messageService.getMessageThread(email).subscribe({
+  //     next: (response) => {
+  //       this.messages = response;
+  //       console.log('Messages loaded:', this.messages);
+       
+  //       console.log('Service Dule Savic: ',this.messageService.messageThread())
+  //     },
+  //     error: (err) => console.error('Error loading messages:', err),
+  //   });
+  // }
 }

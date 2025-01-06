@@ -28,7 +28,7 @@
 
         <!-- Messages -->
         <div class="messages">
-            <div *ngFor="let message of messages" 
+            <div *ngFor="let message of messageService.messageThread()" 
                  [ngClass]="{
                     'message received': senderEmail!== accountService.CurrentUser()?.Email,
                     'message sent': senderEmail === accountService.CurrentUser()?.Email

@@ -67,18 +67,11 @@ LoadMessages() {
     if (this.messageForm.valid) {
       console.log('Form Submitted', this.messageForm.value);
      
-        this.messageService.SendMessageToUser(this.messageForm.controls['email'].value,this.messageForm.controls['content'].value ).subscribe({
-          next: (response) => {
-            
-          this.FormStatus.emit(false);
-          this.LoadMessages();
-            
-            console.log('Message sent successfully:', response.id);
-          },
-          error: (error) => {
-            
-            console.error('Error sending message:', error);
-          }
+        this.messageService.SendMessageToUser(this.messageForm.controls['email'].value,this.messageForm.controls['content'].value ) .then(() => {
+       
+        })
+        .catch(error => {
+          console.error("Error sending message:", error);
         });
       
      
