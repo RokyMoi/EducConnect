@@ -4,6 +4,7 @@ using backend.Extensions;
 using backend.Utilities;
 using EduConnect.Data;
 using EduConnect.Extensions;
+using EduConnect.SignalIR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
@@ -44,7 +45,8 @@ namespace EduConnect
                 {
                     policy.WithOrigins(frontendApplicationOrigin)  // Allow frontend origin
                           .AllowAnyHeader()                       // Allow any headers
-                          .AllowAnyMethod()                      // Allow any methods (GET, POST, etc.)
+                          .AllowAnyMethod()/// Allow any methods (GET, POST, etc.)
+                          .AllowCredentials()
                           .WithExposedHeaders("Authorization"); // Expose the Authorization header
                 });
             });
@@ -60,7 +62,7 @@ namespace EduConnect
                 {
                     options.AddPolicy("SwaggerDevelopmentEnvironmentPolicy", policy =>
                     {
-                        policy.WithOrigins(swaggerLink).AllowAnyHeader().AllowAnyMethod();
+                        policy.WithOrigins(swaggerLink).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                     });
                 });
 
@@ -131,6 +133,7 @@ namespace EduConnect
             }
 
             app.MapControllers();
+            app.MapHub<PresenceHub>("hubs/presence");
 
             app.Run();
         }

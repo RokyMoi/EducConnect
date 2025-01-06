@@ -17,6 +17,7 @@ using backend.Services;
 using EduConnect.Interfaces;
 using EduConnect.Services;
 using EduConnect.Repositories.MessageRepository;
+using EduConnect.SignalIR;
 
 namespace EduConnect.Extensions
 {
@@ -68,6 +69,11 @@ namespace EduConnect.Extensions
 
 
             services.AddAutoMapper(typeof(AutoMapperProfiles));
+
+
+            ///////////////////////////////
+            services.AddSignalR();
+            services.AddSingleton<PresenceTracker>();
 
 
 

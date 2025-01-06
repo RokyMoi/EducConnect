@@ -24,6 +24,7 @@ import { AvailabilitySignupComponent } from './signup/registration-step-process/
 import { TutorTeachingStyleComponent } from './signup/registration-step-process/tutor-teaching-style/tutor-teaching-style.component';
 import { Component } from '@angular/core';
 import { DynamicFormComponent } from './SetingsStudent/dynamic-form/dynamic-form.component';
+import { SendMessageComponent } from './Messenger/send-message/send-message.component';
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -40,6 +41,7 @@ export const routes: Routes = [
   {path: 'direct-message',component: DirectMessagingsComponent},
   {path: 'studentMessageThread/:id',component: StudentThreadMessageComponent},
   {path: 'viewOfAllCourses',component:CourseLandingPageComponent},
+  {path: 'send-message',component:SendMessageComponent},
  
   {
     path: 'signup/phone-number',

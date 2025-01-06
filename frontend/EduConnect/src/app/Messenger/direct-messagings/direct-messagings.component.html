@@ -7,9 +7,12 @@
 </head>
 <body>
 
-    <div class="contacts-container" *ngIf="messagesArray.length > 0; else noMessages">
-        <button routerLink="/student-message-preview" class="modern-button">Message Preview V2</button> <button class="modern-button">Send a message</button>
+    <div class="contacts-container" >
+        <button routerLink="/student-message-preview" class="modern-button">Message Preview V2</button>
+         <button class="modern-button" (click)="OpenModule()">Send a message</button>
+         <app-send-message *ngIf="emitterStatus" (FormStatus)="HandleThis($event)"></app-send-message>
         <hr>
+        @if(messagesArray.length > 0){
         <div *ngFor="let message of messagesArray" >
          {{InitiliazeUserForPhoto(message)}}
             <div class="contact-card" (click)="OpenAThread(message)">
@@ -30,16 +33,9 @@
                 </div>
             </div>
         </div>
+        }
     </div>
 
-    <ng-template #noMessages>
-        <div class="contacts-container">
-            <button routerLink="/student-message-preview" class="modern-button">Message Preview V2</button> <button class="modern-button">Send a message</button>
-            <hr>
-            <div  >
-      
-                
-            </div>
-        </div>    </ng-template>
+
 </body>
 </html>
