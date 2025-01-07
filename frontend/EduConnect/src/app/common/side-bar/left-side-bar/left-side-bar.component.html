@@ -1,11 +1,9 @@
-<aside class="sidebar" [ngClass]="{'toggle': !showSidebar}"
-    [style.padding]="sidebarPadding">
-    <h2 style="color: rgb(2, 80, 176); font-size: 1.2rem; margin-bottom: 20px;">{{sidebarTitle}}</h2>
-    <ul class="option-list" style="list-style-type: none; padding: 0;">
-        <li class="option" *ngFor="let item of sidebarOptions; let i=index" [class.active]="i === selectedOption"
-            (click)="selectOption(i)">
+<div class="sidebar" [ngClass]="{'hidden': showSidebar}">
+    <h2 class="sidebar-title">{{sidebarTitle}}</h2>
+    <ul>
+        <li *ngFor="let item of sidebarItems; let i = index" (click)="selectOption(item.link, i)"
+            [ngClass]="{ 'selected': selectedOption === i }">
             {{item.title}}
         </li>
-
     </ul>
-</aside>
+</div>

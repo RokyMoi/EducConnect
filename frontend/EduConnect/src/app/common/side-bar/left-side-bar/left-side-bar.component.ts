@@ -1,5 +1,5 @@
 import { NgClass, NgFor } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   standalone: true,
@@ -9,14 +9,15 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrl: './left-side-bar.component.css',
 })
 export class LeftSideBarComponent {
+  @Input() sidebarItems: { title: string; link: string }[] = [];
   @Input() sidebarTitle: string = 'Title';
-  @Input() sidebarWidth = '25%';
-  @Input() sidebarPadding = '0px';
-  @Input() sidebarOptions: { title: string; link: string }[] = [];
-  @Input() selectedOption: number = 0;
   @Input() showSidebar: boolean = true;
+  @Input() selectedOption: number = 0;
 
-  selectOption(index: number) {
+  @Output() optionSelected: EventEmitter<string> = new EventEmitter<string>();
+
+  selectOption(option: string, index: number) {
     this.selectedOption = index;
+    this.optionSelected.emit(option);
   }
 }

@@ -1,4 +1,11 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -48,6 +55,9 @@ import {
 export class CourseBasicInformationComponent implements OnInit {
   @Input() componentTitle: string = 'Enter basic information this course';
   @Input() referenceService!: ReferenceService;
+
+  @Output() courseCreated: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() nextStep: EventEmitter<void> = new EventEmitter<void>();
 
   //Injected services
   courseCreateService = inject(CourseCreateService);
@@ -362,12 +372,14 @@ export class CourseBasicInformationComponent implements OnInit {
           this.isOperationSuccessful = true;
           this.floatingWarningBoxMessage = 'Course created successfully';
           this.floatingWarningBoxMessageColor = 'green';
+          this.courseCreated.emit(true);
         }
         if (response.success === 'false') {
           this.isOperationSuccessful = false;
           this.floatingWarningBoxMessage =
             'Failed to save course, ' + response.message;
           this.floatingWarningBoxMessageColor = 'red';
+          this.courseCreated.emit(false);
         }
       });
   }
@@ -599,6 +611,6 @@ export class CourseBasicInformationComponent implements OnInit {
     this.isStepCompleted = true;
 
     //Open the next step
-    console.log('Open next step');
+    this.nextStep.emit();
   }
 }

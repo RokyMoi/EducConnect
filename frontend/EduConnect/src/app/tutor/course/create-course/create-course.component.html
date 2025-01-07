@@ -1,40 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="create-course.component.css">
-    <title>Create Course</title>
-</head>
-
 <body>
+    <app-left-side-bar [sidebarItems]="courseCreationSteps" [showSidebar]="showSidebar" [sidebarTitle]="sidebarTitle"
+        (optionSelected)="onSelectComponent($event)"></app-left-side-bar>
+    <span class="toggle-button" (click)="toggleSidebar()" [ngClass]="{ 'active': showSidebar }">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="undefined">
+            <path
+                d="M440-240 200-480l240-240 56 56-183 184 183 184-56 56Zm264 0L464-480l240-240 56 56-183 184 183 184-56 56Z" />
+        </svg>
+    </span>
+    <div class="content-wrapper" [ngClass]="{ 'move': showSidebar}">
+        <ng-container #dynamicContainerComponent>
+
+        </ng-container>
 
 
-
-    <div class="create-course-container">
-        <span class="toggle-button" (click)="toggleSidebar()" [ngClass]="{'active': showSidebar}">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                fill="undefined">
-                <path
-                    d="M383-480 200-664l56-56 240 240-240 240-56-56 183-184Zm264 0L464-664l56-56 240 240-240 240-56-56 183-184Z" />
-            </svg>
-        </span>
-
-
-        <app-left-side-bar class="sidebar" [ngClass]="{'toggle': !showSidebar}" [sidebarTitle]="sidebarTitle"
-            [style.height]="sidebarHeight" [sidebarOptions]="courseCreationSteps" [selectedOption]="selectedOption"
-            [sidebarPadding]="sidebarPadding">
-
-        </app-left-side-bar>
-        <main class="course-form" [ngClass]="{'hidden': showSidebar}">
-
-            <app-course-basic-information [referenceService]="referenceService"></app-course-basic-information>
-
-        </main>
     </div>
 
-
+    <app-floating-warning-box *ngIf="showFloatingWarningBox" [warningTitle]="floatingWarningBoxTitle">
+        <p [style.color]="floatingWarningBoxMessageColor" [style.font-size]="'24px'">{{floatingWarningBoxMessage}}</p>
+    </app-floating-warning-box>
 </body>
-
-</html>
