@@ -9,6 +9,7 @@ using backend.Entities.Course;
 using backend.Entities.Learning;
 using backend.Entities.Reference;
 using backend.Entities.Reference.Language;
+using backend.Entities.Reference.Learning;
 using backend.Interfaces.Reference;
 using EduConnect.Data;
 using EduConnect.Entities.Reference;
@@ -98,6 +99,11 @@ namespace backend.Repositories.Reference
             return await _dataContext.CommunicationType.ToListAsync();
         }
 
+        public Task<List<CourseType>> GetAllCourseTypesAsync()
+        {
+            return _dataContext.CourseType.ToListAsync();
+        }
+
         public async Task<List<EmploymentType>> GetAllEmploymentTypesAsync()
         {
             return await _dataContext.EmploymentType.ToListAsync();
@@ -128,6 +134,11 @@ namespace backend.Repositories.Reference
                 LearningCategoriesList = learningCategories,
                 LearningSubcategoriesList = learningSubcategories
             };
+        }
+
+        public async Task<List<LearningDifficultyLevel>> GetAllLearningDifficultyLevelsAsync()
+        {
+            return await _dataContext.LearningDifficultyLevel.ToListAsync();
         }
 
         public async Task<List<TutorRegistrationStatus>> GetAllTutorRegistrationStatusesAsync()

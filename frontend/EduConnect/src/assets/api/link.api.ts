@@ -35,8 +35,15 @@ export default class ApiLinks {
   //Get all engagement methods
   public static readonly getAllEngagementMethods =
     this.baseUrl + 'reference/engagement-method/all';
+  //Get all learning categories and subcategories
   public static readonly getAllLearningCategoriesAndSubcategories =
     ApiLinks.baseUrl + 'reference/learning-category-subcategory/all';
+  //Get all difficulty levels
+  public static readonly getAllLearningDifficultyLevels =
+    ApiLinks.baseUrl + 'reference/learning-difficulty-level/all';
+  //Get all course types
+  public static readonly getAllCourseTypes =
+    ApiLinks.baseUrl + 'reference/course-type/all';
 
   //PersonPhoneNumber controller
   //Add phone number
@@ -91,4 +98,9 @@ export default class ApiLinks {
   //Add tutor teaching information
   public static readonly addTutorTeachingInformation =
     ApiLinks.baseUrl + 'tutor/teaching';
+
+  //CourseCreate controller
+  //Add course basic information
+  public static readonly addCourseBasicInformation =
+    ApiLinks.baseUrl + 'course/create/basic';
 }

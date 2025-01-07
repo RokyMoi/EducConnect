@@ -352,5 +352,67 @@ namespace backend.Controllers.Reference
                 }
             );
         }
+
+        [HttpGet("learning-difficulty-level/all")]
+        public async Task<IActionResult> GetAllLearningDifficultyLevels()
+        {
+            var learningDifficultyLevels = await _referenceRepository.GetAllLearningDifficultyLevelsAsync();
+            if (learningDifficultyLevels == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No learning difficulty levels found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {learningDifficultyLevels.Count} learning difficulty levels",
+                    data = new
+                    {
+                        learningDifficultyLevel = learningDifficultyLevels
+                    },
+                    timestamp = DateTime.Now,
+                }
+            );
+        }
+
+        [HttpGet("course-type/all")]
+        public async Task<IActionResult> GetAllCourseTypes()
+        {
+            var courseTypes = await _referenceRepository.GetAllCourseTypesAsync();
+
+            if (courseTypes == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No course types found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {courseTypes.Count} course types",
+                    data = new
+                    {
+                        courseType = courseTypes
+                    },
+                    timestamp = DateTime.Now,
+                }
+            );
+
+        }
     }
 }

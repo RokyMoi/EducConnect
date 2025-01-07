@@ -85,6 +85,22 @@ export class CreateCourseComponent {
       title: 'Step 6: Review and Publish',
       link: 'no-link',
     },
+    {
+      title: 'Step 6: Review and Publish',
+      link: 'no-link',
+    },
+    {
+      title: 'Step 6: Review and Publish',
+      link: 'no-link',
+    },
+    {
+      title: 'Step 6: Review and Publish',
+      link: 'no-link',
+    },
+    {
+      title: 'Step 6: Review and Publish',
+      link: 'no-link',
+    },
   ];
 
   selectedOption = 0;

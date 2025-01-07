@@ -26,6 +26,8 @@ namespace backend.DTOs.Course.Basic
         [Required]
         public int LearningDifficultyLevelId { get; set; }
 
+        public bool IsDraft { get; set; } = true;
+
         [Required]
         public int CourseTypeId { get; set; }
 

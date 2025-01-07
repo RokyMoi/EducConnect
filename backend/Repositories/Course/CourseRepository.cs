@@ -29,6 +29,7 @@ namespace backend.Repositories.Course
                 TutorId = createDTO.TutorId,
                 CourseName = createDTO.CourseName,
                 CourseSubject = createDTO.CourseSubject,
+                IsDraft = createDTO.IsDraft,
                 CreatedAt = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
                 UpdatedAt = null
             };

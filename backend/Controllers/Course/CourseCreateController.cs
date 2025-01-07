@@ -222,6 +222,7 @@ namespace backend.Controllers.Course
                 TutorId = tutor.TutorId,
                 CourseName = saveRequestDTO.CourseName,
                 CourseSubject = saveRequestDTO.CourseSubject,
+                IsDraft = saveRequestDTO.IsDraft,
             };
             var createdCourse = await _courseRepository.CreateCourse(newCourse); ;
 

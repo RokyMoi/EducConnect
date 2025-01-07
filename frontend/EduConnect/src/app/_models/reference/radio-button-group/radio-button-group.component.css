@@ -1,25 +1,32 @@
-body {
+* {
   padding: 0;
   margin: 0;
-  box-sizing: border-box;
-  overflow-y: scroll;
+}
+:host {
+  --label-font-size: 14px;
+  --label-left-padding: 10px;
+  --label-color: gray;
+  --input-area-width: 100%;
+  --input-area-min-height: 50px;
+  --input-area-max-height: 100px;
+  --input-area-left-padding: 4px;
+  --input-area-border-style: 1px solid black;
+  --input-area-border-radius: 12px;
+  --input-area-margin: 1px 0px;
+  --input-area-font-size: 18px;
+  --warning-color: red;
+  --warning-font-size: 12px;
+  --warning-left-padding: 10px;
 }
 
-.title {
-  font-size: 36px;
-  color: blue;
-  font-weight: bold;
-  margin-bottom: 2%;
-}
-form {
-  width: 100%;
-  margin-top: 2%;
-  height: 100%;
-}
 
-.text-input {
-  margin-top: 20px;
-  margin-bottom: 20px;
+
+
+p {
+  color: var(--warning-color);
+  font-size: var(--warning-font-size);
+  padding-left: var(--warning-left-padding);
+  height: 21px;
 }
 
 .radio-select-container {
@@ -74,8 +81,4 @@ form {
 
 .radio-select input:hover {
   cursor: pointer;
-}
-
-.error-message-row {
-  text-align: center;
 }

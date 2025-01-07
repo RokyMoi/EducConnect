@@ -10,6 +10,7 @@ namespace backend.DTOs.Course.Basic
         public Guid TutorId { get; set; }
         public string CourseName { get; set; }
         public string CourseSubject { get; set; }
+        public bool IsDraft { get; set; }
 
     }
 }

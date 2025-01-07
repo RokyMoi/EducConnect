@@ -9,6 +9,7 @@ using backend.Entities.Course;
 using backend.Entities.Learning;
 using backend.Entities.Reference;
 using backend.Entities.Reference.Language;
+using backend.Entities.Reference.Learning;
 using EduConnect.Entities.Reference;
 using EduConnect.Entities.Tutor;
 
@@ -61,5 +62,9 @@ namespace backend.Interfaces.Reference
 
         public Task<LearningCategoryListAndLearningSubcategoryListDTO?>
         GetAllLearningCategoriesAndSubcategories();
+
+        public Task<List<LearningDifficultyLevel>> GetAllLearningDifficultyLevelsAsync();
+
+        public Task<List<CourseType>> GetAllCourseTypesAsync();
     }
 }
