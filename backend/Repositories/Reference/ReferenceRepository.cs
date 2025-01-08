@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Learning;
+using backend.DTOs.Reference.Language;
 using backend.DTOs.Reference.LearningDifficultyLevel;
 using backend.DTOs.Reference.LearningSubcategory;
 using backend.Entities.Course;
@@ -117,6 +118,31 @@ namespace backend.Repositories.Reference
         public async Task<List<IndustryClassification>> GetAllIndustryClassificationsAsync()
         {
             return await _dataContext.IndustryClassification.ToListAsync();
+        }
+
+        public async Task<List<LanguageDTO?>> GetAllLanguagesAsync()
+        {
+            List<Language> languages = await _dataContext.Language.ToListAsync();
+
+            if (languages != null && languages.Count < 1)
+            {
+                return null;
+            }
+
+            var languageDTOs = new List<LanguageDTO>();
+            foreach (var language in languages)
+            {
+                languageDTOs.Add(
+                    new LanguageDTO()
+                    {
+                        LanguageId = language.LanguageId,
+                        Name = language.Name,
+                        Code = language.Code,
+                        IsRightToLeft = language.IsRightToLeft
+                    }
+                );
+            }
+            return languageDTOs;
         }
 
         public async Task<LearningCategoryListAndLearningSubcategoryListDTO?> GetAllLearningCategoriesAndSubcategories()

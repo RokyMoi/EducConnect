@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Course.Basic;
 using backend.DTOs.Course.Language;
+using backend.DTOs.Reference.Language;
 using backend.Entities.Course;
 using backend.Interfaces.Course;
 using EduConnect.Data;
 using EduConnect.Entities.Course;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace backend.Repositories.Course
 {
@@ -181,6 +183,83 @@ namespace backend.Repositories.Course
                 LanguageId = courseLanguage.LanguageId
             };
 
+        }
+
+        public async Task<CourseDetailsDTO?> GetCourseDetailsByCourseIdAsync(Guid courseId)
+        {
+            var courseDetails = await _dataContext.CourseDetails.Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
+
+            if (courseDetails == null)
+            {
+                return null;
+            }
+
+            return new CourseDetailsDTO
+            {
+                CourseId = courseDetails.CourseId,
+                CourseDescription = courseDetails.CourseDescription,
+                Price = courseDetails.Price,
+                LearningSubcategoryId = courseDetails.LearningSubcategoryId,
+                LearningDifficultyLevelId = courseDetails.LearningDifficultyLevelId,
+                CourseTypeId = courseDetails.CourseTypeId
+
+            };
+        }
+
+        public async Task<List<LanguageDTO>?> GetSupportedLanguagesByCourseIdAsync(Guid courseId)
+        {
+            var courseLanguages = await _dataContext.CourseLanguage.Where(x => x.CourseId == courseId)
+            .GroupJoin(
+                _dataContext.Language,
+                cl => cl.LanguageId,
+                l => l.LanguageId,
+                (cl, l) => new { cl, l }
+            ).SelectMany(
+                x => x.l.DefaultIfEmpty(),
+                (x, cl) => new
+                {
+                    CourseLanguage = x.cl,
+                    Language = cl
+                }
+            ).ToListAsync();
+            if (courseLanguages == null || courseLanguages.Count == 0)
+            {
+                return null;
+            }
+
+            foreach (var courseLanguage in courseLanguages)
+            {
+                Console.WriteLine(
+                    courseLanguage.Language.Name + " " + courseLanguage.CourseLanguage.CourseId
+                );
+            }
+
+            var languages = courseLanguages.Select(
+                x => new LanguageDTO
+                {
+                    LanguageId = x.Language.LanguageId,
+                    Name = x.Language.Name,
+                    Code = x.Language.Code,
+                    IsRightToLeft = x.Language.IsRightToLeft
+
+                }
+            );
+
+            return languages.ToList();
+        }
+
+        public async Task<bool> DeleteSupportedLanguageByCourseIdAndLanguageId(Guid courseId, Guid languageId)
+        {
+            var courseLanguage = await _dataContext.CourseLanguage.Where(x => x.CourseId == courseId && x.LanguageId == languageId).FirstOrDefaultAsync();
+
+            if (courseLanguage == null)
+            {
+                return false;
+            }
+
+            _dataContext.CourseLanguage.Remove(courseLanguage);
+            await _dataContext.SaveChangesAsync();
+            return true;
         }
     }
 }

@@ -414,5 +414,36 @@ namespace backend.Controllers.Reference
             );
 
         }
+
+        [HttpGet("language/all")]
+        public async Task<IActionResult> GetAllLanguages()
+        {
+            var languages = await _referenceRepository.GetAllLanguagesAsync();
+            if (languages == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No languages found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {languages.Count} languages",
+                    data = new
+                    {
+                        language = languages
+                    },
+                    timestamp = DateTime.Now,
+                }
+            );
+        }
     }
 }

@@ -26,9 +26,9 @@ export class CourseCreateService {
       learningDifficultyLevelId: courseToCreate.learningDifficultyLevelId,
       IsDraft: true,
       courseTypeId: courseToCreate.courseTypeId,
-      coursePrice: courseToCreate.coursePrice,
+      price: courseToCreate.coursePrice,
     };
-
+    console.log('Request body for creating course', requestBody);
     return this.http
       .post(ApiLinks.addCourseBasicInformation, requestBody, {
         headers: {
@@ -54,4 +54,127 @@ export class CourseCreateService {
         })
       );
   }
-}
+
+  public addSupportedLanguage(courseId: string, languageId: string) {
+    const authorization = this.accountService.getAccessToken();
+    const requestBody = {
+      courseId: courseId,
+      languageId: languageId,
+    };
+    return this.http
+      .post(ApiLinks.addLanguageSupportToCourse, requestBody, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).status,
+          };
+        }),
+        catchError((error) => {
+          console.log(error);
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  getCourseBasicInformation(courseId: string) {
+    const authorization = this.accountService.getAccessToken();
+
+    return this.http
+      .get(`${ApiLinks.getCourseBasicInformation}/${courseId}`, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+        }),
+        catchError((error) => {
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  getLanguagesSupportedByCourse(courseId: string) {
+    const authorization = this.accountService.getAccessToken();
+    return this.http
+      .get(`${ApiLinks.getCourseSupportedLanguages}${courseId}`, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data.supportedLanguages,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+        }),
+        catchError((error) => {
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  removeSupportedLanguage(courseId: string, languageId: string) {
+    const authorization = this.accountService.getAccessToken();
+    const requestBody = {
+      courseId: courseId,
+      languageId: languageId,
+    };
+    return this.http
+      .delete(ApiLinks.deleteLanguageSupportFromCourse, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+        body: requestBody,
+      })
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+        }),
+        catchError((error) => {
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+
+  }}

@@ -21,8 +21,7 @@
         <app-select-dropdown-groups [options]="learningCategoriesAndSubcategoriesMap"
             [label]="courseLearningSubcategoryLabel" [placeholder]="courseLearningSubcategoryPlaceholder"
             [warning]="courseLearningSubcategoryErrorMessage"
-            [formControl]="courseBasicInformationFormGroup.controls['learningSubcategory']"
-            (onChangeEvent)="onCourseSubcategorySelect($event)">
+            [formControl]="courseBasicInformationFormGroup.controls['learningSubcategory']">
         </app-select-dropdown-groups>
         <app-select-dropdown [options]="learningDifficultyLevelOptions"
             [formControl]="courseBasicInformationFormGroup.controls.learningDifficultyLevel"
@@ -30,6 +29,7 @@
             [warning]="courseLearningDifficultyLevelErrorMessage"></app-select-dropdown>
         <app-radio-button-group [options]="courseTypeOptions" [fieldsetTitle]="'Course type'"
             [warning]="courseTypeWarningMessage" [warningColor]="courseTypeWarningMessageColor"
+            [formControl]="courseBasicInformationFormGroup.controls.courseType"
             (selectedOptionChanged)="onCourseTypeSelected($event)"></app-radio-button-group>
 
         <app-text-input [type]="'number'" [formControl]="courseBasicInformationFormGroup.controls.coursePrice"

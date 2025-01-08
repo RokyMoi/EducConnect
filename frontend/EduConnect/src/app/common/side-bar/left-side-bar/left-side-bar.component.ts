@@ -12,7 +12,13 @@ export class LeftSideBarComponent {
   @Input() sidebarItems: { title: string; link: string }[] = [];
   @Input() sidebarTitle: string = 'Title';
   @Input() showSidebar: boolean = true;
-  @Input() selectedOption: number = 0;
+  @Input() set selectedOption(value: number) {
+    this._selectedOption = value;
+  }
+  get selectedOption(): number {
+    return this._selectedOption;
+  }
+  private _selectedOption: number = 0;
 
   @Output() optionSelected: EventEmitter<string> = new EventEmitter<string>();
 

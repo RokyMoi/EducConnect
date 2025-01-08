@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.DTOs.Course.Basic;
 using backend.DTOs.Learning;
+using backend.DTOs.Reference.Language;
 using backend.DTOs.Reference.LearningDifficultyLevel;
 using backend.DTOs.Reference.LearningSubcategory;
 using backend.Entities.Course;
@@ -66,5 +68,7 @@ namespace backend.Interfaces.Reference
         public Task<List<LearningDifficultyLevel>> GetAllLearningDifficultyLevelsAsync();
 
         public Task<List<CourseType>> GetAllCourseTypesAsync();
+
+        public Task<List<LanguageDTO?>> GetAllLanguagesAsync();
     }
 }

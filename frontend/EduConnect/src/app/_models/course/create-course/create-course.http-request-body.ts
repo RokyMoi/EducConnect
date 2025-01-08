@@ -6,5 +6,5 @@ export interface CreateCourseHttpRequestBody {
   learningDifficultyLevelId: number;
   IsDraft: boolean;
   courseTypeId: number;
-  coursePrice: number;
+  price: number;
 }

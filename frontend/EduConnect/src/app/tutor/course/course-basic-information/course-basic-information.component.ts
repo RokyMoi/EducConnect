@@ -53,14 +53,24 @@ import {
   styleUrl: './course-basic-information.component.css',
 })
 export class CourseBasicInformationComponent implements OnInit {
+  //Injected services
+  courseCreateService = inject(CourseCreateService);
+
   @Input() componentTitle: string = 'Enter basic information this course';
   @Input() referenceService!: ReferenceService;
 
-  @Output() courseCreated: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Output() nextStep: EventEmitter<void> = new EventEmitter<void>();
+  //Flag to determine if the course is being created or edited
+  //True - for create
+  //False - for edit
+  @Input() isCreateOrEditMode: boolean = true;
+  @Input() courseId: string = '';
 
-  //Injected services
-  courseCreateService = inject(CourseCreateService);
+  //Notify the parent component that the course was successfully created and to switch to the edit mode
+  @Output() provideCourseId: EventEmitter<string> = new EventEmitter<string>();
+
+  //Notify the parent component to switch to the component which is next in line for data entry
+  @Output() goToNextStep: EventEmitter<void> = new EventEmitter<void>();
+
   //Variables for the course name
   courseNameLabel: string = 'Course Name';
   courseNamePlaceholder: string = 'Enter the course name';
@@ -188,6 +198,11 @@ export class CourseBasicInformationComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    //Check the component mode,
+    //If the component is in create mode, then there is no need to get the course data from the backend
+    //If the component is in edit mode, then there is a need to get the course data from the backend
+    this.checkComponentMode();
+
     this.getLearningCategoriesAndSubcategories();
     this.getLearningDifficultyLevels();
     this.getCourseTypes();
@@ -224,7 +239,6 @@ export class CourseBasicInformationComponent implements OnInit {
 
     this.courseBasicInformationFormGroup.controls.courseType.valueChanges.subscribe(
       () => {
-        console.log('Course type changed');
         this.setCourseTypeDescription(
           this.courseBasicInformationFormGroup.controls.courseType
             .value as string
@@ -238,12 +252,51 @@ export class CourseBasicInformationComponent implements OnInit {
       }
     );
   }
+  checkComponentMode() {
+    if (!this.isCreateOrEditMode) {
+      console.log('Checking basic information for course', this.courseId);
+      this.courseCreateService
+        .getCourseBasicInformation(this.courseId)
+        .subscribe((response) => {
+          console.log('Response from backend', response);
+          if (response.success === 'true') {
+            const courseTypeStr: string = String(
+              response.data.courseDetails.courseTypeId
+            );
+            this.courseBasicInformationFormGroup.patchValue({
+              courseName: response.data.course.courseName,
+              courseSubject: response.data.course.courseSubject,
+              courseDescription: response.data.courseDetails.courseDescription,
+              learningSubcategory:
+                response.data.courseDetails.learningSubcategoryId,
+              learningDifficultyLevel:
+                response.data.courseDetails.learningDifficultyLevelId,
+              courseType: courseTypeStr,
+              coursePrice: response.data.courseDetails.price,
+            });
+
+            console.log(
+              'Form values after patching',
+              this.courseBasicInformationFormGroup.value
+            );
+            console.log(
+              'Course type after patching',
+              typeof this.courseBasicInformationFormGroup.controls.courseType
+                .value
+            );
+          } else {
+            this.formErrorMessage = response.message;
+            this.formErrorMessageColor = 'red';
+            this.showFloatingWarningBox = true;
+          }
+        });
+    }
+  }
 
   getLearningCategoriesAndSubcategories() {
     this.referenceService
       .getLearningCategoriesAndSubcategories()
       .subscribe((response) => {
-        console.log(response);
         if (response.success === 'true') {
           this.learningCategories = response.data.learningCategories;
           this.learningCategoryOptions = this.learningCategories.map(
@@ -255,7 +308,6 @@ export class CourseBasicInformationComponent implements OnInit {
             }
           );
           this.learningSubcategories = response.data.learningSubcategories;
-          console.log(this.learningSubcategories);
           this.learningSubcategoryOptions = this.learningSubcategories.map(
             (learningSubcategory) => {
               return {
@@ -264,7 +316,6 @@ export class CourseBasicInformationComponent implements OnInit {
               };
             }
           );
-          console.log(this.learningSubcategoryOptions);
           this.learningCategoriesAndSubcategoriesMap =
             this.learningCategories.map((category) => {
               const subcategories = this.learningSubcategories.filter(
@@ -281,7 +332,6 @@ export class CourseBasicInformationComponent implements OnInit {
                 }),
               };
             });
-          console.log(this.learningCategoriesAndSubcategoriesMap);
         }
         if (response.success === 'false') {
           console.log(response.message);
@@ -293,10 +343,8 @@ export class CourseBasicInformationComponent implements OnInit {
     this.referenceService
       .getAllLearningDifficultyLevels()
       .subscribe((response) => {
-        console.log(response);
         if (response.success === 'true') {
           this.learningDifficultyLevels = response.data.learningDifficultyLevel;
-          console.log(this.learningDifficultyLevels);
           this.learningDifficultyLevelOptions =
             this.learningDifficultyLevels.map((level) => {
               return {
@@ -313,7 +361,6 @@ export class CourseBasicInformationComponent implements OnInit {
 
   getCourseTypes() {
     this.referenceService.getAllCourseTypes().subscribe((response) => {
-      console.log(response);
       if (response.success === 'true') {
         this.courseTypes = response.data;
         this.courseTypeOptions = this.courseTypes.map((type) => {
@@ -322,7 +369,6 @@ export class CourseBasicInformationComponent implements OnInit {
             value: type.courseTypeId.toString(),
           };
         });
-        console.log(this.courseTypeOptions);
       }
       if (response.success === 'false') {
         console.error(response.message);
@@ -332,15 +378,13 @@ export class CourseBasicInformationComponent implements OnInit {
 
   onCourseTypeSelected(newValue: string) {
     this.courseBasicInformationFormGroup.controls.courseType.setValue(newValue);
-    console.log(this.courseBasicInformationFormGroup.value);
-  }
-
-  onCourseSubcategorySelect(event: Event) {
-    console.log(event);
   }
 
   onSaveData() {
-    console.log('Saving data...');
+    console.log(
+      'Course type in onSaveData',
+      typeof this.courseBasicInformationFormGroup.controls.courseType.value
+    );
     const requestBody: CreateCourseBasicInformation = {
       courseName: this.courseBasicInformationFormGroup.controls.courseName
         .value as string,
@@ -365,21 +409,21 @@ export class CourseBasicInformationComponent implements OnInit {
     this.courseCreateService
       .createCourseBasicInformation(requestBody)
       .subscribe((response) => {
-        console.log(response);
         this.isDataTransmissionActive = false;
         this.isDataTransmissionComplete = true;
         if (response.success === 'true') {
           this.isOperationSuccessful = true;
           this.floatingWarningBoxMessage = 'Course created successfully';
           this.floatingWarningBoxMessageColor = 'green';
-          this.courseCreated.emit(true);
+          this.courseId = response.data.course.courseId;
+          console.log('Saved data for ', this.courseId);
+          this.provideCourseId.emit(this.courseId);
         }
         if (response.success === 'false') {
           this.isOperationSuccessful = false;
           this.floatingWarningBoxMessage =
             'Failed to save course, ' + response.message;
           this.floatingWarningBoxMessageColor = 'red';
-          this.courseCreated.emit(false);
         }
       });
   }
@@ -387,11 +431,8 @@ export class CourseBasicInformationComponent implements OnInit {
   checkForCourseNameErrors() {
     const errors =
       this.courseBasicInformationFormGroup.controls.courseName.errors;
-    console.log(errors);
     if (errors) {
-      console.log('errors');
       if (errors['required']) {
-        console.log('errors required');
         this.courseNameErrorMessage = 'This field is required';
       }
       if (errors['minlength']) {
@@ -411,11 +452,8 @@ export class CourseBasicInformationComponent implements OnInit {
   checkForCourseSubjectErrors() {
     const errors =
       this.courseBasicInformationFormGroup.controls.courseSubject.errors;
-    console.log(errors);
     if (errors) {
-      console.log('errors');
       if (errors['required']) {
-        console.log('errors required');
         this.courseSubjectErrorMessage = 'This field is required';
       }
       if (errors['minlength']) {
@@ -435,11 +473,9 @@ export class CourseBasicInformationComponent implements OnInit {
   checkForCourseDescriptionErrors() {
     const errors =
       this.courseBasicInformationFormGroup.controls.courseDescription.errors;
-    console.log(errors);
+
     if (errors) {
-      console.log('errors');
       if (errors['required']) {
-        console.log('errors required');
         this.courseDescriptionErrorMessage = 'This field is required';
       }
       if (errors['minlength']) {
@@ -454,14 +490,11 @@ export class CourseBasicInformationComponent implements OnInit {
     if (!errors) {
       this.courseDescriptionErrorMessage = '';
     }
-
-    console.log(this.courseBasicInformationFormGroup.value);
   }
 
   checkForCourseLearningSubcategoryErrors() {
     const errors =
       this.courseBasicInformationFormGroup.controls.learningSubcategory.errors;
-    console.log(errors);
 
     if (errors) {
       this.courseLearningSubcategoryErrorMessage = 'This field is required';
@@ -493,11 +526,9 @@ export class CourseBasicInformationComponent implements OnInit {
   checkForCoursePriceErrors() {
     const errors =
       this.courseBasicInformationFormGroup.controls.coursePrice.errors;
-    console.log(errors);
+
     if (errors) {
-      console.log('errors');
       if (errors['required']) {
-        console.log('errors required');
         this.coursePriceErrorMessage = 'This field is required';
       }
       if (errors['min']) {
@@ -552,13 +583,17 @@ export class CourseBasicInformationComponent implements OnInit {
       this.checkForLearningDifficultyLevelErrors();
     }
 
-    if (
-      (this.courseBasicInformationFormGroup.controls.courseType.value as string)
-        .length === 0 ||
-      (
-        this.courseBasicInformationFormGroup.controls.courseType.value as string
-      ).trim() === ''
-    ) {
+    console.log(
+      'Course type in check for errors: ',
+      typeof this.courseBasicInformationFormGroup.controls.courseType.value
+    );
+
+    const courseTypeStr: string = this.courseBasicInformationFormGroup.controls
+      .courseType.value
+      ? this.courseBasicInformationFormGroup.controls.courseType.value.toString()
+      : '';
+    console.log('Course type', courseTypeStr, 'typeof', typeof courseTypeStr);
+    if (courseTypeStr.length === 0 || courseTypeStr.trim() === '') {
       hasErrors = true;
       this.courseTypeWarningMessage = 'This field is required';
       this.courseTypeWarningMessageColor = 'red';
@@ -569,17 +604,16 @@ export class CourseBasicInformationComponent implements OnInit {
       this.checkForCoursePriceErrors();
     }
     if (hasErrors) {
-      console.log('Errors found');
       this.formErrorMessage = 'Please resolve any errors before proceeding';
       this.formErrorMessageColor = 'red';
     } else {
-      console.log('No errors found');
       this.formErrorMessage = 'You can save the data, and proceed';
-      this.formErrorMessageColor = 'red';
+      this.formErrorMessageColor = 'green';
     }
   }
 
   onNextStep() {
+    console.log(this.courseBasicInformationFormGroup.value);
     this.checkForErrors();
     this.courseBasicInformationFormGroup.valueChanges.subscribe(() => {
       this.checkForErrors();
@@ -609,8 +643,7 @@ export class CourseBasicInformationComponent implements OnInit {
     this.isDataTransmissionComplete = false;
     this.isOperationSuccessful = false;
     this.isStepCompleted = true;
-
-    //Open the next step
-    this.nextStep.emit();
+    this.showFloatingWarningBox = false;
+    this.goToNextStep.emit();
   }
 }

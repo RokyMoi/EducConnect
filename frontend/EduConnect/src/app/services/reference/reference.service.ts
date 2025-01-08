@@ -200,4 +200,25 @@ export class ReferenceService {
       })
     );
   }
+
+  getAllLanguages() {
+    return this.http.get(ApiLinks.getAllLanguages).pipe(
+      map((response) => {
+        return {
+          success: (response as any).success,
+          data: (response as any).data.language,
+          message: (response as any).message,
+          statusCode: (response as any).status,
+        };
+      }),
+      catchError((error) => {
+        return of({
+          success: (error as any).error.success,
+          data: (error as any).error.data,
+          message: (error as any).error.message,
+          statusCode: (error as any).status,
+        });
+      })
+    );
+  }
 }
