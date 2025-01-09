@@ -1,11 +1,13 @@
 ﻿
 using backend.Data.DataSeeder;
 using backend.Extensions;
+using backend.Interfaces.Course;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
 using backend.Interfaces.Tutor;
 using backend.Middleware;
 using backend.Middleware.Tutor;
+using backend.Repositories.Course;
 using backend.Repositories.Person;
 using backend.Repositories.Reference;
 using backend.Repositories.Tutor;
@@ -47,12 +49,14 @@ namespace EduConnect.Extensions
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
-            services.AddScoped<IMessageRepository,MessageRepository>();
+            services.AddScoped<ICourseRepository, CourseRepository>();            services.AddScoped<IMessageRepository,MessageRepository>();
 
 
 
             services.AddScoped<CountryExtractor>();
             services.AddScoped<ExtractIndustryClassification>();
+            services.AddScoped<ExtractLearningCategoriesAndSubcategories>();
+
 
             services.AddScoped<WorkTypeDatabaseSeeder>();
             services.AddScoped<EmploymentTypeDatabaseSeeder>();
@@ -61,6 +65,10 @@ namespace EduConnect.Extensions
             services.AddScoped<CommunicationTypeDatabaseSeeder>();
             services.AddScoped<EngagementMethodDatabaseSeeder>();
             services.AddScoped<TutorTeachingStyleTypeDatabaseSeeder>();
+            services.AddScoped<LearningDifficultyLevelDatabaseSeeder>();
+            services.AddScoped<LanguageDatabaseSeeder>();
+            services.AddScoped<CourseTypeDatabaseSeeder>();
+
             //Add Middleware 
             services.AddScoped<CheckTutorRegistrationAttribute>();
             services.AddScoped<CheckPersonLoginSignupAttribute>();
@@ -73,7 +81,7 @@ namespace EduConnect.Extensions
             /////////SHOPPING SERVICES
             services.AddScoped<IShoppingCartService, ShoppingCartService>();
             services.AddScoped<IWishListCourse, WishListService>();
-            services.Configure<StripeModel>(configuration.GetSection("StripeSettings"));
+            
 
             ///////////////////////////////
             services.AddSignalR();

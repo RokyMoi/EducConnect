@@ -18,6 +18,7 @@ import { SubmitButtonComponent } from '../../../common/button/submit-button/subm
 import { FloatingWarningBoxComponent } from '../../../common/floating-warning-box/floating-warning-box/floating-warning-box.component';
 import { AccountService } from '../../../services/account.service';
 import ErrorHttpResponseData from '../../../_models/data/http.response.data/error.http.response.data';
+import SuccessHttpResponseData from '../../../_models/data/http.response.data/success.http.response.data';
 
 import {
   MatProgressSpinnerModule,

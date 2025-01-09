@@ -1,0 +1,242 @@
+[
+  {
+    "Category": {
+      "Name": "Programming and Development",
+      "Description": "Learn to code, develop software, and understand key programming concepts."
+    },
+    "Subcategories": [
+      {
+        "Name": "Web Development",
+        "Description": "Build websites using HTML, CSS, JavaScript, and frameworks like Angular or React."
+      },
+      {
+        "Name": "Mobile App Development",
+        "Description": "Create mobile applications for Android, iOS, and cross-platform environments."
+      },
+      {
+        "Name": "Game Development",
+        "Description": "Design and develop video games using engines like Unity or Unreal."
+      },
+      {
+        "Name": "Software Testing",
+        "Description": "Learn techniques to test and debug software effectively."
+      },
+      {
+        "Name": "Data Structures and Algorithms",
+        "Description": "Understand fundamental concepts of data storage and processing."
+      },
+      {
+        "Name": "Backend Development",
+        "Description": "Build server-side applications with tools like Node.js or .NET."
+      },
+      {
+        "Name": "Frontend Development",
+        "Description": "Focus on creating interactive user interfaces using modern frameworks."
+      },
+      {
+        "Name": "Embedded Systems",
+        "Description": "Program hardware-focused applications for devices and IoT systems."
+      },
+      {
+        "Name": "DevOps Practices",
+        "Description": "Learn CI/CD, containerization, and infrastructure automation."
+      },
+      {
+        "Name": "API Development",
+        "Description": "Design and build APIs for integrating systems and applications."
+      }
+    ]
+  },
+  {
+    "Category": {
+      "Name": "Business and Entrepreneurship",
+      "Description": "Master skills to run and grow a successful business."
+    },
+    "Subcategories": [
+      {
+        "Name": "Business Management",
+        "Description": "Learn effective strategies for managing teams and operations."
+      },
+      {
+        "Name": "Marketing Strategies",
+        "Description": "Explore ways to promote products and services effectively."
+      },
+      {
+        "Name": "Financial Planning",
+        "Description": "Understand how to manage budgets and forecast growth."
+      },
+      {
+        "Name": "E-commerce Essentials",
+        "Description": "Set up and grow your online store with key tools and techniques."
+      },
+      {
+        "Name": "Leadership Skills",
+        "Description": "Develop the traits of an influential and effective leader."
+      },
+      {
+        "Name": "Sales Techniques",
+        "Description": "Master techniques to close deals and drive revenue."
+      },
+      {
+        "Name": "Business Analytics",
+        "Description": "Use data to make informed business decisions."
+      },
+      {
+        "Name": "Product Management",
+        "Description": "Learn how to lead product development and launch."
+      },
+      {
+        "Name": "Business Communication",
+        "Description": "Improve your communication skills for business settings."
+      },
+      {
+        "Name": "Start-Up Essentials",
+        "Description": "Learn what it takes to launch and grow a start-up."
+      }
+    ]
+  },
+  {
+    "Category": {
+      "Name": "Health and Wellness",
+      "Description": "Focus on physical and mental well-being through various practices."
+    },
+    "Subcategories": [
+      {
+        "Name": "Nutrition Basics",
+        "Description": "Understand the fundamentals of healthy eating."
+      },
+      {
+        "Name": "Mental Health Awareness",
+        "Description": "Explore ways to support and improve mental health."
+      },
+      {
+        "Name": "Fitness Training",
+        "Description": "Learn exercises and routines for physical fitness."
+      },
+      {
+        "Name": "Yoga and Meditation",
+        "Description": "Practice mindfulness and flexibility with yoga and meditation."
+      },
+      {
+        "Name": "Stress Management",
+        "Description": "Discover techniques to manage stress and build resilience."
+      },
+      {
+        "Name": "Sports and Athletics",
+        "Description": "Train in specific sports and athletic disciplines."
+      },
+      {
+        "Name": "Alternative Medicine",
+        "Description": "Explore holistic approaches to health and healing."
+      },
+      {
+        "Name": "Healthy Cooking",
+        "Description": "Learn recipes and techniques for nutritious meals."
+      },
+      {
+        "Name": "Disease Prevention",
+        "Description": "Understand ways to prevent common illnesses."
+      },
+      {
+        "Name": "Workplace Wellness",
+        "Description": "Focus on maintaining health in a professional setting."
+      }
+    ]
+  },
+  {
+    "Category": {
+      "Name": "Design and Creative Arts",
+      "Description": "Explore your creative side through various design and art techniques."
+    },
+    "Subcategories": [
+      {
+        "Name": "Graphic Design",
+        "Description": "Learn to create visuals using design tools and principles."
+      },
+      {
+        "Name": "UI/UX Design",
+        "Description": "Design user-friendly interfaces and experiences for digital products."
+      },
+      {
+        "Name": "Interior Design",
+        "Description": "Create aesthetic and functional spaces indoors."
+      },
+      {
+        "Name": "Photography Basics",
+        "Description": "Master the fundamentals of photography."
+      },
+      {
+        "Name": "Video Editing",
+        "Description": "Edit and enhance video content for storytelling."
+      },
+      {
+        "Name": "Animation and Motion Graphics",
+        "Description": "Learn to create dynamic animations and visuals."
+      },
+      {
+        "Name": "Illustration Techniques",
+        "Description": "Explore techniques for drawing and digital illustration."
+      },
+      {
+        "Name": "Fashion Design",
+        "Description": "Design clothing and accessories with creativity."
+      },
+      {
+        "Name": "3D Modeling",
+        "Description": "Create 3D objects and environments using modeling software."
+      },
+      {
+        "Name": "Branding and Identity",
+        "Description": "Learn to design impactful brand identities."
+      }
+    ]
+  },
+  {
+    "Category": {
+      "Name": "Science and Technology",
+      "Description": "Discover advancements and skills in cutting-edge technology fields."
+    },
+    "Subcategories": [
+      {
+        "Name": "Artificial Intelligence",
+        "Description": "Learn how machines can simulate human intelligence."
+      },
+      {
+        "Name": "Machine Learning",
+        "Description": "Build predictive models with data and algorithms."
+      },
+      {
+        "Name": "Quantum Computing",
+        "Description": "Understand the basics of quantum mechanics in computing."
+      },
+      {
+        "Name": "Robotics",
+        "Description": "Explore the creation and control of robots."
+      },
+      {
+        "Name": "Data Science",
+        "Description": "Analyze and interpret complex data sets."
+      },
+      {
+        "Name": "Internet of Things (IoT)",
+        "Description": "Connect devices to create smart systems."
+      },
+      {
+        "Name": "Cybersecurity",
+        "Description": "Protect systems and networks from cyber threats."
+      },
+      {
+        "Name": "Biotechnology",
+        "Description": "Learn about biological systems and their technological applications."
+      },
+      {
+        "Name": "Space Exploration",
+        "Description": "Understand the technologies behind exploring outer space."
+      },
+      {
+        "Name": "Environmental Science",
+        "Description": "Study the interaction of living organisms with their environment."
+      }
+    ]
+  }
+]

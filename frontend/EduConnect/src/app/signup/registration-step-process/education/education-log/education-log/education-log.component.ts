@@ -38,6 +38,7 @@ import EducationInformationHttpSaveRequest from '../../../../../_models/person/e
 import EducationInformationHttpUpdateRequest from '../../../../../_models/person/education/EducationInformationHttpUpdateRequest';
 
 @Component({
+  standalone: true,
   selector: 'app-education-log',
   imports: [
     TextInputComponentComponent,

@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 import { EducationService } from '../../../../../services/education/education-service/education-service.service';
 
 @Component({
+  standalone: true,
   selector: 'app-career-signup',
   imports: [
     NgFor,

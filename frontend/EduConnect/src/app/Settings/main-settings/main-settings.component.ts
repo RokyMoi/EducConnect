@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import { AccountService } from '../../services/account.service';
@@ -7,11 +8,15 @@ import { NgIf } from '@angular/common';
 import { DynamicFormComponent } from "../../SetingsStudent/dynamic-form/dynamic-form.component";
 
 
+=======
+import { Component } from '@angular/core';
+>>>>>>> d93e7ce8e2cd19478839a575de236d1244ad0fd8
 
 
 @Component({
   selector: 'app-main-settings',
   standalone:true,
+<<<<<<< HEAD
   imports: [PhotoComponent, NgIf, DynamicFormComponent],
   templateUrl: './main-settings.component.html',
   styleUrl: './main-settings.component.css'
@@ -67,3 +72,12 @@ this.type = tip;
 
 }
 
+=======
+  imports: [],
+  templateUrl: './main-settings.component.html',
+  styleUrl: './main-settings.component.css'
+})
+export class MainSettingsComponent {
+
+}
+>>>>>>> d93e7ce8e2cd19478839a575de236d1244ad0fd8

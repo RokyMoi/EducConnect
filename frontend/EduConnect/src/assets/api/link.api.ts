@@ -35,6 +35,17 @@ export default class ApiLinks {
   //Get all engagement methods
   public static readonly getAllEngagementMethods =
     this.baseUrl + 'reference/engagement-method/all';
+  //Get all learning categories and subcategories
+  public static readonly getAllLearningCategoriesAndSubcategories =
+    ApiLinks.baseUrl + 'reference/learning-category-subcategory/all';
+  //Get all difficulty levels
+  public static readonly getAllLearningDifficultyLevels =
+    ApiLinks.baseUrl + 'reference/learning-difficulty-level/all';
+  //Get all course types
+  public static readonly getAllCourseTypes =
+    ApiLinks.baseUrl + 'reference/course-type/all';
+  public static readonly getAllLanguages =
+    ApiLinks.baseUrl + 'reference/language/all';
 
   //PersonPhoneNumber controller
   //Add phone number
@@ -89,4 +100,23 @@ export default class ApiLinks {
   //Add tutor teaching information
   public static readonly addTutorTeachingInformation =
     ApiLinks.baseUrl + 'tutor/teaching';
+
+  //CourseCreate controller
+  //Add course basic information
+  public static readonly addCourseBasicInformation =
+    ApiLinks.baseUrl + 'course/create/basic';
+  //Add language support to the course
+  public static readonly addLanguageSupportToCourse =
+    ApiLinks.baseUrl + 'course/create/language';
+
+  //Course controller
+  //Get Course basic information by course id
+  public static readonly getCourseBasicInformation =
+    ApiLinks.baseUrl + 'course/basic';
+  ///Get all languages supported by the course
+  public static readonly getCourseSupportedLanguages =
+    ApiLinks.baseUrl + 'course/supported-language/';
+  //Delete language support from the course
+  public static readonly deleteLanguageSupportFromCourse =
+    ApiLinks.baseUrl + 'course/supported-language/remove';
 }

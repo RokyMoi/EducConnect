@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.DTOs.LearningCategory;
 using backend.DTOs.Reference.EmploymentType;
 using backend.DTOs.Reference.IndustryClassification;
+using backend.DTOs.Reference.LearningSubcategory;
 using backend.DTOs.Reference.Tutor;
 using backend.DTOs.Reference.WorkType;
 using backend.Entities.Reference;
@@ -284,6 +286,162 @@ namespace backend.Controllers.Reference
                         engagementMethod = engagementMethodsList
                     },
                     timestamp = DateTime.Now
+                }
+            );
+        }
+
+        [HttpGet("learning-category-subcategory/all")]
+        public async Task<IActionResult> GetAllLearningCategoriesAndSubcategories()
+        {
+
+            var learningCategoriesAndSubcategories = await _referenceRepository.GetAllLearningCategoriesAndSubcategories();
+
+
+            if (learningCategoriesAndSubcategories == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No learning categories and subcategories found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+
+            }
+
+            var learningCategoriesDTOList = new List<LearningCategoryDTO>();
+            foreach (var category in learningCategoriesAndSubcategories.LearningCategoriesList)
+            {
+                learningCategoriesDTOList.Add(
+                    new LearningCategoryDTO
+                    {
+                        LearningCategoryId = category.LearningCategoryId,
+                        LearningCategoryName = category.LearningCategoryName,
+                        LearningCategoryDescription = category.LearningCategoryDescription
+                    }
+                );
+            }
+
+            var learningSubcategoriesDTOList = new List<LearningSubcategoryDTO>();
+            foreach (var subcategory in learningCategoriesAndSubcategories.LearningSubcategoriesList)
+            {
+                learningSubcategoriesDTOList.Add(
+                    new LearningSubcategoryDTO
+                    {
+                        LearningSubcategoryId = subcategory.LearningSubcategoryId,
+                        LearningSubcategoryName = subcategory.LearningSubcategoryName,
+                        LearningCategoryId = subcategory.LearningCategoryId,
+                        Description = subcategory.Description
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {learningCategoriesAndSubcategories.LearningCategoriesList.Count} learning categories and {learningCategoriesAndSubcategories.LearningSubcategoriesList} subcategories",
+                    data = new
+                    {
+                        learningCategories = learningCategoriesDTOList,
+                        learningSubcategories = learningSubcategoriesDTOList
+                    },
+                    timestamp = DateTime.Now
+                }
+            );
+        }
+
+        [HttpGet("learning-difficulty-level/all")]
+        public async Task<IActionResult> GetAllLearningDifficultyLevels()
+        {
+            var learningDifficultyLevels = await _referenceRepository.GetAllLearningDifficultyLevelsAsync();
+            if (learningDifficultyLevels == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No learning difficulty levels found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {learningDifficultyLevels.Count} learning difficulty levels",
+                    data = new
+                    {
+                        learningDifficultyLevel = learningDifficultyLevels
+                    },
+                    timestamp = DateTime.Now,
+                }
+            );
+        }
+
+        [HttpGet("course-type/all")]
+        public async Task<IActionResult> GetAllCourseTypes()
+        {
+            var courseTypes = await _referenceRepository.GetAllCourseTypesAsync();
+
+            if (courseTypes == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No course types found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {courseTypes.Count} course types",
+                    data = new
+                    {
+                        courseType = courseTypes
+                    },
+                    timestamp = DateTime.Now,
+                }
+            );
+
+        }
+
+        [HttpGet("language/all")]
+        public async Task<IActionResult> GetAllLanguages()
+        {
+            var languages = await _referenceRepository.GetAllLanguagesAsync();
+            if (languages == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No languages found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {languages.Count} languages",
+                    data = new
+                    {
+                        language = languages
+                    },
+                    timestamp = DateTime.Now,
                 }
             );
         }

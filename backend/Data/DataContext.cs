@@ -7,6 +7,10 @@ using EduConnect.Entities.Person;
 using EduConnect.Entities.Reference;
 using EduConnect.Entities.Student;
 using Microsoft.EntityFrameworkCore;
+using EduConnect.Entities.Course;
+using backend.Entities.Reference.Learning;
+using backend.Entities.Reference.Language;
+using backend.Entities.Course;
 using EduConnect.Entities.Messenger;
 using EduConnect.Entities.Shopping;
 using EduConnect.Entities.Course;
@@ -43,7 +47,7 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
 
     public DbSet<LearningCategory> LearningCategory { get; set; }
-    public DbSet<LearningSubcategory> LearningSubCategory { get; set; }
+    public DbSet<EduConnect.Entities.Learning.LearningSubcategory> LearningSubCategory { get; set; }
 
     public DbSet<PersonEducationInformation> PersonEducationInformation { get; set; }
 
@@ -65,6 +69,8 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+         builder.Entity<CourseLanguage>()
+            .HasKey(cl => new { cl.CourseId, cl.LanguageId });
 
         builder.Entity<Message>()
              .HasOne(x => x.Recipient)
@@ -76,6 +82,19 @@ public class DataContext(DbContextOptions options) : DbContext(options)
             .WithMany(x => x.MessagesSent)
             .OnDelete(DeleteBehavior.Restrict);
     }
+
+    public DbSet<CourseDetails> CourseDetails { get; set; }
+
+
+    public DbSet<LearningDifficultyLevel> LearningDifficultyLevel { get; set; }
+
+    public DbSet<Language> Language { get; set; }
+
+    public DbSet<CourseType> CourseType { get; set; }
+
+    public DbSet<CourseLanguage> CourseLanguage { get; set; }
+
+  
 
 
 }

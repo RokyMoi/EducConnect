@@ -1,0 +1,13 @@
+<div class="radio-select-container">
+    <fieldset>
+        <legend>{{fieldsetTitle}}</legend>
+        <div class="radio-select" *ngFor="let item of options; let i=index">
+            <input type="radio" name="" [id]="item.value" [value]="item.value" [formControl]="formControl"
+                (change)="onValueChange($event, item.value)" />
+            <label [for]="item.value">{{options[i].name}}</label>
+        </div>
+
+    </fieldset>
+    <p [style.color]="warningColor">{{warning}}</p>
+
+</div>

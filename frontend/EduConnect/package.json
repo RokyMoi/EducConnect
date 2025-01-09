@@ -23,6 +23,7 @@
     "@microsoft/signalr": "^8.0.7",
     "@types/signalr": "^2.4.3",
     "ngx-file-drop": "^16.0.0",
+    "ngx-file-drop": "^16.0.0",
     "rxjs": "~7.8.0",
     "signalr": "^2.4.3",
     "tslib": "^2.3.0",

@@ -215,7 +215,7 @@ namespace backend.Controllers.Tutor
 
 
             //Update TutorRegistrationStatus to 7
-            var tutorUpdateStatusResult = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 8);
+            var tutorUpdateStatusResult = await _tutorRepository.UpdateTutorRegistrationStatus(personId, 10);
 
             if (tutorUpdateStatusResult == null)
             {

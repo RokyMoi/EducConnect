@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Entities.Learning;
 
-namespace backend.Entities.Learning
+namespace EduConnect.Entities.Learning
 {
-    [Table("LearningSubcategory", Schema = "Learning")]
+    [Table("LearningSubcategory", Schema = "Reference")]
     public class LearningSubcategory
     {
         [Key]
