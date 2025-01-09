@@ -70,5 +70,8 @@ namespace backend.Interfaces.Reference
         public Task<List<CourseType>> GetAllCourseTypesAsync();
 
         public Task<List<LanguageDTO?>> GetAllLanguagesAsync();
+
+        public Task<CourseCreationCompletenessStep?>
+        GetCourseCreationCompletenessStepDTOByStepOrderAsync(int stepOrder);
     }
 }

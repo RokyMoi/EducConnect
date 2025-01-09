@@ -32,6 +32,7 @@ namespace backend.Repositories.Course
                 CourseName = createDTO.CourseName,
                 CourseSubject = createDTO.CourseSubject,
                 IsDraft = createDTO.IsDraft,
+                CourseCreationCompletenessStepId = await _dataContext.CourseCreationCompletenessStep.Where(x => x.StepOrder == 0).Select(x => x.CourseCreationCompletenessStepId).FirstOrDefaultAsync(),
                 CreatedAt = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
                 UpdatedAt = null
             };
@@ -260,6 +261,32 @@ namespace backend.Repositories.Course
             _dataContext.CourseLanguage.Remove(courseLanguage);
             await _dataContext.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<CourseDTO?> UpdateCourseCompletenessStepByCourseIdAndStepOrder(Guid courseId, int stepOrder)
+        {
+            var course = await _dataContext.Course.Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
+            if (course == null)
+            {
+                return null;
+            }
+
+            var CourseCreationCompletenessStep = await _dataContext.CourseCreationCompletenessStep.Where(x => x.StepOrder == stepOrder).FirstOrDefaultAsync();
+            if (CourseCreationCompletenessStep == null)
+            {
+                return null;
+            }
+
+            course.CourseCreationCompletenessStepId = CourseCreationCompletenessStep.CourseCreationCompletenessStepId;
+            await _dataContext.SaveChangesAsync();
+            return new CourseDTO
+            {
+                CourseId = course.CourseId,
+                CourseName = course.CourseName,
+                CourseSubject = course.CourseSubject,
+                CourseCreationCompletenessStepId = course.CourseCreationCompletenessStepId
+            };
+
         }
     }
 }

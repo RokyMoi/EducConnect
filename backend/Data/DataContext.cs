@@ -68,6 +68,7 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<CourseLanguage> CourseLanguage { get; set; }
 
+    public DbSet<CourseCreationCompletenessStep> CourseCreationCompletenessStep { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CourseLanguage>()

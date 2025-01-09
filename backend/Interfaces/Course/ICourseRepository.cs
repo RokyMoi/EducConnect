@@ -27,5 +27,7 @@ namespace backend.Interfaces.Course
         public Task<List<LanguageDTO>?> GetSupportedLanguagesByCourseIdAsync(Guid courseId);
 
         public Task<bool> DeleteSupportedLanguageByCourseIdAndLanguageId(Guid courseId, Guid languageId);
+
+        public Task<CourseDTO?> UpdateCourseCompletenessStepByCourseIdAndStepOrder(Guid courseId, int stepOrder);
     }
 }

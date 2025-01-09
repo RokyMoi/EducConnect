@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using backend.Entities.Reference;
+using EduConnect.Entities.Reference;
 
 namespace EduConnect.Entities.Course
 {
@@ -22,7 +24,13 @@ namespace EduConnect.Entities.Course
 
 
         public required bool IsDraft { get; set; }
-        
+
+        public required Guid CourseCreationCompletenessStepId { get; set; }
+
+        [ForeignKey("CourseCreationCompletenessStepId")]
+        public CourseCreationCompletenessStep? CourseCreationCompletenessStep { get; set; } = null;
+
+
         public required long CreatedAt { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
 
         public long? UpdatedAt { get; set; } = null;

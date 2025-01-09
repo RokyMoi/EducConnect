@@ -1,6 +1,6 @@
 body {
   padding: 40px;
-  height: 100%;
+  height: calc(100% - 80px);
   width: 100%;
   box-sizing: border-box;
   overflow-y: auto;
@@ -83,3 +83,5 @@ form {
 .error-message-row {
   text-align: center;
 }
+
+

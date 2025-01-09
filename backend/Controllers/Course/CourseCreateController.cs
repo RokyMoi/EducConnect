@@ -216,6 +216,9 @@ namespace backend.Controllers.Course
                 );
             }
 
+            //Get the first step of the CourseCreationCompleteness
+            var firstStep = await _referenceRepository.GetCourseCreationCompletenessStepDTOByStepOrderAsync(0);
+
             //Create Course object and save it to the database
             var newCourse = new CourseCreateDTO
             {
@@ -223,6 +226,7 @@ namespace backend.Controllers.Course
                 CourseName = saveRequestDTO.CourseName,
                 CourseSubject = saveRequestDTO.CourseSubject,
                 IsDraft = saveRequestDTO.IsDraft,
+                CourseCreationCompletenessStepId = firstStep.CourseCreationCompletenessStepId,
             };
             var createdCourse = await _courseRepository.CreateCourse(newCourse); ;
 
@@ -452,6 +456,23 @@ namespace backend.Controllers.Course
                         timestamp = DateTime.Now
                     }
                 );
+            }
+
+            //Update the course with the new CourseCreationStep (Step 1)
+            var courseUpdateStep = await _courseRepository.UpdateCourseCompletenessStepByCourseIdAndStepOrder(course.CourseId, 1);
+            Console.WriteLine("Course Completeness Step: " + course.CourseCreationCompletenessStepId);
+            if (courseUpdateStep == null)
+            {
+                return StatusCode(
+                        500,
+                        new
+                        {
+                            success = "false",
+                            message = "An error occurred while updating the course completeness step.",
+                            data = new { },
+                            timestamp = DateTime.Now
+                        }
+                    );
             }
 
             //Attempt to add the language to the course

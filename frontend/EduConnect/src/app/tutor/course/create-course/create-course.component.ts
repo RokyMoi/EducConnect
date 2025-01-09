@@ -36,6 +36,9 @@ export class CreateCourseComponent {
 
   @ViewChild('dynamicContainerComponent', { read: ViewContainerRef })
   container!: ViewContainerRef;
+
+  @ViewChild(LeftSideBarComponent) leftSidebar!: LeftSideBarComponent;
+
   sidebarTitle: string = 'Steps';
 
   showFloatingWarningBox: boolean = false;
@@ -73,12 +76,10 @@ export class CreateCourseComponent {
   //False - for edit
   isCreateOrEditMode: boolean = true;
 
-  // Add a new property to track the previous valid index
-  previousValidIndex: number = 0;
-
-  selectOption(index: number) {
-    this.selectedOption = index;
-  }
+  //Flag variable to determine if the basic information step has been completed
+  isBasicInformationStepCompleted: boolean = false;
+  //Flag variable to determine if the supported languages step has been completed
+  isSupportedLanguagesStepCompleted: boolean = false;
 
   ngAfterViewInit() {
     // Load initial component
@@ -88,56 +89,64 @@ export class CreateCourseComponent {
   toggleSidebar() {
     this.showSidebar = !this.showSidebar;
   }
+  onSelectIndex(index: number) {
+    this.selectedOption = index;
+    console.log('Selected index:', index);
+  }
   onSelectComponent(componentName: string) {
-    console.log(componentName);
-    console.log('Course to edit', this.courseId);
-    console.log(
-      'Component is in',
-      this.isCreateOrEditMode ? 'create' : 'edit',
-      'mode'
-    );
+    console.log('Selected component: ', componentName);
 
-    if (this.isCreateOrEditMode && componentName !== 'CourseBasicInformation') {
-      console.log('Basic information is required first');
-      this.selectedOption = this.previousValidIndex; // Reset to previous valid index
-      this.showFloatingWarningBox = true;
-      this.floatingWarningBoxMessage =
-        'We need you to fill in the basic information first';
-      this.floatingWarningBoxMessageColor = 'red';
-      this.floatingWarningBoxTitle = 'Cannot proceed';
-      setTimeout(() => {
-        this.showFloatingWarningBox = false;
-      }, 3000);
-      return;
-    }
-
-    // If navigation is allowed, update the previous valid index
-    this.previousValidIndex = this.selectedOption;
-
-    var componentType = this.componentsMap[componentName];
     this.container.clear();
-
+    const componentType = this.componentsMap[componentName];
     if (componentType) {
       const componentRef = this.container.createComponent(componentType);
-      if (componentType === CourseBasicInformationComponent) {
-        componentRef.instance.referenceService = this.referenceService;
-        componentRef.instance.isCreateOrEditMode = this.isCreateOrEditMode;
+
+      //Pass and receive values from the CourseBasicInformationComponent
+      if (componentName === 'CourseBasicInformation') {
         componentRef.instance.courseId = this.courseId;
+        componentRef.instance.isCreateOrEditMode = this.isCreateOrEditMode;
+        componentRef.instance.referenceService = this.referenceService;
+
         componentRef.instance.provideCourseId.subscribe((courseId: string) => {
           this.courseId = courseId;
+          console.log('Course Id: ', courseId);
+          this.isBasicInformationStepCompleted = true;
           this.isCreateOrEditMode = false;
-          console.log('Provided course id: ' + this.courseId);
         });
+
         componentRef.instance.goToNextStep.subscribe(() => {
+          this.handleOptionChangeRequest({
+            option: 'CourseSupportedLanguages',
+            index: 1,
+          });
           this.onSelectComponent('CourseSupportedLanguages');
         });
       }
-      console.log('Component opened');
-      if (componentType === CourseSupportedLanguagesComponent) {
+
+      //Pass and receive values from the CourseSupportedLanguagesComponent
+      if (componentName === 'CourseSupportedLanguages') {
+        console.log(
+          'Is create course service initialized:',
+          this.courseCreateService
+        );
+        componentRef.instance.courseId = this.courseId;
+        componentRef.instance.isCreateOrEditMode = this.isCreateOrEditMode;
         componentRef.instance.referenceService = this.referenceService;
         componentRef.instance.createCourseService = this.courseCreateService;
-        componentRef.instance.courseId = this.courseId;
       }
     }
+  }
+  handleOptionChangeRequest(event: { option: string; index: number }) {
+    // Check if user can switch based on current step
+    if (event.index === 1 && !this.isBasicInformationStepCompleted) {
+      console.log(
+        'Cannot switch to supported languages - complete basic information first'
+      );
+      return;
+    }
+
+    this.selectedOption = event.index;
+    this.leftSidebar.updateSelectedIndex(event.index);
+    this.onSelectComponent(event.option);
   }
 }

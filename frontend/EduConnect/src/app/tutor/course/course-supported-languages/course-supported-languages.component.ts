@@ -1,4 +1,11 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { SelectDropdownComponent } from '../../../common/select/select-dropdown/select-dropdown.component';
 import { SubmitButtonComponent } from '../../../common/button/submit-button/submit-button.component';
 import { ReferenceService } from '../../../services/reference/reference.service';
@@ -22,6 +29,13 @@ export class CourseSupportedLanguagesComponent implements OnInit {
   @Input() componentTitle: string =
     'Select supported languages for this course';
 
+  //Output variable used to communicate to the parent to switch to the next step
+  @Output() goToNextStep: EventEmitter<void> = new EventEmitter<void>();
+
+  //Output variable used to communicate to the parent that this step has been completed
+  @Output() supportedLanguageStepCompleted: EventEmitter<void> =
+    new EventEmitter<void>();
+
   //Variables for the select dropdown
   selectLanguageDropdownLabel: string = 'Select a language';
   selectLanguageDropdownPlaceholder: string = 'Select a language';
@@ -30,6 +44,12 @@ export class CourseSupportedLanguagesComponent implements OnInit {
   addLanguageButtonText: string = 'Add selected language';
   addLanguageButtonColor: string = 'green';
 
+  //Variables for the next step button
+  nextStepButtonText: string = 'Next step';
+  nextStepButtonColor: string = 'blue';
+
+  //Common button variables
+  buttonMargin: string = '12px 0px';
   selectedLanguages: Language[] = [];
   supportedLanguages: Language[] = [];
   supportedLanguagesOptions: { name: string; value: string }[] = [];
@@ -51,6 +71,10 @@ export class CourseSupportedLanguagesComponent implements OnInit {
       .subscribe((response) => {
         if (response.success === 'true') {
           this.selectedLanguages = response.data;
+          if (this.selectedLanguages.length > 0) {
+            //Notify the parent component that this step has been completed
+            this.supportedLanguageStepCompleted.emit();
+          }
           console.log('Selected languages: ', this.selectedLanguages);
           this.refreshSupportedLanguagesList();
         }
@@ -114,6 +138,10 @@ export class CourseSupportedLanguagesComponent implements OnInit {
     console.log(selectedLanguage);
     this.selectedLanguages.push(selectedLanguage);
     console.log(this.selectedLanguages);
+
+    //Notify the parent component that this step has been completed
+    this.supportedLanguageStepCompleted.emit();
+
     this.refreshSupportedLanguagesList();
   }
 
@@ -128,5 +156,9 @@ export class CourseSupportedLanguagesComponent implements OnInit {
     );
     console.log(this.selectedLanguages);
     this.refreshSupportedLanguagesList();
+  }
+
+  nextStep() {
+    this.goToNextStep.emit();
   }
 }

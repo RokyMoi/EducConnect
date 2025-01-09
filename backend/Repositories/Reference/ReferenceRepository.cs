@@ -187,6 +187,11 @@ namespace backend.Repositories.Reference
             return await _dataContext.CommunicationType.Where(x => x.CommunicationTypeId == id).FirstOrDefaultAsync();
         }
 
+        public async Task<CourseCreationCompletenessStep?> GetCourseCreationCompletenessStepDTOByStepOrderAsync(int stepOrder)
+        {
+            return await _dataContext.CourseCreationCompletenessStep.Where(x => x.StepOrder == stepOrder).FirstOrDefaultAsync();
+        }
+
         public async Task<CourseType?> GetCourseTypeByIdAsync(int id)
         {
             return await _dataContext.CourseType.Where(x => x.CourseTypeId == id).FirstOrDefaultAsync();
