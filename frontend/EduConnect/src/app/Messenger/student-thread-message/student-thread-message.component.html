@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Chat</title>
 </head>
 <body>
     <div class="message-container">
@@ -11,13 +11,9 @@
         <div class="chat-header">
             <div class="header-left">
                 <div class="avatar-container">
-                    
-                
-                        <img [src]="photourl" class="avatar" alt="Sender Avatar">
-                 
+                    <img [src]="photourl" class="avatar" alt="Sender Avatar">
                 </div>
-                <!-- Display the name of the other user -->
-                <h3>{{ accountService.CurrentUser()?.Email === senderEmail ? recipientEmail: senderEmail }}</h3>
+                <h3>{{ accountService.CurrentUser()?.Email === senderEmail ? recipientEmail : senderEmail }}</h3>
             </div>
             <div class="header-right">
                 <button id="backBtn" (click)="GetBackToDirectMessage()">
@@ -28,26 +24,22 @@
 
         <!-- Messages -->
         <div class="messages">
-            <div *ngFor="let message of messageService.messageThread()" 
+            <div *ngFor="let message of messageService.messageThread()"
                  [ngClass]="{
-                    'message received': senderEmail!== accountService.CurrentUser()?.Email,
-                    'message sent': senderEmail === accountService.CurrentUser()?.Email
+                    'message received': message.senderEmail !== accountService.CurrentUser()?.Email,
+                    'message sent': message.senderEmail === accountService.CurrentUser()?.Email
                 }">
-                
                 <div class="text-container">
-                    <!-- Display message content -->
                     <p>{{ message.content }}</p>
-                    <!-- Display time since message was sent -->
                     <div class="time">{{ timeAgo(message.messageSent) }}</div>
                 </div>
-         
             </div>
         </div>
 
         <!-- Chat Input -->
         <div class="chat-input">
             <input type="text" placeholder="Type a message..." id="messageInput" [(ngModel)]="messageContent">
-            <button id="sendButton" (click)="SendMessage()" [disabled]="!messageContent.trim()">Send</button>
+            <button id="sendButton" (click)="sendMessage()" [disabled]="!messageContent.trim()">Send</button>
         </div>
     </div>
 </body>

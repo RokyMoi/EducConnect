@@ -1,3 +1,4 @@
+
 * {
     margin: 0;
     padding: 0;
@@ -7,10 +8,12 @@
 body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(145deg, #8e44ad, #3498db);
+
     color: #333;
     line-height: 1.6;
     overflow-x: hidden;
 }
+
 
 header {
     background-color: #222;
@@ -64,6 +67,7 @@ header nav ul li.active::after {
     transform: scaleX(1);
     transform-origin: bottom left;
 }
+
 
 .container {
     max-width: 900px;
@@ -170,10 +174,33 @@ button:focus {
     outline: none;
 }
 
-/* Wishlist Section */
-#wishlist .cart-item {
-    border: 1px solid #e0e0e0;
+/* Summary Section */
+.summary {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-top: 1px solid #ddd;
+    font-size: 18px;
 }
+
+.total {
+    font-weight: 600;
+}
+
+.checkout {
+    background-color: #ff5722;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 10px;
+    text-transform: none;
+}
+
+.checkout:hover {
+    background-color: #e64a19;
+}
+
 
 footer {
     text-align: center;
@@ -182,9 +209,11 @@ footer {
     color: #888;
 }
 
+
 .tab-content {
     display: block;
 }
+
 
 @media (max-width: 768px) {
     
@@ -223,6 +252,11 @@ footer {
 
     .text-details .price {
         font-size: 16px;
+    }
+
+    .summary {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     footer {

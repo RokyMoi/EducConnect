@@ -26,6 +26,8 @@ import { Component } from '@angular/core';
 import { DynamicFormComponent } from './SetingsStudent/dynamic-form/dynamic-form.component';
 import { SendMessageComponent } from './Messenger/send-message/send-message.component';
 import { ListOfUsersComponent } from './Messenger/list-of-users/list-of-users.component';
+import { CartItemsComponent } from './ShoppingCart/cart-items/cart-items.component';
+import { WishlistComponent } from './ShoppingCart/wishlist/wishlist.component';
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -43,6 +45,8 @@ export const routes: Routes = [
   {path: 'studentMessageThread/:id',component: StudentThreadMessageComponent},
   {path: 'viewOfAllCourses',component:CourseLandingPageComponent},
   {path: 'send-message',component:SendMessageComponent},
+  {path: 'Shopping-Cart', component: CartItemsComponent},
+  {path: 'course-wishlist', component: WishlistComponent},
   {path: 'ListOfUsers', component: ListOfUsersComponent},
  
   {

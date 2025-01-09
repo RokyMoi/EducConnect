@@ -8,6 +8,8 @@ using EduConnect.Entities.Reference;
 using EduConnect.Entities.Student;
 using Microsoft.EntityFrameworkCore;
 using EduConnect.Entities.Messenger;
+using EduConnect.Entities.Shopping;
+using EduConnect.Entities.Course;
 
 namespace EduConnect.Data;
 
@@ -33,6 +35,10 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<StudentDetails> StudentDetails { get; set; }
 
     public DbSet<Country> Country { get; set; }
+    public DbSet<Course> Course { get; set; }
+    public DbSet<ShoppingCart> ShoppingCart { get; set; }
+
+
 
     public DbSet<LearningCategory> LearningCategory { get; set; }
     public DbSet<LearningSubcategory> LearningSubCategory { get; set; }
