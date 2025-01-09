@@ -73,6 +73,7 @@ namespace EduConnect.Extensions
             /////////SHOPPING SERVICES
             services.AddScoped<IShoppingCartService, ShoppingCartService>();
             services.AddScoped<IWishListCourse, WishListService>();
+            services.Configure<StripeModel>(configuration.GetSection("StripeSettings"));
 
             ///////////////////////////////
             services.AddSignalR();
