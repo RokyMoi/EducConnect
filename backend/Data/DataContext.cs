@@ -37,6 +37,8 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<Country> Country { get; set; }
     public DbSet<Course> Course { get; set; }
     public DbSet<ShoppingCart> ShoppingCart { get; set; }
+    public DbSet<WishList> WishList { get; set; }
+
 
 
 

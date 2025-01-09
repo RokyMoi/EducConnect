@@ -18,6 +18,7 @@ using EduConnect.Interfaces;
 using EduConnect.Services;
 using EduConnect.Repositories.MessageRepository;
 using EduConnect.SignalIR;
+using EduConnect.Interfaces.Shopping;
 
 namespace EduConnect.Extensions
 {
@@ -69,7 +70,9 @@ namespace EduConnect.Extensions
 
 
             services.AddAutoMapper(typeof(AutoMapperProfiles));
-
+            /////////SHOPPING SERVICES
+            services.AddScoped<IShoppingCartService, ShoppingCartService>();
+            services.AddScoped<IWishListCourse, WishListService>();
 
             ///////////////////////////////
             services.AddSignalR();
