@@ -5,6 +5,7 @@
 }
 
 body {
+    overflow-y: scroll;
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(145deg, #8e44ad, #3498db);
     color: #333;
