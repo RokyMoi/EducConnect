@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { AvailabilityDayTimeSelectComponent } from '../availability-day-time-select/availability-day-time-select.component';
-import { NgIf, Time } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { AccountService } from '../../../../services/account.service';
 import { TutorRegistrationStatusService } from '../../../../services/tutor/tutor-status/tutor-status.service';
 import { AvailabilityRecordsTableComponent } from '../availability-records-table/availability-records-table.component';
@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
 import { SubmitButtonComponent } from '../../../../common/button/submit-button/submit-button.component';
 @Component({
   selector: 'app-availability-signup',
+  standalone: true,
   imports: [
     AvailabilityDayTimeSelectComponent,
     NgIf,

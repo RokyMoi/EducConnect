@@ -37,6 +37,7 @@ import {
 import EducationInformationHttpUpdateRequest from '../../../../_models/person/education/EducationInformationHttpUpdateRequest';
 import CareerInformationHttpUpdateRequest from '../../../../_models/person/career/careerInformationHttpUpdateRequest';
 @Component({
+  standalone: true,
   selector: 'app-career-signup-log',
   imports: [
     ReactiveFormsModule,

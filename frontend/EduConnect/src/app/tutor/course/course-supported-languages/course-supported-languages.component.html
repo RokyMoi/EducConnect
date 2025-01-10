@@ -1,0 +1,19 @@
+<body>
+    <p class="title">{{componentTitle}}</p>
+    <form action="" *ngIf="supportedLanguagesOptions.length > 0">
+        <app-select-dropdown [options]="supportedLanguagesOptions" [label]="selectLanguageDropdownLabel"
+            [placeholder]="selectLanguageDropdownPlaceholder"
+            [formControl]="supportedLanguageFormControl"></app-select-dropdown>
+    </form>
+    <p *ngIf="supportedLanguagesOptions.length === 0">You have added support for all the available languages</p>
+    <ul>
+        <li *ngFor="let item of selectedLanguages">
+            {{item.name}}
+            <button (click)="removeLanguage(item.languageId)">Remove</button>
+        </li>
+    </ul>
+    <p>{{warningText}}</p>
+    <app-submit-button [submitButtonText]="addLanguageButtonText" [buttonBackgroundColor]="addLanguageButtonColor"
+        (buttonClick)="addSelectedLanguage()"></app-submit-button>
+    <app-submit-button></app-submit-button>
+</body>

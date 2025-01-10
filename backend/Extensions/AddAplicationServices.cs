@@ -1,11 +1,13 @@
 ﻿
 using backend.Data.DataSeeder;
 using backend.Extensions;
+using backend.Interfaces.Course;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
 using backend.Interfaces.Tutor;
 using backend.Middleware;
 using backend.Middleware.Tutor;
+using backend.Repositories.Course;
 using backend.Repositories.Person;
 using backend.Repositories.Reference;
 using backend.Repositories.Tutor;
@@ -17,6 +19,10 @@ using backend.Services;
 using EduConnect.Interfaces;
 using EduConnect.Services;
 using EduConnect.Repositories.MessageRepository;
+using EduConnect.SignalIR;
+using EduConnect.Interfaces.Shopping;
+using EduConnect.Interfaces.GenericTesting;
+using EduConnect.Repositories;
 
 namespace EduConnect.Extensions
 {
@@ -45,12 +51,14 @@ namespace EduConnect.Extensions
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
-            services.AddScoped<IMessageRepository,MessageRepository>();
+            services.AddScoped<ICourseRepository, CourseRepository>();            services.AddScoped<IMessageRepository,MessageRepository>();
 
 
 
             services.AddScoped<CountryExtractor>();
             services.AddScoped<ExtractIndustryClassification>();
+            services.AddScoped<ExtractLearningCategoriesAndSubcategories>();
+
 
             services.AddScoped<WorkTypeDatabaseSeeder>();
             services.AddScoped<EmploymentTypeDatabaseSeeder>();
@@ -59,6 +67,10 @@ namespace EduConnect.Extensions
             services.AddScoped<CommunicationTypeDatabaseSeeder>();
             services.AddScoped<EngagementMethodDatabaseSeeder>();
             services.AddScoped<TutorTeachingStyleTypeDatabaseSeeder>();
+            services.AddScoped<LearningDifficultyLevelDatabaseSeeder>();
+            services.AddScoped<LanguageDatabaseSeeder>();
+            services.AddScoped<CourseTypeDatabaseSeeder>();
+
             //Add Middleware 
             services.AddScoped<CheckTutorRegistrationAttribute>();
             services.AddScoped<CheckPersonLoginSignupAttribute>();
@@ -68,6 +80,16 @@ namespace EduConnect.Extensions
 
 
             services.AddAutoMapper(typeof(AutoMapperProfiles));
+            /////////SHOPPING SERVICES
+            services.AddScoped<IShoppingCartService,ShoppingCartService>();
+            services.AddScoped<IWishListCourse, WishListService>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+
+
+            ///////////////////////////////
+            services.AddSignalR();
+            services.AddSingleton<PresenceTracker>();
 
 
 

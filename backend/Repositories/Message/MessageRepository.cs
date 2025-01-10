@@ -27,14 +27,27 @@ namespace EduConnect.Repositories.MessageRepository
         }
         public async Task<List<MessageDto>> GetLastMessagesForDirectMessaging(MessageParamsDirect messageParams)
         {
+            
+            if (string.IsNullOrWhiteSpace(messageParams.Email))
+                throw new ArgumentException("Email parameter cannot be null or empty.");
 
-            var messages = await context.Message.ToListAsync();
+           
+            var messages = await context.Message
+                .Where(m => m.SenderEmail == messageParams.Email || m.RecipientEmail == messageParams.Email)
+                .ToListAsync();
 
+            
             var lastMessages = messages
-                .GroupBy(m => m.SenderEmail)
+                .GroupBy(m => new
+                {
+                    PairId = m.SenderEmail == messageParams.Email
+                        ? m.RecipientEmail
+                        : m.SenderEmail 
+                })
                 .Select(g => g.OrderByDescending(m => m.MessageSent).First())
                 .ToList();
 
+            
             var messageDtos = mapper.Map<List<MessageDto>>(lastMessages);
 
             return messageDtos;

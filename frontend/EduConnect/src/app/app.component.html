@@ -1,13 +1,12 @@
 
+
 <div *ngIf="isServerRunning; else offlineTemplate">
-   <app-landing-page-header *ngIf="!isThreadComponent()">
-    
-   </app-landing-page-header>
+    <app-landing-page-header>
+
+    </app-landing-page-header>
 
     <router-outlet></router-outlet>
 </div>
 <ng-template #offlineTemplate>
     <app-server-offline></app-server-offline>
 </ng-template>
-
-

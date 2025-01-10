@@ -18,6 +18,7 @@ import { AccountService } from '../../../../services/account.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
+  standalone: true,
   selector: 'app-availability-records-table',
   imports: [NgFor, NgIf, FormsModule, MatIconModule],
   templateUrl: './availability-records-table.component.html',

@@ -5,9 +5,10 @@
 
 header {
   position: sticky;
+  top: 0;
+
   width: 100%;
-  
-  max-height: 80px;
+  max-height: 30px;
   display: flex;
   flex-direction: row;
   background-color: rgb(2, 80, 176);
@@ -15,8 +16,9 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 2%;
+  overflow: hidden; 
 }
-.RouterLinks{
+.RouterLinks {
   display: flex;
   flex-direction: row;
   gap: 20px;
@@ -43,36 +45,35 @@ header {
   box-shadow: 2px 4px 5px 1px rgb(0, 0, 0);
 }
 
-
 .StudentPhoto {
   display: inline-block;
   background-repeat: no-repeat;
   background-size: cover;
-  width: 40px; 
-  height: 40px; 
-  border-radius: 50%;  
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   margin-right: 0;
   margin-top: 5px;
 }
-.iconComp{
+.iconComp {
   margin-top: 5px;
-  font-size: 30px; 
-  width: 40px; 
+  font-size: 30px;
+  width: 40px;
   height: 40px;
 }
-.IconAllDevices{
+.IconAllDevices {
   margin-top: 5px;
-  font-size: 30px; 
-  width: 40px; 
+  font-size: 30px;
+  width: 40px;
   height: 40px;
 }
 .StudentPhotoPhone {
   display: inline-block;
   background-repeat: no-repeat;
   background-size: cover;
-  width: 40px; 
-  height: 40px; 
-  border-radius: 50%;  
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   margin-right: 0;
   margin-top: 5px;
 }
@@ -93,7 +94,7 @@ header {
   box-sizing: border-box;
 }
 .icon {
-  color:white;
+  color: white;
   font-size: 30px;
   width: 40px;
   height: 40px;
@@ -101,9 +102,9 @@ header {
 
 @media (max-width: 700px) {
   .phoneMenu {
-    display: flex; 
+    display: flex;
   }
-  .iconComp{
-  display: none;
+  .iconComp {
+    display: none;
   }
 }

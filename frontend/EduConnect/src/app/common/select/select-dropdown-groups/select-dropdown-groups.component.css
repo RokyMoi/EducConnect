@@ -1,0 +1,67 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+:host {
+  --label-font-size: 14px;
+  --label-left-padding: 10px;
+  --label-color: gray;
+  --select-area-width: 100%;
+  --select-area-min-height: 50px;
+  --select-area-max-height: 100px;
+  --select-area-left-padding: 4px;
+  --select-area-border-style: 1px solid black;
+  --select-area-border-radius: 12px;
+  --select-area-margin: 1px 0px;
+  --select-area-font-size: 18px;
+  --warning-color: red;
+  --warning-font-size: 12px;
+  --warning-left-padding: 10px;
+}
+div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+label {
+  font-size: var(--label-font-size);
+  padding-left: var(--label-left-padding);
+  color: var(--label-color);
+}
+select {
+  width: var(--select-area-width);
+  min-height: var(--select-area-min-height);
+  max-height: var(--select-area-max-height);
+  padding-left: var(--select-area-left-padding);
+  border: var(--select-area-border-style);
+  border-radius: var(--select-area-border-radius);
+  margin: var(--select-area-margin);
+  font-size: var(--select-area-font-size);
+}
+
+select:hover {
+  outline-style: solid;
+  outline-color: blue;
+  outline-width: 1px;
+  cursor: pointer;
+}
+
+select:focus {
+  cursor: text;
+  border: 1px solid blue;
+}
+
+div:has(select:focus) label {
+  color: black;
+}
+div:has(select:hover) label {
+  color: blue;
+}
+
+p {
+  color: var(--warning-color);
+  font-size: var(--warning-font-size);
+  padding-left: var(--warning-left-padding);
+  height: 21px;
+}

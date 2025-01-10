@@ -1,0 +1,91 @@
+.upload-container {
+    background: linear-gradient(135deg, #00b0ff, #0088cc, #00c6ff); 
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    width: 100%;
+    max-width: 450px;
+    margin: auto;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); 
+    color: white;
+    overflow: hidden;
+    animation: fadeIn 1s ease-out; 
+    position: relative;
+  }
+  
+  input[type="text"] {
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 30px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 100%;
+  }
+  
+  input[type="text"]:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05); 
+  }
+  
+  input[type="text"]:focus {
+    border: 2px solid #4caf50; 
+  }
+  
+  button {
+    padding: 16px 40px;
+    background-color: #0072ff;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  button:hover {
+    background-color: #005bb5;
+    transform: translateY(-2px); 
+  }
+  
+  button:disabled {
+    background-color: #b0c4de;
+    cursor: not-allowed;
+  }
+  
+  button:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: width 0.4s, height 0.4s, top 0.4s, left 0.4s;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  button:hover:before {
+    width: 0;
+    height: 0;
+    top: 50%;
+    left: 50%;
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  

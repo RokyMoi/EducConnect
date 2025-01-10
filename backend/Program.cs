@@ -4,6 +4,7 @@ using backend.Extensions;
 using backend.Utilities;
 using EduConnect.Data;
 using EduConnect.Extensions;
+using EduConnect.SignalIR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
@@ -44,7 +45,8 @@ namespace EduConnect
                 {
                     policy.WithOrigins(frontendApplicationOrigin)  // Allow frontend origin
                           .AllowAnyHeader()                       // Allow any headers
-                          .AllowAnyMethod()                      // Allow any methods (GET, POST, etc.)
+                          .AllowAnyMethod()/// Allow any methods (GET, POST, etc.)
+                          .AllowCredentials()
                           .WithExposedHeaders("Authorization"); // Expose the Authorization header
                 });
             });
@@ -60,7 +62,7 @@ namespace EduConnect
                 {
                     options.AddPolicy("SwaggerDevelopmentEnvironmentPolicy", policy =>
                     {
-                        policy.WithOrigins(swaggerLink).AllowAnyHeader().AllowAnyMethod();
+                        policy.WithOrigins(swaggerLink).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                     });
                 });
 
@@ -100,6 +102,19 @@ namespace EduConnect
                     tutorTeachingStyleTypeDatabaseSeeder.SeedTutorTeachingStyleTypeDataToDatabase().GetAwaiter().GetResult();
 
 
+                    //Get the LearningDifficultyLevel database seeder scoped service from the service container
+                    var learningDifficultyLevelDatabaseSeeder = scope.ServiceProvider.GetRequiredService<LearningDifficultyLevelDatabaseSeeder>();
+                    learningDifficultyLevelDatabaseSeeder.SeedLearningDifficultyLevelDataToDatabase().
+                    GetAwaiter().GetResult();
+
+                    //Get the Language database seeder scoped service from the service container
+                    var languageDatabaseSeeder = scope.ServiceProvider.GetRequiredService<LanguageDatabaseSeeder>();
+                    languageDatabaseSeeder.SeedLanguageDataToDatabase().GetAwaiter().GetResult();
+
+                    //Get the CourseType database seeder scoped service from the service container
+                    var courseTypeDatabaseSeeder = scope.ServiceProvider.GetRequiredService<CourseTypeDatabaseSeeder>();
+                    courseTypeDatabaseSeeder.SeedCourseTypeDataToDatabase().GetAwaiter().GetResult();
+
                 }
                 catch (Exception ex)
                 {
@@ -131,6 +146,8 @@ namespace EduConnect
             }
 
             app.MapControllers();
+            app.MapHub<PresenceHub>("hubs/presence");
+            app.MapHub<MessageHub>("hubs/message");
 
             app.Run();
         }
