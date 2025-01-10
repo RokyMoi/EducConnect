@@ -10,5 +10,7 @@ import { Router } from '@angular/router';
   styleUrl: './wishlist.component.css'
 })
 export class WishlistComponent {
-
+  MoveToShoppingCart(){
+    
+  }
 }
