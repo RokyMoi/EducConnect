@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EduConnect.Controllers.Shopping
 {
-    public class ShoppingCart(IShoppingCartService _shoppingCartService):MainController
+    public class ShoppingCartController(IShoppingCartService _shoppingCartService):MainController
     {
        
 

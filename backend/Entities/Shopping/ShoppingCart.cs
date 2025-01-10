@@ -19,8 +19,8 @@ namespace EduConnect.Entities.Shopping
         [ForeignKey(nameof(StudentID))]
         public Student.Student Student { get; set; }
 
-        //public int? DeliveryMethodId {get;set;}
-        //public string? ClientSecret {get;set;}
-        //public int? PaymentIntentId {get;set;}
+   
+        public string? ClientSecret {get;set;}
+        public string? PaymentIntentId {get;set;}
     }
 }

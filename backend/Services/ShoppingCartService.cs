@@ -105,6 +105,25 @@ namespace EduConnect.Services
                 .FirstOrDefaultAsync(x => x.StudentID == student.StudentId);
         }
 
+        public async Task<long> GetTotalPriceAsync(Guid shoppingCartId)
+        {
+         
+            var shoppingCart = await _context.ShoppingCart
+                .Include(x => x.Items)
+                .FirstOrDefaultAsync(x => x.ShoppingCartID == shoppingCartId);
+
+            if (shoppingCart == null)
+            {
+                throw new ArgumentException("There is no shopping cart with that id");
+            }
+
+            var totalAmount = await _context.CourseDetails
+                .Where(cd => shoppingCart.Items.Select(i => i.CourseId).Contains(cd.CourseId))
+                .SumAsync(cd => (long)cd.Price);
+
+            return totalAmount;
+        }
+
         public async Task<bool> SetShoppingCartAsync(string email, Guid courseID)
         {
             var person = await _context.PersonEmail.FirstOrDefaultAsync(x => x.Email == email);

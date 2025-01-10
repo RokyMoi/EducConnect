@@ -40,7 +40,6 @@ presenceService = inject(PresenceService);
           if (userData) {
             const loggedInUser: User = {
               Email: userData.email,
-              Email: userData.email,
               Role: userData.role,
               Token: userData.token,
             };

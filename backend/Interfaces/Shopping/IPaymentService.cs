@@ -1,9 +1,10 @@
-﻿using EduConnect.Controllers.Shopping;
+﻿
+using EduConnect.Entities.Shopping;
 
 namespace EduConnect.Interfaces.Shopping
 {
     public interface IPaymentService
     {
-        Task<ShoppingCart> CreateOrUpdatePaymentIntent(string cartID);
+        Task<ShoppingCart?> CreateOrUpdatePaymentIntent(Guid cartID);
     }
 }

@@ -21,6 +21,8 @@ using EduConnect.Services;
 using EduConnect.Repositories.MessageRepository;
 using EduConnect.SignalIR;
 using EduConnect.Interfaces.Shopping;
+using EduConnect.Interfaces.GenericTesting;
+using EduConnect.Repositories;
 
 namespace EduConnect.Extensions
 {
@@ -79,9 +81,11 @@ namespace EduConnect.Extensions
 
             services.AddAutoMapper(typeof(AutoMapperProfiles));
             /////////SHOPPING SERVICES
-            services.AddScoped<IShoppingCartService, ShoppingCartService>();
+            services.AddScoped<IShoppingCartService,ShoppingCartService>();
             services.AddScoped<IWishListCourse, WishListService>();
-            
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+
 
             ///////////////////////////////
             services.AddSignalR();

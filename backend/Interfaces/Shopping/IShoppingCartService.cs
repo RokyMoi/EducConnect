@@ -9,6 +9,7 @@ namespace EduConnect.Interfaces.Shopping
         public Task<bool> DeleteShoppingCartItemAsync(string email, Guid courseID);
         public Task<ShoppingCart?> GetShoppingCartForStudentAsync(string email);
         public Task<bool> SetShoppingCartAsync(string email, Guid courseID);
+        public  Task<long> GetTotalPriceAsync(Guid shoppingCartId);
 
 
     }
