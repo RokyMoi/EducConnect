@@ -8,15 +8,10 @@ import { SubmitButtonComponent } from '../../common/button/submit-button/submit-
 @Component({
   standalone: true,
   selector: 'app-tutor-dashboard',
-<<<<<<< HEAD
-  imports: [],
- 
-=======
 
   imports: [CreateCourseComponent, SubmitButtonComponent],
 
 
->>>>>>> SignalBranch
   templateUrl: './tutor-dashboard.component.html',
   styleUrl: './tutor-dashboard.component.css',
 })

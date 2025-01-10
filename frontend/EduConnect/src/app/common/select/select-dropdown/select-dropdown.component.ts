@@ -16,10 +16,7 @@ import {
 @Component({
   standalone: true,
   selector: 'app-select-dropdown',
-<<<<<<< HEAD
-=======
  
->>>>>>> SignalBranch
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './select-dropdown.component.html',
   styleUrl: './select-dropdown.component.css',
