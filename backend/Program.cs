@@ -20,6 +20,13 @@ namespace EduConnect
             Console.WriteLine(RuntimeInformation.OSDescription);
 
 
+            //Configure Kestrel to allow request body up to 100MB in size
+            builder.WebHost.ConfigureKestrel(
+                options =>
+                {
+                    options.Limits.MaxRequestBodySize = 120 * 1024 * 1024;
+                }
+            );
 
             // Extension for services implemented
             builder.Services.AddApplicationServices(builder.Configuration);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Course.Basic;
+using backend.DTOs.Course.CourseMainMaterial;
 using backend.DTOs.Course.Language;
 using backend.DTOs.Reference.Language;
 
@@ -29,5 +30,10 @@ namespace backend.Interfaces.Course
         public Task<bool> DeleteSupportedLanguageByCourseIdAndLanguageId(Guid courseId, Guid languageId);
 
         public Task<CourseDTO?> UpdateCourseCompletenessStepByCourseIdAndStepOrder(Guid courseId, int stepOrder);
+
+        public Task<CourseMainMaterialDTO?> StoreFileToCourseMainMaterial(CourseMainMaterialDTO courseMainMaterialDTO);
+        public Task<long> GetTotalFileSizeOfCourseMainMaterialByCourseId(Guid courseId);
+
+        public Task<int> GetCountOfCourseMainMaterialByCourseId(Guid courseId);
     }
 }

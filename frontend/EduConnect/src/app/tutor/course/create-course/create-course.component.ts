@@ -14,6 +14,7 @@ import { CareerSignupComponent } from '../../../signup/registration-step-process
 import { FloatingWarningBoxComponent } from '../../../common/floating-warning-box/floating-warning-box/floating-warning-box.component';
 import { CourseSupportedLanguagesComponent } from '../course-supported-languages/course-supported-languages.component';
 import { CourseCreateService } from '../../../services/course/course-create-service.service';
+import { CourseMainMaterialsComponent } from '../course-main-materials/course-main-materials.component';
 
 @Component({
   standalone: true,
@@ -55,11 +56,16 @@ export class CreateCourseComponent {
       title: 'Step 2: Supported languages',
       link: 'CourseSupportedLanguages',
     },
+    {
+      title: 'Step 3: Course Main Materials',
+      link: 'CourseMainMaterials',
+    },
   ];
 
   componentsMap: { [key: string]: Type<any> } = {
     CourseBasicInformation: CourseBasicInformationComponent,
     CourseSupportedLanguages: CourseSupportedLanguagesComponent,
+    CourseMainMaterials: CourseMainMaterialsComponent,
   };
 
   selectedOption = 0;
@@ -133,6 +139,19 @@ export class CreateCourseComponent {
         componentRef.instance.isCreateOrEditMode = this.isCreateOrEditMode;
         componentRef.instance.referenceService = this.referenceService;
         componentRef.instance.createCourseService = this.courseCreateService;
+
+        componentRef.instance.supportedLanguageStepCompleted.subscribe(
+          (isCompleted: boolean) => {
+            this.isSupportedLanguagesStepCompleted = isCompleted;
+          }
+        );
+        componentRef.instance.goToNextStep.subscribe(() => {
+          this.handleOptionChangeRequest({
+            option: 'CourseMainMaterials',
+            index: 2,
+          });
+          this.onSelectComponent('CourseMainMaterials');
+        });
       }
     }
   }
@@ -141,6 +160,13 @@ export class CreateCourseComponent {
     if (event.index === 1 && !this.isBasicInformationStepCompleted) {
       console.log(
         'Cannot switch to supported languages - complete basic information first'
+      );
+      return;
+    }
+
+    if (event.index === 2 && !this.isSupportedLanguagesStepCompleted) {
+      console.log(
+        'Cannot switch to main materials - complete supported languages first'
       );
       return;
     }

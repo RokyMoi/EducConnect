@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Course.Basic;
+using backend.DTOs.Course.CourseMainMaterial;
 using backend.DTOs.Course.Language;
 using backend.DTOs.Reference.Language;
 using backend.Entities.Course;
@@ -287,6 +288,42 @@ namespace backend.Repositories.Course
                 CourseCreationCompletenessStepId = course.CourseCreationCompletenessStepId
             };
 
+        }
+
+        public async Task<CourseMainMaterialDTO?> StoreFileToCourseMainMaterial(CourseMainMaterialDTO courseMainMaterialDTO)
+        {
+            var courseMainMaterial = new CourseMainMaterial
+            {
+                CourseMainMaterialId = Guid.NewGuid(),
+                CourseId = courseMainMaterialDTO.CourseId,
+                FileName = courseMainMaterialDTO.FileName,
+                ContentType = courseMainMaterialDTO.ContentType,
+                ContentSize = courseMainMaterialDTO.ContentSize,
+                Data = courseMainMaterialDTO.Data,
+                DateTimePointOfFileCreation = courseMainMaterialDTO.DateTimePointOfFileCreation,
+
+            };
+            await _dataContext.CourseMainMaterial.AddAsync(
+                courseMainMaterial
+            );
+            await _dataContext.SaveChangesAsync();
+
+            courseMainMaterialDTO.CourseMainMaterialId = courseMainMaterial.CourseMainMaterialId;
+            return courseMainMaterialDTO;
+        }
+
+        public async Task<long> GetTotalFileSizeOfCourseMainMaterialByCourseId(Guid courseId)
+        {
+            return await _dataContext.CourseMainMaterial
+            .Where(x => x.CourseId == courseId)
+            .SumAsync(x => x.ContentSize);
+        }
+
+        public async Task<int> GetCountOfCourseMainMaterialByCourseId(Guid courseId)
+        {
+            return await _dataContext.CourseMainMaterial.CountAsync(
+                x => x.CourseId == courseId
+            );
         }
     }
 }

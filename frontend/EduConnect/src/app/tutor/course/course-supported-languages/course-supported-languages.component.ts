@@ -33,8 +33,8 @@ export class CourseSupportedLanguagesComponent implements OnInit {
   @Output() goToNextStep: EventEmitter<void> = new EventEmitter<void>();
 
   //Output variable used to communicate to the parent that this step has been completed
-  @Output() supportedLanguageStepCompleted: EventEmitter<void> =
-    new EventEmitter<void>();
+  @Output() supportedLanguageStepCompleted: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
 
   //Variables for the select dropdown
   selectLanguageDropdownLabel: string = 'Select a language';
@@ -73,7 +73,7 @@ export class CourseSupportedLanguagesComponent implements OnInit {
           this.selectedLanguages = response.data;
           if (this.selectedLanguages.length > 0) {
             //Notify the parent component that this step has been completed
-            this.supportedLanguageStepCompleted.emit();
+            this.supportedLanguageStepCompleted.emit(true);
           }
           console.log('Selected languages: ', this.selectedLanguages);
           this.refreshSupportedLanguagesList();
@@ -140,7 +140,7 @@ export class CourseSupportedLanguagesComponent implements OnInit {
     console.log(this.selectedLanguages);
 
     //Notify the parent component that this step has been completed
-    this.supportedLanguageStepCompleted.emit();
+    this.supportedLanguageStepCompleted.emit(true);
 
     this.refreshSupportedLanguagesList();
   }
@@ -156,6 +156,11 @@ export class CourseSupportedLanguagesComponent implements OnInit {
     );
     console.log(this.selectedLanguages);
     this.refreshSupportedLanguagesList();
+
+    //Notify the parent component that the user has deleted all of the records for the supported languages, thus making this step incomplete
+    if (this.selectedLanguages.length === 0) {
+      this.supportedLanguageStepCompleted.emit(false);
+    }
   }
 
   nextStep() {

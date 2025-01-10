@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250109234601_UpdateCourseMainMaterialWithAdditionalFields")]
+    partial class UpdateCourseMainMaterialWithAdditionalFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,12 +103,9 @@ namespace EduConnect.Migrations
 
             modelBuilder.Entity("EduConnect.Entities.Course.CourseMainMaterial", b =>
                 {
-                    b.Property<Guid>("CourseMainMaterialId")
+                    b.Property<Guid>("CourseMainMaterialsId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("ContentSize")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("ContentType")
                         .IsRequired()
@@ -128,12 +128,14 @@ namespace EduConnect.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("FileTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long?>("UpdatedAt")
                         .HasColumnType("bigint");
 
-                    b.HasKey("CourseMainMaterialId");
-
-                    b.HasIndex("CourseId");
+                    b.HasKey("CourseMainMaterialsId");
 
                     b.ToTable("CourseMainMaterial", "Course");
                 });
@@ -1093,17 +1095,6 @@ namespace EduConnect.Migrations
                     b.Navigation("LearningDifficultyLevel");
 
                     b.Navigation("LearningSubcategory");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.CourseMainMaterial", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Course.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Learning.LearningSubcategory", b =>
