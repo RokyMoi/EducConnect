@@ -562,5 +562,282 @@ namespace backend.Controllers.Course
             );
 
         }
+
+        [HttpDelete("main-material/{courseMainMaterialId}")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> DeleteCourseMainMaterial(Guid courseMainMaterialId)
+        {
+            //Check if the courseMainMaterialId is not a Guid.Empty
+            if (courseMainMaterialId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Course id is required",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to create a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+            //Check if the courseMainMaterialId is associated with the existing record in the CourseMainMaterial table
+            var courseMainMaterial = await _courseRepository.GetCourseMainMaterialById(courseMainMaterialId);
+
+            if (courseMainMaterial == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course main material not found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+
+            //Get the course associated with the courseId in the CourseMainMaterial table
+            var course = await _courseRepository.GetCourseById(courseMainMaterial.CourseId);
+
+            if (course == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course not found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the tutor is the owner of the course
+            if (course.TutorId != tutor.TutorId)
+            {
+                return StatusCode(
+                    300,
+                    new
+                    {
+                        success = "false",
+                        message = "You cannot delete a course main material from the course that you aren't the owner of.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+        );
+            }
+
+            //Attempt to delete the corse main material
+            var deleteResult = await _courseRepository.DeleteCourseMainMaterialByCourseMainMaterialId(courseMainMaterialId);
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "false",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Course main material deleted successfully",
+                    data = new { },
+                    timestamp = DateTime.Now
+                }
+            );
+
+
+        }
+
+        [HttpGet("main-material/download/{courseMainMaterialId}")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> DownloadCourseMainMaterial(Guid courseMainMaterialId)
+        {
+            //Check if the courseMainMaterialId is not a Guid.Empty
+            if (courseMainMaterialId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Course id is required",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to create a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+            //Check if the courseMainMaterialId is associated with the existing record in the CourseMainMaterial table
+            var courseMainMaterial = await _courseRepository.GetCourseMainMaterialById(courseMainMaterialId);
+
+            if (courseMainMaterial == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course main material not found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Return the file
+            return File(
+                courseMainMaterial.Data,
+                courseMainMaterial.ContentType,
+                courseMainMaterial.FileName
+            );
+
+        }
+   
+   
     }
 }

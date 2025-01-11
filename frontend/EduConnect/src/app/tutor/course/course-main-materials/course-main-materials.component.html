@@ -11,7 +11,7 @@
     </div>
 
     <div class="upload-container">
-        <input type="file" id="fileUpload" (change)="onFileSelected($event)">
+        <input type="file" id="fileUpload" #fileInput (change)="onFileSelected($event)">
         <p class="info-text">{{fileUploadInstructionText}}</p>
 
         <div *ngIf="this.selectedFile && this.validateFileType(this.selectedFile) && this.validateFileSize(this.selectedFile)"
@@ -67,11 +67,27 @@
                 <td>{{getFileExtension(item['contentType'])}}</td>
                 <td>{{getDateTimeFromUnixMillis(item['dateTimePointOfFileCreation'])}}</td>
                 <td>{{getFileSizeInMb(item['contentSize'])}} MB</td>
-                <td>Download</td>
-                <td>Delete</td>
+                <td (click)="downloadCourseMainMaterial(item.courseMainMaterialId)">Download</td>
+                <td (click)="deleteCourseMainMaterial(item.courseMainMaterialId, i)">Delete</td>
 
             </tr>
         </tbody>
     </table>
+    <app-floating-warning-box *ngIf="floatingWarningDeleteBoxShow" [warningTitle]="floatingWarningDeleteBoxTitle">
+        <p [style.color]="floatingWarningDeleteBoxMessageColor" [style.font-size]="'24px'">
+            {{floatingWarningDeleteBoxMessage}}</p>
+        <p>{{floatingWarningDeleteBoxFileToDeleteIndex}}</p>
+        <p>{{floatingWarningDeleteBoxFileToDeleteName}}</p>
+        <app-submit-button *ngIf="!isDeleteOperationComplete" [buttonMargin]="floatingWarningBoxButtonMargin"
+            [buttonBackgroundColor]="floatingWarningDeleteBoxConfirmButtonColor"
+            [submitButtonText]="floatingWarningDeleteBoxConfirmButtonText"
+            (buttonClick)="confirmDelete()"></app-submit-button>
+        <app-submit-button *ngIf="!isDeleteOperationComplete" [buttonMargin]="floatingWarningBoxButtonMargin"
+            [buttonBackgroundColor]="floatingWarningDeleteBoxCancelButtonColor"
+            [submitButtonText]="floatingWarningDeleteBoxCancelButtonText"
+            (buttonClick)="cancelDelete()"></app-submit-button>
+        <app-submit-button *ngIf="isDeleteOperationComplete" [buttonBackgroundColor]="closeFloatingBoxButtonColor"
+            [submitButtonText]="closeFloatingBoxButtonText" (buttonClick)="cancelDelete()"></app-submit-button>
+    </app-floating-warning-box>
 
 </body>

@@ -125,4 +125,10 @@ export default class ApiLinks {
   //Get all main materials of the course
   public static readonly getCourseMainMaterials =
     ApiLinks.baseUrl + 'course/main-material/all';
+  //Delete main material from the course
+  public static readonly deleteCourseMainMaterial =
+    ApiLinks.baseUrl + 'course/main-material';
+  //Download main material from the course
+  public static readonly downloadCourseMainMaterial =
+    ApiLinks.baseUrl + 'course/main-material/download';
 }

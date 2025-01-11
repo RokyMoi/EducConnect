@@ -370,5 +370,35 @@ namespace backend.Repositories.Course
 
             return courseMainMaterials;
         }
+
+        public async Task<CourseMainMaterialDTO?> GetCourseMainMaterialById(Guid courseMainMaterialId)
+        {
+            return await _dataContext.CourseMainMaterial.Where(x => x.CourseMainMaterialId == courseMainMaterialId).Select(
+                x => new CourseMainMaterialDTO
+                {
+                    CourseMainMaterialId = x.CourseMainMaterialId,
+                    CourseId = x.CourseId,
+                    FileName = x.FileName,
+                    ContentType = x.ContentType,
+                    ContentSize = x.ContentSize,
+                    Data = x.Data,
+                    DateTimePointOfFileCreation = x.DateTimePointOfFileCreation,
+                }
+            ).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> DeleteCourseMainMaterialByCourseMainMaterialId(Guid courseMainMaterialId)
+        {
+            var courseMainMaterial = await _dataContext.CourseMainMaterial.Where(x => x.CourseMainMaterialId == courseMainMaterialId).FirstOrDefaultAsync();
+            if (courseMainMaterial == null)
+            {
+                return false;
+            }
+
+            _dataContext.CourseMainMaterial.Remove(courseMainMaterial);
+            await _dataContext.SaveChangesAsync();
+            return true;
+
+        }
     }
 }

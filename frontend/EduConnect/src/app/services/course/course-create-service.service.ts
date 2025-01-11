@@ -244,4 +244,90 @@ export class CourseCreateService {
         })
       );
   }
+
+  public deleteCourseMainMaterialByCourseMainMaterialId(
+    courseMainMaterialId: string
+  ) {
+    const authorization = this.accountService.getAccessToken();
+    return this.http
+      .delete(ApiLinks.deleteCourseMainMaterial + '/' + courseMainMaterialId, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+        }),
+        catchError((error) => {
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  public downloadCourseMainMaterialByCourseMainMaterialId(
+    courseMainMaterialId: string
+  ) {
+    const authorization = this.accountService.getAccessToken();
+    return this.http
+      .get(
+        ApiLinks.downloadCourseMainMaterial + '/' + courseMainMaterialId,
+
+        {
+          headers: {
+            Authorization: `Bearer ${authorization}`,
+          },
+          responseType: 'blob',
+        }
+      )
+      .pipe(
+        map((response) => {
+          // Check if the response is a JSON error by attempting to parse it.
+          const isJsonError = response.type === 'application/json';
+          if (isJsonError) {
+            return this.parseErrorBlob(response);
+          }
+          // If it's not JSON, it's a file.
+          return { isFile: true, file: response };
+        }),
+        catchError((error) => {
+          // Handle network or other errors.
+          return of({
+            success: false,
+            message: 'An error occurred while downloading the file.',
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  private parseErrorBlob(blob: Blob): any {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          resolve({
+            isFile: false,
+            ...JSON.parse(reader.result as string),
+          });
+        } catch {
+          resolve({
+            success: false,
+            message: 'An error occurred, but it could not be parsed.',
+          });
+        }
+      };
+      reader.readAsText(blob);
+    });
+  }
 }
