@@ -1,4 +1,62 @@
 <body>
-    <p class="title">{{componentTitle}}</p>
-    
+    <p class="title">Upload Your Course Materials Here</p>
+    <p>These files are meant to be used by the students as general guidebooks, references, and study material while
+        learning the course.</p>
+    <p>Maximum number of files per course: <strong>15</strong></p>
+    <p>Total maximum size these files can take up: <strong>120 MB</strong></p>
+
+    <div class="upload-information-container">
+        <p>Current number of files: <strong>{{currentNumberOfFiles}}</strong></p>
+        <p>Current space taken up: <strong>{{currentSpaceTakenUpInMb}} MB</strong></p>
+    </div>
+
+    <div class="upload-container">
+        <input type="file" id="fileUpload" (change)="onFileSelected($event)">
+        <p class="info-text">{{fileUploadInstructionText}}</p>
+
+        <div *ngIf="this.selectedFile && this.validateFileType(this.selectedFile) && this.validateFileSize(this.selectedFile)"
+            class="file-info-text">
+            <p>File name: {{fileToUploadName}}</p>
+            <p>File size: {{fileToUploadSizeInMegabytes}} MB</p>
+            <p>File type: {{fileToUploadFileCategory}} ({{fileToUploadType}})</p>
+        </div>
+        <div *ngIf="this.selectedFile && (!this.validateFileType(this.selectedFile) || !this.validateFileSize(this.selectedFile))"
+            class="file-warning-text">
+            <p>{{this.fileUploadWarningText}}</p>
+        </div>
+        <div class="file-upload-result">
+            <p [style.color]="fileUploadResultColor">{{fileUploadResultMessage}}</p>
+        </div>
+    </div>
+
+    <app-submit-button
+        *ngIf="this.selectedFile && this.validateFileType(this.selectedFile) && this.validateFileSize(this.selectedFile) && !this.isDataTransmissionActive"
+        [buttonBackgroundColor]="uploadFileButtonColor" [submitButtonText]="uploadFileButtonText"
+        (buttonClick)="uploadFile()"></app-submit-button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>File name</th>
+                <th>File type</th>
+                <th>File created</th>
+                <th>File size</th>
+                <th>File</th>
+
+            </tr>
+
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of courseMainMaterialsArray; let i=index">
+                <td>{{i + 1}}</td>
+                <td>{{item.fileName}}</td>
+                <td>{{item.contentType}}</td>
+                <td>{{item.dateTimePointOfFileCreation}}</td>
+                <td>{{getFileSizeInMb(item.contentSize)}} MB</td>
+                <td>{{item.data.name}}</td>
+
+            </tr>
+        </tbody>
+    </table>
 </body>

@@ -86,6 +86,8 @@ export class CreateCourseComponent {
   isBasicInformationStepCompleted: boolean = false;
   //Flag variable to determine if the supported languages step has been completed
   isSupportedLanguagesStepCompleted: boolean = false;
+  //Flag variable to determine if the main materials step has been completed
+  isMainMaterialsStepCompleted: boolean = false;
 
   ngAfterViewInit() {
     // Load initial component
@@ -153,6 +155,13 @@ export class CreateCourseComponent {
           this.onSelectComponent('CourseMainMaterials');
         });
       }
+
+      //Pass and receive values from the CourseMainMaterialsComponent
+      if (componentName === 'CourseMainMaterials') {
+        componentRef.instance.courseId = this.courseId;
+        componentRef.instance.referenceService = this.referenceService;
+        componentRef.instance.courseCreateService = this.courseCreateService;
+      }
     }
   }
   handleOptionChangeRequest(event: { option: string; index: number }) {
@@ -165,6 +174,13 @@ export class CreateCourseComponent {
     }
 
     if (event.index === 2 && !this.isSupportedLanguagesStepCompleted) {
+      console.log(
+        'Cannot switch to main materials - complete supported languages first'
+      );
+      return;
+    }
+
+    if (event.index === 3 && !this.isSupportedLanguagesStepCompleted) {
       console.log(
         'Cannot switch to main materials - complete supported languages first'
       );

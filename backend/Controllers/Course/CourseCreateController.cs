@@ -592,7 +592,8 @@ namespace backend.Controllers.Course
 
             var allowedArchiveFileTypes = new string[] {
                 "application/zip",
-                "application/x-rar-compressed"
+                "application/x-rar-compressed",
+                "application/x-rar",
             };
 
             //Define max file size in bytes per file type
@@ -828,7 +829,7 @@ namespace backend.Controllers.Course
 
             //Check if the maximum number of course main materials per course is reached (maximum number of materials per course is 15)
             var courseMainMaterialCount = await _courseRepository.GetCountOfCourseMainMaterialByCourseId(course.CourseId);
-            if (courseMainMaterialCount + 1 >= 15)
+            if (courseMainMaterialCount + 1 > 15)
             {
                 return StatusCode(
                     409,

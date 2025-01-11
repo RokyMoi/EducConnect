@@ -35,5 +35,8 @@ namespace backend.Interfaces.Course
         public Task<long> GetTotalFileSizeOfCourseMainMaterialByCourseId(Guid courseId);
 
         public Task<int> GetCountOfCourseMainMaterialByCourseId(Guid courseId);
+
+        public Task<List<CourseMainMaterialDTO>?>
+        GetCourseMainMaterialsByCourseId(Guid courseId);
     }
 }

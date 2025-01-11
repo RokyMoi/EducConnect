@@ -176,5 +176,72 @@ export class CourseCreateService {
           });
         })
       );
+  }
 
-  }}
+  public uploadFileAsCourseMainMaterial(
+    courseId: string,
+    fileName: string,
+    dateTimePointOfFileCreation: string,
+    fileToUpload: File
+  ) {
+    const authorization = this.accountService.getAccessToken();
+    const formData = new FormData();
+    formData.append('FileToUpload', fileToUpload);
+    formData.append('FileName', fileName);
+    formData.append('DateTimePointOfFileCreation', dateTimePointOfFileCreation);
+    formData.append('CourseId', courseId);
+
+    return this.http
+      .post(ApiLinks.uploadCourseMainMaterial, formData, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+        }),
+        catchError((error) => {
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  public getCourseMainMaterials(courseId: string) {
+    const authorization = this.accountService.getAccessToken();
+    return this.http
+      .get(ApiLinks.getCourseMainMaterials + '/' + courseId, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+        }),
+        catchError((error) => {
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+}

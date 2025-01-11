@@ -108,6 +108,9 @@ export default class ApiLinks {
   //Add language support to the course
   public static readonly addLanguageSupportToCourse =
     ApiLinks.baseUrl + 'course/create/language';
+  //Upload course main material
+  public static readonly uploadCourseMainMaterial =
+    ApiLinks.baseUrl + 'course/create/main-materials';
 
   //Course controller
   //Get Course basic information by course id
@@ -119,4 +122,7 @@ export default class ApiLinks {
   //Delete language support from the course
   public static readonly deleteLanguageSupportFromCourse =
     ApiLinks.baseUrl + 'course/supported-language/remove';
+  //Get all main materials of the course
+  public static readonly getCourseMainMaterials =
+    ApiLinks.baseUrl + 'course/main-material/all';
 }
