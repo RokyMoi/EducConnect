@@ -11,7 +11,7 @@ namespace backend.DTOs.Course.CourseMainMaterial
         public Guid CourseId { get; set; }
         public string FileName { get; set; }
 
-        public DateTime DateTimePointOfFileCreation { get; set; }
+        public long DateTimePointOfFileCreation { get; set; }
 
         public IFormFile FileToUpload { get; set; }
     }

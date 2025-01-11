@@ -19,7 +19,20 @@
             <p>File name: {{fileToUploadName}}</p>
             <p>File size: {{fileToUploadSizeInMegabytes}} MB</p>
             <p>File type: {{fileToUploadFileCategory}} ({{fileToUploadType}})</p>
+
+            <div class="edit-fields">
+                <div class="input-group">
+                    <label for="fileName">Enter here new file name or leave empty for the current one</label>
+                    <input type="text" id="fileName" placeholder="Enter file name" [formControl]="fileNameFormControl">
+                </div>
+                <div class="input-group">
+                    <label for="fileDate">Select date when the file was created on you device:</label>
+                    <input type="datetime-local" id="fileDate" [formControl]="fileDateFormControl">
+                </div>
+            </div>
+
         </div>
+
         <div *ngIf="this.selectedFile && (!this.validateFileType(this.selectedFile) || !this.validateFileSize(this.selectedFile))"
             class="file-warning-text">
             <p>{{this.fileUploadWarningText}}</p>
@@ -34,7 +47,7 @@
         [buttonBackgroundColor]="uploadFileButtonColor" [submitButtonText]="uploadFileButtonText"
         (buttonClick)="uploadFile()"></app-submit-button>
 
-    <table>
+    <table *ngIf="courseMainMaterialsArray.length > 0">
         <thead>
             <tr>
                 <th>Number</th>
@@ -42,7 +55,7 @@
                 <th>File type</th>
                 <th>File created</th>
                 <th>File size</th>
-                <th>File</th>
+                <th class="actions-column" colspan="2">Actions</th>
 
             </tr>
 
@@ -50,13 +63,15 @@
         <tbody>
             <tr *ngFor="let item of courseMainMaterialsArray; let i=index">
                 <td>{{i + 1}}</td>
-                <td>{{item.fileName}}</td>
-                <td>{{item.contentType}}</td>
-                <td>{{item.dateTimePointOfFileCreation}}</td>
-                <td>{{getFileSizeInMb(item.contentSize)}} MB</td>
-                <td>{{item.data.name}}</td>
+                <td>{{item['fileName']}}</td>
+                <td>{{getFileExtension(item['contentType'])}}</td>
+                <td>{{getDateTimeFromUnixMillis(item['dateTimePointOfFileCreation'])}}</td>
+                <td>{{getFileSizeInMb(item['contentSize'])}} MB</td>
+                <td>Download</td>
+                <td>Delete</td>
 
             </tr>
         </tbody>
     </table>
+
 </body>

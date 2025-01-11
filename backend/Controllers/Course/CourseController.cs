@@ -529,9 +529,9 @@ namespace backend.Controllers.Course
             }
 
             //Get the course main materials
-            var courseMainMaterials = await _courseRepository.GetCourseMainMaterialsByCourseId(courseId);
+            var courseMainMaterials = await _courseRepository.GetCourseMainMaterialsWithNoFilesByCourseId(courseId);
 
-            
+
             if (courseMainMaterials == null)
             {
                 return NotFound(

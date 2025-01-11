@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Identity.Client;
 
 namespace backend.DTOs.Course.CourseMainMaterial
 {
-    public class CourseMainMaterialDTO
+    public class CourseMainMaterialWithNoFileDTO
     {
         public Guid CourseMainMaterialId { get; set; }
         public Guid CourseId { get; set; }
@@ -16,9 +15,6 @@ namespace backend.DTOs.Course.CourseMainMaterial
 
         public long ContentSize { get; set; }
 
-        public byte[] Data { get; set; }
-
         public long DateTimePointOfFileCreation { get; set; }
-
     }
 }

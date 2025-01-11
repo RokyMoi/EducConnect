@@ -38,5 +38,7 @@ namespace backend.Interfaces.Course
 
         public Task<List<CourseMainMaterialDTO>?>
         GetCourseMainMaterialsByCourseId(Guid courseId);
+
+        public Task<List<CourseMainMaterialWithNoFileDTO>?> GetCourseMainMaterialsWithNoFilesByCourseId(Guid courseId);
     }
 }

@@ -4,11 +4,13 @@ import { NgFor, NgIf } from '@angular/common';
 import { CourseCreateService } from '../../../services/course/course-create-service.service';
 import { ReferenceService } from '../../../services/reference/reference.service';
 import { CourseMainMaterial } from '../../../_models/course/course-main-material/course-main-material.course.model';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import DateHelper from '../../../helpers/date.helper';
 
 @Component({
   standalone: true,
   selector: 'app-course-main-materials',
-  imports: [SubmitButtonComponent, NgIf, NgFor],
+  imports: [SubmitButtonComponent, NgIf, NgFor, ReactiveFormsModule],
   templateUrl: './course-main-materials.component.html',
   styleUrl: './course-main-materials.component.css',
 })
@@ -48,6 +50,9 @@ export class CourseMainMaterialsComponent implements OnInit {
   isDataTransmissionComplete: boolean = false;
 
   courseMainMaterialsArray: CourseMainMaterial[] = [];
+
+  fileNameFormControl = new FormControl('');
+  fileDateFormControl = new FormControl('');
 
   allowedDocumentFileTypes: string[] = [
     'application/pdf',
@@ -211,11 +216,30 @@ export class CourseMainMaterialsComponent implements OnInit {
       this.fileUploadResultMessage = 'Uploading file...';
       this.fileUploadResultColor = 'blue';
 
+      const givenFileName =
+        this.fileNameFormControl.value !== '' &&
+        this.fileNameFormControl.value !== null
+          ? this.fileNameFormControl.value
+          : this.selectedFile.name;
+
+      const givenDateTimeOfCreation =
+        this.fileDateFormControl.value !== '' &&
+        this.fileDateFormControl.value !== null
+          ? new Date(this.fileDateFormControl.value).getTime().toString()
+          : Date.now().toString();
+
+      console.log('Given File Name: ', givenFileName);
+      console.log('Given File Date: ', givenDateTimeOfCreation);
+      console.log(
+        'Given File Date in UNIX: ',
+        new Date(givenDateTimeOfCreation).getTime()
+      );
+
       this.courseCreateService
         .uploadFileAsCourseMainMaterial(
           this.courseId,
-          'Test File',
-          '01/10/2025 13:38:36',
+          givenFileName,
+          givenDateTimeOfCreation,
           this.selectedFile
         )
         .subscribe((response) => {
@@ -256,5 +280,42 @@ export class CourseMainMaterialsComponent implements OnInit {
     return (
       Math.round((Number.parseInt(fileSizeInBytes) / (1024 * 1024)) * 1e2) / 1e2
     );
+  }
+
+  getDateTimeFromUnixMillis(timestamp: number | string): string {
+    const date = new Date(timestamp);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  }
+
+  getFileExtension(fileType: string): string {
+    let extension = fileType.split('/').pop() || '';
+    
+    // Handle special cases for Office documents
+    if (extension.includes('wordprocessingml.document')) {
+      return 'docx';
+    }
+    if (extension.includes('presentationml.presentation')) {
+      return 'pptx';
+    }
+    if (extension.includes('spreadsheetml.sheet')) {
+      return 'xlsx';
+    }
+    
+    // Clean up common prefixes
+    extension = extension
+      .replace('vnd.openxmlformats-officedocument.', '')
+      .replace('vnd.', '')
+      .replace('x-', '')
+      .replace('ms-', '')
+      .replace('application/', '')
+      .replace('text/', '');
+  
+    return extension;
   }
 }

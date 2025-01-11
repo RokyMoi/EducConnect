@@ -91,6 +91,24 @@ p {
   border-color: #aaa;
 }
 
+.edit-fields {
+}
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin: 5px 0;
+}
+
+.input-group label {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.input-group input {
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
 .info-text {
   text-align: center;
   font-size: 14px;
@@ -133,6 +151,7 @@ table {
   overflow: hidden; /* Ensures rounded corners work with borders */
   background-color: #f9f9f9;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 5%;
 }
 thead tr {
   background-color: #0078d7;
@@ -171,6 +190,9 @@ td:hover {
 }
 td {
   width: 20%;
+}
+
+.actions-column {
 }
 
 @media screen and (max-width: 468px) {

@@ -21,11 +21,11 @@ namespace EduConnect.Entities.Course
 
         public string ContentType { get; set; }
 
-        public long ContentSize { get; set; } 
+        public long ContentSize { get; set; }
 
         public byte[] Data { get; set; }
 
-        public DateTime DateTimePointOfFileCreation { get; set; }
+        public long DateTimePointOfFileCreation { get; set; }
 
         public long CreatedAt { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
 

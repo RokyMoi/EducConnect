@@ -532,7 +532,7 @@ namespace backend.Controllers.Course
 
 
             //Check if the DateTimePointOfFileCreation is in the future
-            if (saveRequestDTO.DateTimePointOfFileCreation > DateTime.Now)
+            if (saveRequestDTO.DateTimePointOfFileCreation > DateTimeOffset.Now.ToUnixTimeMilliseconds())
             {
                 return BadRequest(
                     new

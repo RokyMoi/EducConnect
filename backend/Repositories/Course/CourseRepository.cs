@@ -348,5 +348,27 @@ namespace backend.Repositories.Course
                 }
             ).ToList();
         }
+
+        public async Task<List<CourseMainMaterialWithNoFileDTO>?> GetCourseMainMaterialsWithNoFilesByCourseId(Guid courseId)
+        {
+            var courseMainMaterials = await _dataContext.CourseMainMaterial.Where(x => x.CourseId == courseId).Select(
+                x => new CourseMainMaterialWithNoFileDTO
+                {
+                    CourseMainMaterialId = x.CourseMainMaterialId,
+                    CourseId = x.CourseId,
+                    FileName = x.FileName,
+                    ContentType = x.ContentType,
+                    ContentSize = x.ContentSize,
+                    DateTimePointOfFileCreation = x.DateTimePointOfFileCreation,
+                }
+            ).ToListAsync();
+
+            if (courseMainMaterials.Count == 0 || courseMainMaterials == null)
+            {
+                return null;
+            }
+
+            return courseMainMaterials;
+        }
     }
 }

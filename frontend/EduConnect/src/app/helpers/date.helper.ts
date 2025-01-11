@@ -17,4 +17,8 @@ export default class DateHelper {
     const day = parseInt(dateOnly.substring(8, 10));
     return new Date(year, month, day);
   }
+
+  public static toDateFromUnixMillis(unixMillis: number | string): Date {
+    return new Date(Number(unixMillis));
+  }
 }
