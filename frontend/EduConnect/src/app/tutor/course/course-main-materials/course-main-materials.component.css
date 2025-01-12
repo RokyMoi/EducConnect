@@ -195,6 +195,15 @@ td {
 .actions-column {
 }
 
+/*
+  Styling to change the background color of the upload area (div with class name upload-container) when the user drags a file over it.
+*/
+
+.upload-container.dragover {
+  background-color: #f0f0f0;
+  border: 2px dashed #0078d7;
+}
+
 @media screen and (max-width: 468px) {
   .upload-container {
     width: 100%;

@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnInit,
   Output,
@@ -15,6 +16,8 @@ import { CourseMainMaterial } from '../../../_models/course/course-main-material
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import DateHelper from '../../../helpers/date.helper';
 import { FloatingWarningBoxComponent } from '../../../common/floating-warning-box/floating-warning-box/floating-warning-box.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   standalone: true,
@@ -25,6 +28,7 @@ import { FloatingWarningBoxComponent } from '../../../common/floating-warning-bo
     NgFor,
     ReactiveFormsModule,
     FloatingWarningBoxComponent,
+    MatProgressBarModule,
   ],
   templateUrl: './course-main-materials.component.html',
   styleUrl: './course-main-materials.component.css',
@@ -49,7 +53,8 @@ export class CourseMainMaterialsComponent implements OnInit {
   uploadFileButtonText: string = 'Upload selected file';
   uploadFileButtonColor: string = 'green';
 
-  fileUploadInstructionText: string = 'Select a file to upload';
+  fileUploadInstructionText: string =
+    'Drag and drop your file here or select it to upload';
 
   fileUploadWarningText: string = '';
 
@@ -133,14 +138,25 @@ export class CourseMainMaterialsComponent implements OnInit {
   closeFloatingBoxButtonText: string = 'Ok, close';
   closeFloatingBoxButtonColor: string = 'blue';
 
+  downloadFileUrl: any;
+  //Variable that stores the progress in the percentage of the file upload
+  uploadProgress: number = 0;
+  sanitizer: DomSanitizer = inject(DomSanitizer);
+
   ngOnInit(): void {
     this.loadCourseMainMaterials();
   }
 
   onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
+    console.log('File selected event: ', event);
+    console.log('Selected file name: ', event.name);
+
+    this.selectedFile = event;
+    this.fileInput.nativeElement = event;
     this.fileUploadResultMessage = '';
+
     console.log('Selected file:', this.selectedFile);
+    console.log('File input value:', this.fileInput.nativeElement.value);
     if (this.selectedFile) {
       //Check if the file type is allowed
       if (!this.validateFileType(this.selectedFile)) {
@@ -148,6 +164,7 @@ export class CourseMainMaterialsComponent implements OnInit {
         this.fileUploadWarningText =
           'This file type is not allowed, choose another file';
         this.fileUploadInstructionText = '';
+        return;
       }
 
       //Check if the file size is allowed
@@ -258,6 +275,7 @@ export class CourseMainMaterialsComponent implements OnInit {
 
   uploadFile() {
     if (this.selectedFile) {
+      this.fileUploadInstructionText = '';
       this.isDataTransmissionActive = true;
       this.fileUploadResultMessage = 'Uploading file...';
       this.fileUploadResultColor = 'blue';
@@ -280,6 +298,7 @@ export class CourseMainMaterialsComponent implements OnInit {
         'Given File Date in UNIX: ',
         new Date(givenDateTimeOfCreation).getTime()
       );
+      this.isDataTransmissionActive = true;
 
       this.courseCreateService
         .uploadFileAsCourseMainMaterial(
@@ -288,23 +307,37 @@ export class CourseMainMaterialsComponent implements OnInit {
           givenDateTimeOfCreation,
           this.selectedFile
         )
-        .subscribe((response) => {
-          this.isDataTransmissionActive = false;
-          this.isDataTransmissionComplete = true;
-          if (response.success === 'true') {
-            this.fileUploadResultMessage = 'File uploaded successfully';
-            this.fileUploadResultColor = 'green';
-
-            //Clear the file input element
-            this.fileInput.nativeElement.value = '';
-          }
-          if (response.success === 'false') {
-            this.fileUploadResultMessage =
-              'Failed to upload file, ' + response.message;
+        .subscribe({
+          //Handle successful response or still ongoing upload
+          next: (result) => {
+            //Check if the result is a type of number, if it is, then the upload is still in progress
+            if (typeof result === 'number') {
+              console.log(`Upload progress: ${result}%`);
+              this.fileUploadResultMessage = `Uploaded: ${result}%`;
+              this.uploadProgress = result;
+            } else {
+              this.isDataTransmissionActive = false;
+              this.fileUploadResultMessage = 'File uploaded successfully';
+              this.fileUploadResultColor = 'green';
+              console.log('Upload complete', result);
+              this.selectedFile = null;
+              setTimeout(() => {
+                this.fileUploadResultMessage = '';
+                this.fileUploadInstructionText =
+                  'Drag and drop your file here or select it to upload';
+              }, 5000);
+            }
+            this.loadCourseMainMaterials();
+          },
+          //Handle error response
+          error: (error) => {
+            this.isDataTransmissionActive = false;
+            console.log('Upload failed', error);
             this.fileUploadResultColor = 'red';
-          }
-          this.selectedFile = null;
-          this.loadCourseMainMaterials();
+            this.fileUploadResultMessage = 'Upload failed, ' + error.message;
+            this.selectedFile = null;
+            this.loadCourseMainMaterials();
+          },
         });
     }
   }
@@ -436,30 +469,60 @@ export class CourseMainMaterialsComponent implements OnInit {
   }
 
   downloadCourseMainMaterial(courseMainMaterialId: string) {
+    this.downloadFileUrl = null;
+
     this.courseCreateService
       .downloadCourseMainMaterialByCourseMainMaterialId(courseMainMaterialId)
-      .subscribe((response) => {
-        if (response.isFile) {
-          // If it's a file, trigger the download.
-          const blob = response.file;
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-
-          // Extract the filename from the Content-Disposition header.
-          const contentDisposition = blob.headers?.get('Content-Disposition');
-          const filename = contentDisposition
-            ? contentDisposition.split('filename=')[1].replace(/['"]/g, '')
-            : 'downloaded_file';
-
-          a.download = filename;
-          a.click();
-          window.URL.revokeObjectURL(url);
-        } else {
-          // If it's an error, display the message.
-          const { message } = response;
-          alert(`Error: ${message}`);
-        }
+      .subscribe({
+        next: (progressOrFile) => {
+          if (typeof progressOrFile === 'number') {
+            this.uploadProgress = progressOrFile;
+          } else if (progressOrFile instanceof Blob) {
+            // Create URL and trigger download
+            const url = window.URL.createObjectURL(progressOrFile);
+            window.open(url, '_blank');
+            this.downloadFileUrl = (
+              this.sanitizer.bypassSecurityTrustResourceUrl(url) as any
+            ).changingThisBreaksApplicationSecurity;
+            console.log('Downloaded file url:', this.downloadFileUrl);
+          }
+        },
+        error: (error) => {
+          console.error('Error downloading file:', error);
+        },
       });
+  }
+
+  handleFileInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.onFileSelected(input.files[0]);
+    }
+  }
+
+  //Functions for handling file drag and drop
+
+  //Handle dragover event
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    const dropzone = event.target as HTMLElement;
+    dropzone.classList.add('dragover');
+  }
+
+  //Handle dragleave event
+  onDragLeave(event: DragEvent) {
+    const dropzone = event.target as HTMLElement;
+    dropzone.classList.remove('dragover');
+  }
+
+  //Handle drop event
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    const dropzone = event.target as HTMLElement;
+    dropzone.classList.remove('dragover');
+
+    if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+      this.onFileSelected(event.dataTransfer.files[0]);
+    }
   }
 }

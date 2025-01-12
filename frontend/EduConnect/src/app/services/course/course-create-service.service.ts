@@ -1,10 +1,17 @@
-import { HttpClient } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpEvent,
+  HttpEventType,
+  HttpHeaders,
+  HttpRequest,
+} from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { CreateCourseBasicInformation } from '../../_models/course/create-course/create-course.create-course.course.model';
 import { AccountService } from '../account.service';
 import { CreateCourseHttpRequestBody } from '../../_models/course/create-course/create-course.http-request-body';
 import ApiLinks from '../../../assets/api/link.api';
-import { catchError, map, of } from 'rxjs';
+import { catchError, map, of, tap } from 'rxjs';
+import { EventType } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -191,8 +198,110 @@ export class CourseCreateService {
     formData.append('DateTimePointOfFileCreation', dateTimePointOfFileCreation);
     formData.append('CourseId', courseId);
 
+    //Create the HttpRequest object to send as the http post request to the server
+    const requestToSend = new HttpRequest(
+      'POST',
+      ApiLinks.uploadCourseMainMaterial,
+      formData,
+      {
+        headers: new HttpHeaders({
+          Authorization: `Bearer ${authorization}`,
+        }),
+        reportProgress: true,
+      }
+    );
+
+    //Send the http request to the server and return either the upload progress or the response from the server
+    return this.http.request(requestToSend).pipe(
+      map((event) => {
+        //Handle the case where the response is still being sent to the server
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          const progress = Math.round((100 * event.loaded) / event.total);
+          return progress;
+        }
+        //Handle the case where the response is received from the server
+        if (event.type == HttpEventType.Response) {
+          const response = event.body;
+          return {
+            success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: event.status,
+          };
+        }
+
+        //Fallback return
+        return 0;
+      }),
+      catchError((error) => {
+        return of({
+          success: (error as any).error.success,
+          data: (error as any).error.data,
+          message: (error as any).error.message,
+          statusCode: (error as any).status,
+        });
+      })
+    );
+  }
+
+  public downloadCourseMainMaterialByCourseMainMaterialId(
+    courseMainMaterialId: string
+  ) {
+    const authorization = this.accountService.getAccessToken();
     return this.http
-      .post(ApiLinks.uploadCourseMainMaterial, formData, {
+      .get(ApiLinks.downloadCourseMainMaterial + '/' + courseMainMaterialId, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+        responseType: 'blob', // Set the response type to 'blob' for file downloads
+        reportProgress: true, // Enable progress reporting
+        observe: 'events', // Observe the events to track progress of the file download
+      })
+      .pipe(
+        map((event: HttpEvent<any>) => {
+          //Check if the event type is HttpEventType.DownloadProgress
+          if (event.type === HttpEventType.DownloadProgress) {
+            //Calculate and return the progress percentage
+            if (event.total) {
+              return Math.round((event.loaded / event.total) * 100);
+            }
+            return 0; //Fallback return if the progress cannot be calculated
+          }
+
+          //Handle the case where the response is received from the server
+          if (event.type === HttpEventType.Response) {
+            return event.body;
+          }
+
+          ///Fallback return
+          return 0;
+        }),
+        tap((progressOrFile) => {
+          if (typeof progressOrFile === 'number') {
+            console.log('Download progress:', progressOrFile);
+          }
+          if (progressOrFile instanceof Blob) {
+            console.log('Download completed:', progressOrFile);
+          }
+        }),
+        catchError((error) => {
+          console.log(error);
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  public deleteCourseMainMaterialByCourseMainMaterialId(
+    courseMainMaterialId: string
+  ) {
+    const authorization = this.accountService.getAccessToken();
+    return this.http
+      .delete(ApiLinks.deleteCourseMainMaterial + '/' + courseMainMaterialId, {
         headers: {
           Authorization: `Bearer ${authorization}`,
         },
@@ -239,72 +348,6 @@ export class CourseCreateService {
             success: (error as any).error.success,
             data: (error as any).error.data,
             message: (error as any).error.message,
-            statusCode: (error as any).status,
-          });
-        })
-      );
-  }
-
-  public deleteCourseMainMaterialByCourseMainMaterialId(
-    courseMainMaterialId: string
-  ) {
-    const authorization = this.accountService.getAccessToken();
-    return this.http
-      .delete(ApiLinks.deleteCourseMainMaterial + '/' + courseMainMaterialId, {
-        headers: {
-          Authorization: `Bearer ${authorization}`,
-        },
-      })
-      .pipe(
-        map((response) => {
-          return {
-            success: (response as any).success,
-            data: (response as any).data,
-            message: (response as any).message,
-            statusCode: (response as any).statusCode,
-          };
-        }),
-        catchError((error) => {
-          return of({
-            success: (error as any).error.success,
-            data: (error as any).error.data,
-            message: (error as any).error.message,
-            statusCode: (error as any).status,
-          });
-        })
-      );
-  }
-
-  public downloadCourseMainMaterialByCourseMainMaterialId(
-    courseMainMaterialId: string
-  ) {
-    const authorization = this.accountService.getAccessToken();
-    return this.http
-      .get(
-        ApiLinks.downloadCourseMainMaterial + '/' + courseMainMaterialId,
-
-        {
-          headers: {
-            Authorization: `Bearer ${authorization}`,
-          },
-          responseType: 'blob',
-        }
-      )
-      .pipe(
-        map((response) => {
-          // Check if the response is a JSON error by attempting to parse it.
-          const isJsonError = response.type === 'application/json';
-          if (isJsonError) {
-            return this.parseErrorBlob(response);
-          }
-          // If it's not JSON, it's a file.
-          return { isFile: true, file: response };
-        }),
-        catchError((error) => {
-          // Handle network or other errors.
-          return of({
-            success: false,
-            message: 'An error occurred while downloading the file.',
             statusCode: (error as any).status,
           });
         })

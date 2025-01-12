@@ -10,8 +10,9 @@
         <p>Current space taken up: <strong>{{currentSpaceTakenUpInMb}} MB</strong></p>
     </div>
 
-    <div class="upload-container">
-        <input type="file" id="fileUpload" #fileInput (change)="onFileSelected($event)">
+    <div class="upload-container" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)">
+        <input type="file" id="fileUpload" #fileInput (change)="handleFileInput($event)">
         <p class="info-text">{{fileUploadInstructionText}}</p>
 
         <div *ngIf="this.selectedFile && this.validateFileType(this.selectedFile) && this.validateFileSize(this.selectedFile)"
@@ -37,6 +38,8 @@
             class="file-warning-text">
             <p>{{this.fileUploadWarningText}}</p>
         </div>
+        <mat-progress-bar *ngIf="isDataTransmissionActive" mode="determinate"
+            [value]="uploadProgress"></mat-progress-bar>
         <div class="file-upload-result">
             <p [style.color]="fileUploadResultColor">{{fileUploadResultMessage}}</p>
         </div>
@@ -73,6 +76,11 @@
             </tr>
         </tbody>
     </table>
+
+    <div class="download-file">
+        <p>Your file was downloaded, click here to open it:</p>
+        <a [href]="downloadFileUrl" download target="_blank">Open file</a>
+    </div>
     <app-floating-warning-box *ngIf="floatingWarningDeleteBoxShow" [warningTitle]="floatingWarningDeleteBoxTitle">
         <p [style.color]="floatingWarningDeleteBoxMessageColor" [style.font-size]="'24px'">
             {{floatingWarningDeleteBoxMessage}}</p>
