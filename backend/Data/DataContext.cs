@@ -71,11 +71,21 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<CourseCreationCompletenessStep> CourseCreationCompletenessStep { get; set; }
 
     public DbSet<CourseMainMaterial> CourseMainMaterial { get; set; }
+
+    public DbSet<CourseLesson> CourseLesson { get; set; }
+
+    public DbSet<CourseLessonSupplementaryMaterial> CourseLessonSupplementaryMaterial { get; set; }
+
+    public DbSet<CourseLessonContent> CourseLessonContent { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CourseLanguage>()
             .HasKey(cl => new { cl.CourseId, cl.LanguageId });
+
+
     }
+
 
 
 }

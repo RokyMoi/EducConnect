@@ -7,6 +7,7 @@ using backend.DTOs.Course.CourseMainMaterial;
 using backend.DTOs.Course.Language;
 using backend.DTOs.Reference.Language;
 using backend.Entities.Course;
+using EduConnect.DTOs.Course.CourseLesson;
 
 namespace backend.Interfaces.Course
 {
@@ -51,5 +52,24 @@ namespace backend.Interfaces.Course
 
         public Task<CourseDetailsWithTutorIdDTO?> UpdateCourseTypeByCourseId(Guid courseId, int courseTypeId);
 
+        public Task<bool> CheckIfLessonTitleExistsByCourseIdAndLessonTitle(Guid courseId, string lessonTitle);
+
+        public Task<int?> GetHighestLessonSequenceOrderByCourseId(Guid courseId);
+
+        public Task IncrementLessonSequenceOrders(Guid courseId, int fromPosition, int highestOrder);
+        public Task IncrementAllLessonSequenceOrders(Guid courseId);
+
+        public Task<CourseLessonDTO?> CreateCourseLesson(CourseLessonDTO courseLessonDTO);
+
+        public Task<CourseLessonWithCourseDTO?> GetCourseLessonWithCourseByCourseLessonId(Guid courseLessonId);
+
+        public Task<CourseLessonContentDTO?> GetCourseLessonContentByCourseLessonId(Guid courseLessonId);
+        public Task<CourseLessonContentDTO?> CreateCourseCourseLessonContent(CourseLessonContentCreateDTO courseLessonContentToSave);
+
+        public Task<long> GetTotalFileSizeOfCourseLessonSupplementaryMaterialsByCourseLessonId(Guid courseLessonId);
+
+        public Task<int> GetCountOfCourseLessonSupplementaryMaterialsByCourseLessonId(Guid courseLessonId);
+
+        public Task<CourseLessonSupplementaryMaterialDTO?> StoreFileToCourseLessonSupplementaryMaterial(CourseLessonSupplementaryMaterialCreateDTO courseLessonSupplementaryMaterial);
     }
 }

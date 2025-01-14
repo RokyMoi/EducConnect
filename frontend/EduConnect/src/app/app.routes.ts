@@ -26,6 +26,7 @@ import { CreateCourseComponent } from './tutor/course/create-course/create-cours
 import { CourseSupportedLanguagesComponent } from './tutor/course/course-supported-languages/course-supported-languages.component';
 import { CourseMainMaterialsComponent } from './tutor/course/course-main-materials/course-main-materials.component';
 import { ConfirmCourseTypeComponent } from './tutor/course/confirm-course-type/confirm-course-type.component';
+import { CourseLessonsComponent } from './tutor/course/self-paced-course/course-lessons/course-lessons.component';
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -85,6 +86,10 @@ export const routes: Routes = [
   {
     path: 'tutor/course/confirm-course-type',
     component: ConfirmCourseTypeComponent,
+  },
+  {
+    path: 'tutor/course/self-paced/lessons',
+    component: CourseLessonsComponent,
   },
   { path: '**', component: BodyComponent },
 ];

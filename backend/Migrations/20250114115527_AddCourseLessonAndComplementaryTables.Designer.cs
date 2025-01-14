@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250114115527_AddCourseLessonAndComplementaryTables")]
+    partial class AddCourseLessonAndComplementaryTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,136 +99,6 @@ namespace EduConnect.Migrations
                     b.HasIndex("LearningSubcategoryId");
 
                     b.ToTable("CourseDetails", "Course");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.CourseLesson", b =>
-                {
-                    b.Property<Guid>("CourseLessonId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("LessonCompletionTimeInMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<string>("LessonDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LessonObjective")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("LessonPrerequisites")
-                        .IsRequired()
-                        .HasMaxLength(510)
-                        .HasColumnType("nvarchar(510)");
-
-                    b.Property<int>("LessonSequenceOrder")
-                        .HasColumnType("int");
-
-                    b.Property<string>("LessonTag")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LessonTitle")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("CourseLessonId");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("CourseLesson", "Course");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.CourseLessonContent", b =>
-                {
-                    b.Property<Guid>("CourseLessonContentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ContentData")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CourseLessonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("CourseLessonContentId");
-
-                    b.HasIndex("CourseLessonId");
-
-                    b.ToTable("CourseLessonContent", "Course");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.CourseLessonSupplementaryMaterial", b =>
-                {
-                    b.Property<Guid>("CourseLessonSupplementaryMaterialId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("ContentSize")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CourseLessonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<byte[]>("Data")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<long>("DateTimePointOfFileCreation")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("CourseLessonSupplementaryMaterialId");
-
-                    b.HasIndex("CourseLessonId");
-
-                    b.ToTable("CourseLessonSupplementaryMaterial", "Course");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.CourseMainMaterial", b =>
@@ -1223,39 +1096,6 @@ namespace EduConnect.Migrations
                     b.Navigation("LearningDifficultyLevel");
 
                     b.Navigation("LearningSubcategory");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.CourseLesson", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Course.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.CourseLessonContent", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Course.CourseLesson", "Lesson")
-                        .WithMany()
-                        .HasForeignKey("CourseLessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lesson");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.CourseLessonSupplementaryMaterial", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Course.CourseLesson", "CourseLesson")
-                        .WithMany()
-                        .HasForeignKey("CourseLessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CourseLesson");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.CourseMainMaterial", b =>

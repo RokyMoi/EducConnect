@@ -9,6 +9,7 @@ using backend.DTOs.Reference.Language;
 using backend.Entities.Course;
 using backend.Interfaces.Course;
 using EduConnect.Data;
+using EduConnect.DTOs.Course.CourseLesson;
 using EduConnect.Entities.Course;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -471,5 +472,243 @@ namespace backend.Repositories.Course
                 TutorId = courseDetails.Course.TutorId,
             };
         }
+
+        public async Task<bool> CheckIfLessonTitleExistsByCourseIdAndLessonTitle(Guid courseId, string lessonTitle)
+        {
+            return await _dataContext.CourseLesson.Where(x => x.CourseId == courseId && x.LessonTitle == lessonTitle).AnyAsync();
+        }
+
+        public async Task<int?> GetHighestLessonSequenceOrderByCourseId(Guid courseId)
+        {
+            return await _dataContext.CourseLesson.Where(x => x.CourseId == courseId)
+            .MaxAsync(x => (int?)x.LessonSequenceOrder);
+
+
+        }
+
+        public async Task IncrementLessonSequenceOrders(Guid courseId, int fromPosition, int highestOrder)
+        {
+            var lessons = await _dataContext.CourseLesson
+            .Where(x => x.CourseId == courseId && x.LessonSequenceOrder >= fromPosition)
+            .OrderByDescending(x => x.LessonSequenceOrder)
+            .ToListAsync();
+
+            foreach (var lesson in lessons)
+            {
+                lesson.LessonSequenceOrder += 1;
+                lesson.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            }
+
+            await _dataContext.SaveChangesAsync();
+        }
+
+        public async Task IncrementAllLessonSequenceOrders(Guid courseId)
+        {
+            var lessons = await _dataContext.CourseLesson
+            .Where(x => x.CourseId == courseId)
+            .OrderByDescending(x => x.LessonSequenceOrder)
+            .ToListAsync();
+
+            foreach (var lesson in lessons)
+            {
+                lesson.LessonSequenceOrder += 1;
+                lesson.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            }
+
+            await _dataContext.SaveChangesAsync();
+        }
+
+        public async Task<CourseLessonDTO?> CreateCourseLesson(CourseLessonDTO courseLessonDTO)
+        {
+            var newCourseLesson = new CourseLesson
+            {
+                CourseId = courseLessonDTO.CourseId,
+                CourseLessonId = new Guid(),
+                LessonTitle = courseLessonDTO.LessonTitle,
+                LessonDescription = courseLessonDTO.LessonDescription,
+                LessonSequenceOrder = courseLessonDTO.LessonSequenceOrder,
+                LessonPrerequisites = courseLessonDTO.LessonPrerequisites,
+                LessonObjective = courseLessonDTO.LessonObjective,
+                LessonCompletionTimeInMinutes = courseLessonDTO.LessonCompletionTimeInMinutes,
+                LessonTag = courseLessonDTO.LessonTag,
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                UpdatedAt = null
+            };
+
+
+            try
+            {
+                await _dataContext.AddAsync(
+                newCourseLesson
+            );
+
+                await _dataContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+
+            }
+
+            return new CourseLessonDTO
+            {
+                CourseId = courseLessonDTO.CourseId,
+                CourseLessonId = newCourseLesson.CourseLessonId,
+                LessonTitle = courseLessonDTO.LessonTitle,
+                LessonDescription = courseLessonDTO.LessonDescription,
+                LessonSequenceOrder = courseLessonDTO.LessonSequenceOrder,
+                LessonPrerequisites = courseLessonDTO.LessonPrerequisites,
+                LessonObjective = courseLessonDTO.LessonObjective,
+                LessonCompletionTimeInMinutes = courseLessonDTO.LessonCompletionTimeInMinutes,
+                LessonTag = courseLessonDTO.LessonTag,
+            };
+
+
+
+        }
+
+        public async Task<CourseLessonWithCourseDTO?> GetCourseLessonWithCourseByCourseLessonId(Guid courseLessonId)
+        {
+            var courseLesson = await _dataContext.CourseLesson
+            .Include(
+                x => x.Course
+            )
+            .Where(x => x.CourseLessonId == courseLessonId)
+            .FirstOrDefaultAsync();
+
+            if (courseLesson == null)
+            {
+                return null;
+            }
+
+            return new CourseLessonWithCourseDTO
+            {
+                CourseLessonId = courseLesson.CourseLessonId,
+                LessonTitle = courseLesson.LessonTitle,
+                LessonDescription = courseLesson.LessonDescription,
+                LessonSequenceOrder = courseLesson.LessonSequenceOrder,
+                LessonPrerequisites = courseLesson.LessonPrerequisites,
+                LessonObjective = courseLesson.LessonObjective,
+                LessonCompletionTimeInMinutes = courseLesson.
+                LessonCompletionTimeInMinutes,
+                LessonTag = courseLesson.LessonTag,
+                Course = new CourseDTO
+                {
+                    CourseId = courseLesson.Course.CourseId,
+                    TutorId = courseLesson.Course.TutorId,
+                    CourseName = courseLesson.Course.CourseName,
+                    CourseSubject = courseLesson.Course.CourseSubject,
+                    CourseCreationCompletenessStepId = courseLesson.Course.CourseCreationCompletenessStepId,
+                }
+            };
+        }
+
+        public async Task<CourseLessonContentDTO?> GetCourseLessonContentByCourseLessonId(Guid courseLessonId)
+        {
+            var courseLessonContent = await _dataContext.CourseLessonContent.Where(x => x.CourseLessonId == courseLessonId).FirstOrDefaultAsync();
+
+            if (courseLessonContent == null)
+            {
+                return null;
+            }
+
+            return new CourseLessonContentDTO
+            {
+                CourseLessonId = courseLessonContent.CourseLessonId,
+                CourseLessonContentId = courseLessonContent.CourseLessonContentId,
+                Title = courseLessonContent.Title,
+                Description = courseLessonContent.Description,
+                ContentType = courseLessonContent.ContentType,
+                ContentData = courseLessonContent.ContentData,
+            };
+
+        }
+
+        public async Task<CourseLessonContentDTO?> CreateCourseCourseLessonContent(CourseLessonContentCreateDTO courseLessonContentToSave)
+        {
+            var newCourseLessonContent = new CourseLessonContent
+            {
+                CourseLessonContentId = Guid.NewGuid(),
+                CourseLessonId = courseLessonContentToSave.CourseLessonId,
+                Title = courseLessonContentToSave.Title,
+                Description = courseLessonContentToSave.Description,
+                ContentType = courseLessonContentToSave.ContentType,
+                ContentData = courseLessonContentToSave.ContentData,
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                UpdatedAt = null
+            };
+
+            try
+            {
+                await _dataContext.AddAsync(newCourseLessonContent);
+                await _dataContext.SaveChangesAsync();
+
+
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+
+            }
+            return new CourseLessonContentDTO
+            {
+                CourseLessonContentId = newCourseLessonContent.CourseLessonContentId,
+                CourseLessonId = newCourseLessonContent.CourseLessonId,
+                Title = newCourseLessonContent.Title,
+                Description = newCourseLessonContent.Description,
+                ContentType = newCourseLessonContent.ContentType,
+                ContentData = newCourseLessonContent.ContentData,
+            };
+        }
+
+        public async Task<long> GetTotalFileSizeOfCourseLessonSupplementaryMaterialsByCourseLessonId(Guid courseLessonId)
+        {
+            return await _dataContext.CourseLessonSupplementaryMaterial.Where(
+                x => x.CourseLessonId == courseLessonId
+            ).SumAsync(x => x.ContentSize);
+        }
+
+        public async Task<int> GetCountOfCourseLessonSupplementaryMaterialsByCourseLessonId(Guid courseLessonId)
+        {
+            return await _dataContext.CourseLessonSupplementaryMaterial.Where(
+                x => x.CourseLessonId == courseLessonId
+            )
+            .CountAsync();
+
+        }
+
+        public async Task<CourseLessonSupplementaryMaterialDTO?> StoreFileToCourseLessonSupplementaryMaterial(CourseLessonSupplementaryMaterialCreateDTO courseLessonSupplementaryMaterial)
+        {
+            var newCourseLessonSupplementaryMaterial = new CourseLessonSupplementaryMaterial
+            {
+                CourseLessonSupplementaryMaterialId = Guid.NewGuid(),
+                CourseLessonId = courseLessonSupplementaryMaterial.CourseLessonId,
+                FileName = courseLessonSupplementaryMaterial.FileName,
+                ContentType = courseLessonSupplementaryMaterial.ContentType,
+                ContentSize = courseLessonSupplementaryMaterial.ContentSize,
+                Data = courseLessonSupplementaryMaterial.Data,
+                DateTimePointOfFileCreation = courseLessonSupplementaryMaterial.DateTimePointOfFileCreation,
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                UpdatedAt = null
+
+            };
+
+            await _dataContext.AddAsync(newCourseLessonSupplementaryMaterial);
+            await _dataContext.SaveChangesAsync();
+
+            return new CourseLessonSupplementaryMaterialDTO
+            {
+                CourseLessonSupplementaryMaterialId = newCourseLessonSupplementaryMaterial.CourseLessonSupplementaryMaterialId,
+                CourseLessonId = newCourseLessonSupplementaryMaterial.CourseLessonId,
+                FileName = newCourseLessonSupplementaryMaterial.FileName,
+                ContentType = newCourseLessonSupplementaryMaterial.ContentType,
+                ContentSize = newCourseLessonSupplementaryMaterial.ContentSize,
+                Data = newCourseLessonSupplementaryMaterial.Data,
+                DateTimePointOfFileCreation = newCourseLessonSupplementaryMaterial.DateTimePointOfFileCreation,
+            };
+        }
     }
+
 }
