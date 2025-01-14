@@ -6,6 +6,7 @@ using backend.DTOs.Course.Basic;
 using backend.DTOs.Course.CourseMainMaterial;
 using backend.DTOs.Course.Language;
 using backend.DTOs.Reference.Language;
+using backend.Entities.Course;
 
 namespace backend.Interfaces.Course
 {
@@ -15,7 +16,7 @@ namespace backend.Interfaces.Course
 
         public Task<CourseDTO> CreateCourse(CourseCreateDTO createDTO);
 
-        public Task<CourseDetailsDTO?> CreateCourseDetails(CourseDetailsCreateDTO createDTO);
+        public Task<CourseDetailsWithCourseTypeDTO?> CreateCourseDetails(CourseDetailsCreateDTO createDTO);
 
         public Task<CourseDTO?> GetCourseById(Guid courseId);
 
@@ -42,5 +43,13 @@ namespace backend.Interfaces.Course
         public Task<List<CourseMainMaterialWithNoFileDTO>?> GetCourseMainMaterialsWithNoFilesByCourseId(Guid courseId);
         public Task<CourseMainMaterialDTO?> GetCourseMainMaterialById(Guid courseMainMaterialId);
         public Task<bool> DeleteCourseMainMaterialByCourseMainMaterialId(Guid courseMainMaterialId);
+
+        public Task<CourseAndCourseTypeDTO?> GetCourseAndCourseTypeByCourseId(Guid courseId);
+
+        public Task<CourseDetailsWithTutorIdDTO?>
+        GetCourseDetailsWithTutorIdByCourseId(Guid courseId);
+
+        public Task<CourseDetailsWithTutorIdDTO?> UpdateCourseTypeByCourseId(Guid courseId, int courseTypeId);
+
     }
 }

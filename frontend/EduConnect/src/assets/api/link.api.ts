@@ -131,4 +131,7 @@ export default class ApiLinks {
   //Download main material from the course
   public static readonly downloadCourseMainMaterial =
     ApiLinks.baseUrl + 'course/main-material/download';
+  //Update course type
+  public static readonly updateCourseTypeByCourseId =
+    ApiLinks.baseUrl + 'course/basic/course-type';
 }

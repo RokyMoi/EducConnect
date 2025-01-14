@@ -58,7 +58,7 @@ namespace backend.Repositories.Course
             };
         }
 
-        public async Task<CourseDetailsDTO?> CreateCourseDetails(CourseDetailsCreateDTO createDTO)
+        public async Task<CourseDetailsWithCourseTypeDTO?> CreateCourseDetails(CourseDetailsCreateDTO createDTO)
         {
             var newCourseDetails = new CourseDetails
             {
@@ -70,6 +70,13 @@ namespace backend.Repositories.Course
                 CourseTypeId = createDTO.CourseTypeId,
             };
 
+            //Fetch CourseType
+            var courseType = await _dataContext.CourseType.FirstOrDefaultAsync(ct => ct.CourseTypeId == createDTO.CourseTypeId);
+
+            if (courseType == null)
+            {
+                return null;
+            }
             try
             {
                 await _dataContext.AddAsync(newCourseDetails);
@@ -88,14 +95,16 @@ namespace backend.Repositories.Course
                 return null;
             }
 
-            return new CourseDetailsDTO
+
+
+            return new CourseDetailsWithCourseTypeDTO
             {
                 CourseId = newCourseDetails.CourseId,
                 CourseDescription = newCourseDetails.CourseDescription,
                 Price = newCourseDetails.Price,
                 LearningSubcategoryId = newCourseDetails.LearningSubcategoryId,
                 LearningDifficultyLevelId = newCourseDetails.LearningDifficultyLevelId,
-                CourseTypeId = newCourseDetails.CourseTypeId
+                CourseType = courseType
             };
         }
 
@@ -399,6 +408,68 @@ namespace backend.Repositories.Course
             await _dataContext.SaveChangesAsync();
             return true;
 
+        }
+
+        public async Task<CourseAndCourseTypeDTO?> GetCourseAndCourseTypeByCourseId(Guid courseId)
+        {
+            return await _dataContext.CourseDetails
+            .Include(
+                x => x.CourseType
+            )
+            .Where(
+                x => x.CourseId == courseId
+            )
+            .Select(
+                x => new CourseAndCourseTypeDTO
+                {
+                    CourseId = x.CourseId,
+                    CourseType = x.CourseType,
+                }
+            ).FirstOrDefaultAsync();
+        }
+
+        public async Task<CourseDetailsWithTutorIdDTO?> GetCourseDetailsWithTutorIdByCourseId(Guid courseId)
+        {
+            return await _dataContext.CourseDetails.Include(
+                x => x.Course
+            )
+            .Where(x => x.CourseId == courseId)
+            .Select(
+                x => new CourseDetailsWithTutorIdDTO
+                {
+                    CourseId = x.CourseId,
+                    CourseDescription = x.CourseDescription,
+                    Price = x.Price,
+                    LearningSubcategoryId = x.LearningSubcategoryId,
+                    LearningDifficultyLevelId = x.LearningDifficultyLevelId,
+                    CourseTypeId = x.CourseTypeId,
+                    TutorId = x.Course.TutorId,
+
+                }
+            )
+            .FirstOrDefaultAsync();
+        }
+
+        public async Task<CourseDetailsWithTutorIdDTO?> UpdateCourseTypeByCourseId(Guid courseId, int courseTypeId)
+        {
+            var courseDetails = await _dataContext.CourseDetails.Include(x => x.Course).Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
+            if (courseDetails == null)
+            {
+                return null;
+            }
+
+            courseDetails.CourseTypeId = courseTypeId;
+            await _dataContext.SaveChangesAsync();
+            return new CourseDetailsWithTutorIdDTO
+            {
+                CourseId = courseDetails.CourseId,
+                CourseDescription = courseDetails.CourseDescription,
+                Price = courseDetails.Price,
+                LearningSubcategoryId = courseDetails.LearningSubcategoryId,
+                LearningDifficultyLevelId = courseDetails.LearningDifficultyLevelId,
+                CourseTypeId = courseTypeId,
+                TutorId = courseDetails.Course.TutorId,
+            };
         }
     }
 }

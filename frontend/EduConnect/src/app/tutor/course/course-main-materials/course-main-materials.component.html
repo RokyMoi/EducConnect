@@ -70,16 +70,57 @@
                 <td>{{getFileExtension(item['contentType'])}}</td>
                 <td>{{getDateTimeFromUnixMillis(item['dateTimePointOfFileCreation'])}}</td>
                 <td>{{getFileSizeInMb(item['contentSize'])}} MB</td>
-                <td (click)="downloadCourseMainMaterial(item.courseMainMaterialId)">Download</td>
+                <td (click)="downloadCourseMainMaterial(item.courseMainMaterialId)">
+                    <p>Download</p>
+
+                </td>
                 <td (click)="deleteCourseMainMaterial(item.courseMainMaterialId, i)">Delete</td>
 
             </tr>
         </tbody>
     </table>
 
-    <div class="download-file">
-        <p>Your file was downloaded, click here to open it:</p>
-        <a [href]="downloadFileUrl" download target="_blank">Open file</a>
+    <div class="accordion-list-container" *ngIf="courseMainMaterialsArray.length > 0">
+        <p class="accordion-list-title">Uploaded items ({{courseMainMaterialsArray.length}})</p>
+        <div class="accordion-list-item" *ngFor="let item of courseMainMaterialsArray; let i=index">
+            <div class="accordion-list-item-header" (click)="toggleCardExpansion(i)">
+                <p>{{item.fileName}}</p>
+
+            </div>
+            <div class="accordion-list-item-body" [class.active]="i === expandedCardIndex">
+
+                <p>Number: {{i + 1}}</p>
+                <p>File name: {{item.fileName}}</p>
+                <p>File type {{item.contentType}}</p>
+                <p>File size: {{getFileSizeInMb(item['contentSize'])}} MB</p>
+                <p>File created: {{getDateTimeFromUnixMillis(item.dateTimePointOfFileCreation)}}</p>
+
+                <div class="accordion-list-item-body-actions-area">
+                    <button (click)="downloadCourseMainMaterial(item.courseMainMaterialId)">Download</button>
+                    <button [style.backgroundColor]="'red'"
+                        (click)="deleteCourseMainMaterial(item.courseMainMaterialId, i)">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="download-file-container">
+        <p *ngIf="isDownloadComplete === false">{{downloadProgressMessage}}</p>
+        <mat-progress-bar *ngIf="isDownloadComplete === false" mode="determinate"
+            [value]="downloadProgress"></mat-progress-bar>
+        <p *ngIf="isDownloadComplete" class="file-download-info">Your file to download: {{selectedFileToDownload}}</p>
+        <p *ngIf="isDownloadComplete" class="file-download-link-info">The file should have been opened in your browser,
+            if it was not click on this
+            link, to download it to your
+            device: <a class="file-download-link" [href]="this.downloadFileUrl"
+                [download]="selectedFileToDownload">{{selectedFileToDownload}}</a>
+        </p>
+        <p *ngIf="isDownloadComplete === null">Use the Download option in the files table, to download the selected file
+        </p>
+
+        <app-submit-button *ngIf="this.courseMainMaterialsArray.length > 0"
+            [buttonBackgroundColor]="goToNextStepButtonColor" [submitButtonText]="goToNextStepButtonText"
+            (buttonClick)="goToNextStepFunction()"></app-submit-button>
+
     </div>
     <app-floating-warning-box *ngIf="floatingWarningDeleteBoxShow" [warningTitle]="floatingWarningDeleteBoxTitle">
         <p [style.color]="floatingWarningDeleteBoxMessageColor" [style.font-size]="'24px'">

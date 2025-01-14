@@ -15,6 +15,8 @@ import { FloatingWarningBoxComponent } from '../../../common/floating-warning-bo
 import { CourseSupportedLanguagesComponent } from '../course-supported-languages/course-supported-languages.component';
 import { CourseCreateService } from '../../../services/course/course-create-service.service';
 import { CourseMainMaterialsComponent } from '../course-main-materials/course-main-materials.component';
+import { CourseType } from '../../../_models/reference/course-type';
+import { ConfirmCourseTypeComponent } from '../confirm-course-type/confirm-course-type.component';
 
 @Component({
   standalone: true,
@@ -60,12 +62,17 @@ export class CreateCourseComponent {
       title: 'Step 3: Course Main Materials',
       link: 'CourseMainMaterials',
     },
+    {
+      title: 'Step 4: Confirm Course Type',
+      link: 'ConfirmCourseType',
+    },
   ];
 
   componentsMap: { [key: string]: Type<any> } = {
     CourseBasicInformation: CourseBasicInformationComponent,
     CourseSupportedLanguages: CourseSupportedLanguagesComponent,
     CourseMainMaterials: CourseMainMaterialsComponent,
+    ConfirmCourseType: ConfirmCourseTypeComponent,
   };
 
   selectedOption = 0;
@@ -77,6 +84,9 @@ export class CreateCourseComponent {
 
   //Variable to store the course id after the course is created
   courseId: string = '';
+  //Variable to store the course type after the course is created
+  courseType: CourseType | null = null;
+
   //Variable flag to determine if the course is being created or edited
   //True - for create
   //False - for edit
@@ -88,6 +98,8 @@ export class CreateCourseComponent {
   isSupportedLanguagesStepCompleted: boolean = false;
   //Flag variable to determine if the main materials step has been completed
   isMainMaterialsStepCompleted: boolean = false;
+  //Flag variable to determine if the confirm course type step has been completed
+  isConfirmCourseTypeStepCompleted: boolean = false;
 
   ngAfterViewInit() {
     // Load initial component
@@ -121,6 +133,12 @@ export class CreateCourseComponent {
           this.isBasicInformationStepCompleted = true;
           this.isCreateOrEditMode = false;
         });
+        componentRef.instance.provideCourseType.subscribe(
+          (courseType: CourseType) => {
+            this.courseType = courseType;
+            console.log('Course Type: ', courseType);
+          }
+        );
 
         componentRef.instance.goToNextStep.subscribe(() => {
           this.handleOptionChangeRequest({
@@ -161,6 +179,43 @@ export class CreateCourseComponent {
         componentRef.instance.courseId = this.courseId;
         componentRef.instance.referenceService = this.referenceService;
         componentRef.instance.courseCreateService = this.courseCreateService;
+
+        componentRef.instance.courseMainMaterialsStepCompleted.subscribe(
+          (isCompleted: boolean) => {
+            this.isMainMaterialsStepCompleted = isCompleted;
+          }
+        );
+
+        componentRef.instance.goToNextStep.subscribe(() => {
+          this.handleOptionChangeRequest({
+            option: 'ConfirmCourseType',
+            index: 3,
+          });
+          this.onSelectComponent('ConfirmCourseType');
+        });
+      }
+
+      //Pass and receive values from the ConfirmCourseTypeComponent
+      if (componentName === 'ConfirmCourseType') {
+        console.log(
+          'Passing course type to ConfirmCourseTypeComponent',
+          this.courseType
+        );
+        componentRef.instance.courseId = this.courseId;
+        componentRef.instance.originalSelectedCourseType = this.courseType;
+        componentRef.instance.referenceService = this.referenceService;
+        componentRef.instance.courseCreateService = this.courseCreateService;
+
+        componentRef.instance.confirmCourseTypeStepCompleted.subscribe(
+          (isCompleted: boolean) => {
+            this.isConfirmCourseTypeStepCompleted = isCompleted;
+            console.log('Course type confirmed:', isCompleted);
+          }
+        );
+
+        componentRef.instance.goToNextStep.subscribe(() => {
+          console.log('Go to next step');
+        });
       }
     }
   }
@@ -180,9 +235,9 @@ export class CreateCourseComponent {
       return;
     }
 
-    if (event.index === 3 && !this.isSupportedLanguagesStepCompleted) {
+    if (event.index === 3 && !this.isMainMaterialsStepCompleted) {
       console.log(
-        'Cannot switch to main materials - complete supported languages first'
+        'Cannot switch to confirm course type - complete main materials first'
       );
       return;
     }

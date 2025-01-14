@@ -139,9 +139,33 @@ export class CourseMainMaterialsComponent implements OnInit {
   closeFloatingBoxButtonColor: string = 'blue';
 
   downloadFileUrl: any;
+  selectedFileToDownload: string | null = null;
+  downloadProgress: number = 0;
+  downloadProgressMessage: string = '';
+
+  //Variable that is used as a flag to specify if the download is disabled, completed or in progress
+  //Disabled - The value is NULL
+  //Completed - The value is TRUE
+  //In progress - The value is FALSE
+  isDownloadComplete: boolean = false;
+
   //Variable that stores the progress in the percentage of the file upload
   uploadProgress: number = 0;
   sanitizer: DomSanitizer = inject(DomSanitizer);
+
+  //Flag to determine if the table or the stacked list should be displayed for the uploaded files
+  isStackedView: boolean = window.innerWidth < 768;
+
+  //Variable index used to keep track of the card that is selected to be expanded but only in the stacked view
+  expandedCardIndex: number | null = null;
+
+  panelScrollHeight: number = 0;
+
+  goToNextStepFunction() {
+    this.goToNextStep.emit();
+  }
+  goToNextStepButtonColor: string = 'green';
+  goToNextStepButtonText: string = 'Next step';
 
   ngOnInit(): void {
     this.loadCourseMainMaterials();
@@ -315,6 +339,7 @@ export class CourseMainMaterialsComponent implements OnInit {
               console.log(`Upload progress: ${result}%`);
               this.fileUploadResultMessage = `Uploaded: ${result}%`;
               this.uploadProgress = result;
+              this.courseMainMaterialsStepCompleted.emit(true);
             } else {
               this.isDataTransmissionActive = false;
               this.fileUploadResultMessage = 'File uploaded successfully';
@@ -358,6 +383,13 @@ export class CourseMainMaterialsComponent implements OnInit {
             ) / 1e2;
           response.data.courseMainMaterialsTotalSize;
           console.log('Course main materials', this.courseMainMaterialsArray);
+
+          if (this.courseMainMaterialsArray.length > 0) {
+            this.courseMainMaterialsStepCompleted.emit(true);
+          }
+          if (this.courseMainMaterialsArray.length === 0) {
+            this.courseMainMaterialsStepCompleted.emit(false);
+          }
         }
       });
   }
@@ -470,14 +502,21 @@ export class CourseMainMaterialsComponent implements OnInit {
 
   downloadCourseMainMaterial(courseMainMaterialId: string) {
     this.downloadFileUrl = null;
-
+    this.selectedFileToDownload = this.courseMainMaterialsArray.find(
+      (fileToDownload) =>
+        fileToDownload.courseMainMaterialId === courseMainMaterialId
+    )?.fileName as string;
     this.courseCreateService
       .downloadCourseMainMaterialByCourseMainMaterialId(courseMainMaterialId)
       .subscribe({
         next: (progressOrFile) => {
           if (typeof progressOrFile === 'number') {
-            this.uploadProgress = progressOrFile;
+            this.downloadProgress = progressOrFile;
+            this.downloadProgressMessage = `${this.selectedFileToDownload} downloading ${this.downloadProgress}%`;
+            this.isDownloadComplete = false;
           } else if (progressOrFile instanceof Blob) {
+            this.downloadProgressMessage = 'Download complete';
+            this.downloadProgress = 100;
             // Create URL and trigger download
             const url = window.URL.createObjectURL(progressOrFile);
             window.open(url, '_blank');
@@ -485,10 +524,14 @@ export class CourseMainMaterialsComponent implements OnInit {
               this.sanitizer.bypassSecurityTrustResourceUrl(url) as any
             ).changingThisBreaksApplicationSecurity;
             console.log('Downloaded file url:', this.downloadFileUrl);
+            this.isDownloadComplete = true;
           }
         },
         error: (error) => {
           console.error('Error downloading file:', error);
+          this.downloadProgressMessage =
+            'Error downloading file, ' + error.message;
+          this.isDownloadComplete = false;
         },
       });
   }
@@ -524,5 +567,10 @@ export class CourseMainMaterialsComponent implements OnInit {
     if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
       this.onFileSelected(event.dataTransfer.files[0]);
     }
+  }
+
+  toggleCardExpansion(index: number) {
+    console.log('Toggle card expansion for index:', index);
+    this.expandedCardIndex = this.expandedCardIndex === index ? null : index;
   }
 }

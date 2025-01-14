@@ -25,6 +25,7 @@ import { TutorTeachingStyleComponent } from './signup/registration-step-process/
 import { CreateCourseComponent } from './tutor/course/create-course/create-course.component';
 import { CourseSupportedLanguagesComponent } from './tutor/course/course-supported-languages/course-supported-languages.component';
 import { CourseMainMaterialsComponent } from './tutor/course/course-main-materials/course-main-materials.component';
+import { ConfirmCourseTypeComponent } from './tutor/course/confirm-course-type/confirm-course-type.component';
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -80,6 +81,10 @@ export const routes: Routes = [
   {
     path: 'tutor/course/course-main-materials',
     component: CourseMainMaterialsComponent,
+  },
+  {
+    path: 'tutor/course/confirm-course-type',
+    component: ConfirmCourseTypeComponent,
   },
   { path: '**', component: BodyComponent },
 ];

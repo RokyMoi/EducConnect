@@ -28,6 +28,7 @@ import { SubmitButtonComponent } from '../../../common/button/submit-button/subm
 import { CourseCreateService } from '../../../services/course/course-create-service.service';
 import { CreateCourseBasicInformation } from '../../../_models/course/create-course/create-course.create-course.course.model';
 import { FloatingWarningBoxComponent } from '../../../common/floating-warning-box/floating-warning-box/floating-warning-box.component';
+
 import {
   MatProgressSpinner,
   ProgressSpinnerMode,
@@ -70,6 +71,10 @@ export class CourseBasicInformationComponent implements OnInit {
 
   //Notify the parent component to switch to the component which is next in line for data entry
   @Output() goToNextStep: EventEmitter<void> = new EventEmitter<void>();
+
+  //Notify the parent component that the course was successfully created and it will be provided with the chosen course type
+  @Output() provideCourseType: EventEmitter<CourseType> =
+    new EventEmitter<CourseType>();
 
   //Variables for the course name
   courseNameLabel: string = 'Course Name';
@@ -417,7 +422,15 @@ export class CourseBasicInformationComponent implements OnInit {
           this.floatingWarningBoxMessageColor = 'green';
           this.courseId = response.data.course.courseId;
           console.log('Saved data for ', this.courseId);
+
+          //Create a new CourseType object to emit to the parent component
+          const courseType: CourseType = {
+            courseTypeId: response.data.courseType.courseTypeId,
+            name: response.data.courseType.name,
+            description: response.data.courseType.description,
+          };
           this.provideCourseId.emit(this.courseId);
+          this.provideCourseType.emit(courseType);
         }
         if (response.success === 'false') {
           this.isOperationSuccessful = false;

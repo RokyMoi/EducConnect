@@ -274,7 +274,9 @@ namespace backend.Controllers.Course
                 );
             }
 
-
+            //Transfer data from the createdCourseDetails which is CourseDetailsWithCourseTypeDTO to CourseDetailsDTO to avoid circular reference error,
+            //NOTE: CourseDetailsWithCourseTypeDTO is a DTO that contains the CourseType object
+            //And CourseDetailsDTO is a DTO that contains only the id as reference to the CourseType object
 
             return Ok(
                 new
@@ -284,7 +286,8 @@ namespace backend.Controllers.Course
                     data = new
                     {
                         course = createdCourse,
-                        courseDetails = createdCourseDetails
+                        courseDetails = createdCourseDetails,
+                        courseType = createdCourseDetails.CourseType,
                     },
                     timestamp = DateTime.Now
                 }

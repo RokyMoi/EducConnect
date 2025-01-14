@@ -10,6 +10,7 @@ using backend.Interfaces.Tutor;
 using backend.Middleware;
 using EduConnect.Migrations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace backend.Controllers.Course
 {
@@ -837,7 +838,313 @@ namespace backend.Controllers.Course
             );
 
         }
-   
-   
+
+
+        [HttpGet("basic/course-type/{courseId}")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> GetCourseTypeByCourseId(Guid courseId)
+        {
+
+            //Check if the courseId is not a Guid.Empty
+            if (courseId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Course id is required",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to create a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+            //Get the CourseId and CourseType from the CourseDetails table where CourseId equals the courseId
+            var courseAndCourseType = await _courseRepository.GetCourseAndCourseTypeByCourseId(courseId);
+
+            if (courseAndCourseType == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course not found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Course type retrieved successfully",
+                    data = new
+                    {
+                        course = new
+                        {
+                            courseId = courseAndCourseType.CourseId,
+                            courseType = courseAndCourseType.CourseType
+                        }
+                    }
+                }
+            );
+
+
+        }
+
+        [HttpPatch("basic/course-type/{courseId}/{courseTypeId}")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> UpdateCourseTypeByCourseId(
+            Guid courseId,
+            int courseTypeId
+        )
+        {
+            //Check if the courseId is not a Guid.Empty
+            if (courseId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Course id is required",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to create a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+            //Get the CourseDetails table where CourseId equals the courseId
+            var courseDetails = await _courseRepository.GetCourseDetailsWithTutorIdByCourseId(courseId);
+
+            if (courseDetails == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course not found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the tutorId is the same as the tutorId in the CourseDetails table
+            if (courseDetails.TutorId != tutor.TutorId)
+            {
+                return StatusCode(
+                    403,
+                    new
+                    {
+                        success = "false",
+                        message = "You are not authorized to update this course.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the CourseTypeId exist in the CourseType table
+            var courseType = await _referenceRepository.GetCourseTypeByIdAsync(courseTypeId);
+
+            if (courseType == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course type not found",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the course type is the same as the course type in the CourseDetails table
+            if (courseDetails.CourseTypeId == courseTypeId)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "New course type is the same as the current course type",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Update  the CourseDetails table with the new CourseTypeId
+            var updatedCourseDetails = await _courseRepository.UpdateCourseTypeByCourseId(courseId, courseTypeId);
+            if (updatedCourseDetails == null)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "false",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Course type updated successfully",
+                    data = new
+                    {
+                        courseType = courseType
+                    },
+                    timestamp = DateTime.Now
+                }
+            );
+
+        }
     }
+
+
 }
