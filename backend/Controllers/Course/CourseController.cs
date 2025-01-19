@@ -745,8 +745,9 @@ namespace backend.Controllers.Course
                     }
                 );
             }
-            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
 
+            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
+            
             //Check if the email in the context dictionary is null
             if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
             {

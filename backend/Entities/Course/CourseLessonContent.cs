@@ -28,7 +28,6 @@ namespace EduConnect.Entities.Course
         [MaxLength(1000)]
         public required string Description { get; set; }
 
-        public required string ContentType { get; set; }
         public required string ContentData { get; set; }
 
         public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();

@@ -414,7 +414,6 @@ namespace backend.Controllers.Course
                 CourseLessonId = saveRequestDTO.CourseLessonId,
                 Title = saveRequestDTO.Title,
                 Description = saveRequestDTO.Description,
-                ContentType = saveRequestDTO.ContentType,
                 ContentData = saveRequestDTO.ContentData,
             };
 
@@ -445,7 +444,6 @@ namespace backend.Controllers.Course
                         CourseLessonId = saveResult.CourseLessonId,
                         Title = saveResult.Title,
                         Description = saveResult.Description,
-                        ContentType = saveResult.ContentType,
                         ContentData = saveResult.ContentData,
                     },
                     timestamp = DateTime.Now
@@ -833,8 +831,388 @@ namespace backend.Controllers.Course
             );
         }
 
+        [HttpGet("supplementary-material/all/{courseLessonId}")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> GetCourseLessonFilesByCourseLessonId(Guid courseLessonId)
+        {
+            //Check if the courseLessonId is valid Guid (Not equal to  Guid.Empty)
+            if (courseLessonId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "The courseLessonId is not valid.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
 
 
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to edit a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+
+            //Check if the CourseLessonId exists
+            var courseLesson = await _courseRepository.GetCourseLessonWithCourseByCourseLessonId(courseLessonId);
+            if (courseLesson == null)
+            {
+                return NotFound(new
+                {
+                    success = "false",
+                    message = "Course lesson not found.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+            //Get the CourseLessonSupplementaryMaterial by CourseLessonId
+
+            var courseLessonSupplementaryMaterial = await _courseRepository.GetCourseLessonSupplementaryMaterialsWithNoFilesByCourseLessonId(courseLessonId);
+
+            if (courseLessonSupplementaryMaterial == null || courseLessonSupplementaryMaterial.Count == 0)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No supplementary material found for this course lesson.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            var courseLessonSupplementaryMaterialsSize = courseLessonSupplementaryMaterial.Sum(x => x.ContentSize);
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Supplementary material found for this course lesson.",
+                    data = new
+                    {
+                        CourseLessonSupplementaryMaterials = courseLessonSupplementaryMaterial,
+                        CourseLessonSupplementaryMaterialsSize = courseLessonSupplementaryMaterialsSize,
+                    },
+                    timestamp = DateTime.Now
+                }
+            );
+
+
+
+
+        }
+
+        [HttpGet("supplementary-material/download/{courseLessonSupplementaryMaterialId}")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult>
+        DownloadCourseLessonSupplementaryMaterial(Guid courseLessonSupplementaryMaterialId)
+        {
+            //Check if the courseMainMaterialId is not a Guid.Empty
+            if (courseLessonSupplementaryMaterialId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Lesson supplementary material file is required",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to create a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+            //Check if the courseLessonSupplementaryMaterialId is associated with the existing record in the CourseLessonSupplementaryMaterial table
+            var courseLessonSupplementaryMaterial = await _courseRepository.GetCourseLessonSupplementaryMaterialById(courseLessonSupplementaryMaterialId);
+
+            if (courseLessonSupplementaryMaterial == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course lesson supplementary material not found.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            return File(
+                courseLessonSupplementaryMaterial.Data,
+                courseLessonSupplementaryMaterial.ContentType,
+                courseLessonSupplementaryMaterial.FileName
+            );
+        }
+
+
+        [HttpDelete("supplementary-material/{courseLessonSupplementaryMaterialId}")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> DeleteCourseLessonSupplementaryMaterialByCourseLessonSupplementaryMaterialId(Guid courseLessonSupplementaryMaterialId)
+        {
+
+            //Check if the courseLessonSupplementaryMaterialId is not a Guid.Empty
+            if (courseLessonSupplementaryMaterialId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Course lesson supplementary material id is required",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to create a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+            //Get the CourseLessonSupplementaryMaterialId, CourseLessonId, CourseId, and TutorId associated with the CourseLessonSupplementaryMaterial object with the given CourseLessonSupplementaryMaterialId
+            var courseLessonSupplementaryMaterialReference = await _courseRepository.GetCourseSupplementaryMaterialReferenceByCourseLessonSupplementaryMaterialId(courseLessonSupplementaryMaterialId);
+
+            if (courseLessonSupplementaryMaterialReference == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course lesson supplementary material not found.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the logged in user (PersonId) is the same as the TutorId associated with the CourseLessonSupplementaryMaterial object
+            if (courseLessonSupplementaryMaterialReference.TutorId != tutor.TutorId)
+            {
+                return StatusCode(
+                    403,
+                    new
+                    {
+                        success = "false",
+                        message = "You are not authorized to delete this course lesson supplementary material.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Delete the CourseLessonSupplementaryMaterial object from the database
+
+            var deleteResult = await _courseRepository.DeleteCourseLessonSupplementaryMaterialByCourseLessonSupplementaryMaterialId(courseLessonSupplementaryMaterialId);
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Course lesson supplementary material deleted successfully.",
+                    data = new
+                    {
+                    },
+                    timestamp = DateTime.Now
+                }
+            );
+
+        }
 
     }
 }

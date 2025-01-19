@@ -20,8 +20,6 @@ namespace EduConnect.DTOs.Course.CourseLesson
         public required string Description { get; set; }
 
         [Required]
-        public required string ContentType { get; set; }
-        [Required]
         public required string ContentData { get; set; }
     }
 }

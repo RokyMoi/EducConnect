@@ -9,4 +9,14 @@
             successfully</li>
         <li>The expected time duration it will take to complete the lesson</li>
     </ul>
+    <div class="add-lesson-button-container">
+
+        <app-submit-button [buttonBackgroundColor]="addLessonButtonColor" [submitButtonText]="addLessonButtonText"
+            [buttonMargin]="addLessonButtonMargin" [buttonWidth]="addLessonButtonWidth"
+            (buttonClick)="addLesson()"></app-submit-button>
+    </div>
+
+    <app-course-lesson-modal *ngIf="showCourseLessonModal" [isCreateOrEditMode]="isCreateOrEditMode"
+    [modalTitle]="modalTitle"
+        (closeModal)="toggleCourseLessonModal()"></app-course-lesson-modal>
 </body>

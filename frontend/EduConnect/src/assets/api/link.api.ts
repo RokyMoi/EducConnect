@@ -134,4 +134,20 @@ export default class ApiLinks {
   //Update course type
   public static readonly updateCourseTypeByCourseId =
     ApiLinks.baseUrl + 'course/basic/course-type';
+
+  //CourseLesson controller
+  //Create course lesson
+  public static readonly createCourseLesson =
+    ApiLinks.baseUrl + 'course/lesson/create';
+  //Create course lesson content
+  public static readonly createCourseLessonContent =
+    ApiLinks.baseUrl + 'course/lesson/content';
+  public static readonly uploadCourseLessonSupplementaryMaterial =
+    ApiLinks.baseUrl + 'course/lesson/supplementary-material';
+  public static readonly getCourseLessonSupplementaryMaterial =
+    ApiLinks.baseUrl + 'course/lesson/supplementary-material/all';
+  public static readonly downloadCourseLessonSupplementaryMaterial =
+    ApiLinks.baseUrl + 'course/lesson/supplementary-material/download';
+  public static readonly deleteCourseLessonSupplementaryMaterial =
+    ApiLinks.baseUrl + 'course/lesson/supplementary-material';
 }

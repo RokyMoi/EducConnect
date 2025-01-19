@@ -1,0 +1,251 @@
+<div class="modal-overlay">
+
+    <div class="modal-content">
+        <div class="modal-header">
+            {{modalTitle}}
+            <button ng-if="showCloseButton" class="close-button" (click)="toggleCloseModal()">
+                X
+            </button>
+        </div>
+        <div class="modal-body">
+            <form class="course-lesson-form" [formGroup]="courseLessonModalFormGroup">
+                <div class="row-title">
+                    <p>Describe the lesson</p>
+                </div>
+                <div class="row">
+
+                    <app-text-input [label]="courseLessonTitleLabel" [placeholder]="courseLessonTitlePlaceholder"
+                        [warning]="courseLessonTitleWarning"
+                        [formControl]="courseLessonModalFormGroup.controls.courseLessonTitle"></app-text-input>
+                </div>
+                <div class="row">
+
+                    <app-text-input [label]="courseLessonDescriptionLabel"
+                        [placeholder]="courseLessonDescriptionPlaceholder" [warning]="courseLessonDescriptionWarning"
+                        [formControl]="courseLessonModalFormGroup.controls.courseLessonDescription"></app-text-input>
+                </div>
+                <div class="row">
+
+                    <app-text-input [type]="'number'" [label]="courseLessonSequenceOrderLabel"
+                        [placeholder]="courseLessonSequenceOrderPlaceholder"
+                        [warning]="courseLessonSequenceOrderWarning"
+                        [formControl]="courseLessonModalFormGroup.controls.lessonSequenceOrder"></app-text-input>
+                </div>
+                <div class="row">
+
+                    <app-text-input [label]="lessonPrerequisitesLabel" [placeholder]="lessonPrerequisitesPlaceholder"
+                        [warning]="lessonPrerequisitesWarning"
+                        [formControl]="courseLessonModalFormGroup.controls.lessonPrerequisites"></app-text-input>
+                </div>
+                <div class="row">
+
+                    <app-text-input [label]="lessonObjectiveLabel" [placeholder]="lessonObjectivePlaceholder"
+                        [warning]="lessonObjectiveWarning"
+                        [formControl]="courseLessonModalFormGroup.controls.lessonObjective"></app-text-input>
+                </div>
+                <div class="row">
+                    <app-text-input [type]="'time'" [label]="lessonCompletionTimePlaceholder"
+                        [placeholder]="lessonCompletionTimePlaceholder" [warning]="lessonCompletionTimeWarning"
+                        [formControl]="courseLessonModalFormGroup.controls.lessonCompletionTime"></app-text-input>
+                </div>
+                <div class="row">
+                    <app-text-input [label]="lessonTagLabel" [placeholder]="lessonTagPlaceholder"
+                        [warning]="lessonTagWarning"
+                        [formControl]="courseLessonModalFormGroup.controls.lessonTag"></app-text-input>
+                </div>
+            </form>
+
+            <form class="course-lesson-content-form" [formGroup]="lessonContentFormGroup">
+                <div class="row-title">
+                    <p>Enter the content of the lesson</p>
+                </div>
+                <div class="row">
+                    <app-text-input [label]="lessonContentTitleLabel" [placeholder]="lessonContentTitlePlaceholder"
+                        [warning]="lessonContentTitleWarning"
+                        [formControl]="lessonContentFormGroup.controls.lessonContentTitle"></app-text-input>
+
+
+                </div>
+                <div class="row">
+                    <app-text-area-input-component [label]="lessonContentDescriptionLabel"
+                        [placeholder]="lessonContentDescriptionPlaceholder" [warning]="lessonContentDescriptionWarning"
+                        [formControl]="lessonContentFormGroup.controls.lessonContentDescription"
+                        [setResizeType]="lessonContentDescriptionTextAreaResizeType"></app-text-area-input-component>
+                </div>
+                <div class="row editor-row">
+
+                    <p>{{lessonContentLabel}}</p>
+                    <div class="editor-container">
+
+                        <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                        <ngx-editor [editor]="editor" [placeholder]="lessonContentPlaceholder"
+                            [formControl]="lessonContentFormGroup.controls.lessonContent"
+                            (ngModelChange)="checkCourseLessonContent()"></ngx-editor>
+                    </div>
+                    <p class="editor-warning">{{lessonContentWarning}}</p>
+                </div>
+            </form>
+            <div class="submit-response-container">
+                <p [style.color]="submitDataMessageColor" [style.font-size]="'24px'">{{submitDataMessage}}</p>
+                <div class="announcementDiv">
+
+                    <mat-progress-spinner *ngIf="isDataTransmissionActive" [mode]="spinnerMode" class="spinner-color"
+                        [style.stroke]="spinnerColor"></mat-progress-spinner>
+                </div>
+
+                <app-submit-button *ngIf="!showSupplementaryMaterialUpload" [submitButtonText]="submitDataButtonText"
+                    [buttonBackgroundColor]="submitDataButtonColor" [buttonMargin]="submitDataButtonMargin"
+                    (buttonClick)="submitCourseLessonAndCourseLessonContent()"></app-submit-button>
+
+            </div>
+
+
+        </div>
+        <div *ngIf="showSupplementaryMaterialUpload" class="supplementary-material-container">
+            <div class="upload-information-container">
+                <p>Current number of files: <strong>{{currentNumberOfFiles}}</strong></p>
+                <p>Current space taken up: <strong>{{currentSpaceTakenUpInMb}} MB</strong></p>
+            </div>
+            <div class="upload-container" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)">
+                <input type="file" id="fileUpload" #fileInput (change)="handleFileInput($event)">
+                <p class="info-text">{{fileUploadInstructionText}}</p>
+
+                <div *ngIf="this.selectedFile && this.validateFileType(this.selectedFile) && this.validateFileSize(this.selectedFile)"
+                    class="file-info-text">
+                    <p>File name: {{fileToUploadName}}</p>
+                    <p>File size: {{fileToUploadSizeInMegabytes}} MB</p>
+                    <p>File type: {{fileToUploadFileCategory}} ({{fileToUploadType}})</p>
+
+                    <div class="edit-fields">
+                        <div class="input-group">
+                            <label for="fileName">Enter here new file name or leave empty for the current one</label>
+                            <input type="text" id="fileName" placeholder="Enter file name"
+                                [formControl]="fileNameFormControl">
+                        </div>
+                        <div class="input-group">
+                            <label for="fileDate">Select date when the file was created on you device:</label>
+                            <input type="datetime-local" id="fileDate" [formControl]="fileDateFormControl">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div *ngIf="this.selectedFile && (!this.validateFileType(this.selectedFile) || !this.validateFileSize(this.selectedFile))"
+                    class="file-warning-text">
+                    <p>{{this.fileUploadWarningText}}</p>
+                </div>
+                <div class="file-upload-result">
+                    <p [style.color]="fileUploadResultColor">{{fileUploadResultMessage}}</p>
+                </div>
+            </div>
+
+            <app-submit-button
+                *ngIf="this.selectedFile && this.validateFileType(this.selectedFile) && this.validateFileSize(this.selectedFile) && !this.isDataTransmissionActive"
+                [buttonBackgroundColor]="uploadFileButtonColor" [submitButtonText]="uploadFileButtonText"
+                (buttonClick)="uploadFile()"></app-submit-button>
+        </div>
+        <div *ngIf="showSupplementaryMaterialUpload && courseLessonSupplementaryMaterials.length > 0"
+            class="file-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Number</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Size</th>
+                        <th>Created at</th>
+                        <th>Uploaded at</th>
+                        <th class="actions-column" colspan="2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of courseLessonSupplementaryMaterials; let i=index">
+                        <td>{{i + 1}}</td>
+                        <td>{{item['fileName']}}</td>
+                        <td>{{getFileExtension(item['contentType'])}}</td>
+                        <td>{{getFileSizeInMb(item['contentSize'])}} MB</td>
+                        <td>{{getDateTimeFromUnixMillis(item['dateTimePointOfFileCreation'])}}</td>
+                        <td>{{getDateTimeFromUnixMillis(item['createdAt'])}}</td>
+                        <td
+                            (click)="downloadCourseLessonSupplementaryMaterial(item.courseLessonSupplementaryMaterialId)">
+                            <p>Download</p>
+
+                        </td>
+                        <td
+                            (click)="deleteCourseLessonSupplementaryMaterial(item.courseLessonSupplementaryMaterialId, i)">
+                            <p>Delete</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="accordion-list-container"
+            *ngIf="showSupplementaryMaterialUpload && courseLessonSupplementaryMaterials.length > 0">
+            <p class="accordion-list-title">Uploaded items ({{courseLessonSupplementaryMaterials.length}})</p>
+            <div class="accordion-list-item" *ngFor="let item of courseLessonSupplementaryMaterials; let i=index">
+                <div class="accordion-list-item-header" (click)="toggleCardExpansion(i)">
+                    <p>{{item.fileName}}</p>
+
+                </div>
+                <div class="accordion-list-item-body" [class.active]="i === expandedCardIndex">
+
+                    <p>Number: {{i + 1}}</p>
+                    <p>Name: {{item.fileName}}</p>
+                    <p>Type: {{item.contentType}}</p>
+                    <p>Size: {{getFileSizeInMb(item['contentSize'])}} MB</p>
+                    <p>Created at: {{getDateTimeFromUnixMillis(item.dateTimePointOfFileCreation)}}</p>
+                    <p>Uploaded at: {{getDateTimeFromUnixMillis(item.createdAt)}}</p>
+
+                    <div class="accordion-list-item-body-actions-area">
+                        <button
+                            (click)="downloadCourseLessonSupplementaryMaterial(item.courseLessonSupplementaryMaterialId)">Download</button>
+                        <button [style.backgroundColor]="'red'"
+                            (click)="deleteCourseLessonSupplementaryMaterial(item.courseLessonSupplementaryMaterialId,i)">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="showSupplementaryMaterialUpload &&courseLessonSupplementaryMaterials.length > 0"
+            class="download-file-container">
+            <p *ngIf="isDownloadComplete === false">{{downloadProgressMessage}}</p>
+            <mat-progress-bar *ngIf="isDownloadComplete === false" mode="determinate"
+                [value]="downloadProgress"></mat-progress-bar>
+            <p *ngIf="isDownloadComplete" class="file-download-info">Your file to download:
+                {{selectedFileToDownload}}</p>
+            <p *ngIf="isDownloadComplete" class="file-download-link-info">The file should have been opened in your
+                browser,
+                if it was not click on this
+                link, to download it to your
+                device: <a class="file-download-link" [href]="this.downloadFileUrl"
+                    [download]="selectedFileToDownload">{{selectedFileToDownload}}</a>
+            </p>
+            <p *ngIf="isDownloadComplete === null">Use the Download option in the files table, to download the
+                selected file
+            </p>
+
+
+        </div>
+    </div>
+    <app-floating-warning-box *ngIf="floatingWarningDeleteBoxShow" [warningTitle]="floatingWarningDeleteBoxTitle">
+        <p [style.color]="floatingWarningDeleteBoxMessageColor" [style.font-size]="'24px'">
+            {{floatingWarningDeleteBoxMessage}}</p>
+        <p>{{floatingWarningDeleteBoxFileToDeleteIndex}}</p>
+        <p>{{floatingWarningDeleteBoxFileToDeleteName}}</p>
+        <app-submit-button *ngIf="!isDeleteOperationComplete"
+            [buttonBackgroundColor]="floatingWarningDeleteBoxConfirmButtonColor"
+            [submitButtonText]="floatingWarningDeleteBoxConfirmButtonText"
+            [buttonMargin]="floatingWarningBoxButtonMargin" (buttonClick)="confirmDelete()"></app-submit-button>
+        <app-submit-button *ngIf="!isDeleteOperationComplete"
+            [buttonBackgroundColor]="floatingWarningDeleteBoxCancelButtonColor"
+            [submitButtonText]="floatingWarningDeleteBoxCancelButtonText"
+            [buttonMargin]="floatingWarningBoxButtonMargin"
+            (buttonClick)="closeWarningFloatingBox()"></app-submit-button>
+        <app-submit-button *ngIf="isDeleteOperationComplete" [buttonBackgroundColor]="closeFloatingBoxButtonColor"
+            [submitButtonText]="closeFloatingBoxButtonText" [buttonMargin]="floatingWarningBoxButtonMargin"
+            (buttonClick)="closeWarningFloatingBox()">
+        </app-submit-button>
+    </app-floating-warning-box>
+
+</div>

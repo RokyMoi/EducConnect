@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Course.Basic;
+using backend.DTOs.Course.CourseLesson;
 using backend.DTOs.Course.CourseMainMaterial;
 using backend.DTOs.Course.Language;
 using backend.DTOs.Reference.Language;
@@ -71,5 +72,15 @@ namespace backend.Interfaces.Course
         public Task<int> GetCountOfCourseLessonSupplementaryMaterialsByCourseLessonId(Guid courseLessonId);
 
         public Task<CourseLessonSupplementaryMaterialDTO?> StoreFileToCourseLessonSupplementaryMaterial(CourseLessonSupplementaryMaterialCreateDTO courseLessonSupplementaryMaterial);
+
+        public Task<List<CourseLessonSupplementaryMaterialWithNoFileDTO>?> GetCourseLessonSupplementaryMaterialsWithNoFilesByCourseLessonId(Guid courseLessonId);
+
+        public Task<CourseLessonSupplementaryMaterialDTO?> GetCourseLessonSupplementaryMaterialById(Guid courseLessonSupplementaryMaterialId);
+
+        public Task<CourseSupplementaryMaterialReferenceDTO?>
+        GetCourseSupplementaryMaterialReferenceByCourseLessonSupplementaryMaterialId(Guid courseLessonSupplementaryMaterialId);
+
+        public Task<bool>
+        DeleteCourseLessonSupplementaryMaterialByCourseLessonSupplementaryMaterialId(Guid courseLessonSupplementaryMaterialId);
     }
 }

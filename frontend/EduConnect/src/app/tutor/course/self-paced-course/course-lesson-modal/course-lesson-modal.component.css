@@ -1,34 +1,125 @@
-body {
-  font-family: Arial, sans-serif;
-  padding: 40px;
-  margin: 0;
-  height: calc(100% - 80px);
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  box-sizing: border-box;
-  overflow-y: auto;
-  background-color: #f9f9f9;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+}
+
+.modal-content {
+  position: fixed;
+  top: 20%;
+  left: 5%;
+  right: 5%;
+  height: 60%;
+  max-width: 90%;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow-y: scroll;
 }
 
-.title {
-  font-size: 36px;
-  color: blue;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-align: left;
-  align-self: flex-start;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px 12px 0px 0px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: rgb(2, 80, 176);
+  color: white;
+  font-size: 24px;
 }
 
-p {
-  margin: 10px 0;
-  line-height: 1.6;
-  align-self: flex-start;
+.close-button {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
 }
 
+.close-button:hover {
+  color: #e0e0e0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  margin: 2% 0%;
+}
+
+.course-lesson-form {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.course-lesson-content-form {
+  border-bottom: 1px solid #e0e0e0;
+}
+.row {
+  margin: 0% 5%;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.row-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  width: 100%;
+  color: rgb(2, 80, 176);
+  text-align: center;
+}
+.editor-row {
+  margin-bottom: 12px;
+}
+.editor-row p:nth-of-type(1) {
+  color: #808080;
+  padding-left: 10px;
+  font-size: 14px;
+}
+.editor-container {
+  width: 100%;
+  height: 100%;
+  border: 1px solid black;
+  border-radius: 12px;
+  padding: 10px 2px;
+}
+.editor-container:hover {
+  outline-style: solid;
+  outline-color: blue;
+  outline-width: 1px;
+  cursor: pointer;
+}
+
+.editor-container:focus {
+  cursor: text;
+  border: 1px solid blue;
+}
+
+.editor-warning {
+  color: red;
+  height: 21px;
+  font-size: 12px;
+  padding-left: 10px;
+}
+
+.upload-file-row {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 5%;
+}
 .upload-information-container {
   padding: 20px;
   width: 100%;
@@ -40,12 +131,6 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.opened-svg {
-}
-
-.expanded-card {
 }
 
 .upload-information-container p {
@@ -97,9 +182,6 @@ p {
 .upload-container input[type="file"]:hover {
   border-color: #aaa;
 }
-
-.edit-fields {
-}
 .input-group {
   display: flex;
   flex-direction: column;
@@ -150,6 +232,57 @@ p {
   color: red;
 }
 
+.upload-file-button-row {
+  width: 90%;
+  margin: 0 5%;
+}
+
+.create-course-lesson-container {
+  width: 90%;
+  margin: 1% 5%;
+  display: flex;
+  flex-direction: column;
+}
+
+.create-course-lesson-note {
+  width: 100%;
+  text-align: center;
+  font-size: 20px;
+  padding: 12px 0;
+}
+
+.announcementDiv {
+  margin: 5px 0px 15px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.submit-response-container {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  margin: 0 5%;
+}
+
+.supplementary-material-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  margin: 5%;
+}
+
+.file-table-container {
+  width: 90%;
+  margin-top: 5%;
+  margin-right: 5%;
+  margin-left: 5%;
+  margin-bottom: 0;
+}
+
 table {
   width: 100%;
   border-collapse: separate;
@@ -160,10 +293,12 @@ table {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: 5%;
 }
+
 thead tr {
   background-color: #0078d7;
   color: white;
 }
+
 tr,
 th,
 td {
@@ -171,6 +306,7 @@ td {
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
+
 th:first-child,
 td:first-child {
   border-left: 1px solid #ddd;
@@ -185,6 +321,7 @@ th,
 td {
   border-left: 1px solid #ddd;
 }
+
 tbody tr:hover {
   background-color: #f1f1f1;
 }
@@ -199,23 +336,22 @@ td {
   width: 20%;
 }
 
-.actions-column {
-}
-
-/*
-  Styling to change the background color of the upload area (div with class name upload-container) when the user drags a file over it.
-*/
-
-.upload-container.dragover {
-  background-color: #f0f0f0;
-  border: 2px dashed #0078d7;
-}
-
 .download-file-container {
+  width: 90%;
+  margin-top: 4px;
+  margin-right: 5%;
+  margin-left: 5%;
+  margin-bottom: 5%;
+  display: flex;
+  flex-direction: column;
 }
+
 .file-download-info {
+  color: grey;
 }
+
 .file-download-link-info {
+  color: grey;
 }
 .file-download-link {
   color: blue;
@@ -229,7 +365,11 @@ td {
 }
 
 .accordion-list-container {
-  width: 100%;
+  width: 90%;
+  margin-top: 5%;
+  margin-right: 5%;
+  margin-left: 5%;
+  margin-bottom: 0 !important;
   display: none;
   flex-direction: column;
   align-items: stretch;
@@ -261,6 +401,8 @@ td {
   padding: 12px;
   border-top: 1px solid #ddd;
   margin-top: 8px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
   display: none;
 }
 
@@ -294,7 +436,7 @@ td {
   margin-bottom: 12px;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 950px) {
   table {
     display: none;
   }

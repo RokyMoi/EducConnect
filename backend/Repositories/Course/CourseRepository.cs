@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.Course.Basic;
+using backend.DTOs.Course.CourseLesson;
 using backend.DTOs.Course.CourseMainMaterial;
 using backend.DTOs.Course.Language;
 using backend.DTOs.Reference.Language;
@@ -619,7 +620,6 @@ namespace backend.Repositories.Course
                 CourseLessonContentId = courseLessonContent.CourseLessonContentId,
                 Title = courseLessonContent.Title,
                 Description = courseLessonContent.Description,
-                ContentType = courseLessonContent.ContentType,
                 ContentData = courseLessonContent.ContentData,
             };
 
@@ -633,7 +633,6 @@ namespace backend.Repositories.Course
                 CourseLessonId = courseLessonContentToSave.CourseLessonId,
                 Title = courseLessonContentToSave.Title,
                 Description = courseLessonContentToSave.Description,
-                ContentType = courseLessonContentToSave.ContentType,
                 ContentData = courseLessonContentToSave.ContentData,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 UpdatedAt = null
@@ -658,7 +657,6 @@ namespace backend.Repositories.Course
                 CourseLessonId = newCourseLessonContent.CourseLessonId,
                 Title = newCourseLessonContent.Title,
                 Description = newCourseLessonContent.Description,
-                ContentType = newCourseLessonContent.ContentType,
                 ContentData = newCourseLessonContent.ContentData,
             };
         }
@@ -708,6 +706,145 @@ namespace backend.Repositories.Course
                 Data = newCourseLessonSupplementaryMaterial.Data,
                 DateTimePointOfFileCreation = newCourseLessonSupplementaryMaterial.DateTimePointOfFileCreation,
             };
+        }
+
+        public async Task<List<CourseLessonSupplementaryMaterialWithNoFileDTO>?> GetCourseLessonSupplementaryMaterialsWithNoFilesByCourseLessonId(Guid courseLessonId)
+        {
+            var courseLessonSupplementaryMaterials = await _dataContext.CourseLessonSupplementaryMaterial
+            .Where(
+                x => x.CourseLessonId == courseLessonId
+            )
+            .Select(
+                x => new
+                {
+                    x.CourseLessonSupplementaryMaterialId,
+                    x.CourseLessonId,
+                    x.FileName,
+                    x.ContentType,
+                    x.ContentSize,
+                    x.DateTimePointOfFileCreation,
+                    x.CreatedAt,
+
+                }
+            )
+            .ToListAsync();
+
+
+            if (courseLessonSupplementaryMaterials == null)
+            {
+                return null;
+            }
+
+            return [.. courseLessonSupplementaryMaterials
+            .Select(
+                x => new CourseLessonSupplementaryMaterialWithNoFileDTO
+                {
+                    CourseLessonId = x.CourseLessonId,
+                    CourseLessonSupplementaryMaterialId = x.CourseLessonSupplementaryMaterialId,
+                    ContentType = x.ContentType,
+                    ContentSize = x.ContentSize,
+                    FileName = x.FileName,
+                    DateTimePointOfFileCreation = x.DateTimePointOfFileCreation,
+                    CreatedAt = x.CreatedAt,
+                }
+            )];
+
+        }
+
+        public async Task<CourseLessonSupplementaryMaterialDTO?> GetCourseLessonSupplementaryMaterialById(Guid courseLessonSupplementaryMaterialId)
+        {
+
+            var courseLessonSupplementaryMaterial = await _dataContext.CourseLessonSupplementaryMaterial.Where(
+                x => x.CourseLessonSupplementaryMaterialId == courseLessonSupplementaryMaterialId
+            )
+            .Select(
+                x => new
+                {
+                    x.CourseLessonSupplementaryMaterialId,
+                    x.CourseLessonId,
+                    x.FileName,
+                    x.ContentType,
+                    x.ContentSize,
+                    x.Data,
+                    x.DateTimePointOfFileCreation,
+                }
+            ).FirstOrDefaultAsync();
+
+            if (courseLessonSupplementaryMaterial == null)
+            {
+                return null;
+            }
+
+            return new CourseLessonSupplementaryMaterialDTO
+            {
+                CourseLessonId = courseLessonSupplementaryMaterial.CourseLessonId,
+                CourseLessonSupplementaryMaterialId = courseLessonSupplementaryMaterial.CourseLessonSupplementaryMaterialId,
+                ContentType = courseLessonSupplementaryMaterial.ContentType,
+                ContentSize = courseLessonSupplementaryMaterial.ContentSize,
+                FileName = courseLessonSupplementaryMaterial.FileName,
+                Data = courseLessonSupplementaryMaterial.Data,
+                DateTimePointOfFileCreation = courseLessonSupplementaryMaterial.DateTimePointOfFileCreation,
+            };
+        }
+
+        public async Task<CourseSupplementaryMaterialReferenceDTO?> GetCourseSupplementaryMaterialReferenceByCourseLessonSupplementaryMaterialId(Guid courseLessonSupplementaryMaterialId)
+        {
+            var courseLessonSupplementaryMaterial = await _dataContext.CourseLessonSupplementaryMaterial
+            .Include(x => x.CourseLesson.Course)
+            .Where(
+                x => x.CourseLessonSupplementaryMaterialId == courseLessonSupplementaryMaterialId
+            )
+            .Select(
+                x =>
+                new
+                {
+                    x.CourseLessonSupplementaryMaterialId,
+                    x.CourseLessonId,
+                    x.CourseLesson.CourseId,
+                    x.CourseLesson.Course.TutorId
+                }
+
+            )
+            .FirstOrDefaultAsync();
+
+            if (courseLessonSupplementaryMaterial == null)
+            {
+                return null;
+            }
+
+            return new CourseSupplementaryMaterialReferenceDTO
+            {
+                CourseLessonSupplementaryMaterialId = courseLessonSupplementaryMaterial.CourseLessonSupplementaryMaterialId,
+                CourseLessonId = courseLessonSupplementaryMaterial.CourseLessonId,
+                CourseId = courseLessonSupplementaryMaterial.CourseId,
+                TutorId = courseLessonSupplementaryMaterial.TutorId,
+            };
+        }
+
+        public async Task<bool> DeleteCourseLessonSupplementaryMaterialByCourseLessonSupplementaryMaterialId(Guid courseLessonSupplementaryMaterialId)
+        {
+            var courseLessonSupplementaryMaterial = await _dataContext.CourseLessonSupplementaryMaterial.Where(
+                x => x.CourseLessonSupplementaryMaterialId == courseLessonSupplementaryMaterialId
+            ).FirstOrDefaultAsync();
+
+            if (courseLessonSupplementaryMaterial == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                _dataContext.CourseLessonSupplementaryMaterial.Remove(courseLessonSupplementaryMaterial);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to delete course lesson supplementary material: " + ex.Message);
+                Console.WriteLine(ex);
+                return false;
+            }
         }
     }
 
