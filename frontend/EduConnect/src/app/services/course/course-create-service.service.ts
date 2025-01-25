@@ -12,6 +12,7 @@ import { CreateCourseHttpRequestBody } from '../../_models/course/create-course/
 import ApiLinks from '../../../assets/api/link.api';
 import { catchError, map, of, tap } from 'rxjs';
 import { EventType } from '@angular/router';
+import { CourseLessonUpdateRequest } from '../../_models/course/course-lesson/course-lesson-update-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -665,5 +666,139 @@ export class CourseCreateService {
           });
         })
       );
+  }
+
+  public getCourseLessonShorthandListByCourseId(courseId: string) {
+    var authorization = this.accountService.getAccessToken();
+
+    return this.http
+      .get(ApiLinks.getAllCourseLessonsByCourse + '/' + courseId, {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      })
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+        }),
+        catchError((error) => {
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  public deleteCourseLessonAndAssociatedDataByCourseLessonId(
+    courseLessonId: string
+  ) {
+    const authorization = this.accountService.getAccessToken();
+    return this.http
+      .delete(
+        ApiLinks.deleteCourseLessonAndAssociatedData + '/' + courseLessonId,
+        {
+          headers: {
+            Authorization: `Bearer ${authorization}`,
+          },
+        }
+      )
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+        }),
+        catchError((error) => {
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  public getCourseLessonWithContentAndSupplementaryMaterialsByCourseLessonId(
+    courseLessonId: string
+  ) {
+    const authorization = this.accountService.getAccessToken();
+
+    return this.http
+      .get(
+        ApiLinks.getCourseLessonWithContentAndSupplementaryMaterialsByCourseLesson +
+          '/' +
+          courseLessonId,
+        {
+          headers: {
+            Authorization: `Bearer ${authorization}`,
+          },
+        }
+      )
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+          };
+        }),
+        catchError((error) => {
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          });
+        })
+      );
+  }
+
+  public updateCourseLessonByCourseLessonId(
+    courseLessonUpdateRequest: CourseLessonUpdateRequest
+  ) {
+    const authorization = this.accountService.getAccessToken();
+
+    return this.http.patch(
+      ApiLinks.updateCourseLessonAndCourseLessonContent,
+      courseLessonUpdateRequest,
+      {
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      }
+    ).pipe(
+      map((response) => { 
+        return {
+          success: (response as any).success,
+            data: (response as any).data,
+            message: (response as any).message,
+            statusCode: (response as any).statusCode,
+        }
+      }),
+      catchError(
+        (error) => { 
+          return of({
+            success: (error as any).error.success,
+            data: (error as any).error.data,
+            message: (error as any).error.message,
+            statusCode: (error as any).status,
+          })
+        }
+      )
+    )
+      ;
   }
 }

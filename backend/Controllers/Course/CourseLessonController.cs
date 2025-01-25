@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using backend.DTOs.Course.CourseLesson;
 using backend.Interfaces.Course;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
@@ -1214,5 +1215,841 @@ namespace backend.Controllers.Course
 
         }
 
+        [HttpGet("all/{courseId}")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> GetCourseLessonListByCourseId(Guid courseId)
+        {
+
+            //Check if the courseId is not a Guid.Empty value
+            if (courseId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Course Id is required.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to create a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+
+            //Check if the Course table has a record with the CourseId that is equal to the courseId parameter
+            var course = await _courseRepository.CheckIfCourseExistsByCourseId(courseId);
+
+            if (!course)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course not found.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+
+            //Get all instances of the CourseLesson object properties LessonTitle, LessonSequenceOrder, LessonTag, and CreatedAt from the CourseLesson table where the record's CourseId is equal to the courseId parameter
+            var courseLessonList = await _courseRepository.GetCourseLessonShorthandListByCourseId(courseId);
+
+
+            if (courseLessonList.Count == 0 || courseLessonList == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "No course lessons found for this course.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = $"Found {courseLessonList.Count} lesson(s) for this course.",
+                    data = new
+                    {
+                        CourseLesson = courseLessonList
+                    },
+                    timestamp = DateTime.Now
+                }
+            );
+
+
+
+
+        }
+
+        [HttpDelete("delete/{courseLessonId}")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> DeleteCourseLessonByCourseLessonId(Guid courseLessonId)
+        {
+
+            //Check if the courseLessonId is not a Guid.Empty value
+            if (courseLessonId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Course lesson Id is required.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to create a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+            //Check if the CourseLesson table has a record with the CourseLessonId that is equal to the courseLessonId parameter
+
+            var courseLesson = await _courseRepository.GetCourseLessonReferenceByCourseLessonId(courseLessonId);
+
+            if (courseLesson == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course lesson not found.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check if the retrieved CourseLesson joined Course with TutorId is the same as the logged in TutorId
+            if (courseLesson.TutorId != tutor.TutorId)
+            {
+                return StatusCode(
+                    403,
+                    new
+                    {
+                        success = "false",
+                        message = "You are not authorized to delete this course lesson.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //If the CourseLesson is found, delete it
+            var deleteResult = await _courseRepository.DeleteCourseLessonAndAssociatedDataByCourseLessonId(courseLessonId);
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "false",
+                        message = "Something went wrong while deleting the course lesson.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Course lesson deleted successfully.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                }
+            );
+        }
+
+        [HttpGet("{courseLessonId}")]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> GetCourseLessonWithAssociatedDataByCourseLessonId(Guid courseLessonId)
+        {
+
+            //Check if the courseLessonId if the courseLessonId parameter value is equal to Guid.Empty
+            if (courseLessonId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Course lesson id is required.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to create a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+            //Get the CourseLesson from the database using the courseLessonId
+
+            var courseLesson = await _courseRepository.GetCourseLessonWithContentAndSupplementaryMaterialsByCourseLessonId(courseLessonId);
+
+            if (courseLesson == null || courseLesson.CourseLesson == null)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course lesson not found.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            return Ok(
+                new
+                {
+                    success = "true",
+                    message = "Course lesson retrieved successfully.",
+                    data =
+                    new
+                    {
+                        courseLesson = courseLesson
+                    },
+                    timestamp = DateTime.Now
+                }
+
+            );
+
+        }
+
+        [HttpPatch]
+        [CheckPersonLoginSignup]
+        public async Task<IActionResult> UpdateCourseLessonAndCourseLessonContent(UpdateCourseLessonAndCourseLessonContentDTO updateRequestDTO)
+        {
+
+            //Check if the courseLessonId from the updateRequestDTO is equal to Guid.Empty
+            if (updateRequestDTO.CourseLessonId == Guid.Empty)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Course lesson id is required.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            Console.WriteLine("HttpContext email: " + HttpContext.Items["Email"].ToString());
+
+            //Check if the email in the context dictionary is null
+            if (string.IsNullOrEmpty(HttpContext.Items["Email"].ToString()))
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        success = "error",
+                        message = "Something went wrong, please try again later.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            string email = HttpContext.Items["Email"].ToString();
+
+            Guid personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+            //Check if the PersonId from dictionary is null and if it is, call to the database to get the PersonId
+            if (string.IsNullOrEmpty(HttpContext.Items["PersonId"].ToString()))
+            {
+                var personEmail = await _personRepository.GetPersonEmailByEmail(email);
+                personId = personEmail.PersonId;
+            }
+
+
+            //Check if the PersonId is Tutor and if it is, check the TutorRegistrationStatus
+
+            var tutor = await _tutorRepository.GetTutorRegistrationStatusByPersonId(personId);
+            Console.WriteLine("Tutor Id: " + tutor.PersonId);
+
+            if (tutor == null)
+            {
+                return Unauthorized(new
+                {
+
+                    success = "false",
+                    message = "You must be a tutor to create a course.",
+                    data = new { },
+                    timestamp = DateTime.Now
+                });
+            }
+
+
+            //If tutor is not null, check the TutorRegistrationStatus is below 10 (Completed Registration)
+            if (tutor != null && tutor.TutorRegistrationStatusId < 10)
+            {
+                return UnprocessableEntity(
+                    new
+                    {
+
+                        success = "false",
+                        message = "You must complete your registration first, to be able to create a course.",
+                        data = new
+                        {
+                            CurrentTutorRegistrationStatus = new
+                            {
+                                TutorRegistrationStatusId = tutor.TutorRegistrationStatusId,
+
+                            }
+                        },
+                        timestamp = DateTime.Now
+
+                    }
+                );
+            }
+
+            //Get the CourseLesson and CourseLessonContent from the database using the courseLessonId
+
+            var existingCourseLesson = await _courseRepository.GetCourseLessonWithCourseLessonContentByCourseLessonId(updateRequestDTO.CourseLessonId);
+
+            if (existingCourseLesson == null || existingCourseLesson.CourseId == Guid.Empty)
+            {
+                return NotFound(
+                    new
+                    {
+                        success = "false",
+                        message = "Course lesson not found.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Validation of the provided values to update
+
+            //Check LessonTitle
+            if (updateRequestDTO.UpdateLessonTitle && string.IsNullOrEmpty(updateRequestDTO.LessonTitle))
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson title, you must provide a valid value.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check LessonDescription
+            if (updateRequestDTO.UpdateLessonDescription && string.IsNullOrEmpty(updateRequestDTO.LessonDescription))
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson description, you must provide a valid value.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check LessonSequenceOrder
+            if (updateRequestDTO.UpdateLessonSequenceOrder && updateRequestDTO.LessonSequenceOrder < 1)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson sequence order, you must provide a valid value.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check LessonPrerequisites
+            if (updateRequestDTO.UpdateLessonPrerequisites && string.IsNullOrEmpty(updateRequestDTO.LessonPrerequisites) && updateRequestDTO.LessonPrerequisites.Length > 510)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson prerequisites, you must provide a value less than 510 characters in length.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check LessonObjective
+            if (updateRequestDTO.UpdateLessonObjective && string.IsNullOrEmpty(updateRequestDTO.LessonObjective))
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson objective, you must provide a valid value.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            if (updateRequestDTO.UpdateLessonObjective && updateRequestDTO.LessonObjective.Length > 255)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson objective, you must provide a value less than 255 characters in length.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check LessonCompletionTimeInMinutes
+            if (updateRequestDTO.UpdateLessonCompletionTimeInMinutes && string.IsNullOrEmpty(updateRequestDTO.LessonCompletionTimeInMinutes.ToString()))
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson completion time in minutes, you must provide a valid value.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            if (updateRequestDTO.UpdateLessonCompletionTimeInMinutes && updateRequestDTO.LessonCompletionTimeInMinutes < 1)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "Minimum value for lesson completion time in minutes is 1.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check LessonTag
+            if (updateRequestDTO.UpdateLessonTag && string.IsNullOrEmpty(updateRequestDTO.LessonTag))
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson tag, you must provide a valid value.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check CourseLessonContent Title
+            if (updateRequestDTO.UpdateLessonContentTitle && string.IsNullOrEmpty(updateRequestDTO.LessonContentTitle))
+            {
+
+
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson content title, you must provide a valid value.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+            if (updateRequestDTO.UpdateLessonContentTitle && updateRequestDTO.LessonContentTitle.Length > 255)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson content title, you must provide a value less than 255 characters in length.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check CourseLessonContent Description
+            if (updateRequestDTO.UpdateLessonContentDescription && string.IsNullOrEmpty(updateRequestDTO.LessonContentDescription))
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson content description, you must provide a valid value.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            if (updateRequestDTO.UpdateLessonContentDescription && updateRequestDTO.LessonContentDescription.Length > 1000)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson content description, you must provide a value less than 1000 characters in length.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            //Check CourseLessonContent Content
+            if (updateRequestDTO.UpdateLessonContentData && string.IsNullOrEmpty(updateRequestDTO.LessonContentData))
+            {
+
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "To update the lesson content data, you must provide a valid value.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+
+            //Check if the provided updated values are different from the current values
+
+            //Flag variable to check if any updated value is different from the current value
+            bool isUpdated = false;
+
+
+            //Check if the updated LessonTitle is different from the current LessonTitle
+            if (updateRequestDTO.UpdateLessonTitle && updateRequestDTO.LessonTitle != existingCourseLesson.CourseLesson.LessonTitle)
+            {
+                Console.WriteLine($"LessonTitle - Current: {existingCourseLesson.CourseLesson.LessonTitle}, New: {updateRequestDTO.LessonTitle}");
+
+                //Check if the LessonTitle with the same value already exists in the database 
+                var isSame = await _courseRepository.CheckIfLessonTitleExistsByCourseIdAndLessonTitle(existingCourseLesson.CourseId, updateRequestDTO.LessonTitle);
+
+                if (isSame)
+                {
+                    return BadRequest(
+                        new
+                        {
+                            success = "false",
+                            message = "You cannot update the lesson title to an existing value.",
+                            data = new { },
+                            timestamp = DateTime.Now
+                        }
+                    );
+                }
+                Console.WriteLine($"Does the same LessonTitle exist? {isSame}");
+                existingCourseLesson.CourseLesson.LessonTitle = updateRequestDTO.LessonTitle;
+                isUpdated = true;
+            }
+
+            Console.WriteLine($"Is updated after LessonTitle: {isUpdated}");
+            //Check if the updated LessonDescription is different from the current LessonDescription
+            if (updateRequestDTO.UpdateLessonDescription && updateRequestDTO.LessonDescription != existingCourseLesson.CourseLesson.LessonDescription)
+            {
+                Console.WriteLine($"LessonDescription - Current: {existingCourseLesson.CourseLesson.LessonDescription}, New: {updateRequestDTO.LessonDescription}");
+                existingCourseLesson.CourseLesson.LessonDescription = updateRequestDTO.LessonDescription;
+                isUpdated = true;
+            }
+
+            Console.WriteLine($"Is updated after LessonDescription: {isUpdated}");
+            //Check if the updated LessonSequenceOrder is different from the current LessonSequenceOrder
+            if (updateRequestDTO.UpdateLessonSequenceOrder && updateRequestDTO.LessonSequenceOrder != existingCourseLesson.CourseLesson.LessonSequenceOrder)
+            {
+                Console.WriteLine($"LessonSequenceOrder - Current: {existingCourseLesson.CourseLesson.LessonSequenceOrder}, New: {updateRequestDTO.LessonSequenceOrder}");
+                existingCourseLesson.CourseLesson.LessonSequenceOrder = (int)updateRequestDTO.LessonSequenceOrder;
+                isUpdated = true;
+            }
+
+            Console.WriteLine($"Is updated after LessonSequenceOrder: {isUpdated}");
+
+            //Check if the updated LessonPrerequisites is different from the current LessonPrerequisites
+            if (updateRequestDTO.UpdateLessonPrerequisites && updateRequestDTO.LessonPrerequisites != existingCourseLesson.CourseLesson.LessonPrerequisites)
+            {
+                Console.WriteLine($"LessonPrerequisites - Current: {existingCourseLesson.CourseLesson.LessonPrerequisites}, New: {updateRequestDTO.LessonPrerequisites}");
+                existingCourseLesson.CourseLesson.LessonPrerequisites = updateRequestDTO.LessonPrerequisites;
+                isUpdated = true;
+            }
+
+            Console.WriteLine($"Is updated after LessonPrerequisites: {isUpdated}");
+
+            //Check if the updated LessonObjective is different from the current LessonObjective
+            if (updateRequestDTO.UpdateLessonObjective && updateRequestDTO.LessonObjective != existingCourseLesson.CourseLesson.LessonObjective)
+            {
+                Console.WriteLine($"LessonObjective - Current: {existingCourseLesson.CourseLesson.LessonObjective}, New: {updateRequestDTO.LessonObjective}");
+                existingCourseLesson.CourseLesson.LessonObjective = updateRequestDTO.LessonObjective;
+                isUpdated = true;
+            }
+
+            Console.WriteLine($"Is updated after LessonObjective: {isUpdated}");
+
+            //Check if the updated LessonCompletionTimeInMinutes is different from the current LessonCompletionTimeInMinutes
+            if (updateRequestDTO.UpdateLessonCompletionTimeInMinutes && updateRequestDTO.LessonCompletionTimeInMinutes != existingCourseLesson.CourseLesson.LessonCompletionTimeInMinutes)
+            {
+                Console.WriteLine($"LessonCompletionTimeInMinutes - Current: {existingCourseLesson.CourseLesson.LessonCompletionTimeInMinutes}, New: {updateRequestDTO.LessonCompletionTimeInMinutes}");
+                existingCourseLesson.CourseLesson.LessonCompletionTimeInMinutes = (int)updateRequestDTO.LessonCompletionTimeInMinutes;
+                isUpdated = true;
+            }
+
+            Console.WriteLine($"Is updated after LessonCompletionTimeInMinutes: {isUpdated}");
+            //Check if the updated LessonTag is different from the current LessonTag
+            if (updateRequestDTO.UpdateLessonTag && updateRequestDTO.LessonTag != existingCourseLesson.CourseLesson.LessonTag)
+            {
+                Console.WriteLine($"LessonTag - Current: {existingCourseLesson.CourseLesson.LessonTag}, New: {updateRequestDTO.LessonTag}");
+                existingCourseLesson.CourseLesson.LessonTag = updateRequestDTO.LessonTag;
+                isUpdated = true;
+            }
+
+            Console.WriteLine($"Is updated after LessonTag: {isUpdated}");
+
+            //Check if the updated LessonContentTitle is different from the current LessonContentTitle
+            if (updateRequestDTO.UpdateLessonContentTitle && updateRequestDTO.LessonContentTitle != existingCourseLesson.CourseLessonContent.Title)
+            {
+                Console.WriteLine($"LessonContentTitle - Current: {existingCourseLesson.CourseLessonContent.Title}, New: {updateRequestDTO.LessonContentTitle}");
+                existingCourseLesson.CourseLessonContent.Title = updateRequestDTO.LessonContentTitle;
+                isUpdated = true;
+            }
+
+            Console.WriteLine($"Is updated after LessonContentTitle: {isUpdated}");
+
+            //Check if the updated LessonContentDescription is different from the current LessonContentDescription
+            if (updateRequestDTO.UpdateLessonContentDescription && updateRequestDTO.LessonContentDescription != existingCourseLesson.CourseLessonContent.Description)
+            {
+                Console.WriteLine($"LessonContentDescription - Current: {existingCourseLesson.CourseLessonContent.Description}, New: {updateRequestDTO.LessonContentDescription}");
+                existingCourseLesson.CourseLessonContent.Description = updateRequestDTO.LessonContentDescription;
+                isUpdated = true;
+            }
+
+            Console.WriteLine($"Is updated after LessonContentDescription: {isUpdated}");
+
+            //Check if the updated LessonContentData is different from the current LessonContentData
+            if (updateRequestDTO.UpdateLessonContentData && updateRequestDTO.LessonContentData != existingCourseLesson.CourseLessonContent.ContentData)
+            {
+                Console.WriteLine($"LessonContentData - Current: {existingCourseLesson.CourseLessonContent.ContentData}, New: {updateRequestDTO.LessonContentData}");
+                existingCourseLesson.CourseLessonContent.ContentData = updateRequestDTO.LessonContentData;
+                isUpdated = true;
+            }
+            Console.WriteLine($"Is updated after LessonContentData: {isUpdated}");
+
+
+            //If no updated value is different from the current value, return a BadRequest response
+            if (!isUpdated)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = "false",
+                        message = "No new values to update were provided.",
+                        data = new { },
+                        timestamp = DateTime.Now
+                    }
+                );
+            }
+
+            var updateResult = await _courseRepository.UpdateCourseLessonAndCourseLessonContentByCourseLessonId(
+                updateRequestDTO.CourseLessonId,
+                new CourseLessonDTO
+                {
+                    LessonTitle = existingCourseLesson.CourseLesson.LessonTitle,
+                    LessonDescription = existingCourseLesson.CourseLesson.LessonDescription,
+                    LessonSequenceOrder = existingCourseLesson.CourseLesson.LessonSequenceOrder,
+                    LessonPrerequisites = existingCourseLesson.CourseLesson.LessonPrerequisites,
+                    LessonObjective = existingCourseLesson.CourseLesson.LessonObjective,
+                    LessonCompletionTimeInMinutes = existingCourseLesson.CourseLesson.LessonCompletionTimeInMinutes,
+                    LessonTag = existingCourseLesson.CourseLesson.LessonTag,
+                },
+                new CourseLessonContentDTO
+                {
+                    Title = existingCourseLesson.CourseLessonContent.Title,
+                    Description = existingCourseLesson.CourseLessonContent.Description,
+                    ContentData = existingCourseLesson.CourseLessonContent.ContentData,
+
+                }
+
+            );
+
+            return Ok(new
+            {
+                success = "true",
+                message = "Course Lesson and Course Lesson Content updated successfully.",
+                data = new
+                {
+                    updateResult,
+                },
+                timestamp = DateTime.Now
+            });
+
+
+
+
+
+        }
     }
+
+
+
 }

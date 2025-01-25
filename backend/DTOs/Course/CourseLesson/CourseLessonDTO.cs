@@ -16,6 +16,7 @@ namespace EduConnect.DTOs.Course.CourseLesson
         public required string LessonObjective { get; set; }
         public required int LessonCompletionTimeInMinutes { get; set; }
         public required string LessonTag { get; set; }
+        public long? CreatedAt { get; set; }
 
     }
 }

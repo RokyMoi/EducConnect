@@ -150,4 +150,12 @@ export default class ApiLinks {
     ApiLinks.baseUrl + 'course/lesson/supplementary-material/download';
   public static readonly deleteCourseLessonSupplementaryMaterial =
     ApiLinks.baseUrl + 'course/lesson/supplementary-material';
+  public static readonly getAllCourseLessonsByCourse =
+    ApiLinks.baseUrl + 'course/lesson/all';
+  public static readonly deleteCourseLessonAndAssociatedData =
+    ApiLinks.baseUrl + 'course/lesson/delete';
+  public static readonly getCourseLessonWithContentAndSupplementaryMaterialsByCourseLesson =
+    ApiLinks.baseUrl + 'course/lesson';
+  public static readonly updateCourseLessonAndCourseLessonContent =
+    ApiLinks.baseUrl + 'course/lesson';
 }

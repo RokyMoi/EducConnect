@@ -82,5 +82,24 @@ namespace backend.Interfaces.Course
 
         public Task<bool>
         DeleteCourseLessonSupplementaryMaterialByCourseLessonSupplementaryMaterialId(Guid courseLessonSupplementaryMaterialId);
+
+        public Task<List<CourseLessonShorthandDTO>?> GetCourseLessonShorthandListByCourseId(Guid courseId);
+
+        public Task<bool> CheckIfCourseExistsByCourseId(Guid courseId);
+
+        public Task<CourseLessonReferenceDTO?> GetCourseLessonReferenceByCourseLessonId(Guid courseLessonId);
+
+        public Task<bool> DeleteCourseLessonAndAssociatedDataByCourseLessonId(Guid courseLessonId);
+
+        public Task ReorderCourseLessonSequenceOrderAfterDeletion(Guid courseId, int deletedLessonSequenceOrder);
+
+        public Task<CourseLessonWithContentAndSupplementaryMaterialsDTO?> GetCourseLessonWithContentAndSupplementaryMaterialsByCourseLessonId(Guid courseLessonId);
+
+        public Task<CourseLessonWithCourseLessonContentDTO?> GetCourseLessonWithCourseLessonContentByCourseLessonId(Guid courseLessonId);
+
+        public Task<CourseLessonWithCourseLessonContentDTO?> UpdateCourseLessonAndCourseLessonContentByCourseLessonId(Guid courseLessonId, CourseLessonDTO courseLesson,
+        CourseLessonContentDTO courseLessonContent);
+
+        public Task UpdateLessonOrderAsync(int oldPosition, int newPosition);
     }
 }

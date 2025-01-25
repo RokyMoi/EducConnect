@@ -42,5 +42,13 @@ namespace EduConnect.Entities.Course
         public long? UpdatedAt { get; set; } = null;
 
 
+        // Navigation properties
+        public virtual ICollection<CourseLessonSupplementaryMaterial> SupplementaryMaterials { get; set; } = new List<CourseLessonSupplementaryMaterial>();
+
+        public virtual CourseLessonContent? LessonContents { get; set; }
+
+
     }
+
+
 }

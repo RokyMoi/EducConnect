@@ -16,7 +16,102 @@
             (buttonClick)="addLesson()"></app-submit-button>
     </div>
 
+    <div class="lesson-information-container">
+        <p>Number of lessons for this course: <strong>{{this.courseLessonList.length}}</strong></p>
+        <p>Total size of supplementary materials for this course:<strong>
+                {{formatFileSize(totalSizeOfSupplementaryMaterialsForTheCourse)}}
+            </strong></p>
+
+    </div>
+    <div class="course-lesson-table-container" *ngIf="courseLessonList.length > 0">
+        <table>
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th [class.sorted-asc]="currentSortColumn === 'lessonSequenceOrder' && isAscending"
+                        [class.sorted-desc]="currentSortColumn === 'lessonSequenceOrder' && !isAscending"
+                        (click)="sortByColumn('lessonSequenceOrder')">Order</th>
+                    <th [class.sorted-asc]="currentSortColumn === 'lessonTitle' && isAscending"
+                        [class.sorted-desc]="currentSortColumn === 'lessonTitle' && !isAscending"
+                        (click)="sortByColumn('lessonTitle')">Title</th>
+                    <th [class.sorted-asc]="currentSortColumn === 'lessonTag' && isAscending"
+                        [class.sorted-desc]="currentSortColumn === 'lessonTag' && !isAscending"
+                        (click)="sortByColumn('lessonTag')">Tag</th>
+                    <th [class.sorted-asc]="currentSortColumn === 'courseLessonSupplementaryMaterialCount' && isAscending"
+                        [class.sorted-desc]="currentSortColumn === 'courseLessonSupplementaryMaterialCount' && !isAscending"
+                        (click)="sortByColumn('courseLessonSupplementaryMaterialCount')">Num. of materials</th>
+                    <th [class.sorted-asc]="currentSortColumn === 'courseLessonSupplementaryMaterialTotalSize' && isAscending"
+                        [class.sorted-desc]="currentSortColumn === 'courseLessonSupplementaryMaterialTotalSize' && !isAscending"
+                        (click)="sortByColumn('courseLessonSupplementaryMaterialTotalSize')">Total size of materials
+                    </th>
+                    <th class="lesson-date-table" [class.sorted-asc]="currentSortColumn === 'createdAt' && isAscending"
+                        [class.sorted-desc]="currentSortColumn === 'createdAt' && !isAscending"
+                        (click)="sortByColumn('createdAt')">Created at</th>
+                    <th colspan="2">Actions</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr *ngFor="let lesson of courseLessonList; let i=index">
+                    <td class="table-index">{{i + 1}}</td>
+                    <td class="lesson-order-table">{{lesson.lessonSequenceOrder}}</td>
+                    <td class="lesson-title">{{lesson.lessonTitle}}</td>
+                    <td class="lesson-tag">#{{lesson.lessonTag}}</td>
+                    <td class="lesson-material-count">{{lesson.courseLessonSupplementaryMaterialCount}}</td>
+                    <td>{{formatFileSize(lesson.courseLessonSupplementaryMaterialTotalSize)}}</td>
+                    <td class="lesson-date-table">{{formatDate(lesson.createdAt)}}</td>
+                    <td (click)="openEditCourseLessonModal(lesson.courseLessonId, i)">View</td>
+                    <td (click)="openCourseLessonDeleteDialog(lesson.courseLessonId, i)">Delete</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="course-lesson-list-container" *ngIf="courseLessonList.length > 0">
+        <div class="course-lesson-list">
+            <div class="course-lesson-list-item" *ngFor="let lesson of courseLessonList; let i=index">
+                <div class="lesson-order">
+                    {{lesson.lessonSequenceOrder}}
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-title">{{lesson.lessonTitle}}</div>
+                    <div class="lesson-tag">#{{lesson.lessonTag}}</div>
+                    <div class="lesson-meta">
+                        <div class="materials-info" *ngIf="lesson.courseLessonSupplementaryMaterialTotalSize > 0">
+                            <i class="fas fa-file"></i>
+                            {{lesson.courseLessonSupplementaryMaterialCount}} materials
+                        </div>
+                        <div class="materials-info" *ngIf="lesson.courseLessonSupplementaryMaterialTotalSize > 0">
+                            <i class="fas fa-hdd"></i>
+                            {{formatFileSize(lesson.courseLessonSupplementaryMaterialTotalSize)}}
+                        </div>
+                        <div class="materials-info">
+                            <i class="fas fa-clock"></i>
+                            {{formatDate(lesson.createdAt)}}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
     <app-course-lesson-modal *ngIf="showCourseLessonModal" [isCreateOrEditMode]="isCreateOrEditMode"
-    [modalTitle]="modalTitle"
-        (closeModal)="toggleCourseLessonModal()"></app-course-lesson-modal>
+        [modalTitle]="modalTitle" [courseLessonId]="isCreateOrEditMode ? '' : selectedCourseLessonId"
+        [courseLessonPosition]="selectedCourseLessonIndex" (closeModal)="toggleCourseLessonModal()"
+        (closeDeleteDialogAndModalAndRefreshCourseList)="this.closeDeleteDialogAndRefreshCourseLessonList()"></app-course-lesson-modal>
+
+
+    <app-course-delete-dialog *ngIf="showCourseLessonDeleteDialog && (selectedCourseLessonIndex > -1)"
+        [isAccessedFromCourseLessonModal]="false"
+        [courseLessonId]="courseLessonList[selectedCourseLessonIndex].courseLessonId"
+        [lessonTitle]="courseLessonList[selectedCourseLessonIndex].lessonTitle"
+        [lessonTag]="courseLessonList[selectedCourseLessonIndex].lessonTag"
+        [lessonPosition]="courseLessonList[selectedCourseLessonIndex].lessonSequenceOrder"
+        [createdAt]="courseLessonList[selectedCourseLessonIndex].createdAt"
+        [numberOfMaterials]="courseLessonList[selectedCourseLessonIndex].courseLessonSupplementaryMaterialCount"
+        [courseCreateService]="courseCreateService" (closeDeleteDialog)="closeDeleteDialog()"
+        (closeDeleteDialogAndRefreshCourseLessonList)="this.closeDeleteDialogAndRefreshCourseLessonList()">
+    </app-course-delete-dialog>
+
 </body>

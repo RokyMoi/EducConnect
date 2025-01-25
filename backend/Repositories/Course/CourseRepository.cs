@@ -12,6 +12,7 @@ using backend.Interfaces.Course;
 using EduConnect.Data;
 using EduConnect.DTOs.Course.CourseLesson;
 using EduConnect.Entities.Course;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -846,6 +847,350 @@ namespace backend.Repositories.Course
                 return false;
             }
         }
+
+        public async Task<List<CourseLessonShorthandDTO>?> GetCourseLessonShorthandListByCourseId(Guid courseId)
+        {
+
+            return await _dataContext.CourseLesson
+            .Where(x => x.CourseId == courseId)
+            .GroupJoin(
+                _dataContext.CourseLessonSupplementaryMaterial,
+                ccl => ccl.CourseLessonId,
+                clsm => clsm.CourseLessonId,
+                (ccl, clsmGroup) => new
+                {
+                    CourseLesson = ccl,
+                    SupplementaryMaterials = clsmGroup
+                }
+            )
+            .Select(
+                x => new CourseLessonShorthandDTO
+                {
+                    CourseLessonId = x.CourseLesson.CourseLessonId,
+                    CourseId = x.CourseLesson.CourseId,
+                    LessonTitle = x.CourseLesson.LessonTitle,
+                    LessonTag = x.CourseLesson.LessonTag,
+                    LessonSequenceOrder = x.CourseLesson.LessonSequenceOrder,
+                    CourseLessonSupplementaryMaterialCount = x.SupplementaryMaterials.Count(),
+                    CourseLessonSupplementaryMaterialTotalSize = x.SupplementaryMaterials.Sum(y => (long?)y.ContentSize) ?? 0,
+                    CreatedAt = x.CourseLesson.CreatedAt,
+                }
+            )
+            .OrderBy(x => x.LessonSequenceOrder)
+            .ToListAsync();
+
+
+
+        }
+
+        public async Task<bool> CheckIfCourseExistsByCourseId(Guid courseId)
+        {
+            return await _dataContext.Course.Where(x => x.CourseId == courseId).AnyAsync();
+        }
+
+        public async Task<CourseLessonReferenceDTO?> GetCourseLessonReferenceByCourseLessonId(Guid courseLessonId)
+        {
+            var courseLesson = await _dataContext.CourseLesson.Include(x => x.Course)
+            .Where(x => x.CourseLessonId == courseLessonId)
+            .Select(
+                x => new CourseLessonReferenceDTO
+                {
+                    CourseId = x.CourseId,
+                    CourseLessonId = x.CourseLessonId,
+                    TutorId = x.Course.TutorId
+                }
+            )
+            .FirstOrDefaultAsync();
+
+            if (courseLesson == null)
+            {
+                return null;
+            }
+
+            return courseLesson;
+        }
+
+        public async Task<bool> DeleteCourseLessonAndAssociatedDataByCourseLessonId(Guid courseLessonId)
+        {
+            var lesson = await _dataContext.CourseLesson.Where(x => x.CourseLessonId == courseLessonId).FirstOrDefaultAsync();
+
+            if (lesson == null)
+            {
+                Console.WriteLine("CourseLesson not found");
+                return false;
+            }
+
+            var sequenceOrder = lesson.LessonSequenceOrder;
+            var courseId = lesson.CourseId;
+
+            var lessonContents = await _dataContext.CourseLessonContent.Where(x => x.CourseLessonId == courseLessonId).ToListAsync();
+            _dataContext.CourseLessonContent.RemoveRange(lessonContents);
+
+            var lessonSupplementaryMaterials = await _dataContext.CourseLessonSupplementaryMaterial.Where(x => x.CourseLessonId == courseLessonId).ToListAsync();
+            _dataContext.CourseLessonSupplementaryMaterial.RemoveRange(lessonSupplementaryMaterials);
+
+            _dataContext.CourseLesson.Remove(lesson);
+
+            await _dataContext.SaveChangesAsync();
+
+            await ReorderCourseLessonSequenceOrderAfterDeletion(courseId, sequenceOrder);
+            return true;
+        }
+
+        public async Task ReorderCourseLessonSequenceOrderAfterDeletion(Guid courseId, int deletedLessonSequenceOrder)
+        {
+            var lessonsToUpdate = await _dataContext.CourseLesson
+            .Where(x => x.CourseId == courseId && x.LessonSequenceOrder > deletedLessonSequenceOrder)
+            .OrderBy(x => x.LessonSequenceOrder)
+            .ToListAsync();
+
+
+
+
+            foreach (var lesson in lessonsToUpdate)
+            {
+                Console.WriteLine($"Lesson sequence order before: {lesson.LessonSequenceOrder}");
+                lesson.LessonSequenceOrder = deletedLessonSequenceOrder++;
+                Console.WriteLine($"Lesson sequence order after: {lesson.LessonSequenceOrder}");
+
+            }
+
+            await _dataContext.SaveChangesAsync();
+        }
+
+        public async Task<CourseLessonWithContentAndSupplementaryMaterialsDTO?> GetCourseLessonWithContentAndSupplementaryMaterialsByCourseLessonId(Guid courseLessonId)
+        {
+            return await _dataContext.CourseLesson
+            .Where(x => x.CourseLessonId == courseLessonId)
+            .Include(x => x.Course)
+            .Select(
+                x => new CourseLessonWithContentAndSupplementaryMaterialsDTO
+                {
+                    TutorId = x.Course.TutorId,
+                    CourseId = x.CourseId,
+                    CourseLesson = new CourseLessonDTO
+                    {
+                        CourseLessonId = x.CourseLessonId,
+                        CourseId = x.CourseId,
+                        LessonTitle = x.LessonTitle,
+                        LessonDescription = x.LessonDescription,
+                        LessonSequenceOrder = x.LessonSequenceOrder,
+                        LessonPrerequisites = x.LessonPrerequisites,
+                        LessonObjective = x.LessonObjective,
+                        LessonCompletionTimeInMinutes = x.LessonCompletionTimeInMinutes,
+                        LessonTag = x.LessonTag,
+                        CreatedAt = x.CreatedAt,
+                    },
+                    CourseLessonContent = _dataContext.CourseLessonContent.Where(y => y.CourseLessonId == x.CourseLessonId)
+                    .Select(
+                        y => new CourseLessonContentDTO
+                        {
+                            CourseLessonId = y.CourseLessonId,
+                            CourseLessonContentId = y.CourseLessonContentId,
+                            Title = y.Title,
+                            Description = y.Description,
+                            ContentData = y.ContentData,
+                        }
+                    )
+                    .FirstOrDefault(),
+                    CourseLessonSupplementaryMaterials = _dataContext.CourseLessonSupplementaryMaterial.Where(y => y.CourseLessonId == x.CourseLessonId)
+                    .Select(sm =>
+                        new CourseLessonSupplementaryMaterialWithNoFileDTO
+                        {
+                            CourseLessonId = sm.CourseLessonId,
+                            CourseLessonSupplementaryMaterialId = sm.CourseLessonSupplementaryMaterialId,
+                            ContentType = sm.ContentType,
+                            ContentSize = sm.ContentSize,
+                            FileName = sm.FileName,
+                            DateTimePointOfFileCreation = sm.DateTimePointOfFileCreation,
+                            CreatedAt = sm.CreatedAt,
+                        }
+
+                    ).ToList()
+
+                }
+            ).FirstOrDefaultAsync();
+
+
+
+
+
+
+
+        }
+
+        public async Task<CourseLessonWithCourseLessonContentDTO?> GetCourseLessonWithCourseLessonContentByCourseLessonId(Guid courseLessonId)
+        {
+            return await _dataContext.CourseLesson.Include(x => x.Course).Where(x => x.CourseLessonId == courseLessonId).Select(
+                x => new CourseLessonWithCourseLessonContentDTO
+                {
+                    CourseLessonId = x.CourseLessonId,
+                    CourseId = x.CourseId,
+                    TutorId = x.Course.TutorId,
+                    CourseLesson = new CourseLessonDTO
+                    {
+                        CourseLessonId = x.CourseLessonId,
+                        CourseId = x.CourseId,
+                        LessonTitle = x.LessonTitle,
+                        LessonDescription = x.LessonDescription,
+                        LessonSequenceOrder = x.LessonSequenceOrder,
+                        LessonPrerequisites = x.LessonPrerequisites,
+                        LessonObjective = x.LessonObjective,
+                        LessonCompletionTimeInMinutes = x.LessonCompletionTimeInMinutes,
+                        LessonTag = x.LessonTag,
+                    },
+                    CourseLessonContent = _dataContext.CourseLessonContent.Where(y => y.CourseLessonId == x.CourseLessonId).Select(
+                        clc => new CourseLessonContentDTO
+                        {
+                            CourseLessonId = clc.CourseLessonId,
+                            CourseLessonContentId = clc.CourseLessonContentId,
+                            Title = clc.Title,
+                            Description = clc.Description,
+                            ContentData = clc.ContentData,
+                        }
+                    ).FirstOrDefault(),
+                }
+            ).FirstOrDefaultAsync();
+        }
+
+        public async Task<CourseLessonWithCourseLessonContentDTO?> UpdateCourseLessonAndCourseLessonContentByCourseLessonId(Guid courseLessonId, CourseLessonDTO courseLesson, CourseLessonContentDTO courseLessonContent)
+        {
+            var courseLessonToUpdate = await _dataContext.CourseLesson.Include(x => x.Course).Where(x => x.CourseLessonId == courseLessonId).FirstOrDefaultAsync();
+
+            if (courseLessonToUpdate == null)
+            {
+                return null;
+            }
+
+            var courseLessonContentToUpdate = await _dataContext.CourseLessonContent.Where(x => x.CourseLessonId == courseLessonId).FirstOrDefaultAsync();
+
+            if (courseLessonContentToUpdate == null)
+            {
+                return null;
+            }
+
+            //Logic for reordering lessons sequence order if the lesson sequence order is changed
+            // Store the current lesson sequence order
+            int currentLessonSequenceOrder = courseLessonToUpdate.LessonSequenceOrder;
+            // Get the total number of lessons for the course
+            int totalLessons = await _dataContext.CourseLesson
+                .CountAsync(l => l.CourseId == courseLessonToUpdate.CourseId);
+
+            // Ensure the new position does not exceed the total number of lessons
+            int newLessonSequenceOrder = Math.Min(courseLesson.LessonSequenceOrder, totalLessons);
+
+            Console.WriteLine($"Current Lesson Sequence Order: {currentLessonSequenceOrder}");
+            Console.WriteLine($"New Lesson Sequence Order: {newLessonSequenceOrder}");
+            Console.WriteLine($"Total Lessons: {totalLessons}");
+
+
+
+            if (currentLessonSequenceOrder != newLessonSequenceOrder)
+            {
+                if (currentLessonSequenceOrder < newLessonSequenceOrder)
+                {
+                    // Moving lesson down: Shift other lessons up (decrement order)
+                    var lessonsToShiftUp = await _dataContext.CourseLesson
+                        .Where(l => l.CourseId == courseLessonToUpdate.CourseId &&
+                                    l.LessonSequenceOrder > currentLessonSequenceOrder &&
+                                    l.LessonSequenceOrder <= newLessonSequenceOrder)
+                        .ToListAsync();
+
+                    foreach (var lesson in lessonsToShiftUp)
+                    {
+                        lesson.LessonSequenceOrder--;
+                    }
+                }
+                else
+                {
+                    // Moving lesson up: Shift other lessons down (increment order)
+                    var lessonsToShiftDown = await _dataContext.CourseLesson
+                        .Where(l => l.CourseId == courseLessonToUpdate.CourseId &&
+                                    l.LessonSequenceOrder < currentLessonSequenceOrder &&
+                                    l.LessonSequenceOrder >= newLessonSequenceOrder)
+                        .ToListAsync();
+
+                    foreach (var lesson in lessonsToShiftDown)
+                    {
+                        lesson.LessonSequenceOrder++;
+                    }
+                }
+
+                // Assign the new sequence order to the updated lesson
+                courseLessonToUpdate.LessonSequenceOrder = newLessonSequenceOrder;
+            }
+
+
+            courseLessonToUpdate.LessonTitle = courseLesson.LessonTitle;
+            courseLessonToUpdate.LessonDescription = courseLesson.LessonDescription;
+            courseLessonToUpdate.LessonPrerequisites = courseLesson.LessonPrerequisites;
+            courseLessonToUpdate.LessonObjective = courseLesson.LessonObjective;
+            courseLessonToUpdate.LessonCompletionTimeInMinutes = courseLesson.LessonCompletionTimeInMinutes;
+            courseLessonToUpdate.LessonTag = courseLesson.LessonTag;
+            courseLessonToUpdate.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            courseLessonContentToUpdate.Title = courseLessonContent.Title;
+            courseLessonContentToUpdate.Description = courseLessonContent.Description;
+            courseLessonContentToUpdate.ContentData = courseLessonContent.ContentData;
+            courseLessonContentToUpdate.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            await _dataContext.SaveChangesAsync();
+
+            return new CourseLessonWithCourseLessonContentDTO
+            {
+                CourseLessonId = courseLessonId,
+                CourseId = courseLessonToUpdate.CourseId,
+                TutorId = courseLessonToUpdate.Course.TutorId,
+                CourseLesson = courseLesson,
+                CourseLessonContent = courseLessonContent,
+            };
+
+        }
+
+        public async Task UpdateLessonOrderAsync(int oldPosition, int newPosition)
+        {
+
+            // Get the lesson that needs to be moved
+            var lessonToMove = await _dataContext.CourseLesson
+                .FirstOrDefaultAsync(l => l.LessonSequenceOrder == oldPosition);
+
+            if (lessonToMove == null)
+            {
+                throw new InvalidOperationException("Lesson not found.");
+            }
+
+            if (oldPosition < newPosition)
+            {
+                // Shift lessons up (decrease order by 1)
+                var lessonsToShiftUp = await _dataContext.CourseLesson
+                    .Where(l => l.LessonSequenceOrder > oldPosition && l.LessonSequenceOrder <= newPosition)
+                    .ToListAsync();
+
+                foreach (var lesson in lessonsToShiftUp)
+                {
+                    lesson.LessonSequenceOrder--;
+                }
+            }
+            else
+            {
+                // Shift lessons down (increase order by 1)
+                var lessonsToShiftDown = await _dataContext.CourseLesson
+                    .Where(l => l.LessonSequenceOrder < oldPosition && l.LessonSequenceOrder >= newPosition)
+                    .ToListAsync();
+
+                foreach (var lesson in lessonsToShiftDown)
+                {
+                    lesson.LessonSequenceOrder++;
+                }
+            }
+
+            // Set the new position for the moved lesson
+            lessonToMove.LessonSequenceOrder = newPosition;
+
+            // Save changes to the database
+            await _dataContext.SaveChangesAsync();
+        }
+
     }
 
 }

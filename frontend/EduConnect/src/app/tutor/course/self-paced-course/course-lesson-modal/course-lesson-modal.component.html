@@ -85,7 +85,27 @@
                     <p class="editor-warning">{{lessonContentWarning}}</p>
                 </div>
             </form>
-            <div class="submit-response-container">
+            <div *ngIf="!isCreateOrEditMode" class="update-response-container">
+                <p [style.color]="updateDataMessageColor" [style.font-size]="'24px'">{{updateDataMessage}}</p>
+
+
+                <!--Button used to activate the dialog with controls for updating the data-->
+
+                <app-submit-button *ngIf="!isCreateOrEditMode" [submitButtonText]="updateDataButtonText"
+                    [buttonBackgroundColor]="updateDataButtonColor" [buttonMargin]="updateDataButtonMargin"
+                    (buttonClick)="toggleSaveDialog()"></app-submit-button>
+
+                <!--Button used to activate the dialog with controls for discarding the updates to the data-->
+                <app-submit-button *ngIf="!isCreateOrEditMode" [submitButtonText]="discardUpdateDataButtonText"
+                    [buttonBackgroundColor]="discardUpdateDataButtonColor"
+                    [buttonMargin]="discardUpdateDataButtonMargin"
+                    (buttonClick)="toggleDiscardDialog()"></app-submit-button>
+
+
+
+            </div>
+
+            <div *ngIf="isCreateOrEditMode" class="submit-response-container">
                 <p [style.color]="submitDataMessageColor" [style.font-size]="'24px'">{{submitDataMessage}}</p>
                 <div class="announcementDiv">
 
@@ -144,6 +164,12 @@
                 *ngIf="this.selectedFile && this.validateFileType(this.selectedFile) && this.validateFileSize(this.selectedFile) && !this.isDataTransmissionActive"
                 [buttonBackgroundColor]="uploadFileButtonColor" [submitButtonText]="uploadFileButtonText"
                 (buttonClick)="uploadFile()"></app-submit-button>
+            <app-submit-button
+                *ngIf="this.selectedFile && this.validateFileType(this.selectedFile) && this.validateFileSize(this.selectedFile) && !this.isDataTransmissionActive && this.fileToUploadUrl"
+                [buttonBackgroundColor]="'blue'" [submitButtonText]="'Preview file'"
+                (buttonClick)="toggleFilePreview()">
+
+            </app-submit-button>
         </div>
         <div *ngIf="showSupplementaryMaterialUpload && courseLessonSupplementaryMaterials.length > 0"
             class="file-table-container">
@@ -181,7 +207,13 @@
             </table>
         </div>
 
-        <div class="accordion-list-container"
+
+
+
+
+
+
+        <!-- <div class="accordion-list-container"
             *ngIf="showSupplementaryMaterialUpload && courseLessonSupplementaryMaterials.length > 0">
             <p class="accordion-list-title">Uploaded items ({{courseLessonSupplementaryMaterials.length}})</p>
             <div class="accordion-list-item" *ngFor="let item of courseLessonSupplementaryMaterials; let i=index">
@@ -206,7 +238,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <div *ngIf="showSupplementaryMaterialUpload &&courseLessonSupplementaryMaterials.length > 0"
             class="download-file-container">
             <p *ngIf="isDownloadComplete === false">{{downloadProgressMessage}}</p>
@@ -226,6 +258,12 @@
             </p>
 
 
+        </div>
+        <div *ngIf="!isCreateOrEditMode" class="delete-response-container">
+            <p [style.color]="deleteDataMessageColor" [style.font-size]="'24px'">{{deleteDataMessage}}</p>
+            <app-submit-button *ngIf="!isCreateOrEditMode" [submitButtonText]="deleteDataButtonText"
+                [buttonBackgroundColor]="deleteDataButtonColor" [buttonMargin]="deleteDataButtonMargin"
+                (buttonClick)="openDeleteDialog()"></app-submit-button>
         </div>
     </div>
     <app-floating-warning-box *ngIf="floatingWarningDeleteBoxShow" [warningTitle]="floatingWarningDeleteBoxTitle">
@@ -247,5 +285,42 @@
             (buttonClick)="closeWarningFloatingBox()">
         </app-submit-button>
     </app-floating-warning-box>
+    <app-course-lesson-dialog *ngIf="showDialog" [dialogTitle]="courseLessonToServerOperationDialogTitle"
+        (closeModal)="toggleDialog()">
+        <p [style.color]="courseLessonToServerOperationMessageColor" [style.font-size]="'24px'">
+            {{courseLessonToServerOperationMessage}}</p>
+        <div class="announcementDiv" *ngIf="isDataTransmissionActive">
+
+            <mat-progress-spinner [mode]="spinnerMode" class="spinner-color"
+                [style.stroke]="spinnerColor"></mat-progress-spinner>
+        </div>
+        <app-submit-button *ngIf="!isDataTransmissionActive && !isDataTransmissionComplete"
+            [buttonBackgroundColor]="courseLessonToServerOperationConfirmButtonColor"
+            [submitButtonText]="courseLessonToServerOperationConfirmButtonText"
+            (buttonClick)="confirmToServerOperation()"></app-submit-button>
+        <app-submit-button *ngIf="!isDataTransmissionActive && !isDataTransmissionComplete"
+            [buttonBackgroundColor]="courseLessonToServerOperationCancelButtonColor"
+            [submitButtonText]="courseLessonToServerOperationCancelButtonText"
+            (buttonClick)="closeDialog()"></app-submit-button>
+        <app-submit-button *ngIf="isDataTransmissionComplete"
+            [buttonBackgroundColor]="courseLessonToServerOperationCloseDialogButtonColor"
+            [submitButtonText]="courseLessonToServerOperationCloseDialogButtonText"
+            (buttonClick)="closeAllDialogs()"></app-submit-button>
+
+    </app-course-lesson-dialog>
+
+    <app-course-delete-dialog *ngIf="showDeleteDialog" [isAccessedFromCourseLessonModal]="true"
+        [courseLessonId]="this.courseLessonId" [lessonTitle]="this.courseLessonDeleteDialogValues.lessonTitle"
+        [lessonTag]="this.courseLessonDeleteDialogValues.lessonTag" [lessonPosition]="this.courseLessonPosition + 1"
+        [createdAt]="this.courseLessonDeleteDialogValues.createdAt"
+        [numberOfMaterials]="this.courseLessonSupplementaryMaterials.length" [courseCreateService]="courseCreateService"
+        (closeDeleteDialog)="closeDeleteDialog()"
+        (closeDeleteDialogAndRefreshCourseLessonList)="closeDeleteDialogAndCloseModalWithCourseLessonListRefresh()">
+    </app-course-delete-dialog>
+    <app-course-lesson-dialog *ngIf="showFilePreview" (closeModal)="toggleFilePreview()">
+        <ngx-doc-viewer *ngIf="fileToUploadUrl" [url]="fileToUploadUrl" viewer="url" style="width:100%;height:50vh;">
+        </ngx-doc-viewer>
+    </app-course-lesson-dialog>
+
 
 </div>

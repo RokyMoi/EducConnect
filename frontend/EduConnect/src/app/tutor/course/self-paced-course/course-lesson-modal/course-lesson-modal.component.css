@@ -436,6 +436,24 @@ td {
   margin-bottom: 12px;
 }
 
+.update-response-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 5%;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 12px;
+}
+
+.delete-response-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 5%;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 12px;
+}
+
 @media screen and (max-width: 950px) {
   table {
     display: none;

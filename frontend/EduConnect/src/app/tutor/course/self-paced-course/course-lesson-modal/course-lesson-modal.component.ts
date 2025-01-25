@@ -15,6 +15,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { NgxDocViewerModule } from 'ngx-doc-viewer';
+
 import { TextInputComponentComponent } from '../../../../common/input/text/text-input-component/text-input-component.component';
 import { Form } from '@angular/forms';
 import { TextAreaInputComponentComponent } from '../../../../common/input/text/text-area-input-component/text-area-input-component.component';
@@ -32,6 +34,13 @@ import {
 } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FloatingWarningBoxComponent } from '../../../../common/floating-warning-box/floating-warning-box/floating-warning-box.component';
+import { CourseLesson } from '../../../../_models/course/course-lesson/course-lesson.model';
+import { CourseLessonContent } from '../../../../_models/course/course-lesson-content.model';
+import { CourseLessonDialogComponent } from '../course-lesson-dialog/course-lesson-dialog.component';
+import { FrontendToBackendOperationType } from '../../../../../enums/frontend-to-backend-operation-type.enum';
+import { CourseLessonUpdateRequest } from '../../../../_models/course/course-lesson/course-lesson-update-request.model';
+import { CourseDeleteDialogComponent } from '../course-delete-dialog/course-delete-dialog.component';
+import { CourseLessonShorthand } from '../../../../_models/course/course-lesson/course-lesson-shorthand.model';
 
 @Component({
   standalone: true,
@@ -47,6 +56,9 @@ import { FloatingWarningBoxComponent } from '../../../../common/floating-warning
     NgFor,
     MatProgressBarModule,
     FloatingWarningBoxComponent,
+    CourseLessonDialogComponent,
+    CourseDeleteDialogComponent,
+    NgxDocViewerModule,
   ],
   templateUrl: './course-lesson-modal.component.html',
   styleUrl: './course-lesson-modal.component.css',
@@ -56,8 +68,10 @@ export class CourseLessonModalComponent implements OnInit {
   @Input() isCreateOrEditMode: boolean = true;
   @Input() courseId: string = 'e6c87eb6-f462-4516-8d17-ddbd9b3b1def';
   @Input() courseLessonId: string = '';
-
+  @Input() courseLessonPosition: number = -1;
   @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
+  @Output() closeDeleteDialogAndModalAndRefreshCourseList: EventEmitter<void> =
+    new EventEmitter<void>();
 
   courseCreateService: CourseCreateService = inject(CourseCreateService);
 
@@ -69,6 +83,40 @@ export class CourseLessonModalComponent implements OnInit {
   public editor: Editor = new Editor();
 
   showSupplementaryMaterialUpload: boolean = false;
+
+  showDialog: boolean = false;
+
+  showDeleteDialog: boolean = false;
+
+  showFilePreview: boolean = false;
+  updatedCourseLessonValues: any = {
+    courseLessonTitle: false,
+    courseLessonDescription: false,
+    lessonSequenceOrder: false,
+    lessonPrerequisites: false,
+    lessonObjective: false,
+    lessonCompletionTime: false,
+    lessonTag: false,
+    lessonContentTitle: false,
+    lessonContentDescription: false,
+    lessonContent: false,
+  };
+
+  originalCourseLesson: CourseLesson | null = null;
+  originalCourseLessonContent: CourseLessonContent | null = null;
+
+  //An object that stores the values for the course lesson delete dialog
+  courseLessonDeleteDialogValues: CourseLessonShorthand = {
+    courseLessonId: this.courseLessonId,
+    courseId: this.courseId,
+    lessonTitle: '',
+    lessonTag: '',
+    lessonSequenceOrder: 0,
+    courseLessonSupplementaryMaterialCount: 0,
+    courseLessonSupplementaryMaterialTotalSize: 0,
+    createdAt: '',
+  };
+
   //Variables for handling the displaying and styling the message and other related elements to the status of the course creation request to the server and it's subsequent response
 
   //Flag variable that indicates up to what step of the course creation process the user is currently at
@@ -94,6 +142,38 @@ export class CourseLessonModalComponent implements OnInit {
     'Add the lesson to the course, then you can add supplementary material';
   submitDataMessageColor: string = 'rgb(2, 80, 176)';
 
+  //Variables for the styling of the save changes button
+  updateDataButtonText: string = 'Save changes';
+  updateDataButtonColor: string = 'green';
+  updateDataButtonMargin: string = '12px 0px';
+
+  //Variables for the styling of the discard changes button
+  discardUpdateDataButtonText: string = 'Discard changes';
+  discardUpdateDataButtonColor: string = 'red';
+  discardUpdateDataButtonMargin: string = '12px 0px';
+
+  //Variables for the styling of the delete lesson button
+  deleteDataButtonText: string = 'Delete lesson';
+  deleteDataButtonColor: string = 'red';
+  deleteDataButtonMargin: string = '12px 0px';
+
+  //Variables for the styling of the go back button
+  goBackButtonText: string = 'Go back';
+  goBackButtonColor: string = 'blue';
+  goBackButtonMargin: string = '12px 0px';
+
+  selectedToServerOperation: FrontendToBackendOperationType =
+    FrontendToBackendOperationType.None;
+
+  //Variable that holds the message that is displayed above the create course button, this variable is used to notify the user what do they need to do to create a course lesson
+  updateDataMessage: string =
+    'Add the lesson to the course, then you can add supplementary material';
+  updateDataMessageColor: string = 'rgb(2, 80, 176)';
+
+  deleteDataMessage: string =
+    'If you want to delete this lesson, click the delete button below';
+  deleteDataMessageColor: string = 'red';
+
   @ViewChild('fileInput') fileInput!: ElementRef;
 
   currentNumberOfFiles: number = 0;
@@ -114,6 +194,7 @@ export class CourseLessonModalComponent implements OnInit {
   fileToUploadType: string = '';
   fileToUploadFileCategory: string = '';
 
+  fileToUploadUrl: string = '';
   fileUploadResultMessage: string = '';
   fileUploadResultColor: string = 'green';
 
@@ -200,6 +281,19 @@ export class CourseLessonModalComponent implements OnInit {
     'application/x-rar-compressed',
     'application/x-rar',
   ];
+
+  courseLessonToServerOperationMessage: string = '';
+  courseLessonToServerOperationMessageColor: string = 'green';
+  courseLessonToServerOperationDialogTitle: string = '';
+
+  courseLessonToServerOperationConfirmButtonText: string = '';
+  courseLessonToServerOperationConfirmButtonColor: string = '';
+
+  courseLessonToServerOperationCancelButtonText: string = '';
+  courseLessonToServerOperationCancelButtonColor: string = '';
+
+  courseLessonToServerOperationCloseDialogButtonText: string = '';
+  courseLessonToServerOperationCloseDialogButtonColor: string = '';
 
   //Variables for handling the styling of the text input component for the course lesson title
   courseLessonTitleLabel: string = 'Lesson Title';
@@ -302,7 +396,18 @@ export class CourseLessonModalComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadCourseLessonSupplementaryMaterials();
+    //Check if the course lesson id was provided by the parent component
+    if (this.courseLessonId) {
+      //If provided, set the course lesson modal into an edit mode and fetch the course data from the backend
+      this.isCreateOrEditMode = false;
+      this.modalTitle = 'Edit Course Lesson';
+
+      this.getExistingData();
+    }
+    if (!this.courseLessonId) {
+      this.isCreateOrEditMode = true;
+      this.modalTitle = 'Create Course Lesson';
+    }
     this.courseLessonModalFormGroup.controls.courseLessonTitle.valueChanges.subscribe(
       (value) => {
         this.checkCourseLessonTitle();
@@ -375,13 +480,17 @@ export class CourseLessonModalComponent implements OnInit {
     ) {
       this.submitDataMessage = 'Please remove any errors to proceed!';
       this.submitDataMessageColor = 'red';
+      this.updateDataMessageColor = 'red';
+      this.updateDataMessage = 'Please remove any errors to proceed!';
     }
     if (
-      this.courseLessonModalFormGroup.valid ||
+      this.courseLessonModalFormGroup.valid &&
       this.lessonContentFormGroup.valid
     ) {
       this.submitDataMessage = 'All fields are valid!';
       this.submitDataMessageColor = 'green';
+      this.updateDataMessageColor = 'green';
+      this.updateDataMessage = 'All fields are valid!';
     }
     this.courseLessonModalFormGroup.valueChanges.subscribe(() => {
       console.log('Checking for errors for courseLessonModalFormGroup');
@@ -399,13 +508,17 @@ export class CourseLessonModalComponent implements OnInit {
       ) {
         this.submitDataMessage = 'Please remove any errors to proceed!';
         this.submitDataMessageColor = 'red';
+        this.updateDataMessageColor = 'red';
+        this.updateDataMessage = 'Please remove any errors to proceed!';
       }
       if (
-        this.courseLessonModalFormGroup.valid ||
+        this.courseLessonModalFormGroup.valid &&
         this.lessonContentFormGroup.valid
       ) {
         this.submitDataMessage = 'All fields are valid!';
         this.submitDataMessageColor = 'green';
+        this.updateDataMessageColor = 'green';
+        this.updateDataMessage = 'All fields are valid!';
       }
     });
     this.lessonContentFormGroup.valueChanges.subscribe(() => {
@@ -415,13 +528,17 @@ export class CourseLessonModalComponent implements OnInit {
       ) {
         this.submitDataMessage = 'Please remove any errors to proceed!';
         this.submitDataMessageColor = 'red';
+        this.updateDataMessageColor = 'red';
+        this.updateDataMessage = 'Please remove any errors to proceed!';
       }
       if (
-        this.courseLessonModalFormGroup.valid ||
+        this.courseLessonModalFormGroup.valid &&
         this.lessonContentFormGroup.valid
       ) {
         this.submitDataMessage = 'All fields are valid!';
         this.submitDataMessageColor = 'green';
+        this.updateDataMessageColor = 'green';
+        this.updateDataMessage = 'All fields are valid!';
       }
     });
   }
@@ -650,7 +767,7 @@ export class CourseLessonModalComponent implements OnInit {
 
     //Check if the form is valid
     if (this.courseLessonModalFormGroup.valid) {
-      //Call the function to create the course lesson
+      //Check whatever the modal is in create or edit mode
       this.createCourseLesson();
     }
   }
@@ -783,6 +900,7 @@ export class CourseLessonModalComponent implements OnInit {
         this.fileUploadWarningText =
           'This file type is not allowed, choose another file';
         this.fileUploadInstructionText = '';
+        this.fileToUploadUrl = '';
         return;
       }
 
@@ -797,6 +915,7 @@ export class CourseLessonModalComponent implements OnInit {
           this.selectedFile.type
         )}MB`;
         this.fileUploadInstructionText = '';
+        this.fileToUploadUrl = '';
         return;
       }
 
@@ -809,9 +928,20 @@ export class CourseLessonModalComponent implements OnInit {
         this.selectedFile.type
       );
       this.fileToUploadType = this.getCleanFileType(this.selectedFile.type);
+
+      if (this.isPreviewableFileType(this.selectedFile.type)) {
+        this.fileToUploadUrl = URL.createObjectURL(this.selectedFile);
+        console.log('File URL:', this.fileToUploadUrl);
+      } else {
+        this.fileToUploadUrl = '';
+      }
     }
   }
 
+  isPreviewableFileType(fileType: string): boolean {
+    const previewebleTypes = ['application/pdf', ...this.allowedImageFileTypes];
+    return previewebleTypes.includes(fileType);
+  }
   getFileCategory(fileType: string): string {
     if (this.allowedImageFileTypes.includes(fileType)) {
       return 'Image';
@@ -939,6 +1069,8 @@ export class CourseLessonModalComponent implements OnInit {
               this.fileUploadResultColor = 'green';
               console.log('Upload complete', result);
               this.selectedFile = null;
+              URL.revokeObjectURL(this.fileToUploadUrl);
+              this.fileToUploadUrl = '';
               this.loadCourseLessonSupplementaryMaterials();
               setTimeout(() => {
                 this.fileUploadResultMessage = '';
@@ -1179,5 +1311,447 @@ export class CourseLessonModalComponent implements OnInit {
   toggleCardExpansion(index: number) {
     console.log('Toggle card expansion for index:', index);
     this.expandedCardIndex = this.expandedCardIndex === index ? null : index;
+  }
+
+  getExistingData() {
+    if (!this.isCreateOrEditMode) {
+      console.log('Fetching existing data...');
+      this.courseCreateService
+        .getCourseLessonWithContentAndSupplementaryMaterialsByCourseLessonId(
+          this.courseLessonId
+        )
+        .subscribe((response) => {
+          if (response.success === 'true') {
+            const existingCourseLesson: CourseLesson =
+              response.data.courseLesson.courseLesson;
+            const existingCourseLessonContent: CourseLessonContent =
+              response.data.courseLesson.courseLessonContent;
+            this.courseLessonSupplementaryMaterials =
+              response.data.courseLesson.courseLessonSupplementaryMaterials;
+
+            this.courseLessonModalFormGroup.setValue({
+              courseLessonTitle: existingCourseLesson.lessonTitle,
+              courseLessonDescription: existingCourseLesson.lessonDescription,
+              lessonSequenceOrder: existingCourseLesson.lessonSequenceOrder,
+              lessonPrerequisites: existingCourseLesson.lessonPrerequisites,
+              lessonObjective: existingCourseLesson.lessonObjective,
+              lessonCompletionTime: this.getHoursAndMinutesFromMinutes(
+                existingCourseLesson.lessonCompletionTimeInMinutes
+              ),
+              lessonTag: existingCourseLesson.lessonTag,
+            });
+
+            this.lessonContentFormGroup.setValue({
+              lessonContentTitle: existingCourseLessonContent.title,
+              lessonContentDescription: existingCourseLessonContent.description,
+              lessonContent: existingCourseLessonContent.contentData,
+            });
+
+            this.showSupplementaryMaterialUpload = true;
+            this.submitDataMessage = `${this.courseLessonSupplementaryMaterials.length} supplementary materials.`;
+
+            //Assign the data that was retrieved from the database to the originalCourseLesson object, to be later used to check if the user has made any changes to the data.
+            this.originalCourseLesson = {
+              courseLessonId: this.courseLessonId,
+              courseId: existingCourseLesson.courseId,
+              lessonTitle: existingCourseLesson.lessonTitle,
+              lessonDescription: existingCourseLesson.lessonDescription,
+              lessonSequenceOrder: existingCourseLesson.lessonSequenceOrder,
+              lessonPrerequisites: existingCourseLesson.lessonPrerequisites,
+              lessonObjective: existingCourseLesson.lessonObjective,
+              lessonCompletionTimeInMinutes:
+                existingCourseLesson.lessonCompletionTimeInMinutes,
+              lessonTag: existingCourseLesson.lessonTag,
+              createdAt: existingCourseLesson.createdAt,
+            };
+
+            console.log('Existing course lesson:', this.originalCourseLesson);
+            //Assign the data that was retrieved from the database to the originalCourseLessonContent object, to be later used to check if the user has made any changes to the data.
+            this.originalCourseLessonContent = {
+              courseLessonContentId:
+                existingCourseLessonContent.courseLessonContentId,
+              courseLessonId: existingCourseLessonContent.courseLessonId,
+              title: existingCourseLessonContent.title,
+              description: existingCourseLessonContent.description,
+              contentData: existingCourseLessonContent.contentData,
+            };
+          }
+        });
+    }
+  }
+
+  getHoursAndMinutesFromMinutes(minutes: number): string {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    // Ensure two-digit formatting
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = remainingMinutes.toString().padStart(2, '0');
+
+    return `${formattedHours}:${formattedMinutes}`;
+  }
+
+  toggleDialog() {
+    this.showDialog = !this.showDialog;
+  }
+
+  toggleSaveDialog() {
+    //Check for errors
+    this.checkForErrors();
+    console.log(
+      'Title value: ',
+      this.courseLessonModalFormGroup.controls.courseLessonTitle.value
+    );
+    if (
+      this.courseLessonModalFormGroup.invalid ||
+      this.lessonContentFormGroup.invalid
+    ) {
+      return;
+    }
+
+    //Check if any of the values have been updated
+    if (!this.checkForUpdates()) {
+      this.updateDataMessage = 'Updating not possible, no changes were made!';
+      this.updateDataMessageColor = 'red';
+      return;
+    }
+
+    console.log('Toggle save dialog');
+    this.courseLessonToServerOperationDialogTitle = 'Save changes';
+    this.courseLessonToServerOperationMessage =
+      'Are you sure you want to save changes?';
+    this.courseLessonToServerOperationMessageColor = 'blue';
+
+    //Set the button texts and colors
+    this.courseLessonToServerOperationConfirmButtonText = 'Yes, save changes!';
+    this.courseLessonToServerOperationConfirmButtonColor = 'green';
+    this.courseLessonToServerOperationCancelButtonText =
+      "No, don't save the changes!";
+    this.courseLessonToServerOperationCancelButtonColor = 'blue';
+
+    this.courseLessonToServerOperationCloseDialogButtonText =
+      'Ok, close dialog';
+    this.courseLessonToServerOperationCloseDialogButtonColor = 'orange';
+
+    //Set the selected operation as Update
+    this.selectedToServerOperation = FrontendToBackendOperationType.Update;
+
+    this.toggleDialog();
+  }
+
+  toggleDiscardDialog() {
+    //Check if any of the values have been updated
+    if (!this.checkForUpdates()) {
+      this.updateDataMessage = 'No changes have been made, no need to discard!';
+      this.updateDataMessageColor = 'red';
+      return;
+    }
+
+    this.courseLessonToServerOperationDialogTitle = 'Discard changes';
+    this.courseLessonToServerOperationMessage =
+      'Are you sure you want to discard changes?';
+    this.courseLessonToServerOperationMessageColor = 'red';
+
+    //Set the button texts and colors
+    this.courseLessonToServerOperationConfirmButtonText =
+      'Yes, discard changes!';
+    this.courseLessonToServerOperationConfirmButtonColor = 'red';
+    this.courseLessonToServerOperationCancelButtonText =
+      "No, don't save discard the changes!";
+    this.courseLessonToServerOperationCancelButtonColor = 'blue';
+
+    this.courseLessonToServerOperationCloseDialogButtonText =
+      'Ok, close dialog';
+    this.courseLessonToServerOperationCloseDialogButtonColor = 'orange';
+
+    //Set the selected operation as Update
+    this.selectedToServerOperation = FrontendToBackendOperationType.Discard;
+    this.toggleDialog();
+  }
+
+  //Used for confirming the operation to the server
+  //Operations can be Create and Update
+  confirmToServerOperation() {
+    //Check if the selected operation is Update
+    if (
+      this.selectedToServerOperation === FrontendToBackendOperationType.Update
+    ) {
+      this.updateCourseLesson();
+    }
+
+    if (
+      this.selectedToServerOperation === FrontendToBackendOperationType.Discard
+    ) {
+      this.discardChangesToTheCourseLesson();
+    }
+  }
+
+  //Method for sending a request to the server to update a data for the CourseLesson and CourseLessonContent
+  updateCourseLesson() {
+    console.log('Update lesson data');
+
+    const lessonCompletionTimeFormatted: string = this
+      .courseLessonModalFormGroup.controls.lessonCompletionTime.value as string;
+    const [hours, minutes] = lessonCompletionTimeFormatted
+      ?.split(':')
+      .map(Number);
+
+    const lessonCompletionTime: number = hours * 60 + minutes;
+    const updateRequest: CourseLessonUpdateRequest = {
+      courseLessonId: this.courseLessonId,
+      lessonTitle: this.courseLessonModalFormGroup.controls.courseLessonTitle
+        .value as string,
+      updateLessonTitle: this.updatedCourseLessonValues.courseLessonTitle,
+      lessonDescription: this.courseLessonModalFormGroup.controls
+        .courseLessonDescription.value as string,
+      updateLessonDescription:
+        this.updatedCourseLessonValues.courseLessonDescription,
+      lessonSequenceOrder:
+        this.courseLessonModalFormGroup.controls.lessonSequenceOrder.value ?? 0,
+      updateLessonSequenceOrder:
+        this.updatedCourseLessonValues.lessonSequenceOrder,
+      lessonPrerequisites: this.courseLessonModalFormGroup.controls
+        .lessonPrerequisites.value as string,
+      updateLessonPrerequisites:
+        this.updatedCourseLessonValues.lessonPrerequisites,
+      lessonObjective: this.courseLessonModalFormGroup.controls.lessonObjective
+        .value as string,
+      updateLessonObjective: this.updatedCourseLessonValues.lessonObjective,
+      lessonCompletionTimeInMinutes: lessonCompletionTime,
+      updateLessonCompletionTimeInMinutes:
+        this.updatedCourseLessonValues.lessonCompletionTime,
+      lessonTag: this.courseLessonModalFormGroup.controls.lessonTag
+        .value as string,
+      updateLessonTag: this.updatedCourseLessonValues.lessonTag,
+      lessonContentTitle: this.lessonContentFormGroup.controls
+        .lessonContentTitle.value as string,
+      updateLessonContentTitle:
+        this.updatedCourseLessonValues.lessonContentTitle,
+      lessonContentDescription: this.lessonContentFormGroup.controls
+        .lessonContentDescription.value as string,
+      updateLessonContentDescription:
+        this.updatedCourseLessonValues.lessonContentDescription,
+      lessonContentData: this.lessonContentFormGroup.controls.lessonContent
+        .value as string,
+      updateLessonContentData: this.updatedCourseLessonValues.lessonContent,
+    };
+
+    console.log('Update request: ', updateRequest);
+    this.courseCreateService
+      .updateCourseLessonByCourseLessonId(updateRequest)
+      .subscribe((response) => {
+        console.log(response);
+        this.isDataTransmissionActive = true;
+        this.isDataTransmissionComplete = false;
+        this.courseLessonToServerOperationMessage = 'Updating data...';
+
+        if (response.success === 'true') {
+          this.isDataTransmissionActive = false;
+          this.isDataTransmissionComplete = true;
+          this.courseLessonToServerOperationMessage =
+            'Data updated successfully!';
+          this.courseLessonToServerOperationMessageColor = 'green';
+        }
+        if (response.success !== 'true') {
+          this.isDataTransmissionActive = false;
+          this.isDataTransmissionComplete = true;
+          this.courseLessonToServerOperationMessage =
+            'Failed to update, ' + response.message;
+          this.courseLessonToServerOperationMessageColor = 'red';
+        }
+      });
+  }
+
+  discardChangesToTheCourseLesson() {
+    this.courseLessonModalFormGroup.setValue({
+      courseLessonTitle: this.originalCourseLesson?.lessonTitle as string,
+      courseLessonDescription: this.originalCourseLesson
+        ?.lessonDescription as string,
+      lessonSequenceOrder: this.originalCourseLesson
+        ?.lessonSequenceOrder as number,
+      lessonPrerequisites: this.originalCourseLesson
+        ?.lessonPrerequisites as string,
+      lessonObjective: this.originalCourseLesson?.lessonObjective as string,
+      lessonCompletionTime: this.getHoursAndMinutesFromMinutes(
+        this.originalCourseLesson?.lessonCompletionTimeInMinutes as number
+      ),
+      lessonTag: this.originalCourseLesson?.lessonTag as string,
+    });
+
+    this.lessonContentFormGroup.setValue({
+      lessonContentTitle: this.originalCourseLessonContent?.title as string,
+      lessonContentDescription: this.originalCourseLessonContent
+        ?.description as string,
+      lessonContent: this.originalCourseLessonContent?.contentData as string,
+    });
+
+    this.toggleDialog();
+  }
+  //Method for checking if any of the values have been updated
+  checkForUpdates() {
+    //Check if the lesson title has been updated
+    if (
+      this.originalCourseLesson?.lessonTitle !==
+      this.courseLessonModalFormGroup.controls.courseLessonTitle.value
+    ) {
+      this.updatedCourseLessonValues.courseLessonTitle = true;
+    }
+
+    //Check if the lesson description has been updated
+    if (
+      this.originalCourseLesson?.lessonDescription !==
+      this.courseLessonModalFormGroup.controls.courseLessonDescription.value
+    ) {
+      this.updatedCourseLessonValues.courseLessonDescription = true;
+    }
+
+    //Check if the lesson sequence order has been updated
+    if (
+      this.originalCourseLesson?.lessonSequenceOrder !==
+      this.courseLessonModalFormGroup.controls.lessonSequenceOrder.value
+    ) {
+      this.updatedCourseLessonValues.lessonSequenceOrder = true;
+    }
+
+    //Check if the lesson prerequisites has been updated
+    if (
+      this.originalCourseLesson?.lessonPrerequisites !==
+      this.courseLessonModalFormGroup.controls.lessonPrerequisites.value
+    ) {
+      this.updatedCourseLessonValues.lessonPrerequisites = true;
+    }
+
+    //Check if the lesson objective has been updated
+    if (
+      this.originalCourseLesson?.lessonObjective !==
+      this.courseLessonModalFormGroup.controls.lessonObjective.value
+    ) {
+      this.updatedCourseLessonValues.lessonObjective = true;
+    }
+    const lessonCompletionTimeFormatted: string = this
+      .courseLessonModalFormGroup.controls.lessonCompletionTime.value as string;
+    const [hours, minutes] = lessonCompletionTimeFormatted
+      ?.split(':')
+      .map(Number);
+
+    const lessonCompletionTime: number = hours * 60 + minutes;
+    //Check if the lesson duration has been updated
+    if (
+      this.originalCourseLesson?.lessonCompletionTimeInMinutes !==
+      lessonCompletionTime
+    ) {
+      this.updatedCourseLessonValues.lessonCompletionTime = true;
+    }
+
+    //Check if the lesson tag has been updated
+    if (
+      this.originalCourseLesson?.lessonTag !==
+      this.courseLessonModalFormGroup.controls.lessonTag.value
+    ) {
+      this.updatedCourseLessonValues.lessonTag = true;
+    }
+
+    //Check if the lesson content title has been updated
+    if (
+      this.originalCourseLessonContent?.title !==
+      this.lessonContentFormGroup.controls.lessonContentTitle.value
+    ) {
+      this.updatedCourseLessonValues.lessonContentTitle = true;
+    }
+
+    //Check if the lesson content description has been updated
+    if (
+      this.originalCourseLessonContent?.description !==
+      this.lessonContentFormGroup.controls.lessonContentDescription.value
+    ) {
+      this.updatedCourseLessonValues.lessonContentDescription = true;
+    }
+
+    //Check if the lesson content has been updated
+    if (
+      this.originalCourseLessonContent?.contentData !==
+      this.lessonContentFormGroup.controls.lessonContent.value
+    ) {
+      this.updatedCourseLessonValues.lessonContent = true;
+    }
+
+    console.log('Updated course lesson values', this.updatedCourseLessonValues);
+
+    const updatedValue = Object.values(this.updatedCourseLessonValues).some(
+      (value) => value === true
+    );
+    console.log('Were any values updated?', updatedValue);
+    for (let key in this.updatedCourseLessonValues) {
+      console.log(key, this.updatedCourseLessonValues[key]);
+      if (this.updatedCourseLessonValues[key] === true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  closeDialog() {
+    this.isDataTransmissionActive = false;
+    this.isDataTransmissionComplete = false;
+    this.courseLessonToServerOperationMessage = '';
+    this.courseLessonToServerOperationMessageColor = '';
+    this.toggleDialog();
+  }
+  closeAllDialogs() {
+    this.isDataTransmissionActive = false;
+    this.isDataTransmissionComplete = false;
+    this.courseLessonToServerOperationMessage = '';
+    this.courseLessonToServerOperationMessageColor = '';
+    this.toggleDialog();
+    this.toggleCloseModal();
+  }
+
+  openDeleteDialog() {
+    console.log('Values for the delete dialog', this.originalCourseLesson);
+    this.courseLessonDeleteDialogValues = {
+      courseLessonId: this.courseLessonId,
+      courseId: this.courseId,
+      lessonTitle: this.originalCourseLesson?.lessonTitle ?? '',
+      lessonTag: this.originalCourseLesson?.lessonTag ?? '',
+      lessonSequenceOrder: this.originalCourseLesson?.lessonSequenceOrder ?? 0,
+      courseLessonSupplementaryMaterialCount:
+        this.courseLessonSupplementaryMaterials.length,
+      courseLessonSupplementaryMaterialTotalSize: 0,
+      createdAt: this.originalCourseLesson?.createdAt as string,
+    };
+
+    console.log(
+      'Assigned values for the delete dialog',
+      this.courseLessonDeleteDialogValues
+    );
+
+    console.log(
+      'Delete dialog created at',
+      this.originalCourseLesson?.createdAt
+    );
+    this.showDeleteDialog = !this.showDeleteDialog;
+  }
+
+  closeDeleteDialog() {
+    this.showDeleteDialog = false;
+  }
+
+  closeDeleteDialogAndCloseModalWithCourseLessonListRefresh() {
+    this.showDeleteDialog = false;
+    this.toggleCloseModal();
+    this.closeDeleteDialogAndModalAndRefreshCourseList.emit();
+  }
+
+  toggleFilePreview() {
+    console.log('File preview toggled');
+    if (!this.fileToUploadUrl) {
+      this.fileToUploadUrl = '';
+      this.showFilePreview = false;
+      return;
+    }
+    this.showFilePreview = !this.showFilePreview;
+    if (this.showFilePreview) {
+      console.log('File preview shown with file url', this.fileToUploadUrl);
+    }
   }
 }
