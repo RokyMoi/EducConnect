@@ -6,13 +6,13 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { CreateCourseBasicInformation } from '../../_models/course/create-course/create-course.create-course.course.model';
+import { CreateCourseBasicInformation } from '../../models/course/create-course/create-course.create-course.course.model';
 import { AccountService } from '../account.service';
-import { CreateCourseHttpRequestBody } from '../../_models/course/create-course/create-course.http-request-body';
+import { CreateCourseHttpRequestBody } from '../../models/course/create-course/create-course.http-request-body';
 import ApiLinks from '../../../assets/api/link.api';
 import { catchError, map, of, tap } from 'rxjs';
 import { EventType } from '@angular/router';
-import { CourseLessonUpdateRequest } from '../../_models/course/course-lesson/course-lesson-update-request.model';
+import { CourseLessonUpdateRequest } from '../../models/course/course-lesson/course-lesson-update-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -771,34 +771,33 @@ export class CourseCreateService {
   ) {
     const authorization = this.accountService.getAccessToken();
 
-    return this.http.patch(
-      ApiLinks.updateCourseLessonAndCourseLessonContent,
-      courseLessonUpdateRequest,
-      {
-        headers: {
-          Authorization: `Bearer ${authorization}`,
-        },
-      }
-    ).pipe(
-      map((response) => { 
-        return {
-          success: (response as any).success,
+    return this.http
+      .patch(
+        ApiLinks.updateCourseLessonAndCourseLessonContent,
+        courseLessonUpdateRequest,
+        {
+          headers: {
+            Authorization: `Bearer ${authorization}`,
+          },
+        }
+      )
+      .pipe(
+        map((response) => {
+          return {
+            success: (response as any).success,
             data: (response as any).data,
             message: (response as any).message,
             statusCode: (response as any).statusCode,
-        }
-      }),
-      catchError(
-        (error) => { 
+          };
+        }),
+        catchError((error) => {
           return of({
             success: (error as any).error.success,
             data: (error as any).error.data,
             message: (error as any).error.message,
             statusCode: (error as any).status,
-          })
-        }
-      )
-    )
-      ;
+          });
+        })
+      );
   }
 }

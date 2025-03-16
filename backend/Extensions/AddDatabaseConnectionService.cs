@@ -32,6 +32,8 @@ namespace EduConnect.Extensions
             optionsBuilder.UseSqlServer(connectionString);
             Console.WriteLine(connectionString);
 
+
+
             using (var context = new DataContext(optionsBuilder.Options))
             {
                 try
@@ -51,6 +53,7 @@ namespace EduConnect.Extensions
 
                     Console.WriteLine($"Error connecting to the database: {ex.Message}");
                     Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                    Console.WriteLine(ex.ToString());
                     throw; // Re-throw the exception to ensure visibility during startup.
                 }
             }

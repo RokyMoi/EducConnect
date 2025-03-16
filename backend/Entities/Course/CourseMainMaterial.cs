@@ -25,9 +25,9 @@ namespace EduConnect.Entities.Course
 
         public byte[] Data { get; set; }
 
-        public long DateTimePointOfFileCreation { get; set; }
+        public DateTime DateTimePointOfFileCreation { get; set; }
 
-        public long CreatedAt { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+        public long CreatedAt { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
         public long? UpdatedAt { get; set; } = null;
 

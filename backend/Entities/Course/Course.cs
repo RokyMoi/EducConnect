@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using backend.Entities.Reference;
+using backend.Entities.Reference.Language;
+using backend.Entities.Reference.Learning;
 using EduConnect.Entities.Reference;
 
 namespace EduConnect.Entities.Course
@@ -9,31 +11,52 @@ namespace EduConnect.Entities.Course
     public class Course
     {
 
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public required Guid CourseId { get; set; }
-        public required Guid TutorId { get; set; }
+        public Guid CourseId { get; set; } = Guid.NewGuid();
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public Guid CourseCategoryId { get; set; }
 
-        //Navigation property
-        [ForeignKey("TutorId")]
-        public Tutor.Tutor? Tutor { get; set; }
+        [ForeignKey(nameof(CourseCategoryId))]
+        public CourseCategory? CourseCategory { get; set; } = null;
 
-        public required string CourseName { get; set; }
+        public Guid LanguageId { get; set; }
 
-        public required string CourseSubject { get; set; }
+        [ForeignKey(nameof(LanguageId))]
+        public Language? Language { get; set; } = null;
 
+        public Guid TutorId { get; set; }
 
-        public required bool IsDraft { get; set; }
-
-        public required Guid CourseCreationCompletenessStepId { get; set; }
-
-        [ForeignKey("CourseCreationCompletenessStepId")]
-        public CourseCreationCompletenessStep? CourseCreationCompletenessStep { get; set; } = null;
+        [ForeignKey(nameof(TutorId))]
+        public Tutor.Tutor? Tutor { get; set; } = null;
 
 
-        public required long CreatedAt { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+        public int LearningDifficultyLevelId { get; set; }
+
+        [ForeignKey(nameof(LearningDifficultyLevelId))]
+        public LearningDifficultyLevel? LearningDifficultyLevel { get; set; } = null;
+
+        public long EstimatedDurationMinutes { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Price { get; set; } = 0;
+
+        public int? MinNumberOfStudents { get; set; } = null;
+
+        public int? MaxNumberOfStudents { get; set; } = null;
+
+        //Flag value which indicates the status of the course
+        //True - published
+        //False - draft
+        //Null - archived
+
+        public bool? PublishedStatus { get; set; } = false;
+        public List<string> Tags { get; set; } = new List<string>();
+
+
+        public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         public long? UpdatedAt { get; set; } = null;
+
 
 
 

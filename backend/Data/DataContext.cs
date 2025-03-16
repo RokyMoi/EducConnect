@@ -11,11 +11,19 @@ using EduConnect.Entities.Course;
 using backend.Entities.Reference.Learning;
 using backend.Entities.Reference.Language;
 using backend.Entities.Course;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace EduConnect.Data;
 
-public class DataContext(DbContextOptions options) : DbContext(options)
+public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
+
+
 {
+    public DataContext(DbContextOptions<DataContext> options) : base(options)
+    {
+
+    }
 
     public DbSet<Person> Person { get; set; }
     public DbSet<PersonDetails> PersonDetails { get; set; }
@@ -26,6 +34,8 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<PersonVerificationCode> PersonVerificationCode { get; set; }
 
     public DbSet<PersonPhoneNumber> PersonPhoneNumber { get; set; }
+
+    public DbSet<AuthenticationToken> AuthenticationToken { get; set; }
     public DbSet<Tutor> Tutor { get; set; }
 
     public DbSet<TutorRegistrationStatus> TutorRegistrationStatus { get; set; }
@@ -57,34 +67,48 @@ public class DataContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<Course> Course { get; set; }
 
-    public DbSet<CourseDetails> CourseDetails { get; set; }
+
 
 
     public DbSet<LearningDifficultyLevel> LearningDifficultyLevel { get; set; }
 
     public DbSet<Language> Language { get; set; }
 
-    public DbSet<CourseType> CourseType { get; set; }
 
-    public DbSet<CourseLanguage> CourseLanguage { get; set; }
 
-    public DbSet<CourseCreationCompletenessStep> CourseCreationCompletenessStep { get; set; }
 
-    public DbSet<CourseMainMaterial> CourseMainMaterial { get; set; }
+    public DbSet<CourseCategory> CourseCategory { get; set; }
 
-    public DbSet<CourseLesson> CourseLesson { get; set; }
-
-    public DbSet<CourseLessonSupplementaryMaterial> CourseLessonSupplementaryMaterial { get; set; }
-
-    public DbSet<CourseLessonContent> CourseLessonContent { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.Entity<CourseLanguage>()
-            .HasKey(cl => new { cl.CourseId, cl.LanguageId });
+        base.OnModelCreating(builder);
+
+        builder.Entity<Person>().ToTable("Person", "Person");
+
+        builder.Entity<Person>(
+            b =>
+            {
+                b.ToTable("Person", "Person");
+                b.HasKey(x => x.PersonId);
+                b.Property(x => x.PersonId).HasColumnName("PersonId");
+                b.Property(x => x.CreatedAt).HasColumnName("CreatedAt");
+            }
+        );
+
+        builder.Entity<Person>().Ignore(x => x.Id)
+        .Ignore(x => x.PasswordHash)
+        .Ignore(x => x.Email)
+        .Ignore(x => x.PhoneNumber)
+        .Ignore(x => x.UserName);
 
 
+
+        builder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLoginLog");
+
+        builder.Entity<IdentityUserRole<Guid>>().ToTable("UserRoles");
     }
+
+
 
 
 

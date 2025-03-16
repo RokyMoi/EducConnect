@@ -383,37 +383,37 @@ namespace backend.Controllers.Reference
             );
         }
 
-        [HttpGet("course-type/all")]
-        public async Task<IActionResult> GetAllCourseTypes()
-        {
-            var courseTypes = await _referenceRepository.GetAllCourseTypesAsync();
+        // [HttpGet("course-type/all")]
+        // public async Task<IActionResult> GetAllCourseTypes()
+        // {
+        //     var courseTypes = await _referenceRepository.GetAllCourseTypesAsync();
 
-            if (courseTypes == null)
-            {
-                return NotFound(
-                    new
-                    {
-                        success = "false",
-                        message = "No course types found",
-                        data = new { },
-                        timestamp = DateTime.Now
-                    }
-                );
-            }
-            return Ok(
-                new
-                {
-                    success = "true",
-                    message = $"Found {courseTypes.Count} course types",
-                    data = new
-                    {
-                        courseType = courseTypes
-                    },
-                    timestamp = DateTime.Now,
-                }
-            );
+        //     if (courseTypes == null)
+        //     {
+        //         return NotFound(
+        //             new
+        //             {
+        //                 success = "false",
+        //                 message = "No course types found",
+        //                 data = new { },
+        //                 timestamp = DateTime.Now
+        //             }
+        //         );
+        //     }
+        //     return Ok(
+        //         new
+        //         {
+        //             success = "true",
+        //             message = $"Found {courseTypes.Count} course types",
+        //             data = new
+        //             {
+        //                 courseType = courseTypes
+        //             },
+        //             timestamp = DateTime.Now,
+        //         }
+        //     );
 
-        }
+        // }
 
         [HttpGet("language/all")]
         public async Task<IActionResult> GetAllLanguages()

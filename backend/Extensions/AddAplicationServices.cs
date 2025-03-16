@@ -1,19 +1,27 @@
 ﻿
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using backend.Data.DataSeeder;
 using backend.Extensions;
-using backend.Interfaces.Course;
+// using backend.Interfaces.Course;
 using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
 using backend.Interfaces.Tutor;
 using backend.Middleware;
 using backend.Middleware.Tutor;
-using backend.Repositories.Course;
+// using backend.Repositories.Course;
 using backend.Repositories.Person;
 using backend.Repositories.Reference;
 using backend.Repositories.Tutor;
 using backend.Services;
+using EduConnect.Entities.Person;
 using EduConnect.Interfaces;
 using EduConnect.Services;
+using Microsoft.AspNetCore.Identity;
+using EduConnect.Data;
+using EduConnect.Utilities;
 
 namespace EduConnect.Extensions
 {
@@ -39,7 +47,7 @@ namespace EduConnect.Extensions
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
-            services.AddScoped<ICourseRepository, CourseRepository>();
+            // services.AddScoped<ICourseRepository, CourseRepository>();
 
             //Add Database Seeders as Scoped services
             services.AddScoped<CountryExtractor>();
@@ -56,7 +64,7 @@ namespace EduConnect.Extensions
             services.AddScoped<TutorTeachingStyleTypeDatabaseSeeder>();
             services.AddScoped<LearningDifficultyLevelDatabaseSeeder>();
             services.AddScoped<LanguageDatabaseSeeder>();
-            services.AddScoped<CourseTypeDatabaseSeeder>();
+            // services.AddScoped<CourseTypeDatabaseSeeder>();
 
             //Add Middleware 
             services.AddScoped<CheckTutorRegistrationAttribute>();
@@ -66,7 +74,24 @@ namespace EduConnect.Extensions
             services.AddHostedService<IndustryClassificationHostedService>();
             services.AddHostedService<LearningCategoryAndSubcategoryHostedService>();
 
+            services.AddIdentity<Person, IdentityRole<Guid>>(
+                options =>
+                {
+                    options.Password.RequireDigit = false;
+                    options.Password.RequiredLength = 0;
+                    options.Password.RequiredUniqueChars = 0;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+                    options.User.RequireUniqueEmail = false;
 
+                }
+            )
+            .AddEntityFrameworkStores<DataContext>()
+            .AddDefaultTokenProviders()
+            .AddRoles<IdentityRole<Guid>>();
+
+            services.AddScoped<UserManager<Person>, PersonManager>();
 
 
 

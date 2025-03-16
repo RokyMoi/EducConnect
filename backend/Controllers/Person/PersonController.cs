@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,9 +15,13 @@ using backend.Middleware;
 using backend.Repositories.Person;
 using EduConnect.Data;
 using EduConnect.DTOs;
+using EduConnect.Entities;
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
 using EduConnect.Interfaces;
+using EduConnect.Middleware;
+using EduConnect.Utilities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,112 +29,85 @@ namespace backend.Controllers.Person
 {
     [ApiController]
     [Route("person")]
-    public class PersonController(DataContext db, ITokenService _tokenService, IStudentRepository _studentRepo, IPersonRepository _personRepository, ITutorRepository _tutorRepository, IPersonAvailabilityRepository _personAvailability, IPersonCareerInformationRepository _personCareerInformationRepository, IPersonEducationInformationRepository _personEducationInformationRepository) : ControllerBase
+    public class PersonController(DataContext db, ITokenService _tokenService, IStudentRepository _studentRepo, IPersonRepository _personRepository, ITutorRepository _tutorRepository, IPersonAvailabilityRepository _personAvailability, IPersonCareerInformationRepository _personCareerInformationRepository, IPersonEducationInformationRepository _personEducationInformationRepository, UserManager<EduConnect.Entities.Person.Person> _userManager, IHttpContextAccessor _httpContextAccessor) : ControllerBase
     {
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDTO login)
+        public async Task<IActionResult> Login(UserLoginRequest login)
         {
 
+            Console.WriteLine("Login user with username or email: " + login.UsernameOrEmail);
+            Console.WriteLine("Login user with password: " + login.Password);
 
-            // Retrieve the person's email
-            var personEmail = await db.PersonEmail.Include(x => x.Person).Where(x => x.Email == login.Email)
-                .FirstOrDefaultAsync();
+            var person = await _personRepository.GetPersonByEmailOrUsername(login.UsernameOrEmail);
 
-            if (personEmail == null)
+
+            if (person == null)
             {
-                return NotFound(new
-                {
-                    success = "false",
-                    message = "User not found",
-                    data = new { },
-                    timestamp = DateTime.Now,
-
-                });
-            }
-
-
-
-            // Retrieve the corresponding person and password details
-            var personPassword = await db.PersonPassword
-    .FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
-
-            if (personPassword == null)
-            {
-                return BadRequest(
-                    new
-                    {
-                        success = "false",
-                        message = "Username or password invalid",
-                        data = new { },
-                        timestamp = DateTime.Now,
-                    }
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "User not found",
+                        new { }
+                    )
                 );
             }
 
-            // Hash the provided password using the same salt as the stored hash
-            using var hmac = new HMACSHA512(personPassword.Salt);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(login.Password));
+            var personPassword = await _personRepository.GetPersonPasswordByPersonId(person.PersonId);
 
-            // Compare the computed hash with the stored hash
-            for (int i = 0; i < computedHash.Length; i++)
+            if (personPassword == null)
             {
-                if (computedHash[i] != personPassword.Hash[i])
-                {
-                    return BadRequest(new
+                return StatusCode(500,
+                ApiResponse<object>.GetApiResponse(
+                        "We could not log you in, please try again later",
+                        new { }
+                ));
+            }
+            var passwordComparisonResult = EncryptionUtilities.VerifyHashedPassword(personPassword.PasswordHash, login.Password);
+
+            Console.WriteLine("Password comparison result: " + passwordComparisonResult);
+
+            if (!passwordComparisonResult)
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Password is incorrect",
+                        new
+                        {
+                            personPassword.PasswordHash
+                        }
+                    )
+                );
+
+            }
+
+            var roles = await _personRepository.GetRolesByPersonId(person.PersonId);
+
+            Console.WriteLine("Roles for person: " + login.UsernameOrEmail + " - " + roles == null);
+            foreach (var role in roles)
+            {
+                Console.WriteLine("Role for person: " + login.UsernameOrEmail + " - Role name: " + role.Name + " - Role id: " + role.Id);
+            }
+            if (await _tokenService.CheckIfExistsByPersonId(person.PersonId))
+            {
+                await _tokenService.RevokeTokenByPersonId(person.PersonId);
+
+            }
+
+            var token = await _tokenService.CreateTokenAsync(person);
+
+            Response.Headers.Append("Authorization", "Bearer " + token.Token);
+
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "You have logged in successfully",
+                    new
                     {
-                        success = "false",
-                        message = "Username or password invalid",
-                        data = new { },
-                        timestamp = DateTime.Now,
-                    });
-                }
-            }
-            string role = "";
-            // Check if the user is a Student or Tutor by looking up the appropriate tables
-            var student = await db.Student.FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
-            var tutor = await db.Tutor.FirstOrDefaultAsync(x => x.PersonId == personEmail.PersonId);
-
-            if (student != null)
-            {
-                role = "student";  // User is a student
-            }
-            else if (tutor != null)
-            {
-                role = "tutor";  // User is a tutor
-            }
-            else
-            {
-                return Unauthorized(new
-                {
-                    success = "error",
-                    message = "Role undefined",
-                    data = new { },
-                    timestamp = DateTime.Now,
-                });
-            }
+                        role = roles.FirstOrDefault().Name,
+                    }
+                )
+            );
 
 
-            var token = await _tokenService.CreateTokenAsync(personEmail);
-
-
-            //Add the token to the response authorization header
-            HttpContext.Response.Headers.Authorization = $"Bearer {token}";
-            return
-            Ok(
-                new
-                {
-                    success = "true",
-                    message = "Login succesfull",
-                    data = new
-
-            UserDTO
-                    {
-                        Email = personEmail.Email,
-                        Token = token,
-                        Role = role,
-                    },
-                    timestamp = DateTime.Now,
-                });
 
         }
 
@@ -489,6 +467,279 @@ namespace backend.Controllers.Person
 
 
         }
+
+        [HttpGet("authenticate")]
+        public async Task<IActionResult> Authenticate()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                return BadRequest("Missing HttpContext");
+            }
+
+            var token = httpContext.Request.Headers.Authorization.ToString().Replace("Bearer", "").Trim();
+
+            Console.WriteLine("Request token: ");
+            Console.WriteLine(token);
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Missing token");
+            }
+
+            var validationResult = await _tokenService.ValidateToken(token);
+
+            if (!validationResult)
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var userPublicIdFromClaims = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(
+                            x => x.Type == ClaimTypes.NameIdentifier
+                        )?.Value;
+            var publicUserId = Guid.Parse(userPublicIdFromClaims);
+            var user = await _personRepository.GetPersonByPublicPersonId(publicUserId);
+
+            var roles = await _personRepository.GetRolesByPersonId(user.PersonId);
+
+            var roleNames = roles.Select(role => role.Name).ToList();
+
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "User is already logged in",
+                    new
+                    {
+                        role = roleNames.FirstOrDefault().ToLower(),
+                    }
+                )
+            );
+        }
+        [HttpPost("role")]
+        [AuthenticationGuard(isTutor: true, isAdmin: true, isStudent: true)]
+        public async Task<IActionResult> CheckUserRole([FromBody] CheckUserRoleRequest request)
+        {
+            if (string.IsNullOrEmpty(request.RequiredRole.Trim()))
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Role must be provided",
+                        null
+                    )
+                );
+            }
+
+            var userPublicIdFromClaims = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(
+                            x => x.Type == ClaimTypes.NameIdentifier
+                        )?.Value;
+
+            Console.WriteLine($"User public Id: {userPublicIdFromClaims}");
+
+            Guid userPublicId = Guid.Empty;
+            if (string.IsNullOrEmpty(userPublicIdFromClaims) || !Guid.TryParse(userPublicIdFromClaims, out userPublicId))
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Missing user public id",
+                        new { })
+                );
+            }
+
+            Console.WriteLine($"Parse User Public Id: {userPublicId}");
+            var publicUserId = userPublicId;
+            var user = await _personRepository.GetPersonByPublicPersonId(userPublicId);
+
+            if (user == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "User not found",
+                        new { })
+                );
+
+            }
+
+            var roles = await _personRepository.GetRolesByPersonId(user.PersonId);
+
+            if (!roles.Any(x => x.NormalizedName.Equals(request.RequiredRole, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "You do not have the required role",
+                        new { })
+
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "You have the required role",
+                    new
+                    {
+
+                    })
+            );
+
+
+        }
+
+        [HttpGet("protected/student")]
+        [AuthenticationGuard(isTutor: false, isAdmin: false, isStudent: true)]
+        public async Task<IActionResult> StudentProtectedRoute()
+        {
+
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "This is a protected route for students",
+                    null
+                )
+            );
+
+        }
+
+        [HttpGet("protected/tutor")]
+        [AuthenticationGuard(isTutor: true, isAdmin: false, isStudent: false)]
+        public async Task<IActionResult> TutorProtectedRoute()
+        {
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "This is a protected route for tutors",
+                    null
+                )
+            );
+
+        }
+
+        [HttpGet("protected/admin")]
+        [AuthenticationGuard(isTutor: false, isAdmin: true, isStudent: false)]
+        public async Task<IActionResult> AdminProtectedRoute()
+        {
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "This is a protected route for tutors",
+                    null
+                )
+            );
+
+        }
+
+        [HttpDelete("logout")]
+        [AuthenticationGuard(isTutor: true, isAdmin: true, isStudent: true)]
+        public async Task<IActionResult> Logout()
+        {
+            var userPublicIdFromClaims = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(
+                x => x.Type == ClaimTypes.NameIdentifier
+            )?.Value;
+
+            Console.WriteLine($"User public Id: {userPublicIdFromClaims}");
+
+            Guid userPublicId = Guid.Empty;
+            if (string.IsNullOrEmpty(userPublicIdFromClaims) || !Guid.TryParse(userPublicIdFromClaims, out userPublicId))
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Missing user public id",
+                        new { })
+                );
+            }
+
+            Console.WriteLine($"Parse User Public Id: {userPublicId}");
+            var publicUserId = userPublicId;
+            var user = await _personRepository.GetPersonByPublicPersonId(userPublicId);
+
+            if (user == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "User not found",
+                        new { })
+                );
+            }
+
+
+            var deleteResult = await _tokenService.RevokeTokenByPersonId(user.PersonId);
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "Failed to log out",
+                        new { })
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Logout successful",
+                    new { })
+            );
+
+        }
+
+        [HttpGet("dashboard/info/user")]
+        [AuthenticationGuard(isTutor: true, isAdmin: true, isStudent: true)]
+        public async Task<IActionResult> GetDashboardUserInfo()
+        {
+            var userPublicIdFromClaims = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(
+                x => x.Type == ClaimTypes.NameIdentifier
+            )?.Value;
+
+            Console.WriteLine($"User public Id: {userPublicIdFromClaims}");
+
+            Guid userPublicId = Guid.Empty;
+            if (string.IsNullOrEmpty(userPublicIdFromClaims) || !Guid.TryParse(userPublicIdFromClaims, out userPublicId))
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Missing user public id",
+                        new { })
+                );
+            }
+
+            Console.WriteLine($"Parse User Public Id: {userPublicId}");
+            var publicUserId = userPublicId;
+            var user = await _personRepository.GetPersonByPublicPersonId(userPublicId);
+
+            if (user == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "User not found",
+                        new { })
+                );
+            }
+
+            var personInfo = await _personRepository.GetDashboardPersonInfo(user.PersonId);
+
+            if (personInfo == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Data for user not found",
+                        new { })
+                );
+
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "User info",
+                    personInfo
+                )
+            );
+
+
+
+
+
+
+        }
+
 
 
     }

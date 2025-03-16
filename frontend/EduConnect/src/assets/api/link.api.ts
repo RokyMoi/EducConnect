@@ -158,4 +158,7 @@ export default class ApiLinks {
     ApiLinks.baseUrl + 'course/lesson';
   public static readonly updateCourseLessonAndCourseLessonContent =
     ApiLinks.baseUrl + 'course/lesson';
+
+  //PersonController base link
+  public static readonly PersonControllerUrl = `${this.baseUrl}person`;
 }

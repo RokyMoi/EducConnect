@@ -1,10 +1,13 @@
-﻿
+﻿using backend.Interfaces.Person;
+using backend.Interfaces.Reference;
 using EduConnect.Data;
 using EduConnect.DTOs;
-
+using EduConnect.Entities;
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
 using EduConnect.Interfaces;
+using EduConnect.Utilities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -13,7 +16,7 @@ using System.Text;
 
 namespace EduConnect.Controllers
 {
-    public class StudentController(DataContext db, ITokenService _tokenService, IStudentRepository _studentRepo) : MainController
+    public class StudentController(DataContext db, ITokenService _tokenService, IStudentRepository _studentRepo, PersonManager personManager, IPersonRepository _personRepository, IReferenceRepository _referenceRepository) : MainController
     {
         [HttpGet("all-students")]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudents()
@@ -85,92 +88,143 @@ namespace EduConnect.Controllers
         }
 
         [HttpPost("student-register")]
-        public async Task<ActionResult<UserDTO>> RegisterTutor(RegisterStudentDTO student)
+        public async Task<ActionResult<UserDTO>> RegisterStudent(RegisterStudentDTO request)
         {
-            if (await isRegistered(student))
+            //Check if the email is taken
+            var emailExists = await _personRepository.EmailExists(request.Email);
+
+            if (emailExists)
             {
-                return BadRequest("That email was already taken");
+                return Conflict(
+                    ApiResponse<object>.GetApiResponse(
+                        "Email address is already taken",
+                        new { }
+                    )
+                );
             }
-            var Person = new Person
+
+
+
+            var countryOfOrigin = await _referenceRepository.GetCountryByName(request.CountryOfOrigin);
+
+            if (countryOfOrigin == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Country of origin not found",
+                        new { }
+                    )
+                );
+            }
+
+            var countryOfPhoneNumber = await _referenceRepository.GetCountryByNationalCallingCode(request.PhoneNumberCountryCode);
+
+            if (countryOfPhoneNumber == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "National calling code does not match any country",
+                        new { }
+                    )
+                );
+            }
+
+
+
+            var hashedPassword = EncryptionUtilities.HashPassword(request.Password);
+
+            var Person = new EduConnect.Entities.Person.Person
             {
                 PersonId = Guid.NewGuid(),
-                IsActive = true,
-                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                ModifiedAt = null
-            };
-
-            var PersonDetails = new PersonDetails
-            {
-                PersonDetailsId = Guid.NewGuid(),
-                PersonId = Person.PersonId,
-                FirstName = student.FirstName,
-                LastName = student.LastName,
-                Username = student.Username,
-                CountryOfOriginCountryId = Guid.Parse(student.CountryOfOrigin),
+                PersonPublicId = Guid.NewGuid(),
+                IsActive = false,
+                UserName = request.Username,
+                SecurityStamp = Guid.NewGuid().ToString(),
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
 
-
-
             };
-            var PersonEmail = new PersonEmail
+
+            var PersonEmail = new EduConnect.Entities.Person.PersonEmail
             {
                 PersonEmailId = Guid.NewGuid(),
+                Email = request.Email,
                 PersonId = Person.PersonId,
-                Email = student.Email,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
-
-
             };
-            using var hmac = new HMACSHA512();
-            var vhashi = hmac.ComputeHash(Encoding.UTF8.GetBytes(student.Password));
-            var PersonPassword = new PersonPassword
+
+            var PersonPassword = new EduConnect.Entities.Person.PersonPassword
             {
                 PersonPasswordId = Guid.NewGuid(),
                 PersonId = Person.PersonId,
-                Hash = vhashi,
-                Salt = hmac.Key,
+                PasswordHash = hashedPassword,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
 
-            var NumberofR = 10000;
-            var PersonSalt = new PersonSalt
+            var personDetails = new EduConnect.Entities.Person.PersonDetails
             {
-                PersonSaltId = Guid.NewGuid(),
+                PersonDetailsId = Guid.NewGuid(),
                 PersonId = Person.PersonId,
-                NumberOfRounds = NumberofR,
-                Salt = GenerateSalt(),
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Username = request.Username,
+                CountryOfOriginCountryId = countryOfOrigin.CountryId,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
 
-            var studentt = new Student
+            var personPhoneNumber = new backend.Entities.Person.PersonPhoneNumber
             {
+                PersonPhoneNumberId = Guid.NewGuid(),
                 PersonId = Person.PersonId,
-                StudentId = Guid.NewGuid(),
+                PhoneNumber = request.PhoneNumber,
+                NationalCallingCodeCountryId = countryOfPhoneNumber.CountryId,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                ModifiedAt = null
+                UpdatedAt = null
+
             };
-            await Task.Run(async () =>
+
+            var createPersonResult = await _personRepository.CreatePerson(Person);
+
+            if (!createPersonResult)
             {
-                db.Person.Add(Person);
-                db.PersonEmail.Add(PersonEmail);
-                db.PersonDetails.Add(PersonDetails);
-                db.PersonPassword.Add(PersonPassword);
-                db.PersonSalt.Add(PersonSalt);
-                db.Student.Add(studentt);
+                return StatusCode(500, ApiResponse<object>.GetApiResponse("Failed to register you, please try again later", new { }));
+            }
+
+            var createPersonEmailResult = await _personRepository.CreatePersonEmail(PersonEmail);
+            var createPersonPasswordResult = await _personRepository.CreatePersonPassword(PersonPassword);
+
+            var createPersonDetailsResult = await _personRepository.CreatePersonDetails(personDetails);
+            var createPersonPhoneNumberResult = await _personRepository.CreatePersonPhoneNumber(personPhoneNumber);
 
 
-                await db.SaveChangesAsync();
-            });
-            return new UserDTO
+            if (!createPersonEmailResult || !createPersonPasswordResult || !createPersonDetailsResult || !createPersonPhoneNumberResult)
             {
-                Email = PersonEmail.Email,
-                Token = await _tokenService.CreateTokenAsync(PersonEmail),
-                Role = "student"
-            };
+                return StatusCode(500, ApiResponse<object>.GetApiResponse("Failed to register you, please try again later", new { }));
+            }
+
+            var roleAddResult = await personManager.AddToRoleAsync(Person, "Student");
+
+            Console.WriteLine("Was user added to the Student role: " + roleAddResult.Succeeded);
+
+            foreach (var role in roleAddResult.Errors)
+            {
+                Console.WriteLine(role.Code);
+                Console.WriteLine(role.Description);
+            }
+
+            var token = await _tokenService.CreateTokenAsync(Person);
+
+
+            Response.Headers.Append("Authorization", "Bearer " + token.Token);
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "You have registered successfully as a student",
+                    new { }
+                )
+            );
         }
         private string GenerateSalt()
         {
