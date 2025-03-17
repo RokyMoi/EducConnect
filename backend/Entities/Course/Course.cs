@@ -19,10 +19,6 @@ namespace EduConnect.Entities.Course
         [ForeignKey(nameof(CourseCategoryId))]
         public CourseCategory? CourseCategory { get; set; } = null;
 
-        public Guid LanguageId { get; set; }
-
-        [ForeignKey(nameof(LanguageId))]
-        public Language? Language { get; set; } = null;
 
         public Guid TutorId { get; set; }
 
@@ -35,7 +31,6 @@ namespace EduConnect.Entities.Course
         [ForeignKey(nameof(LearningDifficultyLevelId))]
         public LearningDifficultyLevel? LearningDifficultyLevel { get; set; } = null;
 
-        public long EstimatedDurationMinutes { get; set; } = 0;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; } = 0;
@@ -50,7 +45,6 @@ namespace EduConnect.Entities.Course
         //Null - archived
 
         public bool? PublishedStatus { get; set; } = false;
-        public List<string> Tags { get; set; } = new List<string>();
 
 
         public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();

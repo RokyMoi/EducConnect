@@ -111,6 +111,20 @@ namespace backend.Controllers.Tutor
                 Console.WriteLine(role.Description);
             }
 
+            var tutor = new EduConnect.Entities.Tutor.Tutor
+            {
+                TutorId = Guid.NewGuid(),
+                PersonId = Person.PersonId,
+                TutorRegistrationStatusId = 1,
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                ModifiedAt = null
+
+            };
+
+            var createTutorResult = await _tutorRepository.CreateTutor(tutor);
+
+            
+
             var token = await _tokenService.CreateTokenAsync(Person);
 
 

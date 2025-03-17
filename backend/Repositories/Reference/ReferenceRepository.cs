@@ -14,6 +14,7 @@ using backend.Entities.Reference.Language;
 using backend.Entities.Reference.Learning;
 using backend.Interfaces.Reference;
 using EduConnect.Data;
+using EduConnect.Entities.Course;
 using EduConnect.Entities.Reference;
 using EduConnect.Entities.Tutor;
 using Microsoft.EntityFrameworkCore;
@@ -99,6 +100,11 @@ namespace backend.Repositories.Reference
         public async Task<List<CommunicationType>> GetAllCommunicationTypesAsync()
         {
             return await _dataContext.CommunicationType.ToListAsync();
+        }
+
+        public async Task<List<CourseCategory>> GetAllCourseCategories()
+        {
+            return await _dataContext.CourseCategory.ToListAsync();
         }
 
         // public Task<List<CourseType>> GetAllCourseTypesAsync()
@@ -278,6 +284,13 @@ namespace backend.Repositories.Reference
         public async Task<WorkType?> GetWorkTypeByIdAsync(int id)
         {
             return await _dataContext.WorkType.Where(w => w.WorkTypeId == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> LearningDifficultyLevelExistsById(int levelId)
+        {
+            return await _dataContext.LearningDifficultyLevel.Where(
+                x => x.LearningDifficultyLevelId == levelId
+            ).AnyAsync();
         }
     }
 }

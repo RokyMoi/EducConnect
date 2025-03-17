@@ -1,0 +1,71 @@
+<div class="container">
+    <div *ngIf="isResponseMessageVisible" class="response-message-container">
+        <p [style.color]="responseMessageColor">
+            {{responseMessage}}
+        </p>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Index</th>
+                <th (click)="sortByColumn('dayOfWeek')">Day</th>
+                <th (click)="sortByColumn('startTime')">From</th>
+                <th (click)="sortByColumn('endTime')">To</th>
+                <th *ngIf="editRowIndex !== null" rowspan="2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of availabilityRecords; let i=index">
+                <td>{{i+1}}</td>
+                <td [id]="'dayOfWeek' + i" (click)="startEdit(i, 'dayOfWeek')">
+                    <span *ngIf="'dayOfWeek' + i !== currentCell">
+                        {{ setDayNameValue(i, item.dayOfWeek, editData.dayOfWeek) }}
+                    </span>
+                    <select *ngIf="'dayOfWeek' + i === currentCell" [(ngModel)]="editData.dayOfWeek"
+                        (change)="validateUpdateInput(i)">
+                        <option *ngFor="let day of dayOptions" [value]="day.value">{{ day.label }}</option>
+                    </select>
+
+
+                </td>
+                <td [id]="'startTime' + i" (click)="startEdit(i, 'startTime')">
+
+                    <span *ngIf="'startTime' + i !== currentCell">
+                        {{ setStartTimeValue(i, item.startTime, editData.startTime)}}
+                    </span>
+                    <input *ngIf="'startTime' + i === currentCell" [(ngModel)]="editData.startTime" type="time"
+                        value="{{item.startTime.slice(0, -3)}}" (change)="validateUpdateInput(i)">
+
+                </td>
+                <td [id]="'endTime' + i" (click)="startEdit(i, 'endTime')">
+                    <span *ngIf="'endTime' + i !== currentCell">
+                        {{ setEndTimeValue(i, item.endTime, editData.endTime)}}
+                    </span>
+                    <input *ngIf="'endTime' + i === currentCell" [(ngModel)]="editData.endTime" type="time"
+                        value="{{item.endTime.slice(0, -3) }}" (change)="validateUpdateInput(i)">
+                </td>
+
+                <td *ngIf="editRowIndex !== null" [class.actions-column]="editRowIndex === i">
+                    <button *ngIf="editRowIndex === i && (isValidationSuccess === true || isValidationSuccess === null)"
+                        (click)="saveEdit(i)">Save
+
+                    </button>
+                    <button *ngIf="editRowIndex === i && (isValidationSuccess === true || isValidationSuccess === null)"
+                        (click)="
+                        cancelEdit()">Cancel</button>
+                    <button *ngIf="editRowIndex === i && 
+                    (isValidationSuccess === true ||
+                    isValidationSuccess === null)" (click)="deleteRecord(i)">
+                        Delete
+
+                    </button>
+                    <p *ngIf="isValidationSuccess === false && editRowIndex === i" style="color: red;">
+                        {{validationError}}
+
+                    </p>
+                </td>
+
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -79,6 +79,12 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<CourseCategory> CourseCategory { get; set; }
 
+    public DbSet<CourseLanguage> CourseLanguage { get; set; }
+
+    public DbSet<Tag> Tag { get; set; }
+
+    public DbSet<CourseTag> CourseTag { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -106,6 +112,18 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
         builder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLoginLog");
 
         builder.Entity<IdentityUserRole<Guid>>().ToTable("UserRoles");
+
+        builder.Entity<CourseTag>()
+        .HasOne(ct => ct.Course)
+        .WithMany()
+        .HasForeignKey(ct => ct.CourseId)
+        .OnDelete(DeleteBehavior.ClientSetNull);
+
+        builder.Entity<CourseTag>()
+            .HasOne(ct => ct.Tag)
+            .WithMany()
+            .HasForeignKey(ct => ct.TagId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
     }
 
 

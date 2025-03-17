@@ -1,0 +1,53 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;  
+  justify-content: center;
+  align-items: center;
+}
+
+.textWarningBox {
+  width: 100%;
+  font-size: 16px;
+  text-align: center;
+  padding-right: 25%;
+  margin-top: 2%;
+}
+
+.valueWarningBox {
+  width: 100%;
+  font-size: 24px;
+  text-align: center;
+}
+
+.announcementDiv {
+  margin: 5px 0px 15px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.education-log-grid {
+  width: 80%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 20px;
+}
+
+.education-log-grid-item {
+  border: 1px solid #ccc;
+  padding: 48px 16px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  cursor: pointer;
+}

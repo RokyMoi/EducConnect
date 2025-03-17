@@ -1,0 +1,227 @@
+
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300,100,500);
+
+:root {
+    --background: #1a1a2e;
+    --color: #ffffff;
+    --primary-color: #0f3460;
+}
+
+.blueOverall {
+    background-color: rgba(0, 0, 128, 0.9);
+    opacity: 90%;
+}
+
+.OverLayGradient {
+    background: rgba(255, 0, 0, 0.5);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 100%);
+    height: 100vh;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color);
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.6),
+        -2px -2px 4px rgba(0, 0, 0, 0.6);
+}
+
+body {
+    background: url('https://images.pexels.com/photos/1438081/pexels-photo-1438081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') left no-repeat;
+    background-size: cover;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    position: relative;
+    width: 22.2rem;
+}
+
+.form-container {
+    border: 1px solid hsla(0, 0%, 65%, 0.158);
+    box-shadow: 0 0 36px 1px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(20px);
+    z-index: 99;
+    padding: 2rem;
+}
+
+.login-container form input {
+    display: block;
+    padding: 14.5px;
+    width: 100%;
+    margin: 2rem 0;
+    font-family: roboto;
+
+    color: white;
+    outline: none;
+    background-color: #9191911f;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    font-size: 15px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);  /* Dodana senka za input */
+}
+
+.login-container form input:focus {
+    box-shadow: 0 0 16px 1px rgba(0, 0, 0, 0.3);  /* Senka pri fokusu postaje izraženija */
+    animation: wobble 0.3s ease-in;
+}
+
+.login-container form button {
+    background-color: transparent; 
+    color: white;  
+    display: block;
+    padding: 13px;
+    border-radius: 5px;
+    outline: none;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.1s ease-in-out;
+}
+
+.login-container form button:hover {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
+    transform: scale(1.02);
+}
+
+.circle {
+    width: 8rem;
+    height: 8rem;
+    background: var(--primary-color);
+    border-radius: 50%;
+    position: absolute;
+}
+
+
+.loginText {
+    position:absolute;
+    top:-5%;
+    right:20%;
+    font-family: roboto;
+
+    color: white;
+    font-size: 36px;
+    opacity:70%;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+.illustration {
+    position: absolute;
+    top: -50%;
+    left: 1px;
+    
+    opacity: 80%;
+    width: 140%;
+}
+
+.circle-one {
+    top: 0;
+    left: 0;
+    z-index: -1;
+    transform: translate(-45%, -45%);
+}
+
+.circle-two {
+    bottom: 0;
+    right: 0;
+    z-index: -1;
+    transform: translate(45%, 45%);
+}
+
+.register-forget {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.opacity {
+    font-family: roboto;
+
+    z-index: 1;
+    color: white;
+    text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.1), 
+        -2px -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-btn-container {
+    position: absolute;
+    left: 0;
+    bottom: 2rem;
+}
+
+.theme-btn {
+    cursor: pointer;
+    transition: all 0.3s ease-in;
+}
+
+.theme-btn:hover {
+    width: 40px !important;
+}
+
+@keyframes wobble {
+    0% {
+        transform: scale(1.025);
+    }
+    25% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1.025);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.login-container form input::placeholder {
+    color: #ffffff;
+    font-family: roboto;
+
+    opacity: 1;
+}
+
+
+.warning {
+    color: red;
+    font-size: 1rem;
+    padding: 0;
+    margin: 0;
+}
+
+.announcement{
+    color: green;
+    font-size: 1rem;
+    padding: 0;
+    margin: 0;
+}

@@ -1,0 +1,80 @@
+<body>
+
+    <h1>
+        Enter your personal details
+    </h1>
+
+    <form [formGroup]="personDetailsFormGroup">
+
+        <!--
+            Field to enter the first name of the user
+            It is optional field
+            -->
+        <app-text-input [label]="firstNameLabel" [placeholder]="firstNamePlaceholder" [warning]="firstNameWarning"
+            [formControl]="personDetailsFormGroup.controls.firstName"></app-text-input>
+        <!--
+                Field to enter the last name of the user
+                It is optional field
+                -->
+        <app-text-input [label]="lastNameLabel" [placeholder]="lastNamePlaceholder" [warning]="lastNameWarning"
+            [formControl]="personDetailsFormGroup.controls.lastName"></app-text-input>
+
+        <!--
+                    Field to enter the username of the user
+                    It is required field
+                    -->
+        <app-text-input [label]="usernameLabel" [placeholder]="usernamePlaceholder" [warning]="usernameWarning"
+            [formControl]="personDetailsFormGroup.controls.username"
+            (input)="handleUsernameInput($event)"></app-text-input>
+
+        <!--
+                        Field to select the country of origin of the user
+                        It is optional field
+                        -->
+        <app-select-dropdown [options]="countries" [label]="selectCountryLabel" [placeholder]="selectCountryPlaceholder"
+            [formControl]="personDetailsFormGroup.controls.countryOfOrigin"
+            (onChangeEvent)="handleCountryOfOriginSelect($event)"></app-select-dropdown>
+
+        <app-submit-button (buttonClick)="handleSubmitButton()">
+        </app-submit-button>
+    </form>
+
+    <app-floating-warning-box [warningTitle]="warningBoxTitle" [warningMessage]="warningBoxText" *ngIf="showWarningBox"
+        [toggleFloatingBox]="toggleFloatingBox.bind(this)">
+        <p class="textWarningBox" *ngIf="showFirstName">First name:</p>
+        <p class="valueWarningBox" *ngIf="showFirstName">{{personDetailsFormGroup.controls.firstName.value}}</p>
+        <p class="textWarningBox" *ngIf="showLastName">Last name:</p>
+        <p class="valueWarningBox" *ngIf="showLastName">{{personDetailsFormGroup.controls.lastName.value}}</p>
+        <p class="textWarningBox">Username:</p>
+        <p class="valueWarningBox">{{personDetailsFormGroup.controls.username.value}}</p>
+        <p class="textWarningBox" *ngIf="showCountryOfOrigin">Country of origin:</p>
+        <p class="valueWarningBox" *ngIf="showCountryOfOrigin">{{this.selectedCountryOfOrigin?.flagEmoji}}
+            {{this.selectedCountryOfOrigin?.name}}
+        </p>
+        <div *ngIf="!isDataTransmissionActive">
+            <app-submit-button *ngIf="!isDataTransmissionComplete" class="submit-button-warning-box"
+                [submitButtonText]="warningBoxYesButtonText"
+                [buttonBackgroundColor]="warningBoxYesButtonBackgroundColor" [buttonMargin]="warningBoxButtonMargin"
+                (buttonClick)="handleYesButton($event)">
+            </app-submit-button>
+            <app-submit-button *ngIf="!isDataTransmissionComplete" [submitButtonText]="warningBoxNoButtonText"
+                [buttonBackgroundColor]="warningBoxNoButtonBackgroundColor" (buttonClick)="handleNoButton($event)">
+            </app-submit-button>
+            <app-submit-button *ngIf="isDataTransmissionComplete" [submitButtonText]="continueButtonText"
+                [buttonBackgroundColor]="continueButtonText" [buttonMargin]="warningBoxButtonMargin"
+                (buttonClick)="handleContinueButton($event)">
+            </app-submit-button>
+            <app-submit-button *ngIf="isDataTransmissionComplete" [submitButtonText]="editButtonText"
+                [buttonBackgroundColor]="warningBoxNoButtonBackgroundColor" [buttonMargin]="warningBoxButtonMargin"
+                (buttonClick)="handleEditButton($event)">
+            </app-submit-button>
+        </div>
+
+        <div class="announcementDiv" *ngIf="isDataTransmissionActive">
+
+            <mat-progress-spinner [mode]="spinnerMode" class="spinner-color"
+                [style.stroke]="spinnerColor"></mat-progress-spinner>
+        </div>
+        <p [ngStyle]="{color: saveOperationResultTextColor}">{{saveOperationResult}}</p>
+    </app-floating-warning-box>
+</body>

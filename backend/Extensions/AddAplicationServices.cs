@@ -22,6 +22,8 @@ using EduConnect.Services;
 using Microsoft.AspNetCore.Identity;
 using EduConnect.Data;
 using EduConnect.Utilities;
+using EduConnect.Interfaces.Course;
+using EduConnect.Repositories.Course;
 
 namespace EduConnect.Extensions
 {
@@ -47,7 +49,8 @@ namespace EduConnect.Extensions
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
-            // services.AddScoped<ICourseRepository, CourseRepository>();
+
+            services.AddScoped<ICourseRepository, CourseRepository>();
 
             //Add Database Seeders as Scoped services
             services.AddScoped<CountryExtractor>();

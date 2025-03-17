@@ -9,6 +9,7 @@ import { RouterModule } from '@angular/router';
 import { AccountService } from './services/account.service';
 import { HeaderTemplateComponent } from './common/header/header-template/header-template.component';
 import { HeaderComponent } from './modules/shared/header/header.component';
+import { SnackboxComponent } from "./modules/shared/snackbox/snackbox.component";
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,8 @@ import { HeaderComponent } from './modules/shared/header/header.component';
     ServerOfflineComponent,
     HeaderTemplateComponent,
     HeaderComponent,
-  ],
+    SnackboxComponent
+],
   standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],

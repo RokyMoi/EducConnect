@@ -1,0 +1,142 @@
+<body>
+    <p class="title">Upload Your Course Materials Here</p>
+    <p>These files are meant to be used by the students as general guidebooks, references, and study material while
+        learning the course.</p>
+    <p>Maximum number of files per course: <strong>15</strong></p>
+    <p>Total maximum size these files can take up: <strong>120 MB</strong></p>
+
+    <div class="upload-information-container">
+        <p>Current number of files: <strong>{{currentNumberOfFiles}}</strong></p>
+        <p>Current space taken up: <strong>{{currentSpaceTakenUpInMb}} MB</strong></p>
+    </div>
+
+    <div class="upload-container" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)">
+        <input type="file" id="fileUpload" #fileInput (change)="handleFileInput($event)">
+        <p class="info-text">{{fileUploadInstructionText}}</p>
+
+        <div *ngIf="this.selectedFile && this.validateFileType(this.selectedFile) && this.validateFileSize(this.selectedFile)"
+            class="file-info-text">
+            <p>File name: {{fileToUploadName}}</p>
+            <p>File size: {{fileToUploadSizeInMegabytes}} MB</p>
+            <p>File type: {{fileToUploadFileCategory}} ({{fileToUploadType}})</p>
+
+            <div class="edit-fields">
+                <div class="input-group">
+                    <label for="fileName">Enter here new file name or leave empty for the current one</label>
+                    <input type="text" id="fileName" placeholder="Enter file name" [formControl]="fileNameFormControl">
+                </div>
+                <div class="input-group">
+                    <label for="fileDate">Select date when the file was created on you device:</label>
+                    <input type="datetime-local" id="fileDate" [formControl]="fileDateFormControl">
+                </div>
+            </div>
+
+        </div>
+
+        <div *ngIf="this.selectedFile && (!this.validateFileType(this.selectedFile) || !this.validateFileSize(this.selectedFile))"
+            class="file-warning-text">
+            <p>{{this.fileUploadWarningText}}</p>
+        </div>
+        <mat-progress-bar *ngIf="isDataTransmissionActive" mode="determinate"
+            [value]="uploadProgress"></mat-progress-bar>
+        <div class="file-upload-result">
+            <p [style.color]="fileUploadResultColor">{{fileUploadResultMessage}}</p>
+        </div>
+    </div>
+
+    <app-submit-button
+        *ngIf="this.selectedFile && this.validateFileType(this.selectedFile) && this.validateFileSize(this.selectedFile) && !this.isDataTransmissionActive"
+        [buttonBackgroundColor]="uploadFileButtonColor" [submitButtonText]="uploadFileButtonText"
+        (buttonClick)="uploadFile()"></app-submit-button>
+
+    <table *ngIf="courseMainMaterialsArray.length > 0">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>File name</th>
+                <th>File type</th>
+                <th>File created</th>
+                <th>File size</th>
+                <th class="actions-column" colspan="2">Actions</th>
+
+            </tr>
+
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of courseMainMaterialsArray; let i=index">
+                <td>{{i + 1}}</td>
+                <td>{{item['fileName']}}</td>
+                <td>{{getFileExtension(item['contentType'])}}</td>
+                <td>{{getDateTimeFromUnixMillis(item['dateTimePointOfFileCreation'])}}</td>
+                <td>{{getFileSizeInMb(item['contentSize'])}} MB</td>
+                <td (click)="downloadCourseMainMaterial(item.courseMainMaterialId)">
+                    <p>Download</p>
+
+                </td>
+                <td (click)="deleteCourseMainMaterial(item.courseMainMaterialId, i)">Delete</td>
+
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="accordion-list-container" *ngIf="courseMainMaterialsArray.length > 0">
+        <p class="accordion-list-title">Uploaded items ({{courseMainMaterialsArray.length}})</p>
+        <div class="accordion-list-item" *ngFor="let item of courseMainMaterialsArray; let i=index">
+            <div class="accordion-list-item-header" (click)="toggleCardExpansion(i)">
+                <p>{{item.fileName}}</p>
+
+            </div>
+            <div class="accordion-list-item-body" [class.active]="i === expandedCardIndex">
+
+                <p>Number: {{i + 1}}</p>
+                <p>File name: {{item.fileName}}</p>
+                <p>File type {{item.contentType}}</p>
+                <p>File size: {{getFileSizeInMb(item['contentSize'])}} MB</p>
+                <p>File created: {{getDateTimeFromUnixMillis(item.dateTimePointOfFileCreation)}}</p>
+
+                <div class="accordion-list-item-body-actions-area">
+                    <button (click)="downloadCourseMainMaterial(item.courseMainMaterialId)">Download</button>
+                    <button [style.backgroundColor]="'red'"
+                        (click)="deleteCourseMainMaterial(item.courseMainMaterialId, i)">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="download-file-container">
+        <p *ngIf="isDownloadComplete === false">{{downloadProgressMessage}}</p>
+        <mat-progress-bar *ngIf="isDownloadComplete === false" mode="determinate"
+            [value]="downloadProgress"></mat-progress-bar>
+        <p *ngIf="isDownloadComplete" class="file-download-info">Your file to download: {{selectedFileToDownload}}</p>
+        <p *ngIf="isDownloadComplete" class="file-download-link-info">The file should have been opened in your browser,
+            if it was not click on this
+            link, to download it to your
+            device: <a class="file-download-link" [href]="this.downloadFileUrl"
+                [download]="selectedFileToDownload">{{selectedFileToDownload}}</a>
+        </p>
+        <p *ngIf="isDownloadComplete === null">Use the Download option in the files table, to download the selected file
+        </p>
+
+        <app-submit-button *ngIf="this.courseMainMaterialsArray.length > 0"
+            [buttonBackgroundColor]="goToNextStepButtonColor" [submitButtonText]="goToNextStepButtonText"
+            (buttonClick)="goToNextStepFunction()"></app-submit-button>
+
+    </div>
+    <app-floating-warning-box *ngIf="floatingWarningDeleteBoxShow" [warningTitle]="floatingWarningDeleteBoxTitle">
+        <p [style.color]="floatingWarningDeleteBoxMessageColor" [style.font-size]="'24px'">
+            {{floatingWarningDeleteBoxMessage}}</p>
+        <p>{{floatingWarningDeleteBoxFileToDeleteIndex}}</p>
+        <p>{{floatingWarningDeleteBoxFileToDeleteName}}</p>
+        <app-submit-button *ngIf="!isDeleteOperationComplete" [buttonMargin]="floatingWarningBoxButtonMargin"
+            [buttonBackgroundColor]="floatingWarningDeleteBoxConfirmButtonColor"
+            [submitButtonText]="floatingWarningDeleteBoxConfirmButtonText"
+            (buttonClick)="confirmDelete()"></app-submit-button>
+        <app-submit-button *ngIf="!isDeleteOperationComplete" [buttonMargin]="floatingWarningBoxButtonMargin"
+            [buttonBackgroundColor]="floatingWarningDeleteBoxCancelButtonColor"
+            [submitButtonText]="floatingWarningDeleteBoxCancelButtonText"
+            (buttonClick)="cancelDelete()"></app-submit-button>
+        <app-submit-button *ngIf="isDeleteOperationComplete" [buttonBackgroundColor]="closeFloatingBoxButtonColor"
+            [submitButtonText]="closeFloatingBoxButtonText" (buttonClick)="cancelDelete()"></app-submit-button>
+    </app-floating-warning-box>
+
+</body>

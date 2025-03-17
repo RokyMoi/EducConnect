@@ -13,6 +13,7 @@ using backend.Entities.Reference;
 using backend.Entities.Reference.Country;
 using backend.Entities.Reference.Language;
 using backend.Entities.Reference.Learning;
+using EduConnect.Entities.Course;
 using EduConnect.Entities.Reference;
 using EduConnect.Entities.Tutor;
 
@@ -79,6 +80,9 @@ namespace backend.Interfaces.Reference
 
         public Task<Country?> GetCountryByNationalCallingCode(string nationalCallingCode);
 
+        public Task<bool> LearningDifficultyLevelExistsById(int levelId);
+
+        public Task<List<CourseCategory>> GetAllCourseCategories();
 
     }
 }

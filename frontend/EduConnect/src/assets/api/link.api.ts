@@ -161,4 +161,10 @@ export default class ApiLinks {
 
   //PersonController base link
   public static readonly PersonControllerUrl = `${this.baseUrl}person`;
+
+  //ReferenceController base link
+  public static readonly ReferenceControllerUrl = `${this.baseUrl}reference`;
+
+  //CourseTutorController base link
+  public static readonly CourseTutorControllerUrl = `${this.baseUrl}tutor/course`;
 }
