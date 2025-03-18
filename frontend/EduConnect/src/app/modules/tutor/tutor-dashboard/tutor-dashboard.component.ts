@@ -51,6 +51,13 @@ export class TutorDashboardComponent implements OnInit {
         buttonText: 'Create',
         link: '/tutor/course/create',
       },
+      {
+        title: 'My Courses',
+        description: 'View and manage all your courses',
+        dataInfo: '',
+        buttonText: 'View My Courses',
+        link: '/tutor/course',
+      },
     ];
   }
 

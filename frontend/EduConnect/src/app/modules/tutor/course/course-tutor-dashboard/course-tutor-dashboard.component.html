@@ -1,0 +1,37 @@
+<div class="course-tutor-dashboard">
+    <h2 class="component-title">My Courses Dashboard</h2>
+    <div class="dashboard-grid">
+        <div class="course-card" *ngFor="let course of courses">
+            <img class="course-image" src="https://picsum.photos/320/200" alt="Course Image" />
+            <div class="course-info">
+                <h2 class="course-title">{{ course.title }}</h2>
+                <p class="course-description">{{ course.description.length > 300 ? (course.description | slice:0:300) +
+                    '...' : course.description }}</p>
+                <div class="course-meta">
+                    <span class="category">Category: <strong>{{ course.courseCategoryName }}</strong></span>
+                    <span class="difficulty">Difficulty: <strong>{{ course.learningDifficultyLevelName
+                            }}</strong></span>
+                    <span class="created">Created On: <strong>{{ course.createdAt | date:'MMM d, yyyy'
+                            }}</strong></span>
+                    <span *ngIf="course.minNumberOfStudents">Min Students: <strong>{{ course.minNumberOfStudents
+                            }}</strong></span>
+                    <span *ngIf="course.maxNumberOfStudents">Max Students: <strong>{{ course.maxNumberOfStudents
+                            }}</strong></span>
+                </div>
+                <div class="course-footer">
+                    <span class="price">$<strong>{{ course.price !== 0 ? course.price.toFixed(2) :
+                            'Free'}}</strong></span>
+                    <span class="status-container">
+                        <span class="status"
+                            [ngClass]="{'published': course.publishedStatus === true, 'unpublished': course.publishedStatus === false, 'archived': course.publishedStatus === null}">
+                            {{ course.publishedStatus === null ? 'Archived' : (course.publishedStatus ? 'Published' :
+                            'Unpublished') }}
+                        </span>
+                    </span>
+                </div>
+                <button class="view-course">View Course</button>
+            </div>
+        </div>
+
+    </div>
+</div>

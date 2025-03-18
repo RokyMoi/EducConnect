@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.Interfaces.Reference;
 using backend.Interfaces.Tutor;
+using EduConnect.DTOs;
 using EduConnect.DTOs.Course;
 using EduConnect.Entities;
 using EduConnect.Interfaces.Course;
@@ -138,6 +139,60 @@ namespace EduConnect.Controllers.Course
                 ApiResponse<object>.GetApiResponse(
                     courseTitleTaken ? "Course title already taken" : "",
                     courseTitleTaken
+                )
+            );
+
+
+
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllCourses()
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while getting the courses, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+
+            var courses = await _courseRepository.GetAllCoursesByTutorId(tutor.TutorId);
+
+            if (courses == null || courses.Count == 0)
+            {
+                return NoContent();
+            }
+
+            var response = courses.Select(
+                x => new GetAllCoursesResponse
+                {
+                    CourseId = x.CourseId,
+                    Title = x.Title,
+                    Description = x.Description,
+                    CourseCategoryId = x.CourseCategoryId,
+                    CourseCategoryName = x.CourseCategory.Name,
+                    LearningDifficultyLevelId = x.LearningDifficultyLevelId,
+                    LearningDifficultyLevelName = x.LearningDifficultyLevel.Name,
+                    MinNumberOfStudents = x.MinNumberOfStudents,
+                    MaxNumberOfStudents = x.MaxNumberOfStudents,
+                    Price = x.Price,
+                    PublishedStatus = x.PublishedStatus,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
+                });
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Courses retrieved successfully",
+                    response
                 )
             );
 

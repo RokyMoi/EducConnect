@@ -11,5 +11,7 @@ namespace EduConnect.Interfaces.Course
         Task<bool> CourseCategoryExistsById(Guid courseCategoryId);
 
         Task<bool> CreateCourse(Entities.Course.Course course);
+
+        Task<List<Entities.Course.Course>> GetAllCoursesByTutorId(Guid tutorId);
     }
 }

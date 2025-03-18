@@ -33,6 +33,7 @@ import { CreateCourseDetailsComponent } from './modules/tutor/create-course/crea
 import { AuthenticationGuardService } from './services/shared/authentication-guard.service';
 import { ForbiddenAccessComponent } from './modules/shared/forbidden-access/forbidden-access/forbidden-access.component';
 import { AdminDashboardComponent } from './modules/admin/admin-dashboard/admin-dashboard.component';
+import { CourseTutorDashboardComponent } from './modules/tutor/course/course-tutor-dashboard/course-tutor-dashboard.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -87,6 +88,14 @@ export const routes: Routes = [
   {
     path: 'tutor/course/create',
     component: CreateCourseDetailsComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/course',
+    component: CourseTutorDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
   },
 
   //Admin routes

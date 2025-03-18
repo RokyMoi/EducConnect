@@ -36,5 +36,13 @@ namespace EduConnect.Repositories.Course
                 return false;
             }
         }
+
+        public async Task<List<Entities.Course.Course>> GetAllCoursesByTutorId(Guid tutorId)
+        {
+            return await _dataContext.Course
+            .Include(x => x.CourseCategory)
+            .Include(x => x.LearningDifficultyLevel)
+            .Where(x => x.TutorId == tutorId).ToListAsync();
+        }
     }
 }

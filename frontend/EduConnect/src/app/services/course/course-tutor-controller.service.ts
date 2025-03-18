@@ -35,4 +35,13 @@ export class CourseTutorControllerService {
       }
     );
   }
+
+  getAllCourses() {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<DefaultServerResponse>(`${this.apiUrl}/all`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
 }
