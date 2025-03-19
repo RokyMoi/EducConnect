@@ -97,6 +97,11 @@ namespace backend.Repositories.Reference
             }
         }
 
+        public async Task<bool> CourseCategoryExistsById(Guid courseCategoryId)
+        {
+            return await _dataContext.CourseCategory.Where(x => x.CourseCategoryId == courseCategoryId).AnyAsync();
+        }
+
         public async Task<List<CommunicationType>> GetAllCommunicationTypesAsync()
         {
             return await _dataContext.CommunicationType.ToListAsync();

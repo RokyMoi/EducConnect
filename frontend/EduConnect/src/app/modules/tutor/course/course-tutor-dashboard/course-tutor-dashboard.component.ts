@@ -3,6 +3,7 @@ import { CourseTutorControllerService } from '../../../../services/course/course
 import { GetAllCoursesResponse } from '../../../../models/course/course-tutor-controller/get-all-courses-response';
 import { CommonModule } from '@angular/common';
 import { SnackboxService } from '../../../../services/shared/snackbox.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-course-tutor-dashboard',
@@ -15,7 +16,8 @@ export class CourseTutorDashboardComponent implements OnInit {
   courses: GetAllCoursesResponse[] = [];
   constructor(
     private snackboxService: SnackboxService,
-    private courseTutorControllerService: CourseTutorControllerService
+    private courseTutorControllerService: CourseTutorControllerService,
+    private router: Router
   ) {}
   ngOnInit(): void {
     this.loadCourses();
@@ -35,5 +37,17 @@ export class CourseTutorDashboardComponent implements OnInit {
         );
       },
     });
+  }
+
+  goBack() {
+    this.router.navigate(['/tutor/dashboard']);
+  }
+
+  onCreateCourse() {
+    this.router.navigate(['/tutor/course/create']);
+  }
+
+  onViewCourse(courseId: string) {
+    this.router.navigate(['tutor/course/', courseId]);
   }
 }

@@ -199,5 +199,245 @@ namespace EduConnect.Controllers.Course
 
 
         }
+
+        [HttpGet("info")]
+        public async Task<IActionResult> GetCourseManagementDashboardInfo(
+            [FromQuery] Guid courseId
+        )
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while getting the courses, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            var course = await _courseRepository.GetCourseById(courseId);
+
+            if (course == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course not found",
+                        null
+                    )
+                );
+
+            }
+
+            var response = new CourseManagementDashboardResponse
+            {
+                CourseId = course.CourseId,
+                Title = course.Title,
+                DifficultyLevel = course.LearningDifficultyLevel.Name,
+                Category = course.CourseCategory.Name,
+                CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(course.CreatedAt).UtcDateTime,
+                UpdatedAt = course.UpdatedAt != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)course.UpdatedAt).UtcDateTime : null,
+            };
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Course retrieved successfully",
+                    response
+                )
+            );
+
+        }
+
+        [HttpGet("basics")]
+        public async Task<IActionResult> GetCourseBasics([FromQuery] Guid courseId)
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while getting the courses, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            var course = await _courseRepository.GetCourseById(courseId);
+
+            if (course == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course not found",
+                        null
+                    )
+                );
+            }
+
+            var response = new GetAllCoursesResponse
+            {
+                CourseId = course.CourseId,
+                Title = course.Title,
+                Description = course.Description,
+                CourseCategoryId = course.CourseCategoryId,
+                CourseCategoryName = course.CourseCategory.Name,
+                LearningDifficultyLevelId = course.LearningDifficultyLevelId,
+                LearningDifficultyLevelName = course.LearningDifficultyLevel.Name,
+                MinNumberOfStudents = course.MinNumberOfStudents,
+                MaxNumberOfStudents = course.MaxNumberOfStudents,
+                Price = course.Price,
+                PublishedStatus = course.PublishedStatus,
+                CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(course.CreatedAt).UtcDateTime,
+
+            };
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Course retrieved successfully",
+                    response
+                )
+            );
+        }
+
+        [HttpPatch("update/basics")]
+        public async Task<IActionResult> UpdateCourseBasics(
+            [FromBody] UpdateCourseBasicsRequest request
+        )
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while getting the courses, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            //Check if the course exists and if the tutor is the owner of the course
+            var course = await _courseRepository.GetCourseById(request.CourseId);
+
+            if (course == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course not found",
+                        null
+                    )
+                );
+            }
+
+            //Check if the course title is taken by another course
+            var courseTitleExists = await _courseRepository.CourseExistsByTitleExceptTheGivenCourseById(request.CourseId, request.Title);
+
+            if (courseTitleExists)
+            {
+                return Conflict(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course title already exists",
+                        null
+                    )
+                );
+            }
+
+
+            if (course.TutorId != tutor.TutorId)
+            {
+                return Conflict(
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to update this course",
+                        null
+                    )
+                );
+            }
+
+            //Check if the course category exists
+            var courseCategory = await _referenceRepository.CourseCategoryExistsById(request.CourseCategoryId);
+
+            if (!courseCategory)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course category not found",
+                        null
+                    )
+                );
+            }
+
+
+            //Check if the learning difficulty level exists
+            var learningDifficultyLevel = await _referenceRepository.LearningDifficultyLevelExistsById(request.LearningDifficultyLevelId);
+
+            if (!learningDifficultyLevel)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Learning difficulty level not found",
+                        null
+                    )
+                );
+            }
+
+            //Update the course 
+            course.Title = request.Title;
+            course.Description = request.Description;
+            course.CourseCategoryId = request.CourseCategoryId;
+            course.LearningDifficultyLevelId = request.LearningDifficultyLevelId;
+            course.MinNumberOfStudents = request.MinNumberOfStudents;
+            course.MaxNumberOfStudents = request.MaxNumberOfStudents;
+            course.Price = request.Price;
+            course.PublishedStatus = request.PublishedStatus;
+            course.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            var updateResult = await _courseRepository.UpdateCourseBasics(course);
+
+            if (!updateResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while updating the course, please try again later",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Course updated successfully",
+                    null
+                )
+            );
+
+
+        }
+
+        [HttpGet("check-title-except")]
+        public async Task<IActionResult> CheckCourseTitleExistEmitGivenCourse(
+            [FromQuery] CheckCourseTitleExistEmitGivenCourseRequest request
+        )
+        {
+            var courseTitleExists = await _courseRepository.CourseExistsByTitleExceptTheGivenCourseById(request.CourseId, request.Title);
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    $"Course title {request.Title} {(courseTitleExists ? "already exists" : "does not exist")}",
+                    courseTitleExists
+                )
+            );
+        }
     }
 }

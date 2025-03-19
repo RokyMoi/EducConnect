@@ -84,5 +84,7 @@ namespace backend.Interfaces.Reference
 
         public Task<List<CourseCategory>> GetAllCourseCategories();
 
+        public Task<bool> CourseCategoryExistsById(Guid courseCategoryId);
+
     }
 }

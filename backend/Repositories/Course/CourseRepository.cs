@@ -20,6 +20,15 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.Course.Where(x => x.Title.ToLower().Equals(courseTitle.ToLower())).AnyAsync();
         }
 
+        public async Task<bool> CourseExistsByTitleExceptTheGivenCourseById(Guid courseId, string title)
+        {
+            return await _dataContext.Course
+            .Where(
+                x => x.CourseId != courseId && x.Title.ToLower().Equals(title.ToLower())
+            )
+            .AnyAsync();
+        }
+
         public async Task<bool> CreateCourse(Entities.Course.Course course)
         {
             try
@@ -43,6 +52,31 @@ namespace EduConnect.Repositories.Course
             .Include(x => x.CourseCategory)
             .Include(x => x.LearningDifficultyLevel)
             .Where(x => x.TutorId == tutorId).ToListAsync();
+        }
+
+        public async Task<Entities.Course.Course?> GetCourseById(Guid courseId)
+        {
+            return await _dataContext.Course
+            .Include(x => x.CourseCategory)
+            .Include(x => x.LearningDifficultyLevel)
+            .FirstOrDefaultAsync(x => x.CourseId == courseId);
+        }
+
+        public async Task<bool> UpdateCourseBasics(Entities.Course.Course course)
+        {
+            try
+            {
+                _dataContext.Course.Update(course);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to update course " + course.Title);
+                Console.WriteLine(ex);
+                return false;
+            }
         }
     }
 }

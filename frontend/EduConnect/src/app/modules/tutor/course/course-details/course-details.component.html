@@ -1,0 +1,103 @@
+<div class="create-course-details-container">
+    <h2>Course View Module</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+    </div>
+    <div class="create-course-details">
+        <form [formGroup]="courseFormGroup">
+            <div class="form-item">
+                <label for="title">Course Title</label>
+                <input type="text" id="title" name="title" formControlName="title"
+                    placeholder="Enter title of the course">
+                <div class="error-container">
+                    <p>{{titleErrorMessage}}</p>
+                </div>
+            </div>
+
+            <div class="form-item">
+                <label for="description">Course Description</label>
+                <textarea id="description" name="description" formControlName="description"
+                    placeholder="Describe this course"></textarea>
+                <div class="error-container">
+                    <p>{{descriptionErrorMessage}}</p>
+                </div>
+            </div>
+
+            <div class="form-item">
+                <label for="category">Course Category</label>
+                <select name="category" id="category" formControlName="selectedCourseCategoryId">
+                    <option value="" disabled selected class="placeholder-option">Under which category does this course
+                        belong</option>
+                    <option *ngFor="let category of courseCategories" [value]="category.courseCategoryId">
+                        {{category.name}}</option>
+                </select>
+                <div class="error-container">
+                    <p>{{courseCategoryErrorMessage}}</p>
+                </div>
+            </div>
+
+            <div class="form-item">
+                <label for="difficultyLevel">Difficulty level</label>
+                <select name="difficultyLevel" id="difficultyLevel" formControlName="selectedLearningLevelId">
+                    <option value="" disabled selected class="placeholder-option">Select the recommended level</option>
+                    <option *ngFor="let level of learningDifficultyLevels" [value]="level.learningDifficultyLevelId">
+                        {{level.name}}</option>
+                </select>
+                <div class="error-container">
+                    <p>{{learningDifficultyLevelErrorMessage}}</p>
+                </div>
+            </div>
+
+
+            <div class="form-item">
+                <label for="price">Price (Enter 0 for free course)</label>
+                <input type="number" min="0" max="999999999999999.99" id="price" name="price" formControlName="price"
+                    placeholder="Enter the price of the course in USD">
+                <div class="error-container">
+                    <p>{{priceErrorMessage}}</p>
+                </div>
+            </div>
+
+            <div class="form-item">
+                <label for="minNumberOfStudents">Minimum number of students (Optional)</label>
+                <input type="number" min="1" max="1000000000" id="minNumberOfStudents" name="minNumberOfStudents"
+                    formControlName="minNumberOfStudents"
+                    placeholder="Minimum number of students required for this course">
+                <div class="error-container">
+                    <p>{{minimumErrorMessage}}</p>
+                </div>
+            </div>
+
+            <div class="form-item">
+                <label for="maxNumberOfStudents">Maximum number of students (Optional)</label>
+                <input type="number" min="1" max="1000000000" id="maxNumberOfStudents" name="maxNumberOfStudents"
+                    formControlName="maxNumberOfStudents"
+                    placeholder="Maximum number of students allowed for this course">
+                <div class="error-container">
+                    <p>{{maximumErrorMessage}}</p>
+                </div>
+            </div>
+        </form>
+
+        <div class="form-actions-row">
+            <button class="discard-action-button" (click)="onDiscard()">Discard</button>
+            <button class="save-action-button" (click)="onSaveAction()">Save</button>
+        </div>
+    </div>
+
+    <app-custom-header-ng-content-dialog-box *ngIf="showCreateCourseDialog">
+        <p>{{createCourseDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="onCancelSaveDialog()">Cancel</button>
+            <button class="confirm-button" (click)="saveCourse()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+
+    <app-custom-header-ng-content-dialog-box *ngIf="showDiscardChangesCourseDialog">
+        <p>{{discardChangesCourseDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="onCancelDiscardChangesDialog()">Cancel</button>
+            <button class="confirm-button" (click)="discardChanges()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+</div>

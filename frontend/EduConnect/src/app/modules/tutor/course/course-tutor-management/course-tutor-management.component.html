@@ -1,0 +1,136 @@
+<div class="course-tutor-management-container">
+    <h2>Course Management Dashboard</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+        <button class="publish-course-button">Publish</button>
+    </div>
+    <div class="management-console" *ngIf="dashboardInfo">
+        <!-- Course Information Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-book-open"></i> Course Basics</h2>
+                <button class="edit-btn" (click)="onViewBasics()">View Basics</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Current Data:</strong></p>
+                    <p>Course Title: <strong>{{dashboardInfo.title}}</strong></p>
+                    <p>Difficulty Level: {{dashboardInfo.difficultyLevel}}</p>
+                    <p>Category: {{dashboardInfo.category}}</p>
+                </div>
+                <div class="quick-actions">
+                    <p>Created At: {{dashboardInfo.createdAt | date:'longDate'}}</p>
+                    <p *ngIf="dashboardInfo.updatedAt">Last Updated: {{dashboardInfo.updatedAt | date:'longDate'}}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Materials Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-file-alt"></i> Teaching Resources</h2>
+                <button class="add-btn">Add New Material</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Current Materials:</strong></p>
+                    <div class="material-item">
+                        <i class="fas fa-book"></i> "Quantum Mechanics: The Theoretical Minimum" (Core Textbook)
+                    </div>
+                    <div class="material-item">
+                        <i class="fas fa-link"></i> MIT OpenCourseWare Reference Links
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn">
+                        <i class="fas fa-sort-alpha-down"></i> Reorder Resources
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-archive"></i> Archive Old
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lessons Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-chalkboard-teacher"></i> Class Schedule</h2>
+                <button class="add-btn">New Lesson</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Upcoming Sessions:</strong></p>
+                    <div class="lesson-item">
+                        <i class="fas fa-circle" style="color: #4CAF50;"></i> Week 3: Wave-Particle Duality (Draft)
+                    </div>
+                    <div class="lesson-item">
+                        <i class="fas fa-circle" style="color: #FF9800;"></i> Week 4: Schrödinger Equation (In Review)
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn">
+                        <i class="fas fa-video"></i> Record Session
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-chart-line"></i> Progress Analytics
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Management Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-users"></i> Participants</h2>
+                <button class="add-btn">Enroll Student</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Recent Enrollments:</strong></p>
+                    <div class="student-item">
+                        <i class="fas fa-user-graduate"></i> Emily Johnson (85% Completed)
+                    </div>
+                    <div class="student-item">
+                        <i class="fas fa-user-clock"></i> Michael Chen (Pending Assessment)
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn">
+                        <i class="fas fa-envelope"></i> Message Group
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-chart-bar"></i> Performance Report
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Promotion Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-bullhorn"></i> Marketing Tools</h2>
+                <button class="add-btn">New Campaign</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Active Promotions:</strong></p>
+                    <div class="promo-item">
+                        <i class="fas fa-ad"></i> Social Media Campaign (1,234 Clicks)
+                    </div>
+                    <div class="promo-item">
+                        <i class="fas fa-tag"></i> Early Bird Discount (23 Redemptions)
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn">
+                        <i class="fas fa-chart-pie"></i> Analytics
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-share-alt"></i> Share Links
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

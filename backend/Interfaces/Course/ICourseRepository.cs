@@ -13,5 +13,11 @@ namespace EduConnect.Interfaces.Course
         Task<bool> CreateCourse(Entities.Course.Course course);
 
         Task<List<Entities.Course.Course>> GetAllCoursesByTutorId(Guid tutorId);
+
+        Task<Entities.Course.Course?> GetCourseById(Guid courseId);
+
+        Task<bool> UpdateCourseBasics(Entities.Course.Course course);
+
+        Task<bool> CourseExistsByTitleExceptTheGivenCourseById(Guid courseId, string title);
     }
 }

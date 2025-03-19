@@ -34,6 +34,8 @@ import { AuthenticationGuardService } from './services/shared/authentication-gua
 import { ForbiddenAccessComponent } from './modules/shared/forbidden-access/forbidden-access/forbidden-access.component';
 import { AdminDashboardComponent } from './modules/admin/admin-dashboard/admin-dashboard.component';
 import { CourseTutorDashboardComponent } from './modules/tutor/course/course-tutor-dashboard/course-tutor-dashboard.component';
+import { CourseTutorManagementComponent } from './modules/tutor/course/course-tutor-management/course-tutor-management.component';
+import { CourseDetailsComponent } from './modules/tutor/course/course-details/course-details.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -94,6 +96,18 @@ export const routes: Routes = [
   {
     path: 'tutor/course',
     component: CourseTutorDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/course/:courseId',
+    component: CourseTutorManagementComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/course/details/:courseId',
+    component: CourseDetailsComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'tutor' },
   },
