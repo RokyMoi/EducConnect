@@ -175,23 +175,38 @@ namespace EduConnect.Controllers.Course
             {
                 return NoContent();
             }
+            var response = new List<GetAllCoursesResponse>();
+            foreach (var x in courses)
+            {
+                string? thumbnailUrl = null;
+                bool hasThumbnail = x.CourseThumbnail != null;
 
-            var response = courses.Select(
-                x => new GetAllCoursesResponse
+                if (hasThumbnail)
                 {
-                    CourseId = x.CourseId,
-                    Title = x.Title,
-                    Description = x.Description,
-                    CourseCategoryId = x.CourseCategoryId,
-                    CourseCategoryName = x.CourseCategory.Name,
-                    LearningDifficultyLevelId = x.LearningDifficultyLevelId,
-                    LearningDifficultyLevelName = x.LearningDifficultyLevel.Name,
-                    MinNumberOfStudents = x.MinNumberOfStudents,
-                    MaxNumberOfStudents = x.MaxNumberOfStudents,
-                    Price = x.Price,
-                    PublishedStatus = x.PublishedStatus,
-                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
-                });
+                    thumbnailUrl = !string.IsNullOrEmpty(x.CourseThumbnail.ThumbnailUrl) ? x.CourseThumbnail.ThumbnailUrl : $"{Request.Scheme}://{Request.Host}/public/course/thumbnail/get?courseId={x.CourseId}";
+                }
+                response.Add(
+                    new GetAllCoursesResponse
+                    {
+                        CourseId = x.CourseId,
+                        Title = x.Title,
+                        Description = x.Description,
+                        CourseCategoryId = x.CourseCategoryId,
+                        CourseCategoryName = x.CourseCategory.Name,
+                        LearningDifficultyLevelId = x.LearningDifficultyLevelId,
+                        LearningDifficultyLevelName = x.LearningDifficultyLevel.Name,
+                        MinNumberOfStudents = x.MinNumberOfStudents,
+                        MaxNumberOfStudents = x.MaxNumberOfStudents,
+                        Price = x.Price,
+                        PublishedStatus = x.PublishedStatus,
+                        CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
+                        HasThumbnail = hasThumbnail,
+                        ThumbnailUrl = thumbnailUrl
+
+                    }
+                );
+            }
+
 
             return Ok(
                 ApiResponse<object>.GetApiResponse(

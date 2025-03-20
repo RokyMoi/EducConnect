@@ -51,6 +51,8 @@ namespace EduConnect.Entities.Course
 
         public long? UpdatedAt { get; set; } = null;
 
+        public virtual CourseThumbnail? CourseThumbnail { get; set; } = null;
+
 
 
 

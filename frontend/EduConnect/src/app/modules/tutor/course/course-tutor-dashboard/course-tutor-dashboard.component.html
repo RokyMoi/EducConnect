@@ -6,7 +6,9 @@
     </div>
     <div class="dashboard-grid">
         <div class="course-card" *ngFor="let course of courses">
-            <img class="course-image" src="https://picsum.photos/320/200" alt="Course Image" />
+            <img class="course-image"
+                [src]="course.thumbnailUrl || 'https://dummyimage.com/320x200/cccccc/969696.png&text=No+Thumbnail'"
+                alt="Thumbnail not found" />
             <div class="course-info">
                 <h2 class="course-title">{{ course.title }}</h2>
                 <p class="course-description">{{ course.description.length > 300 ? (course.description | slice:0:300) +

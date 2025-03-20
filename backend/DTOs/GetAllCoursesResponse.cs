@@ -30,6 +30,10 @@ namespace EduConnect.DTOs
 
         public DateTime CreatedAt { get; set; }
 
+        public bool HasThumbnail { get; set; }
+
+        public string? ThumbnailUrl { get; set; }
+
 
     }
 }
