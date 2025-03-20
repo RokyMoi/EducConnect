@@ -13,6 +13,7 @@ import { CourseTutorControllerService } from '../../../../services/course/course
 import { UploadCourseThumbnailRequest } from '../../../../models/course/course-tutor-controller/upload-course-thumbnail-request';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DefaultServerResponse } from '../../../../models/shared/default-server-response';
+import { ImageCompressionService } from '../../../../services/image-compression.service';
 
 @Component({
   selector: 'app-course-thumbnail',
@@ -58,6 +59,7 @@ export class CourseThumbnailComponent implements OnInit {
   constructor(
     private snackboxService: SnackboxService,
     private courseTutorControllerService: CourseTutorControllerService,
+    private imageCompressionService: ImageCompressionService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -85,7 +87,7 @@ export class CourseThumbnailComponent implements OnInit {
     );
   }
 
-  onFileSelected(event: any) {
+  async onFileSelected(event: any) {
     this.isNewOrExisting = true;
     this.selectedFile = event.target.files[0];
     console.log('Added file: ', this.selectedFile);
@@ -96,6 +98,29 @@ export class CourseThumbnailComponent implements OnInit {
 
     if (this.checkFile()) {
       this.createPreviewUrl();
+
+      try {
+        const compressedFile = await this.imageCompressionService.compressImage(
+          this.selectedFile as File,
+          {
+            maxWidth: 1024,
+            maxHeight: 1024,
+            quality: 0.5,
+          }
+        );
+
+        console.log(
+          `Original file size: ${this.selectedFile?.size} - Compressed file size: ${compressedFile.size}`
+        );
+
+        this.selectedFile = compressedFile;
+      } catch (error) {
+        console.log('Compression failed: ', error);
+        this.snackboxService.showSnackbox(
+          'We failed to compress the thumbnail image, ' + error,
+          'error'
+        );
+      }
     }
   }
 
