@@ -1,0 +1,64 @@
+<div class="course-thumbnail-container">
+    <h2>Course Thumbnail</h2>
+    <div class="thumbnail-upload-container">
+        <h3>Upload your file here</h3>
+        <div class="action-buttons-container">
+            <button class="go-back-button" (click)="goBack()">← Go Back</button>
+            <button *ngIf="!isNewOrExisting" class="delete-thumbnail-button" (click)="onRemoveThumbnail()">Remove
+                thumbnail</button>
+        </div>
+        <form [formGroup]="thumbnailFormGroup">
+            <div class="form-item">
+                <label for="thumbnailFileName">Use Azure Blob Storage or SQL Server</label>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="thumbnailFileName" name="thumbnailFileName"
+                        formControlName="useAzureStorage" placeholder="Enter here the name of the thumbnail file">
+                    <label for="thumbnailFileName">
+                        {{thumbnailFormGroup.controls.useAzureStorage.value ?
+                        'Using Azure Storage' : 'Using SQL Server'}}
+                    </label>
+                </div>
+
+            </div>
+            <div class="form-item">
+                <div class="file-upload-wrapper">
+                    <label for="thumbnailData" class="file-upload-label">
+                        <span class="upload-button">Choose File</span>
+                    </label>
+                    <input type="file" id="thumbnailData" accept="image/*" class="visually-hidden"
+                        (change)="onFileSelected($event)" aria-describedby="fileHelp" formControlName="file">
+                    <div id="fileHelp" class="helper-text" *ngIf="!thumbnailFormGroup.controls.file.errors">Supported
+                        formats:
+                        JPEG, PNG, GIF</div>
+                    <div *ngIf="thumbnailFormGroup.controls.file.errors" class="error-container">
+                        <span>{{fileErrorMessage}}</span>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="preview-container" *ngIf="previewUrl">
+            <h4>{{isNewOrExisting ? 'Preview' : 'Current thumbnail'}}</h4>
+            <img [src]="previewUrl" alt="Thumbnail preview" class="thumbnail-preview">
+        </div>
+
+        <div class="form-actions-row" *ngIf="selectedFile">
+            <button class="discard-action-button">Discard</button>
+            <button class="save-action-button" (click)="onSaveThumbnail()">Save</button>
+        </div>
+    </div>
+    <app-custom-header-ng-content-dialog-box *ngIf="showSaveDialog">
+        <p>{{saveDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="onCancelSaveDialog()">Cancel</button>
+            <button class="confirm-button" (click)="saveThumbnail()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+    <app-custom-header-ng-content-dialog-box *ngIf="showRemoveDialog">
+        <p>Are you sure you want to remove the thumbnail for this course?</p>
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="onCancelRemoveDialog()">Cancel</button>
+            <button class="confirm-button" (click)="removeThumbnail()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+</div>

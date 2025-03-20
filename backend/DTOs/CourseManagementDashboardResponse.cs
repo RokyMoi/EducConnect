@@ -15,5 +15,10 @@ namespace EduConnect.DTOs
         public DateTime CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
+
+        public bool IsThumbnailAdded { get; set; }
+        public DateTime? ThumbnailAddedOn { get; set; }
+        public bool IsUsingAzureStorage { get; set; }
+
     }
 }

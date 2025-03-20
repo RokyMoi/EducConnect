@@ -19,5 +19,15 @@ namespace EduConnect.Interfaces.Course
         Task<bool> UpdateCourseBasics(Entities.Course.Course course);
 
         Task<bool> CourseExistsByTitleExceptTheGivenCourseById(Guid courseId, string title);
+
+        Task<bool> CreateCourseThumbnail(Entities.Course.CourseThumbnail courseThumbnail);
+
+        Task<bool> CourseThumbnailExists(Guid courseId);
+
+        Task<Entities.Course.CourseThumbnail?> GetCourseThumbnailByCourseId(Guid courseId);
+
+        Task<bool> UpdateCourseThumbnail(Entities.Course.CourseThumbnail courseThumbnail);
+
+        Task<bool> DeleteCourseThumbnail(Guid courseId);
     }
 }

@@ -36,6 +36,7 @@ import { AdminDashboardComponent } from './modules/admin/admin-dashboard/admin-d
 import { CourseTutorDashboardComponent } from './modules/tutor/course/course-tutor-dashboard/course-tutor-dashboard.component';
 import { CourseTutorManagementComponent } from './modules/tutor/course/course-tutor-management/course-tutor-management.component';
 import { CourseDetailsComponent } from './modules/tutor/course/course-details/course-details.component';
+import { CourseThumbnailComponent } from './modules/tutor/course/course-thumbnail/course-thumbnail.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -108,6 +109,12 @@ export const routes: Routes = [
   {
     path: 'tutor/course/details/:courseId',
     component: CourseDetailsComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/course/thumbnail/:courseId',
+    component: CourseThumbnailComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'tutor' },
   },

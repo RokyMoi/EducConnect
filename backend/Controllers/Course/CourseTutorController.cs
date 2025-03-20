@@ -7,8 +7,11 @@ using backend.Interfaces.Tutor;
 using EduConnect.DTOs;
 using EduConnect.DTOs.Course;
 using EduConnect.Entities;
+using EduConnect.Entities.Course;
 using EduConnect.Interfaces.Course;
 using EduConnect.Middleware;
+using EduConnect.Services;
+using EduConnect.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EduConnect.Controllers.Course
@@ -19,7 +22,8 @@ namespace EduConnect.Controllers.Course
     public class CourseTutorController(
         ICourseRepository _courseRepository,
         IReferenceRepository _referenceRepository,
-        ITutorRepository _tutorRepository
+        ITutorRepository _tutorRepository,
+        AzureBlobStorageService _azureBlobStorageService
     ) : ControllerBase
     {
         [HttpPost("create")]
@@ -233,6 +237,12 @@ namespace EduConnect.Controllers.Course
 
             }
 
+            var thumbnail = await _courseRepository.GetCourseThumbnailByCourseId(courseId);
+
+            Console.WriteLine("Does course have a thumbnail? " + (thumbnail != null));
+
+
+
             var response = new CourseManagementDashboardResponse
             {
                 CourseId = course.CourseId,
@@ -241,7 +251,12 @@ namespace EduConnect.Controllers.Course
                 Category = course.CourseCategory.Name,
                 CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(course.CreatedAt).UtcDateTime,
                 UpdatedAt = course.UpdatedAt != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)course.UpdatedAt).UtcDateTime : null,
+                IsThumbnailAdded = thumbnail != null,
+                ThumbnailAddedOn = thumbnail != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)thumbnail.CreatedAt).UtcDateTime : null,
+                IsUsingAzureStorage = thumbnail != null && !string.IsNullOrEmpty(thumbnail.ThumbnailUrl)
             };
+
+            PrintObjectUtility.PrintObjectProperties(response);
 
             return Ok(
                 ApiResponse<object>.GetApiResponse(
@@ -439,5 +454,258 @@ namespace EduConnect.Controllers.Course
                 )
             );
         }
+
+        [HttpPost("thumbnail/upload")]
+        public async Task<IActionResult> UploadCourseThumbnail(UploadCourseThumbnailRequest request)
+        {
+            const int maxFileSize = 5 * 1024 * 1024; // 5MB
+            //Check file size 
+            if (request.ThumbnailData.Length > maxFileSize)
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Thumbnail maximum file size is 5MB, this file has a size of " + request.ThumbnailData.Length + " bytes",
+                        null
+                    )
+                );
+            }
+
+            //Check if the course exists
+            var course = await _courseRepository.GetCourseById(request.CourseId);
+            if (course == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course not found",
+                        null
+                    )
+                );
+            }
+
+            //Check if file type is image
+            if (!request.ThumbnailData.ContentType.StartsWith("image/"))
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Thumbnail must be an image",
+                        null
+                    )
+                );
+            }
+
+            //Check if the course already has a thumbnail (is it create or update operation)
+            var courseThumbnail = await _courseRepository.GetCourseThumbnailByCourseId(request.CourseId);
+            bool isUpdate = courseThumbnail != null;
+            bool isChangingStorageType = false;
+
+            bool currentlyUsingAzureStorage = false;
+
+            if (isUpdate)
+            {
+                currentlyUsingAzureStorage = !string.IsNullOrEmpty(courseThumbnail.ThumbnailUrl) && courseThumbnail.ThumbnailImageFile == null;
+                isChangingStorageType = currentlyUsingAzureStorage != request.UseAzureStorage;
+            }
+
+
+            string? uploadImageUrl = null;
+            byte[]? thumbnailImageFile = null;
+
+
+
+            if (request.UseAzureStorage)
+            {
+                uploadImageUrl = await _azureBlobStorageService.UploadCourseThumbnailAsync(request.ThumbnailData, request.CourseId.ToString());
+            }
+
+            if (!request.UseAzureStorage)
+            {
+                using var memoryStream = new MemoryStream();
+                await request.ThumbnailData.CopyToAsync(memoryStream);
+                thumbnailImageFile = memoryStream.ToArray();
+            }
+
+            if (isChangingStorageType)
+            {
+                if (currentlyUsingAzureStorage && !request.UseAzureStorage)
+                {
+                    await _azureBlobStorageService.DeleteCourseThumbnailAsync(request.CourseId);
+                }
+
+            }
+
+            if (!isUpdate)
+            {
+                courseThumbnail = new CourseThumbnail
+                {
+                    CourseThumbnailId = Guid.NewGuid(),
+                    CourseId = request.CourseId,
+                    ThumbnailUrl = request.UseAzureStorage ? uploadImageUrl : null,
+                    ThumbnailImageFile = request.UseAzureStorage ? null : thumbnailImageFile,
+                    ContentType = request.ThumbnailData.ContentType,
+                    CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    UpdatedAt = null
+                };
+
+                var createResult = await _courseRepository.CreateCourseThumbnail(courseThumbnail);
+
+                if (!createResult)
+                {
+                    return StatusCode(
+                        500,
+                        ApiResponse<object>.GetApiResponse("Failed to create a thumbnail for this course, please try again later", null)
+                    );
+                }
+            }
+
+            if (isUpdate)
+            {
+                courseThumbnail.ThumbnailUrl = request.UseAzureStorage ? uploadImageUrl : null;
+                courseThumbnail.ThumbnailImageFile = request.UseAzureStorage ? null : thumbnailImageFile;
+                courseThumbnail.ContentType = request.ThumbnailData.ContentType;
+                courseThumbnail.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+                var updateResult = await _courseRepository.UpdateCourseThumbnail(courseThumbnail);
+
+                if (!updateResult)
+                {
+                    return StatusCode(
+                        500,
+                        ApiResponse<object>.GetApiResponse("Failed to update the thumbnail for this course, please try again later", null)
+                    );
+                }
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Thumbnail uploaded successfully",
+                    null
+                )
+            );
+        }
+
+        [HttpGet("thumbnail/get")]
+        public async Task<IActionResult> GetCourseThumbnail([FromQuery] Guid courseId)
+        {
+            var courseThumbnail = await _courseRepository.GetCourseThumbnailByCourseId(courseId);
+
+            if (courseThumbnail == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course thumbnail not found",
+                        null
+                    )
+                );
+            }
+
+            if (courseThumbnail.ThumbnailImageFile != null)
+            {
+                return File(courseThumbnail.ThumbnailImageFile, courseThumbnail.ContentType);
+            }
+
+
+            try
+            {
+                var (stream, contentType) = await _azureBlobStorageService.DownloadCourseThumbnailAsync(courseId);
+                return File(stream, contentType);
+
+            }
+            catch (FileNotFoundException fileEx)
+            {
+
+                Console.WriteLine("Thumbnail for course " + courseId + " not found");
+                Console.WriteLine(fileEx);
+                await _courseRepository.DeleteCourseThumbnail(courseId);
+
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course thumbnail not found",
+                        null
+                    )
+                );
+            }
+
+
+        }
+
+
+        [HttpDelete("thumbnail/delete")]
+        public async Task<IActionResult> DeleteCourseThumbnail([FromQuery] Guid courseId)
+        {
+            var courseThumbnail = await _courseRepository.GetCourseThumbnailByCourseId(courseId);
+
+            if (courseThumbnail == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course thumbnail not found",
+                        null
+                    )
+                );
+            }
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(Guid.Parse(HttpContext.Items["PersonId"].ToString()));
+
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the thumbnail, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            if (tutor.TutorId != courseThumbnail.Course.TutorId)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to delete this thumbnail",
+                        null
+                    )
+                );
+            }
+
+            var blobDeleteResult = await _azureBlobStorageService.DeleteCourseThumbnailAsync(courseId);
+
+            if (!blobDeleteResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the thumbnail on remote server, please try again later",
+                        null
+                    )
+                );
+            }
+            var deleteResult = await _courseRepository.DeleteCourseThumbnail(courseId);
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the thumbnail, please try again later",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Course thumbnail deleted successfully",
+                    null
+                )
+            );
+
+
+        }
+
+
+
+
     }
 }

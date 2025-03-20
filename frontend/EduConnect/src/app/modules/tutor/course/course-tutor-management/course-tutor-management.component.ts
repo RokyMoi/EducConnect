@@ -53,4 +53,8 @@ export class CourseTutorManagementComponent implements OnInit {
   onViewBasics() {
     this.router.navigate(['tutor/course/details/' + this.courseId]);
   }
+
+  onViewThumbnail() {
+    this.router.navigate(['tutor/course/thumbnail/' + this.courseId]);
+  }
 }

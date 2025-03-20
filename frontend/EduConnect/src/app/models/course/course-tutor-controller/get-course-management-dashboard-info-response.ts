@@ -5,4 +5,7 @@ export interface GetCourseManagementDashboardInfoResponse {
   category: string;
   createdAt: string;
   updatedAt: string | null;
+  isThumbnailAdded: boolean;
+  thumbnailAddedOn: string | null;
+  isUsingAzureStorage: boolean;
 }

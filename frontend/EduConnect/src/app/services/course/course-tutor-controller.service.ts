@@ -6,6 +6,7 @@ import { DefaultServerResponse } from '../../models/shared/default-server-respon
 import { CheckCourseTitleExistsEmitGivenCourseRequest } from '../../models/course/course-tutor-controller/check-course-title-exists-emit-given-course-request';
 import { buildHttpParams } from '../../helpers/build-http-params.helper';
 import { UpdateCourseBasicsRequest } from '../../models/course/course-tutor-controller/update-course-basics-request';
+import { UploadCourseThumbnailRequest } from '../../models/course/course-tutor-controller/upload-course-thumbnail-request';
 
 @Injectable({
   providedIn: 'root',
@@ -93,6 +94,50 @@ export class CourseTutorControllerService {
     return this.httpClient.patch<DefaultServerResponse>(
       `${this.apiUrl}/update/basics`,
       request,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  uploadCourseThumbnail(request: UploadCourseThumbnailRequest) {
+    var token = localStorage.getItem('Authorization');
+
+    const formData = new FormData();
+    formData.append('courseId', request.courseId);
+    formData.append('useAzureStorage', String(request.useAzureStorage));
+    formData.append('thumbnailData', request.thumbnailData);
+
+    return this.httpClient.post<DefaultServerResponse>(
+      `${this.apiUrl}/thumbnail/upload`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  getCourseThumbnail(courseId: string) {
+    var token = localStorage.getItem('Authorization');
+    return this.httpClient.get(
+      `${this.apiUrl}/thumbnail/get?courseId=${courseId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      }
+    );
+  }
+
+  deleteCourseThumbnail(courseId: string) {
+    var token = localStorage.getItem('Authorization');
+    return this.httpClient.delete<DefaultServerResponse>(
+      `${this.apiUrl}/thumbnail/delete?courseId=${courseId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -72,6 +72,10 @@ namespace EduConnect.Extensions
             //Add Middleware 
             services.AddScoped<CheckTutorRegistrationAttribute>();
             services.AddScoped<CheckPersonLoginSignupAttribute>();
+
+            //Add Azure Blob Storage
+            services.AddScoped<AzureBlobStorageService>();
+
             //ADD HOSTED SERVICES
             services.AddHostedService<CountrySeederHostedService>();
             services.AddHostedService<IndustryClassificationHostedService>();
