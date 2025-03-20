@@ -14,6 +14,7 @@
             public string? CurrentAcademicInstitution { get; set; }
             public string? CurrentEducationLevel { get; set; }
             public string? MainAreaOfSpecialization { get; set; }
+        public string? CreatedAt { get; set; }
     
         
     }

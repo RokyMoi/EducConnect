@@ -1,10 +1,5 @@
-import { Component, inject } from '@angular/core';
-import {
-  HttpClient,
-  HttpEventType,
-  HttpHeaders,
-  HttpRequest,
-} from '@angular/common/http';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { HttpClient, HttpEventType, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AccountService } from '../../../services/account.service';
 import { NgIf } from '@angular/common';
@@ -17,6 +12,11 @@ import { NgIf } from '@angular/common';
   styleUrls: ['./photo-comp.component.css'],
 })
 export class PhotoComponent {
+MessageSuccessful: any;
+StatusChange() {
+this.FormStatus.emit(false);
+} 
+  @Output() FormStatus = new EventEmitter<boolean>();
   selectedFile: File | null = null;
   uploadProgress: number = 0;
   imagePreview: string | ArrayBuffer | null = null;
@@ -43,18 +43,13 @@ export class PhotoComponent {
       const headers = new HttpHeaders({
         Authorization: `Bearer ${token}`,
       });
-
-      const uploadReq = new HttpRequest(
-        'POST',
-        'http://localhost:5177/Photo/addPersonProfilePicture',
-        formData,
-        {
-          headers: headers,
-          reportProgress: true,
-        }
-      );
-
-      this.http.request(uploadReq).subscribe((event) => {
+  
+      const uploadReq = new HttpRequest('POST', 'http://localhost:5177/Photo/addPersonProfilePicture', formData, {
+        headers: headers,
+        reportProgress: true,
+      });
+  
+      this.http.request(uploadReq).subscribe(event => {
         switch (event.type) {
           case HttpEventType.UploadProgress:
             if (event.total) {
@@ -65,9 +60,11 @@ export class PhotoComponent {
             break;
           case HttpEventType.Response:
             console.log('Upload complete', event.body);
+            this.MessageSuccessful = "Upload Complete: " + event.body;
+            this.FormStatus.emit(false); 
             break;
         }
       });
     }
   }
-}
+  }

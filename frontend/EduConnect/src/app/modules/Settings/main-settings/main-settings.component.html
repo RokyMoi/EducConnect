@@ -3,56 +3,78 @@
     <section class="profile-section">
       <h2>Profile Settings</h2>
       <div class="avatar-container">
-        <img src="https://via.placeholder.com/100" alt="Profile Avatar" class="avatar" />
-        <button class="btn-change-picture">Change Picture</button>
+        <img [src]="photoUrl" alt="Profile Avatar" class="avatar" />
+        <button (click)="OpenPhotoEditor()" class="btn-change-picture">Change Picture</button>
       </div>
+      <app-photo-comp 
+      *ngIf="statusController" 
+      (FormStatus)="HandleFormStatus($event)">
+    </app-photo-comp>
       <div class="profile-inputs">
         <div class="input-group">
             <label for="firstname">First name</label>
             <input type="text" id="firstname" disabled placeholder="Your description" />
-            <button class="edit-btn"><i ></i> Edit</button>
+            <button (click)="OpenEditor('FirstName')" class="edit-btn"><i ></i> Edit</button>
           </div>
+
+          <app-dynamic-form *ngIf="settingsControll && type=='FirstName'"
+           [ApiLink]="FirstNameLink" [valueNameChild]="'First Name'" 
+           (FormStatus)="HandleFormStatusForMain($event)"></app-dynamic-form>
+
           <div class="input-group">
             <label for="lastname">Last Name</label>
             <input type="text" id="lastname" disabled placeholder="Your description" />
-            <button class="edit-btn"><i></i> Edit</button>
+            <button (click)="OpenEditor('LastName')" class="edit-btn"><i></i> Edit</button>
           </div>
+
+          <app-dynamic-form *ngIf="settingsControll && type=='LastName'"
+           [ApiLink]="LastNameLink" 
+           [valueNameChild]="'Last Name'"
+           (FormStatus)="HandleFormStatusForMain($event)">
+          </app-dynamic-form>
+
         <div class="input-group">
           <label for="description">Description</label>
           <input type="text" id="description" disabled placeholder="Your description" />
-          <button class="edit-btn"><i></i> Edit</button>
+          <button (click)="OpenEditor('Description')" class="edit-btn"><i></i> Edit</button>
         </div>
-        <div class="input-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" disabled placeholder="you@example.com" />
-          <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
-        </div>
+
+        <app-dynamic-form *ngIf="settingsControll && type=='Description'"
+        [ApiLink]="DescriptionLink" [valueNameChild]="'Description'"
+        (FormStatus)="HandleFormStatusForMain($event)"
+        ></app-dynamic-form>
+
+       
         <div class="input-group">
           <label for="password">Password</label>
           <input type="password" id="password" disabled placeholder="********" />
-          <button class="edit-btn"><i></i> Edit</button>
+          <button (click)="OpenEditor('Password')" class="edit-btn"><i></i> Edit</button>
         </div>
+        <app-dynamic-form [ApiLink]="PasswordChangeLink"
+        *ngIf="settingsControll && type=='Password'"
+        [valueNameChild]="'Password'"
+        (FormStatus)="HandleFormStatusForMain($event)"></app-dynamic-form>
         <div class="input-group">
           <label for="phone">Phone</label>
           <input type="text" id="phone" disabled placeholder="+1234567890" />
-          <button class="edit-btn"><i></i> Edit</button>
+          <button (click)="OpenEditor('Phone')" class="edit-btn"><i></i> Edit</button>
         </div>
-        <label>Add social media links</label>
-        <div class="input-group">
+        <!-- <label>Add social media links</label> -->
+        <!-- <div class="input-group">
             <label for="twitter">TwitterLink</label>
             <input type="text" id="twitter" disabled placeholder="TwitterLink" />
-            <button class="edit-btn"><i></i> Edit</button>
+            <button (click)="OpenEditor()" class="edit-btn"><i></i> Edit</button>
           </div>
           <div class="input-group">
             <label for="facebook">Facebook Link</label>
             <input type="text" id="facebook" disabled placeholder="instagramLink" />
-            <button class="edit-btn"><i></i> Edit</button>
+            <button (click)="OpenEditor()" class="edit-btn"><i></i> Edit</button>
           </div>
           <div class="input-group">
             <label for="instagram">Instagram Link</label>
             <input type="text" id="instagram" disabled placeholder="FacebookLink" />
-            <button class="edit-btn"><i></i> Edit</button>
-          </div>
+            <button (click)="OpenEditor()" class="edit-btn"><i></i> Edit</button>
+          </div> -->
       </div>
     </section>
   

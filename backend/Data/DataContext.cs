@@ -11,6 +11,9 @@ using EduConnect.Entities.Course;
 using backend.Entities.Reference.Learning;
 using backend.Entities.Reference.Language;
 using backend.Entities.Course;
+using EduConnect.Entities.Messenger;
+using EduConnect.Entities.Shopping;
+using EduConnect.Entities.Course;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 
@@ -27,10 +30,12 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<Person> Person { get; set; }
     public DbSet<PersonDetails> PersonDetails { get; set; }
+
     public DbSet<PersonEmail> PersonEmail { get; set; }
     public DbSet<PersonPassword> PersonPassword { get; set; }
     public DbSet<PersonProfilePicture> PersonProfilePicture { get; set; }
     public DbSet<PersonSalt> PersonSalt { get; set; }
+    public DbSet<PersonPhoto> PersonPhoto { get; set; }
     public DbSet<PersonVerificationCode> PersonVerificationCode { get; set; }
 
     public DbSet<PersonPhoneNumber> PersonPhoneNumber { get; set; }
@@ -40,9 +45,16 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<TutorRegistrationStatus> TutorRegistrationStatus { get; set; }
     public DbSet<Student> Student { get; set; }
+    public DbSet<Message> Message { get; set; }
     public DbSet<StudentDetails> StudentDetails { get; set; }
 
     public DbSet<Country> Country { get; set; }
+    public DbSet<Course> Course { get; set; }
+    public DbSet<ShoppingCart> ShoppingCart { get; set; }
+    public DbSet<WishList> WishList { get; set; }
+
+
+
 
     public DbSet<LearningCategory> LearningCategory { get; set; }
     public DbSet<EduConnect.Entities.Learning.LearningSubcategory> LearningSubCategory { get; set; }
@@ -58,6 +70,7 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
     public DbSet<PersonAvailability> PersonAvailibility { get; set; }
 
     public DbSet<CommunicationType> CommunicationType { get; set; }
+    public DbSet<IndustryClassification> IndustryClassification { get; set; }
 
     public DbSet<EngagementMethod> EngagementMethod { get; set; }
 
@@ -67,7 +80,7 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<Course> Course { get; set; }
 
-
+    public DbSet<CourseDetails> CourseDetails { get; set; }
 
 
     public DbSet<LearningDifficultyLevel> LearningDifficultyLevel { get; set; }
@@ -127,7 +140,6 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
             .HasForeignKey(ct => ct.TagId)
             .OnDelete(DeleteBehavior.ClientSetNull);
     }
-
 
 
 

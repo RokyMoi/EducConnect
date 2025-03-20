@@ -1,4 +1,5 @@
 * {
+
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -7,6 +8,7 @@ html{
     position: relative;
 }
 body {
+    overflow-y: scroll;
     height: 100%;
     width: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -24,7 +26,7 @@ body {
     flex-direction: column;
     width: 100%;
     max-width: 900px;
-    height: 100%;
+    height: 87%;
     background-color: #ffffff;
     border-radius: 12px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
@@ -90,8 +92,9 @@ h3 {
     padding: 20px;
     flex-grow: 1;
     background-color: #f9f9f9;
-    overflow-y: auto; /* Skrol samo za poruke */
-    max-height: calc(100vh - 140px); /* Prilagodljiva visina */
+    overflow-y: auto;
+    min-height: 70vh;
+    max-height: calc(100vh - 140px); 
 }
 
 .message {
@@ -127,7 +130,7 @@ h3 {
     border-radius: 15px;
     position: relative;
     font-size: 14px;
-    color: white;
+    color: black;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 

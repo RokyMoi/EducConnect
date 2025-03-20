@@ -5,6 +5,7 @@
   }
   
   body {
+    overflow-y: scroll;
     font-family: 'Roboto', sans-serif;
     background: #f4f7fc;
     color: #333;

@@ -15,8 +15,12 @@ using backend.Middleware.Tutor;
 using backend.Repositories.Person;
 using backend.Repositories.Reference;
 using backend.Repositories.Tutor;
+
+using EduConnect.Helpers;
+
 using backend.Services;
 using EduConnect.Entities.Person;
+
 using EduConnect.Interfaces;
 using EduConnect.Services;
 using Microsoft.AspNetCore.Identity;
@@ -24,6 +28,11 @@ using EduConnect.Data;
 using EduConnect.Utilities;
 using EduConnect.Interfaces.Course;
 using EduConnect.Repositories.Course;
+using EduConnect.Repositories.MessageRepository;
+using EduConnect.SignalIR;
+using EduConnect.Interfaces.Shopping;
+using EduConnect.Interfaces.GenericTesting;
+using EduConnect.Repositories;
 
 namespace EduConnect.Extensions
 {
@@ -43,6 +52,9 @@ namespace EduConnect.Extensions
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<ITutorRepository, TutorRepository>();
+            services.AddScoped<IPhotoService, PhotoService>();
+            services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IPersonEducationInformationRepository, PersonEducationInformationRepository>();
             services.AddScoped<IPersonCareerInformationRepository, PersonCareerInformationRepository>();
@@ -50,9 +62,10 @@ namespace EduConnect.Extensions
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
 
-            services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<ICourseRepository, CourseRepository>();            services.AddScoped<IMessageRepository,MessageRepository>();
 
-            //Add Database Seeders as Scoped services
+
+
             services.AddScoped<CountryExtractor>();
             services.AddScoped<ExtractIndustryClassification>();
             services.AddScoped<ExtractLearningCategoriesAndSubcategories>();
@@ -79,6 +92,19 @@ namespace EduConnect.Extensions
             //ADD HOSTED SERVICES
             services.AddHostedService<CountrySeederHostedService>();
             services.AddHostedService<IndustryClassificationHostedService>();
+
+
+            services.AddAutoMapper(typeof(AutoMapperProfiles));
+            /////////SHOPPING SERVICES
+            services.AddScoped<IShoppingCartService,ShoppingCartService>();
+            services.AddScoped<IWishListCourse, WishListService>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+
+
+            ///////////////////////////////
+            services.AddSignalR();
+            services.AddSingleton<PresenceTracker>();
             services.AddHostedService<LearningCategoryAndSubcategoryHostedService>();
 
             services.AddIdentity<Person, IdentityRole<Guid>>(
