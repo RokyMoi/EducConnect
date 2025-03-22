@@ -92,7 +92,6 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.Course
             .Include(x => x.CourseCategory)
             .Include(x => x.LearningDifficultyLevel)
-            .Include(x => x.CourseThumbnail)
             .Where(x => x.TutorId == tutorId).ToListAsync();
         }
 
