@@ -180,8 +180,7 @@ namespace EduConnect.Migrations
 
                     b.HasKey("CourseThumbnailId");
 
-                    b.HasIndex("CourseId")
-                        .IsUnique();
+                    b.HasIndex("CourseId");
 
                     b.ToTable("CourseThumbnail", "Course");
                 });
@@ -1484,8 +1483,8 @@ namespace EduConnect.Migrations
             modelBuilder.Entity("EduConnect.Entities.Course.CourseThumbnail", b =>
                 {
                     b.HasOne("EduConnect.Entities.Course.Course", "Course")
-                        .WithOne("CourseThumbnail")
-                        .HasForeignKey("EduConnect.Entities.Course.CourseThumbnail", "CourseId")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1841,11 +1840,6 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.Course", b =>
-                {
-                    b.Navigation("CourseThumbnail");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.Person", b =>

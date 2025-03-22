@@ -11,6 +11,4 @@ export interface GetAllCoursesResponse {
   maxNumberOfStudents: number | null;
   publishedStatus: boolean | null;
   createdAt: string;
-  hasThumbnail: boolean;
-  thumbnailUrl?: string;
 }
