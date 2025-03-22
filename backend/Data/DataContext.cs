@@ -76,9 +76,7 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<TutorTeachingInformation> TutorTeachingInformation { get; set; }
 
-    public DbSet<IndustryClassification> IndustryClassification { get; set; }
 
-    public DbSet<Course> Course { get; set; }
 
     public DbSet<CourseDetails> CourseDetails { get; set; }
 

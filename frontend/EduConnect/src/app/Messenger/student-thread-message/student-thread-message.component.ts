@@ -5,12 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../../services/account.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { NgClass, NgForOf } from '@angular/common';
+import { CommonModule, NgClass, NgForOf } from '@angular/common';
 
 @Component({
   selector: 'app-student-thread-message',
   standalone: true,
-  imports: [NgIf, NgFor, NgForOf, NgClass, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './student-thread-message.component.html',
   styleUrls: ['./student-thread-message.component.css'],
 })
@@ -38,14 +38,20 @@ export class StudentThreadMessageComponent implements OnInit, OnDestroy {
 
       const currentUser = this.accountService.CurrentUser();
       if (currentUser?.Email === this.senderEmail) {
-        this.messageService.ceateHubConnection(currentUser, this.recipientEmail);
+        this.messageService.ceateHubConnection(
+          currentUser,
+          this.recipientEmail
+        );
       }
       if (currentUser?.Email === this.recipientEmail) {
         this.messageService.ceateHubConnection(currentUser, this.senderEmail);
       }
 
       const currentUserEmail = this.accountService.CurrentUser()?.Email;
-      this.userForPhoto = currentUserEmail === this.senderEmail ? this.recipientEmail : this.senderEmail;
+      this.userForPhoto =
+        currentUserEmail === this.senderEmail
+          ? this.recipientEmail
+          : this.senderEmail;
       this.getImageForUser(this.userForPhoto);
     });
 
@@ -72,9 +78,10 @@ export class StudentThreadMessageComponent implements OnInit, OnDestroy {
       recipientEmailToSend = this.senderEmail;
     }
 
-    this.messageService.SendMessageToUser(recipientEmailToSend, this.messageContent)
+    this.messageService
+      .SendMessageToUser(recipientEmailToSend, this.messageContent)
       .then(() => {
-        this.messageContent = '';  // Clear the message input
+        this.messageContent = ''; // Clear the message input
       })
       .catch((error) => {
         console.error('Error sending message:', error);
@@ -88,7 +95,11 @@ export class StudentThreadMessageComponent implements OnInit, OnDestroy {
       headers = headers.append('Authorization', `Bearer ${token}`);
     }
 
-    this.http.get<{ data: { url: string } }>(`http://localhost:5177/Photo/GetPhotoForUser/${email}`, { headers })
+    this.http
+      .get<{ data: { url: string } }>(
+        `http://localhost:5177/Photo/GetPhotoForUser/${email}`,
+        { headers }
+      )
       .subscribe({
         next: (response) => {
           this.photourl = response.data.url;

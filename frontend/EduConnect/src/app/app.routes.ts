@@ -24,12 +24,11 @@ import { CareerSignupComponent } from './modules/signup/registration-step-proces
 import { AvailabilitySignupComponent } from './modules/signup/registration-step-process/availability/availability-signup/availability-signup.component';
 import { TutorTeachingStyleComponent } from './modules/signup/registration-step-process/tutor-teaching-style/tutor-teaching-style.component';
 
-
-import { DynamicFormComponent } from './SetingsStudent/dynamic-form/dynamic-form.component';
+import { DynamicFormComponent } from './modules/SetingsStudent/dynamic-form/dynamic-form.component';
 import { SendMessageComponent } from './Messenger/send-message/send-message.component';
 import { ListOfUsersComponent } from './Messenger/list-of-users/list-of-users.component';
 import { CartItemsComponent } from './ShoppingCart/cart-items/cart-items.component';
-import { WishlistComponent } from './ShoppingCart/wishlist/wishlist.component';
+import { WishlistComponent } from './modules/ShoppingCart/wishlist/wishlist.component';
 import { CourseSupportedLanguagesComponent } from './modules/tutor/course/course-supported-languages/course-supported-languages.component';
 import { CourseMainMaterialsComponent } from './modules/tutor/course/course-main-materials/course-main-materials.component';
 import { ConfirmCourseTypeComponent } from './modules/tutor/course/confirm-course-type/confirm-course-type.component';
@@ -50,7 +49,7 @@ import { CourseTutorTeachingResourcesDetailsComponent } from './modules/tutor/co
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
   { path: '', component: BodyComponent },
-  {path: "settings",component:MainSettingsComponent},
+  { path: 'settings', component: MainSettingsComponent },
   { path: 'student-register', component: RegisterStudentComponent },
   { path: 'tutor-signup', component: TutorSignupComponent },
   { path: 'login', component: LoginComponent },
@@ -66,19 +65,22 @@ export const routes: Routes = [
     component: StudentThreadMessageComponent,
   },
   { path: 'viewOfAllCourses', component: CourseLandingPageComponent },
-  {path: 'student-profile', component: StudentProfileComponent},
-  {path: 'learning-student', component: LearningComponent},
+  { path: 'student-profile', component: StudentProfileComponent },
+  { path: 'learning-student', component: LearningComponent },
   { path: 'student-dashboard', component: StudentDashboardComponent },
   { path: 'tutor-dashboard', component: TutorDashboardComponent },
-  {path: 'dynamicForm',component: DynamicFormComponent},
-  {path: 'student-message-preview',component: MessagesComponent},
-  {path: 'direct-message',component: DirectMessagingsComponent},
-  {path: 'studentMessageThread/:id',component: StudentThreadMessageComponent},
-  {path: 'viewOfAllCourses',component:CourseLandingPageComponent},
-  {path: 'send-message',component:SendMessageComponent},
-  {path: 'Shopping-Cart', component: CartItemsComponent},
-  {path: 'course-wishlist', component: WishlistComponent},
-  {path: 'ListOfUsers', component: ListOfUsersComponent},
+  { path: 'dynamicForm', component: DynamicFormComponent },
+  { path: 'student-message-preview', component: MessagesComponent },
+  { path: 'direct-message', component: DirectMessagingsComponent },
+  {
+    path: 'studentMessageThread/:id',
+    component: StudentThreadMessageComponent,
+  },
+  { path: 'viewOfAllCourses', component: CourseLandingPageComponent },
+  { path: 'send-message', component: SendMessageComponent },
+  { path: 'Shopping-Cart', component: CartItemsComponent },
+  { path: 'course-wishlist', component: WishlistComponent },
+  { path: 'ListOfUsers', component: ListOfUsersComponent },
 
   {
     path: 'signup/phone-number',
@@ -172,5 +174,3 @@ export const routes: Routes = [
   },
   { path: '**', component: BodyComponent },
 ];
-
-

@@ -8,8 +8,12 @@ import {
 } from '../models/paginationHelper';
 import { AccountService } from './account.service';
 import { environment } from '../../environments/environment.development';
-import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
-import { User } from '../_models/User';
+import {
+  HubConnection,
+  HubConnectionBuilder,
+  HubConnectionState,
+} from '@microsoft/signalr';
+import { User } from '../models/User';
 
 @Injectable({
   providedIn: 'root',
@@ -17,33 +21,37 @@ import { User } from '../_models/User';
 export class MessageService {
   baseUrl = 'http://localhost:5177/Messenger/GetMessagesForUser';
   private http = inject(HttpClient);
-  hubUrl= environment.hubsUrl;
+  hubUrl = environment.hubsUrl;
   HubConnection?: HubConnection;
   accService = inject(AccountService);
-  paginatedResultForMessaging = signal<PaginationResult<Message[]> | null>(null);
+  paginatedResultForMessaging = signal<PaginationResult<Message[]> | null>(
+    null
+  );
   messageThread = signal<Message[]>([]);
 
-  ceateHubConnection(user: User,otherEmail: string){
+  ceateHubConnection(user: User, otherEmail: string) {
     this.HubConnection = new HubConnectionBuilder()
-    .withUrl(this.hubUrl + 'message?user=' + otherEmail,{
-      accessTokenFactory: () => user.Token
-    }).withAutomaticReconnect().build();
+      .withUrl(this.hubUrl + 'message?user=' + otherEmail, {
+        accessTokenFactory: () => user.Token,
+      })
+      .withAutomaticReconnect()
+      .build();
 
-    this.HubConnection.start().catch(error => console.log(error));
+    this.HubConnection.start().catch((error) => console.log(error));
     this.HubConnection.on('ReceiveMessageThread', (messages: Message[]) => {
       console.log('Received messages:', messages);
       this.messageThread.set(messages);
     });
     this.HubConnection.on('NewMessage', (message: Message) => {
       console.log('Added new message:', message);
-      this.messageThread.update(messages => [...messages, message])
+      this.messageThread.update((messages) => [...messages, message]);
     });
   }
-StopHubConnection(){
-  if(this.HubConnection?.state == HubConnectionState.Connected){
-    this.HubConnection.stop().catch(error => console.log(error));
+  StopHubConnection() {
+    if (this.HubConnection?.state == HubConnectionState.Connected) {
+      this.HubConnection.stop().catch((error) => console.log(error));
+    }
   }
-}
   getMessages(pageNumber: number, pageSize: number, container: string) {
     let params = setPaginationHeaders(pageNumber, pageSize);
     let headers = new HttpHeaders();
@@ -81,9 +89,9 @@ StopHubConnection(){
     );
   }
   async SendMessageToUser(email: string, content: string) {
-
-
-      this.HubConnection?.invoke('SendMessage',{RecipientEmail: email,Content:content})
-
-}
+    this.HubConnection?.invoke('SendMessage', {
+      RecipientEmail: email,
+      Content: content,
+    });
+  }
 }

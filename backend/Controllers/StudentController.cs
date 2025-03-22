@@ -187,7 +187,6 @@ namespace EduConnect.Controllers
             {
                 PersonPhoneNumberId = Guid.NewGuid(),
                 PersonId = Person.PersonId,
-                StudentId = Guid.NewGuid(),
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 UpdatedAt = null
 
