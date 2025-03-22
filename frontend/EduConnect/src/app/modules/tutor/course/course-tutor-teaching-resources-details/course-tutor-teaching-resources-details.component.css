@@ -1,3 +1,33 @@
+.teaching-resources-details-container {
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.action-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.go-back-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.go-back-button:hover {
+  background-color: #0056b3;
+}
+
 .course-thumbnail-container {
   width: 100%;
   display: flex;
@@ -297,3 +327,25 @@
   width: 100%;
 }
 
+.form-item textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 100px;
+  resize: none;
+}
+
+.form-item select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.error-container {
+  display: block;
+  color: #ff4d4d;
+  font-size: 0.875em;
+  margin-top: 5px;
+  height: 16px;
+}

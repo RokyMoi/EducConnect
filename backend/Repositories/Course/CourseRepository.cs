@@ -16,6 +16,12 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.CourseCategory.Where(x => x.CourseCategoryId == courseCategoryId).AnyAsync();
         }
 
+        public async Task<bool> CourseExistsById(Guid courseId)
+        {
+            return await _dataContext.Course
+            .Where(x => x.CourseId == courseId).AnyAsync();
+        }
+
         public async Task<bool> CourseExistsByTitle(string courseTitle)
         {
             return await _dataContext.Course.Where(x => x.Title.ToLower().Equals(courseTitle.ToLower())).AnyAsync();
@@ -47,6 +53,22 @@ namespace EduConnect.Repositories.Course
             {
 
                 Console.WriteLine("Failed to create course " + course.Title);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> CreateCourseTeachingResource(CourseTeachingResource courseTeachingResource)
+        {
+            try
+            {
+                await _dataContext.CourseTeachingResource.AddAsync(courseTeachingResource);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("Failed to create course teaching resource " + courseTeachingResource.CourseId);
                 Console.WriteLine(ex);
                 return false;
             }
@@ -104,6 +126,13 @@ namespace EduConnect.Repositories.Course
             .FirstOrDefaultAsync(x => x.CourseId == courseId);
         }
 
+        public async Task<CourseTeachingResource?> GetCourseTeachingResourceById(Guid courseTeachingResourceId)
+        {
+            return await _dataContext.CourseTeachingResource
+            .Where(x => x.CourseTeachingResourceId == courseTeachingResourceId)
+            .FirstOrDefaultAsync();
+        }
+
         public async Task<CourseThumbnail?> GetCourseThumbnailByCourseId(Guid courseId)
         {
             return await _dataContext.CourseThumbnail.Include(x => x.Course).Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
@@ -121,6 +150,23 @@ namespace EduConnect.Repositories.Course
             {
 
                 Console.WriteLine("Failed to update course " + course.Title);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateCourseTeachingResource(CourseTeachingResource courseTeachingResource)
+        {
+            try
+            {
+                _dataContext.CourseTeachingResource.Update(courseTeachingResource);
+                await _dataContext.SaveChangesAsync();
+                return true;
+
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("Failed to update course teaching resource " + courseTeachingResource.CourseId);
                 Console.WriteLine(ex);
                 return false;
             }

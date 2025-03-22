@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EduConnect.Entities.Course;
 
 namespace EduConnect.Interfaces.Course
 {
@@ -29,5 +30,13 @@ namespace EduConnect.Interfaces.Course
         Task<bool> UpdateCourseThumbnail(Entities.Course.CourseThumbnail courseThumbnail);
 
         Task<bool> DeleteCourseThumbnail(Guid courseId);
+
+        Task<bool> CourseExistsById(Guid courseId);
+
+        Task<bool> CreateCourseTeachingResource(Entities.Course.CourseTeachingResource courseTeachingResource);
+
+        Task<CourseTeachingResource?> GetCourseTeachingResourceById(Guid courseTeachingResourceId);
+
+        Task<bool> UpdateCourseTeachingResource(CourseTeachingResource courseTeachingResource);
     }
 }

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import ApiLinks from '../../../assets/api/link.api';
 import { CreateCourseRequest } from '../../models/course/course-tutor-controller/create-course-request';
@@ -7,6 +7,7 @@ import { CheckCourseTitleExistsEmitGivenCourseRequest } from '../../models/cours
 import { buildHttpParams } from '../../helpers/build-http-params.helper';
 import { UpdateCourseBasicsRequest } from '../../models/course/course-tutor-controller/update-course-basics-request';
 import { UploadCourseThumbnailRequest } from '../../models/course/course-tutor-controller/upload-course-thumbnail-request';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -110,15 +111,32 @@ export class CourseTutorControllerService {
     formData.append('useAzureStorage', String(request.useAzureStorage));
     formData.append('thumbnailData', request.thumbnailData);
 
-    return this.httpClient.post<DefaultServerResponse>(
-      `${this.apiUrl}/thumbnail/upload`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    return this.httpClient
+      .post<DefaultServerResponse>(
+        `${this.apiUrl}/thumbnail/upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          reportProgress: true,
+          observe: 'events',
+        }
+      )
+      .pipe(
+        map((event: HttpEvent<DefaultServerResponse>) => {
+          if (event.type === HttpEventType.UploadProgress) {
+            const progress = event.total
+              ? Math.round((100 * event.loaded) / event.total)
+              : 0;
+            return { progress, response: null };
+          }
+          if (event.type === HttpEventType.Response) {
+            return { progress: 100, response: event.body };
+          }
+          return { progress: 0, response: null };
+        })
+      );
   }
 
   getCourseThumbnail(courseId: string) {

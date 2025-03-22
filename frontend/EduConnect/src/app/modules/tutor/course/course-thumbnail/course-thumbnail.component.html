@@ -21,7 +21,13 @@
 
             </div>
             <div class="form-item">
-                <div class="file-upload-wrapper">
+                <div class="file-upload-wrapper" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                    (drop)="onDrop($event)" [class.dragging]="isDragging">
+                    <div class="drag-drop-content">
+                        <span class="upload-icon">📤</span>
+                        <p class="drag-drop-text">Drag and drop your thumbnail here</p>
+                        <p class="drag-drop-subtext">or</p>
+                    </div>
                     <label for="thumbnailData" class="file-upload-label">
                         <span class="upload-button">Choose File</span>
                     </label>
@@ -37,6 +43,20 @@
                 </div>
             </div>
         </form>
+
+        <div class="upload-progress-area-container" *ngIf="uploadInProgress">
+            <label for="thumbnailFileName">Upload Status</label>
+            <div class="upload-progress-container">
+                <div class="progress-status">
+                    <span>{{uploadStatusMessage}}</span>
+
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" [style.width.%]="uploadProgress"></div>
+                </div>
+                <div class="progress-percentage">{{uploadProgress}}%</div>
+            </div>
+        </div>
         <div class="preview-container" *ngIf="previewUrl">
             <h4>{{isNewOrExisting ? 'Preview' : 'Current thumbnail'}}</h4>
             <img [src]="previewUrl" alt="Thumbnail preview" class="thumbnail-preview">

@@ -56,6 +56,12 @@ export class CourseThumbnailComponent implements OnInit {
 
   showRemoveDialog: boolean = false;
 
+  uploadInProgress: boolean = false;
+  uploadProgress: number = 50;
+  uploadStatusMessage: string = '';
+
+  isDragging: boolean = false;
+
   constructor(
     private snackboxService: SnackboxService,
     private courseTutorControllerService: CourseTutorControllerService,
@@ -98,29 +104,7 @@ export class CourseThumbnailComponent implements OnInit {
 
     if (this.checkFile()) {
       this.createPreviewUrl();
-
-      try {
-        const compressedFile = await this.imageCompressionService.compressImage(
-          this.selectedFile as File,
-          {
-            maxWidth: 1024,
-            maxHeight: 1024,
-            quality: 0.5,
-          }
-        );
-
-        console.log(
-          `Original file size: ${this.selectedFile?.size} - Compressed file size: ${compressedFile.size}`
-        );
-
-        this.selectedFile = compressedFile;
-      } catch (error) {
-        console.log('Compression failed: ', error);
-        this.snackboxService.showSnackbox(
-          'We failed to compress the thumbnail image, ' + error,
-          'error'
-        );
-      }
+      await this.handleImageCompression();
     }
   }
 
@@ -195,13 +179,29 @@ export class CourseThumbnailComponent implements OnInit {
         .value as boolean,
       thumbnailData: this.selectedFile as File,
     };
+
+    this.uploadInProgress = true;
+    this.uploadProgress = 0;
+    this.uploadStatusMessage = 'Preparing to upload...';
+    this.showSaveDialog = false;
     this.courseTutorControllerService.uploadCourseThumbnail(request).subscribe({
       next: (response) => {
-        this.snackboxService.showSnackbox(
-          'Thumbnail uploaded successfully',
-          'success'
-        );
-        this.showSaveDialog = false;
+        this.uploadProgress = response.progress;
+
+        if (this.uploadProgress < 100) {
+          this.uploadStatusMessage = `Uploading ${this.uploadProgress}% complete`;
+        } else if (response.response) {
+          this.uploadStatusMessage = 'Upload complete! Processing...';
+        }
+
+        if (response.response) {
+          this.uploadInProgress = false;
+
+          this.snackboxService.showSnackbox(
+            'Thumbnail uploaded successfully',
+            'success'
+          );
+        }
       },
       error: (error) => {
         this.snackboxService.showSnackbox(
@@ -243,5 +243,59 @@ export class CourseThumbnailComponent implements OnInit {
           );
         },
       });
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  async onDrop(event: DragEvent): Promise<void> {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+      this.isNewOrExisting = true;
+      this.selectedFile = event.dataTransfer.files[0];
+
+      if (this.checkFile()) {
+        this.createPreviewUrl();
+        await this.handleImageCompression();
+      }
+      event.dataTransfer.clearData();
+    }
+  }
+
+  private async handleImageCompression(): Promise<void> {
+    try {
+      const compressedFile = await this.imageCompressionService.compressImage(
+        this.selectedFile as File,
+        {
+          maxWidth: 1024,
+          maxHeight: 1024,
+          quality: 0.5,
+        }
+      );
+
+      console.log(
+        `Original file size: ${this.selectedFile?.size} - Compressed file size: ${compressedFile.size}`
+      );
+
+      this.selectedFile = compressedFile;
+    } catch (error) {
+      console.log('Compression failed: ', error);
+      this.snackboxService.showSnackbox(
+        'We failed to compress the thumbnail image, ' + error,
+        'error'
+      );
+    }
   }
 }

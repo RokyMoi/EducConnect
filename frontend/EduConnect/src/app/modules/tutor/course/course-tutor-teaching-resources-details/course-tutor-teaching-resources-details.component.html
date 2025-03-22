@@ -1,0 +1,45 @@
+<div class="teaching-resources-details-container">
+    <h2>Teaching Resource Details</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+
+    </div>
+    <form [formGroup]="courseTeachingResourceFormGroup">
+        <div class="form-item">
+            <label for="resourceType">Are you going to upload a file or set an url?</label>
+            <div class="checkbox-container">
+                <input type="checkbox" id="resourceType" name="resourceType" formControlName="resourceType">
+                <label for="resourceType">
+                    {{courseTeachingResourceFormGroup.controls['resourceType'].value ?
+                    'Resource: URL' : 'Resource: File'}}
+                </label>
+            </div>
+
+        </div>
+        <div class="form-item">
+            <label for="resourceType">Resource Title</label>
+            <input type="text" id="title" name="title" formControlName="title"
+                placeholder="Enter the title of the resource the users will see">
+            <div class="error-container">
+                <p>{{titleErrorMessage}}</p>
+            </div>
+        </div>
+        <div class="form-item">
+            <label for="description">Resource Description</label>
+            <textarea id="description" name="description" formControlName="description"
+                placeholder="Describe this resource"></textarea>
+            <div class="error-container">
+                <p>{{descriptionErrorMessage}}</p>
+            </div>
+        </div>
+        <div class="form-item" *ngIf="courseTeachingResourceFormGroup.controls['resourceType'].value">
+            <label for="resourceType">Resource URL</label>
+            <input type="url" id="resourceLink" name="resourceLink" formControlName="resourceLink"
+                placeholder="Enter the url of the resource">
+            <div class="error-container">
+                <p>{{urlErrorMessage}}</p>
+            </div>
+        </div>
+
+    </form>
+</div>

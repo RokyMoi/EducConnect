@@ -31,7 +31,14 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authenticationGuardService.checkIsValidToken();
+    this.authenticationGuardService.checkIsValidToken().subscribe({
+      next: (response) => {
+        console.log('Response');
+      },
+      error: (error) => {
+        console.log('Error');
+      },
+    });
   }
   login() {
     this.personControllerService
