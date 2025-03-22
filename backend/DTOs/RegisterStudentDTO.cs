@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using System.ComponentModel.DataAnnotations;
+
 namespace EduConnect.DTOs
 {
     public class RegisterStudentDTO
@@ -28,11 +30,8 @@ namespace EduConnect.DTOs
         [RegularExpression(@"^\+\d+$", ErrorMessage = "The field must start with '+' and contain at least one digit.")]
         public required string PhoneNumberCountryCode { get; set; }
 
-        [Required]
-        [RegularExpression(@"^\d+$", ErrorMessage = "The field must contain numbers only.")]
         public required string PhoneNumber { get; set; }
 
-        [Required]
         public required string CountryOfOrigin { get; set; }
     }
 }

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+  
+</head>
+<body>
+    
+    <div class="container">
+        <button class="go-back" (click)="NavigateCurrentUser()">Go back</button>
+        <div class="user-list" *ngFor="let user of users">
+           
+            <div class="user-card">
+                <img [src]="user.photoLink" alt="User Avatar" class="avatar">
+                <div class="user-info">
+                    <p class="user-email">{{user.firstName+' '+ user.lastName}}</p>
+              
+                    <p class="user-email">{{user.email}}</p>
+                </div>
+                <button (click)="OpenThread(user.email)" class="new-chat">New Chat</button>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

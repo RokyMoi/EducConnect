@@ -1,16 +1,22 @@
-﻿using backend.Interfaces.Person;
+using backend.Interfaces.Person;
 using backend.Interfaces.Reference;
+using backend.Entities.Person;
+using backend.Middleware;
 using EduConnect.Data;
 using EduConnect.DTOs;
 using EduConnect.Entities;
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
+using EduConnect.Extensions;
+using EduConnect.Helpers;
 using EduConnect.Interfaces;
 using EduConnect.Utilities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -32,10 +38,12 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-        [HttpGet("student/{email}")]
-        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByEmail(string email)
+        [HttpGet("getCurrentStudentForProfile")]
+        [CheckPersonLoginSignup]
+        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByEmail()
         {
-            var students = await _studentRepo.GetStudentInfoByEmail(email);
+            var caller = new Caller(this.HttpContext);
+            var students = await _studentRepo.GetStudentInfoByEmail(caller.Email);
 
             if (students == null)
             {
@@ -179,8 +187,7 @@ namespace EduConnect.Controllers
             {
                 PersonPhoneNumberId = Guid.NewGuid(),
                 PersonId = Person.PersonId,
-                PhoneNumber = request.PhoneNumber,
-                NationalCallingCodeCountryId = countryOfPhoneNumber.CountryId,
+                StudentId = Guid.NewGuid(),
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 UpdatedAt = null
 

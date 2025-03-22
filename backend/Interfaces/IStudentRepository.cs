@@ -1,6 +1,7 @@
 ﻿using backend.DTOs.Student;
 using EduConnect.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EduConnect.Interfaces
 {
@@ -9,7 +10,9 @@ namespace EduConnect.Interfaces
         Task<IEnumerable<StudentDTO>> GetAllStudents();
         Task<StudentDTO> GetStudentInfoByEmail(string email);
 
+
         Task<StudentEntityDTO> GetStudentByPersonId(Guid personId);
+
     }
 
 }

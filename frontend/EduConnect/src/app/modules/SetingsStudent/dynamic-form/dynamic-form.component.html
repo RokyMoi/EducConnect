@@ -1,1 +1,19 @@
-<p>dynamic-form works!</p>
+<div class="upload-container">
+<h4> Please enter your {{valueNameChild}}</h4>
+<form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()">
+    <input type="text" formControlName="userInput"  placeholder="Enter your {{valueNameChild}}"/>
+
+    <div *ngIf="dynamicForm.controls['userInput'].touched && dynamicForm.controls['userInput'].invalid">
+ 
+        <small class="error-message">Email is required.</small>
+
+    </div>
+    
+  
+
+
+  
+    <button type="submit" [disabled]="dynamicForm.controls['userInput'].invalid">Upload</button>
+    <button (click)="ChangeFormStatus()">Close</button>
+</form>
+  </div>

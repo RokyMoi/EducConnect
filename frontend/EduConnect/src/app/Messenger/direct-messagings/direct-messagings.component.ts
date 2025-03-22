@@ -5,18 +5,27 @@ import { Message } from '../../models/messenger/message';
 import { AccountService } from '../../services/account.service';
 import { NgFor, NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { SendMessageComponent } from "../send-message/send-message.component";
 
 @Component({
   selector: 'app-direct-messagings',
-  standalone: true,
-  imports: [NgFor, NgIf, RouterLink],
+  standalone:true,
+  imports: [NgFor, NgIf, RouterLink, SendMessageComponent],
   templateUrl: './direct-messagings.component.html',
   styleUrls: ['./direct-messagings.component.css'],
 })
 export class DirectMessagingsComponent implements OnInit {
+HandleThis($event: boolean) {
+this.emitterStatus = $event;
+}
+OpenModule() {
+// this.emitterStatus=true;
+this.router.navigateByUrl("/ListOfUsers");
+}
   constructor(private router: Router) {}
+  emitterStatus:boolean=false;
 
-  // Deklaracije
+
   messageService = inject(MessageService);
   AccountService = inject(AccountService);
   http = inject(HttpClient);
@@ -24,7 +33,7 @@ export class DirectMessagingsComponent implements OnInit {
   UserPhotoEmai = '';
   messagesArray: any[] = [];
 
-  // Keš za slike korisnika
+
   private userPhotosCache: Map<string, string> = new Map();
 
   ngOnInit(): void {

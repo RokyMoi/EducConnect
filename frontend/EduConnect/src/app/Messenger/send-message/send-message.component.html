@@ -1,0 +1,32 @@
+<div class="container">
+    <div class="form-wrapper">
+      <h2>Send new message</h2>
+      <form [formGroup]="messageForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Email Input -->
+        <div class="form-group">
+          <label for="email">RecipientEmail</label>
+          <input type="email" id="email" formControlName="email" required />
+          <div *ngIf="email?.invalid && email?.touched" class="error-message">
+            Please enter a valid email address.
+          </div>
+        </div>
+  
+        <!-- Message Content -->
+        <div class="form-group">
+          <label for="content">Message</label>
+          <textarea id="content" formControlName="content" rows="5" required></textarea>
+          <div *ngIf="content?.invalid && content?.touched" class="error-message">
+            Message must be at least 1 character long.
+          </div>
+        </div>
+  
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn" [disabled]="messageForm.invalid">Send Message</button>
+        
+        <!-- Back Button -->
+        <button type="button" class="back-btn" (click)="onBack()">Back</button>
+      </form>
+    </div>
+  </div>
+  

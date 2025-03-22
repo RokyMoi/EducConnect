@@ -6,6 +6,7 @@ using EduConnect.Entities.Person;
 using EduConnect.Extensions;
 using EduConnect.Utilities;
 using Microsoft.AspNetCore.Identity;
+using EduConnect.SignalIR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -97,7 +98,8 @@ namespace EduConnect
                 {
                     policy.WithOrigins(frontendApplicationOrigin)  // Allow frontend origin
                           .AllowAnyHeader()                       // Allow any headers
-                          .AllowAnyMethod()                      // Allow any methods (GET, POST, etc.)
+                          .AllowAnyMethod()/// Allow any methods (GET, POST, etc.)
+                          .AllowCredentials()
                           .WithExposedHeaders("Authorization"); // Expose the Authorization header
                 });
             });
@@ -113,7 +115,7 @@ namespace EduConnect
                 {
                     options.AddPolicy("SwaggerDevelopmentEnvironmentPolicy", policy =>
                     {
-                        policy.WithOrigins(swaggerLink).AllowAnyHeader().AllowAnyMethod();
+                        policy.WithOrigins(swaggerLink).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                     });
                 });
 

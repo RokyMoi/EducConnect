@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EduConnect.Entities.Messenger;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
@@ -19,9 +20,10 @@ namespace EduConnect.Entities.Person
 
         public long? ModifiedAt { get; set; }
 
-        ///Pristupi
+        ///Navigations
 
         public PersonDetails PersonDetails { get; set; }
+        public ICollection<PersonPhoto> PersonPhoto { get; set; }
         public PersonEmail PersonEmail { get; set; }
         public PersonSalt PersonSalt { get; set; }
 
@@ -30,6 +32,9 @@ namespace EduConnect.Entities.Person
             get => PersonId;
             set => PersonId = value;
         }
+
+        public List<Message> MessagesSent { get; set; }
+        public List<Message> MessagesReceived { get; set; }
     }
 }
 
