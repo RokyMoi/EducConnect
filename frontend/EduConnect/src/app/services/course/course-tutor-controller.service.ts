@@ -8,6 +8,7 @@ import { buildHttpParams } from '../../helpers/build-http-params.helper';
 import { UpdateCourseBasicsRequest } from '../../models/course/course-tutor-controller/update-course-basics-request';
 import { UploadCourseThumbnailRequest } from '../../models/course/course-tutor-controller/upload-course-thumbnail-request';
 import { map } from 'rxjs';
+import { UploadCourseTeachingResourceRequest } from '../../models/course/course-tutor-controller/upload-course-teaching-resource-request';
 
 @Injectable({
   providedIn: 'root',
@@ -160,6 +161,101 @@ export class CourseTutorControllerService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+      }
+    );
+  }
+
+  uploadCourseTeachingResource(request: UploadCourseTeachingResourceRequest) {
+    var token = localStorage.getItem('Authorization');
+    const formData = new FormData();
+    if (request.courseTeachingResourceId) {
+      formData.append(
+        'courseTeachingResourceId',
+        request.courseTeachingResourceId
+      );
+    }
+    if (request.courseId) {
+      formData.append('courseId', request.courseId);
+    }
+    formData.append('title', request.title);
+    formData.append('description', request.description);
+    if (request.courseTeachingResourceId) {
+      formData.append(
+        'courseTeachingResourceId',
+        request.courseTeachingResourceId
+      );
+    }
+    if (request.resourceUrl) {
+      formData.append('resourceUrl', request.resourceUrl);
+    }
+    if (request.resourceFile) {
+      formData.append('resourceFile', request.resourceFile);
+    }
+
+    return this.httpClient
+      .post<DefaultServerResponse>(
+        `${this.apiUrl}/teaching-resource/upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          reportProgress: true,
+          observe: 'events',
+        }
+      )
+      .pipe(
+        map((event: HttpEvent<DefaultServerResponse>) => {
+          if (event.type === HttpEventType.UploadProgress) {
+            const progress = event.total
+              ? Math.round((100 * event.loaded) / event.total)
+              : 0;
+            return { progress, response: null };
+          }
+          if (event.type === HttpEventType.Response) {
+            return { progress: 100, response: event.body };
+          }
+          return { progress: 0, response: null };
+        })
+      );
+  }
+
+  getCourseTeachingResource(courseTeachingResourceId: string) {
+    var token = localStorage.getItem('Authorization');
+    return this.httpClient.get<DefaultServerResponse>(
+      `${this.apiUrl}/teaching-resource/get?courseTeachingResourceId=${courseTeachingResourceId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  getAllCourseTeachingResourcesByCourseId(courseId: string) {
+    const token = localStorage.getItem('Authorization');
+
+    return this.httpClient.get<DefaultServerResponse>(
+      `${this.apiUrl}/teaching-resource/all?courseId=${courseId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  downloadCourseTeachingResource(resourceId: string) {
+    var token = localStorage.getItem('Authorization');
+    return this.httpClient.get(
+      `${this.apiUrl}/teaching-resource/download?courseTeachingResourceId=${resourceId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+        reportProgress: true,
+        observe: 'events',
       }
     );
   }

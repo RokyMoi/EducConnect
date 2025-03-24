@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EduConnect.DTOs;
 using EduConnect.Entities.Course;
 
 namespace EduConnect.Interfaces.Course
@@ -38,5 +39,9 @@ namespace EduConnect.Interfaces.Course
         Task<CourseTeachingResource?> GetCourseTeachingResourceById(Guid courseTeachingResourceId);
 
         Task<bool> UpdateCourseTeachingResource(CourseTeachingResource courseTeachingResource);
+
+        Task<bool> CourseTeachingResourceExists(Guid courseTeachingResourceId);
+
+        Task<List<GetCourseTeachingResourceResponse>> GetAllCourseTeachingResourcesWithoutFileDataByCourseId(Guid courseId);
     }
 }

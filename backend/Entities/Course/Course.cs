@@ -4,6 +4,7 @@ using backend.Entities.Reference;
 using backend.Entities.Reference.Language;
 using backend.Entities.Reference.Learning;
 using EduConnect.Entities.Reference;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EduConnect.Entities.Course
 {
@@ -14,6 +15,8 @@ namespace EduConnect.Entities.Course
         public Guid CourseId { get; set; } = Guid.NewGuid();
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+
+        [ForeignKey("CourseCategoryId")]
         public Guid CourseCategoryId { get; set; }
 
         [ForeignKey(nameof(CourseCategoryId))]
@@ -50,6 +53,9 @@ namespace EduConnect.Entities.Course
         public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         public long? UpdatedAt { get; set; } = null;
+
+        
+        public virtual CourseThumbnail? CourseThumbnail { get; set; } = null;
 
 
 

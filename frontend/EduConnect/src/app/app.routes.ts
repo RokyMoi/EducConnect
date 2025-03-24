@@ -155,7 +155,7 @@ export const routes: Routes = [
     data: { requiredRole: 'tutor' },
   },
   {
-    path: 'tutor/course/teaching-resources/details/:resourceId',
+    path: 'tutor/course/teaching-resources/details/:courseId/:resourceId',
     component: CourseTutorTeachingResourcesDetailsComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'tutor' },

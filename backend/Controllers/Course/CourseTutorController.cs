@@ -177,8 +177,22 @@ namespace EduConnect.Controllers.Course
                 return NoContent();
             }
 
-            var response = courses.Select(
-                x => new GetAllCoursesResponse
+            var response = new List<GetAllCoursesResponse>();
+
+            foreach (var x in courses)
+            {
+
+                string? thumbnailUrl = null;
+                bool hasThumbnail = x.CourseThumbnail != null;
+
+                if (hasThumbnail)
+                {
+                    thumbnailUrl = !string.IsNullOrEmpty(x.CourseThumbnail.ThumbnailUrl)
+                        ? x.CourseThumbnail.ThumbnailUrl
+                        : $"{Request.Scheme}://{Request.Host}/public/course/thumbnail/get?courseId={x.CourseId}";
+                }
+
+                response.Add(new GetAllCoursesResponse
                 {
                     CourseId = x.CourseId,
                     Title = x.Title,
@@ -192,18 +206,25 @@ namespace EduConnect.Controllers.Course
                     Price = x.Price,
                     PublishedStatus = x.PublishedStatus,
                     CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
+                    HasThumbnail = x.CourseThumbnail != null,
+                    ThumbnailUrl = thumbnailUrl
                 });
-
+            }
+            ;
             return Ok(
                 ApiResponse<object>.GetApiResponse(
                     "Courses retrieved successfully",
                     response
                 )
             );
-
-
-
         }
+
+
+
+
+
+
+
 
         [HttpGet("info")]
         public async Task<IActionResult> GetCourseManagementDashboardInfo(
@@ -669,18 +690,24 @@ namespace EduConnect.Controllers.Course
                     )
                 );
             }
-
-            var blobDeleteResult = await _azureBlobStorageService.DeleteCourseThumbnailAsync(courseId);
-
-            if (!blobDeleteResult)
+            if (!string.IsNullOrEmpty(courseThumbnail.ThumbnailUrl))
             {
-                return StatusCode(
-                    500,
-                    ApiResponse<object>.GetApiResponse(
-                        "An error occurred while deleting the thumbnail on remote server, please try again later",
-                        null
-                    )
-                );
+
+
+                var blobDeleteResult = await _azureBlobStorageService.DeleteCourseThumbnailAsync(courseId);
+
+                if (!blobDeleteResult)
+                {
+                    return StatusCode(
+                        500,
+                        ApiResponse<object>.GetApiResponse(
+                            "An error occurred while deleting the thumbnail on remote server, please try again later",
+                            null
+                        )
+                    );
+                }
+
+                return Ok(ApiResponse<object>.GetApiResponse("Course thumbnail deleted successfully from remote server", null));
             }
             var deleteResult = await _courseRepository.DeleteCourseThumbnail(courseId);
 
@@ -697,7 +724,7 @@ namespace EduConnect.Controllers.Course
 
             return Ok(
                 ApiResponse<object>.GetApiResponse(
-                    "Course thumbnail deleted successfully",
+                    "Course thumbnail deleted successfully from local server",
                     null
                 )
             );
@@ -709,8 +736,18 @@ namespace EduConnect.Controllers.Course
         public async Task<IActionResult> UploadCourseTeachingResource(UploadCourseTeachingResourceRequest request)
         {
 
-            //Check if the course exists 
-            if (!await _courseRepository.CourseExistsById(request.CourseId))
+            //Check is it update or create operation (determined by the CourseTeachingResourceId field and the CourseId field from the request, if the CourseTeachingResourceId field is null and CourseId is populated by Guid value, then it is a create operation, and if it is vice versa, then it is an update operation)
+
+            //Check if the teaching resource exists (update operation)
+            if (request.CourseTeachingResourceId.HasValue && !await _courseRepository.CourseTeachingResourceExists(request.CourseTeachingResourceId.Value))
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse("Course teaching resource not found", null)
+                    );
+            }
+
+            //Check if the course exists (create operation)
+            if (request.CourseId.HasValue && !await _courseRepository.CourseExistsById(request.CourseId.Value))
             {
                 return NotFound(
                     ApiResponse<object>.GetApiResponse("Course not found", null)
@@ -774,17 +811,6 @@ namespace EduConnect.Controllers.Course
 
             }
 
-            if (!string.IsNullOrEmpty(request.ResourceUrl))
-            {
-                if (!Uri.TryCreate(request.ResourceUrl, UriKind.Absolute, out Uri uriResult)
-            || (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
-                {
-                    return BadRequest(ApiResponse<object>.GetApiResponse(
-                        "Invalid URL format. Must be a valid HTTP/HTTPS URL (e.g., https://example.com)",
-                        null));
-                }
-            }
-
             if (request.CourseTeachingResourceId.HasValue)
             {
                 var existingResource = await _courseRepository.GetCourseTeachingResourceById(request.CourseTeachingResourceId.Value);
@@ -794,10 +820,6 @@ namespace EduConnect.Controllers.Course
                     return NotFound(ApiResponse<object>.GetApiResponse("Resource not found", null));
                 }
 
-                if (existingResource.CourseId != request.CourseId)
-                {
-                    return BadRequest(ApiResponse<object>.GetApiResponse("Resource does not belong to this course", null));
-                }
 
                 existingResource.Title = request.Title;
                 existingResource.Description = request.Description;
@@ -846,7 +868,7 @@ namespace EduConnect.Controllers.Course
 
             var newResource = new CourseTeachingResource
             {
-                CourseId = request.CourseId,
+                CourseId = request.CourseId.Value,
                 Title = request.Title,
                 Description = request.Description,
                 ResourceUrl = request.ResourceUrl,
@@ -868,6 +890,84 @@ namespace EduConnect.Controllers.Course
             );
 
 
+        }
+
+        [HttpGet("teaching-resource/get")]
+        public async Task<IActionResult> GetCourseTeachingResource(Guid courseTeachingResourceId)
+        {
+            var resource = await _courseRepository.GetCourseTeachingResourceById(courseTeachingResourceId);
+
+            if (resource == null)
+            {
+                return NotFound(ApiResponse<object>.GetApiResponse("Resource not found", null));
+            }
+
+            GetCourseTeachingResourceResponse response = new()
+            {
+                CourseTeachingResourceId = resource.CourseTeachingResourceId,
+                Title = resource.Title,
+                Description = resource.Description,
+                ResourceUrl = resource.ResourceUrl,
+            };
+
+            if (resource.FileData != null)
+            {
+                response.ResourceUrl = null;
+                response.FileName = resource.FileName;
+                response.ContentType = resource.ContentType;
+                response.FileSize = resource.FileSize;
+
+            }
+
+
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Resource retrieved successfully", response)
+            );
+        }
+
+        [HttpGet("teaching-resource/all")]
+        public async Task<IActionResult> GetAllCourseTeachingResourcesByCourseId([FromQuery] Guid courseId)
+        {
+
+            var courseExists = await _courseRepository.CourseExistsById(courseId);
+
+            if (!courseExists)
+            {
+                return NotFound(ApiResponse<object>.GetApiResponse("Course not found", null));
+            }
+
+
+            var resources = await _courseRepository.GetAllCourseTeachingResourcesWithoutFileDataByCourseId(courseId);
+
+            if (resources == null || resources.Count == 0)
+            {
+                return NotFound(ApiResponse<object>.GetApiResponse("No resources found for the course", null));
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Resources retrieved successfully", resources)
+            );
+
+
+        }
+
+        [HttpGet("teaching-resource/download")]
+        public async Task<IActionResult> DownloadCourseTeachingResource(Guid courseTeachingResourceId)
+        {
+            var resourceFile = await _courseRepository.GetCourseTeachingResourceById(courseTeachingResourceId);
+
+            if (resourceFile == null)
+            {
+                return NotFound(ApiResponse<object>.GetApiResponse("Resource not found", null));
+            }
+
+            if (resourceFile.FileData == null)
+            {
+                return Conflict(ApiResponse<object>.GetApiResponse("Only files hosted on EduConnect server's can be downloaded", null));
+            }
+
+            return File(resourceFile.FileData, resourceFile.ContentType, resourceFile.FileName);
         }
 
 

@@ -349,3 +349,79 @@
   margin-top: 5px;
   height: 16px;
 }
+
+.existing-file-container {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.existing-file-container label {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+  font-size: 1.1em;
+}
+.file-data-row {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.file-data-label {
+  font-weight: 600;
+  min-width: 120px;
+  color: #495057;
+}
+
+.file-data-value {
+  color: #6c757d;
+  word-break: break-word;
+}
+
+.file-action-buttons {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.preview-button,
+.download-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+
+.preview-button:hover,
+.download-button:hover {
+  opacity: 0.9;
+}
+
+.preview-button {
+  background-color: #2196f3;
+  color: white;
+}
+
+.download-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.preview-button:disabled,
+.download-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.fas {
+  margin-right: 5px;
+}

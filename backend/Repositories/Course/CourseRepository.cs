@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EduConnect.Data;
+using EduConnect.DTOs;
 using EduConnect.Entities.Course;
 using EduConnect.Interfaces.Course;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,13 @@ namespace EduConnect.Repositories.Course
                 x => x.CourseId != courseId && x.Title.ToLower().Equals(title.ToLower())
             )
             .AnyAsync();
+        }
+
+        public async Task<bool> CourseTeachingResourceExists(Guid courseTeachingResourceId)
+        {
+            return await _dataContext.CourseTeachingResource.Where(
+                x => x.CourseTeachingResourceId == courseTeachingResourceId
+            ).AnyAsync();
         }
 
         public async Task<bool> CourseThumbnailExists(Guid courseId)
@@ -114,7 +122,27 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.Course
             .Include(x => x.CourseCategory)
             .Include(x => x.LearningDifficultyLevel)
+            .Include(x => x.CourseThumbnail)
             .Where(x => x.TutorId == tutorId).ToListAsync();
+        }
+
+        public Task<List<GetCourseTeachingResourceResponse>> GetAllCourseTeachingResourcesWithoutFileDataByCourseId(Guid courseId)
+        {
+            return _dataContext.CourseTeachingResource
+            .Where(x => x.CourseId == courseId)
+            .Select(
+                x => new GetCourseTeachingResourceResponse
+                {
+                    CourseTeachingResourceId = x.CourseTeachingResourceId,
+                    Title = x.Title,
+                    Description = x.Description,
+                    ResourceUrl = x.ResourceUrl,
+                    FileName = x.FileName,
+                    ContentType = x.ContentType,
+                    FileSize = x.FileSize,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime
+                }
+            ).ToListAsync();
         }
 
         public async Task<Entities.Course.Course?> GetCourseById(Guid courseId)
@@ -122,6 +150,7 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.Course
             .Include(x => x.CourseCategory)
             .Include(x => x.LearningDifficultyLevel)
+            .Include(x => x.CourseThumbnail)
             .FirstOrDefaultAsync(x => x.CourseId == courseId);
         }
 

@@ -1,10 +1,53 @@
 <div class="course-teaching-resources-container">
-    <h2>Teaching Resources</h2>
+    <h2>Teaching Resources (Files and URL's)</h2>
     <div class="action-buttons-container">
         <button class="go-back-button" (click)="goBack()">← Go Back</button>
         <button class="add-new-resource" (click)="onAddNewResource()">Add New Resource</button>
     </div>
-    <div class="resources-list">
-        
+
+    <div class="resource-list">
+        <div *ngFor="let resource of resources" class="resource-card">
+            <div class="resource-content">
+                <div class="resource-type-indicator" [class.url-type]="resource.resourceUrl"
+                    [class.file-type]="resource.fileName"></div>
+                <div class="resource-info">
+                    <h3 class="resource-title">{{ resource.title }}</h3>
+                    <p class="resource-description">{{ resource.description }}</p>
+                    <div class="resource-details">
+                        <span *ngIf="resource.resourceUrl" class="resource-url">
+                            <span class="detail-label">URL:</span>
+                            <a href="{{ resource.resourceUrl }}" target="_blank" class="url-link">{{
+                                resource.resourceUrl }}</a>
+                        </span>
+                        <span *ngIf="resource.fileName" class="file-info">
+                            <span class="detail-label">File:</span>
+                            <span class="file-name">{{ resource.fileName }}</span>
+                            <span class="file-size-type" *ngIf="resource.fileSize && resource.contentType">
+                                ({{ resource.fileSize / 1024 | number:'1.0-0' }}KB, {{ resource.contentType }})
+                            </span>
+                        </span>
+                        <span>Uploaded: {{resource.createdAt | date:"longDate"}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="resource-actions">
+                <button class="action-btn view-btn" (click)="onViewResource(resource.courseTeachingResourceId)">
+                    View
+                </button>
+                <button class="action-btn download-btn" (click)="onDownloadResource(resource)">
+                    Download
+                </button>
+            </div>
+            <div *ngIf="currentDownloads.has(resource.courseTeachingResourceId)" class="download-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill"
+                        [style.width.%]="downloadProgress[resource.courseTeachingResourceId] || 0">
+                    </div>
+                </div>
+                <span class="progress-text">
+                    {{ downloadProgress[resource.courseTeachingResourceId] || 0 }}%
+                </span>
+            </div>
+        </div>
     </div>
 </div>

@@ -298,4 +298,16 @@ export class CourseThumbnailComponent implements OnInit {
       );
     }
   }
+
+  urlValidator(control: AbstractControl) {
+    const url = control.value;
+    if (!url) return null;
+    try {
+      new URL(url);
+      return null;
+    } catch {
+      return { invalidUrl: true };
+    }
+  }
+
 }
