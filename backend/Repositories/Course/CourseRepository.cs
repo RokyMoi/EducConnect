@@ -161,6 +161,42 @@ namespace EduConnect.Repositories.Course
             .FirstOrDefaultAsync();
         }
 
+        public async Task<GetCourseTeachingResourcesInformationByCourseIdResponseFromRepository?> GetCourseTeachingResourcesInformationByCourseId(Guid courseId)
+        {
+            var query = _dataContext.CourseTeachingResource.Where(x => x.CourseId == courseId);
+
+            var result = await query
+            .GroupBy(x => 1)
+            .Select(
+                x => new GetCourseTeachingResourcesInformationByCourseIdResponseFromRepository
+                {
+                    TotalNumberOfTeachingResources = x.Count(),
+                    NumberOfFiles = x.Count(x => x.ResourceUrl == null),
+                    NumberOfURLs = x.Count(x => x.ResourceUrl != null),
+                    TotalSizeOfFilesInBytes = x.Sum(x => x.FileSize ?? 0),
+                    TwoLatestAddedTeachingResources = x.OrderByDescending(
+                        x => x.UpdatedAt ?? x.CreatedAt
+                    )
+                    .Take(2)
+                    .Select(y => new GetCourseTeachingResourceResponse
+                    {
+                        CourseTeachingResourceId = y.CourseTeachingResourceId,
+                        Title = y.Title,
+                        FileName = y.FileName,
+                        ContentType = y.ContentType,
+                        FileSize = y.FileSize,
+                        ResourceUrl = y.ResourceUrl,
+                        Description = y.Description,
+                        CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(y.CreatedAt).UtcDateTime,
+                    }).ToList()
+
+
+                }
+            ).FirstOrDefaultAsync();
+
+            return result ?? null;
+        }
+
         public async Task<CourseThumbnail?> GetCourseThumbnailByCourseId(Guid courseId)
         {
             return await _dataContext.CourseThumbnail.Include(x => x.Course).Where(x => x.CourseId == courseId).FirstOrDefaultAsync();

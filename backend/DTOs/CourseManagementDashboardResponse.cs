@@ -20,5 +20,15 @@ namespace EduConnect.DTOs
         public DateTime? ThumbnailAddedOn { get; set; }
         public bool IsUsingAzureStorage { get; set; }
 
+        public int TotalNumberOfTeachingResources { get; set; } = 0;
+
+        public int NumberOfURLs { get; set; } = 0;
+
+        public int NumberOfFiles { get; set; } = 0;
+
+        public long TotalSizeOfFilesInBytes { get; set; } = 0;
+
+        public List<GetCourseTeachingResourceResponse> TwoLatestAddedTeachingResources { get; set; } = new List<GetCourseTeachingResourceResponse>();
+
     }
 }

@@ -1,3 +1,5 @@
+import { GetCourseTeachingResourceResponse } from './get-course-teaching-resource-response';
+
 export interface GetCourseManagementDashboardInfoResponse {
   courseId: string;
   title: string;
@@ -8,4 +10,9 @@ export interface GetCourseManagementDashboardInfoResponse {
   isThumbnailAdded: boolean;
   thumbnailAddedOn: string | null;
   isUsingAzureStorage: boolean;
+  totalNumberOfTeachingResources: number;
+  numberOfFiles: number;
+  numberOfURLs: number;
+  totalSizeOfFilesInBytes: number;
+  twoLatestAddedTeachingResources: GetCourseTeachingResourceResponse[];
 }

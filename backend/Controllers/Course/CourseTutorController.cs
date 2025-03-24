@@ -263,7 +263,16 @@ namespace EduConnect.Controllers.Course
 
             Console.WriteLine("Does course have a thumbnail? " + (thumbnail != null));
 
+            //Get Course Teaching Resources information
+            /*
+            INFORMATION:
+            - Total number of teaching resources
+            - Number of URL
+            - Number of files and their total size
+            - Two latest added teaching resources
+            */
 
+            var teachingResourcesInformation = await _courseRepository.GetCourseTeachingResourcesInformationByCourseId(courseId);
 
             var response = new CourseManagementDashboardResponse
             {
@@ -275,7 +284,13 @@ namespace EduConnect.Controllers.Course
                 UpdatedAt = course.UpdatedAt != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)course.UpdatedAt).UtcDateTime : null,
                 IsThumbnailAdded = thumbnail != null,
                 ThumbnailAddedOn = thumbnail != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)thumbnail.CreatedAt).UtcDateTime : null,
-                IsUsingAzureStorage = thumbnail != null && !string.IsNullOrEmpty(thumbnail.ThumbnailUrl)
+                IsUsingAzureStorage = thumbnail != null && !string.IsNullOrEmpty(thumbnail.ThumbnailUrl),
+                TotalNumberOfTeachingResources = teachingResourcesInformation == null ? 0 : teachingResourcesInformation.TotalNumberOfTeachingResources,
+                NumberOfURLs = teachingResourcesInformation == null ? 0 : teachingResourcesInformation.NumberOfURLs,
+                NumberOfFiles = teachingResourcesInformation == null ? 0 : teachingResourcesInformation.NumberOfFiles,
+                TotalSizeOfFilesInBytes = teachingResourcesInformation == null ? 0 : teachingResourcesInformation.TotalSizeOfFilesInBytes,
+                TwoLatestAddedTeachingResources = teachingResourcesInformation == null ? [] : teachingResourcesInformation.TwoLatestAddedTeachingResources
+
             };
 
             PrintObjectUtility.PrintObjectProperties(response);

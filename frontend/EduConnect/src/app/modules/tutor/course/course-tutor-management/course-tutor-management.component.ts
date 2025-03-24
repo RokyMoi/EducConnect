@@ -4,6 +4,7 @@ import { CourseTutorControllerService } from '../../../../services/course/course
 import { SnackboxService } from '../../../../services/shared/snackbox.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GetCourseManagementDashboardInfoResponse } from '../../../../models/course/course-tutor-controller/get-course-management-dashboard-info-response';
+import formatFileSize from '../../../../helpers/format-file-size.helper';
 
 @Component({
   selector: 'app-course-management-dashboard',
@@ -60,5 +61,23 @@ export class CourseTutorManagementComponent implements OnInit {
 
   onViewTeachingResources() {
     this.router.navigate(['tutor/course/teaching-resources/' + this.courseId]);
+  }
+
+  getFileSize(fileSize: number) {
+    return formatFileSize(fileSize);
+  }
+
+  onAddNewResource() {
+    this.router.navigate([
+      '/tutor/course/teaching-resources/new/' + this.courseId,
+    ]);
+  }
+
+  onViewResource(courseTeachingResourceId: string) {
+    this.router.navigate([
+      '/tutor/course/teaching-resources/details',
+      this.courseId,
+      courseTeachingResourceId,
+    ]);
   }
 }

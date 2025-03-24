@@ -49,29 +49,44 @@
             </div>
         </div>
 
-        <!-- Course Materials Card -->
-        <div class=" management-card">
+        <!-- Course Teaching Resources Card -->
+        <div class="management-card">
             <div class="card-header">
                 <h2><i class="fas fa-file-alt"></i> Teaching Resources</h2>
-                <button class="add-btn" (click)="onViewTeachingResources()">Add New Material</button>
+                <button
+                    [ngClass]="{'add-btn': dashboardInfo.totalNumberOfTeachingResources === 0, 'edit-btn': dashboardInfo.totalNumberOfTeachingResources !== 0}"
+                    (click)="onViewTeachingResources()">
+
+                    {{dashboardInfo.totalNumberOfTeachingResources === 0 ? 'Add New Resource' : 'View Resources'}}
+                </button>
             </div>
             <div class="card-content">
-                <div class="sample-data">
+                <div class="sample-data" *ngIf="dashboardInfo.totalNumberOfTeachingResources > 0">
                     <p><strong>Current Materials:</strong></p>
-                    <div class="material-item">
-                        <i class="fas fa-book"></i> "Quantum Mechanics: The Theoretical Minimum" (Core Textbook)
+
+                    <div class="material-item" *ngFor="let resource of dashboardInfo.twoLatestAddedTeachingResources"
+                        (click)="onViewResource(resource.courseTeachingResourceId)">
+                        <i class="fas"
+                            [ngClass]="{'fa-link': resource.resourceUrl, 'fa-book': !resource.resourceUrl }"></i>{{resource.fileName
+                        ? resource.fileName : resource.resourceUrl}}
                     </div>
-                    <div class="material-item">
-                        <i class="fas fa-link"></i> MIT OpenCourseWare Reference Links
-                    </div>
+
+
+                    <p><strong>Resources Metadata</strong></p>
+                    <p>Number Of Resources: <strong>{{dashboardInfo.totalNumberOfTeachingResources}}</strong></p>
+
+                    <p>Number Of Files: <strong>{{dashboardInfo.numberOfFiles}}</strong></p>
+
+                    <p>Number Of URLs: <strong>{{dashboardInfo.numberOfURLs}}</strong></p>
+
+                    <p>Total file size: <strong>{{getFileSize(dashboardInfo.totalSizeOfFilesInBytes)}}</strong></p>
+
                 </div>
                 <div class="quick-actions">
-                    <button class="icon-btn">
-                        <i class="fas fa-sort-alpha-down"></i> Reorder Resources
+                    <button class="icon-btn" (click)="onAddNewResource()">
+                        <i class="fas fa-file-pen"></i> Add New Resource
                     </button>
-                    <button class="icon-btn">
-                        <i class="fas fa-archive"></i> Archive Old
-                    </button>
+
                 </div>
             </div>
         </div>

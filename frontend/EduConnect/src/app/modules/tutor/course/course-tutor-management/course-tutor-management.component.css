@@ -149,6 +149,11 @@
   gap: 10px;
 }
 
+.material-item:hover {
+  color: blue;
+  cursor: pointer;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .card-content {
