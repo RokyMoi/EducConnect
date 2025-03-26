@@ -12,40 +12,44 @@ namespace EduConnect.Entities.Course
     public class CourseLesson
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid CourseLessonId { get; set; }
+        public Guid CourseLessonId { get; set; } = Guid.NewGuid();
 
         public Guid CourseId { get; set; }
 
-        [ForeignKey("CourseId")]
-        public EduConnect.Entities.Course.Course? Course { get; set; } = null;
+        [ForeignKey(nameof(CourseId))]
+        public Course? Course { get; set; } = null;
 
-        public required string LessonTitle { get; set; }
+        public string Title { get; set; }
 
-        public required string LessonDescription { get; set; }
+        //This is field that is used to display a short summary of the lesson in the course overview page
+        public string ShortSummary { get; set; }
 
-        public required int LessonSequenceOrder { get; set; }
+        //This is the actual description of the lesson that is displayed in the lesson page
+        public string Description { get; set; }
 
-        [MaxLength(510)]
+        public int? LessonSequenceOrder { get; set; } = null;
 
-        public string LessonPrerequisites { get; set; } = string.Empty;
+        //Status of the lesson, represents a flag that indicates lesson status, with the following values:
+        //false - not published
+        //true - published
+        //null - archived
+        public bool? PublishedStatus { get; set; } = false;
 
-        [MaxLength(255)]
+        public DateTime? StatusChangedAt { get; set; } = null;
 
-        public required string LessonObjective { get; set; }
+        public Guid TutorId { get; set; }
 
-        public required int LessonCompletionTimeInMinutes { get; set; } = 1;
+        [ForeignKey(nameof(TutorId))]
+        public EduConnect.Entities.Tutor.Tutor? Tutor { get; set; } = null;
 
-        public required string LessonTag { get; set; }
-        public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         public long? UpdatedAt { get; set; } = null;
 
 
-        // Navigation properties
-        public virtual ICollection<CourseLessonSupplementaryMaterial> SupplementaryMaterials { get; set; } = new List<CourseLessonSupplementaryMaterial>();
 
-        public virtual CourseLessonContent? LessonContents { get; set; }
+
+
 
 
     }
