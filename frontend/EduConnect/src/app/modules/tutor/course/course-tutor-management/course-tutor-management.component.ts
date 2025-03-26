@@ -80,4 +80,8 @@ export class CourseTutorManagementComponent implements OnInit {
       courseTeachingResourceId,
     ]);
   }
+
+  onViewLessons() {
+    this.router.navigate(['/tutor/course/lessons/new/' + this.courseId]);
+  }
 }

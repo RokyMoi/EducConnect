@@ -66,6 +66,41 @@ namespace EduConnect.Repositories.Course
             }
         }
 
+        public async Task<bool> CreateCourseLesson(CourseLesson courseLesson)
+        {
+            try
+            {
+                await _dataContext.CourseLesson.AddAsync(courseLesson);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to create course lesson " + courseLesson.CourseId);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> CreateCourseLessonContent(CourseLessonContent courseLessonContent)
+        {
+            try
+            {
+                await _dataContext.CourseLessonContent.AddAsync(courseLessonContent);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to create course lesson content " + courseLessonContent.CourseLessonId);
+                Console.WriteLine(ex);
+                return false;
+
+            }
+        }
+
         public async Task<bool> CreateCourseTeachingResource(CourseTeachingResource courseTeachingResource)
         {
             try
@@ -178,6 +213,19 @@ namespace EduConnect.Repositories.Course
             .FirstOrDefaultAsync(x => x.CourseId == courseId);
         }
 
+        public async Task<CourseLesson?> GetCourseLessonById(Guid courseLessonId)
+        {
+            return await _dataContext.CourseLesson.Include(x => x.CourseLessonContent).Where(x => x.CourseLessonId == courseLessonId).FirstOrDefaultAsync();
+
+        }
+
+        public async Task<int> GetCourseLessonCountByCourseId(Guid courseId)
+        {
+            return await _dataContext.CourseLesson
+            .Where(x => x.CourseId == courseId)
+            .CountAsync();
+        }
+
         public async Task<CourseTeachingResource?> GetCourseTeachingResourceById(Guid courseTeachingResourceId)
         {
             return await _dataContext.CourseTeachingResource
@@ -250,6 +298,20 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.CourseThumbnail.Include(x => x.Course).Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
         }
 
+        public async Task<bool> RearrangeCourseLessonSequenceOrder(int newLessonPosition, Guid courseId)
+        {
+            var lessonsToMove = await _dataContext.CourseLesson
+                    .Where(l => l.CourseId == courseId && l.LessonSequenceOrder >= newLessonPosition).ToListAsync();
+
+            foreach (var lesson in lessonsToMove)
+            {
+                lesson.LessonSequenceOrder++;
+            }
+
+            _dataContext.CourseLesson.UpdateRange(lessonsToMove);
+            return true;
+        }
+
         public async Task<bool> UpdateCourseBasics(Entities.Course.Course course)
         {
             try
@@ -262,6 +324,23 @@ namespace EduConnect.Repositories.Course
             {
 
                 Console.WriteLine("Failed to update course " + course.Title);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateCourseLesson(CourseLesson courseLesson)
+        {
+            try
+            {
+                _dataContext.CourseLesson.Update(courseLesson);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to update course lesson " + courseLesson.Title);
                 Console.WriteLine(ex);
                 return false;
             }

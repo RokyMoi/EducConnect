@@ -27,6 +27,8 @@ namespace EduConnect.Entities.Person
         public PersonEmail PersonEmail { get; set; }
         public PersonSalt PersonSalt { get; set; }
 
+        public virtual List<IdentityUserRole<Guid>> UserRoles { get; set; }
+
         public override Guid Id
         {
             get => PersonId;

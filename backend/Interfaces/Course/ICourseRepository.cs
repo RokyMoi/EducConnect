@@ -48,5 +48,18 @@ namespace EduConnect.Interfaces.Course
 
         Task<GetCourseTeachingResourceByIdIncludeCourseExcludeFileDataIfFile?> GetCourseTeachingResourceByIdWithoutFileData(Guid courseTeachingResourceId);
         Task<bool> DeleteCourseTeachingResourceById(Guid courseTeachingResourceId);
+
+        Task<CourseLesson?> GetCourseLessonById(Guid courseLessonId);
+
+        Task<int> GetCourseLessonCountByCourseId(Guid courseId);
+
+        Task<bool> CreateCourseLesson(CourseLesson courseLesson);
+
+        Task<bool> RearrangeCourseLessonSequenceOrder(int newLessonPosition, Guid courseId);
+
+        Task<bool> UpdateCourseLesson(CourseLesson courseLesson);
+
+        Task<bool> CreateCourseLessonContent(CourseLessonContent courseLessonContent);
+
     }
 }

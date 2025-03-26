@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using backend.Interfaces.Reference;
 using backend.Interfaces.Tutor;
 using EduConnect.Constants;
+using EduConnect.Data;
 using EduConnect.DTOs;
 using EduConnect.DTOs.Course;
 using EduConnect.Entities;
@@ -14,6 +15,7 @@ using EduConnect.Middleware;
 using EduConnect.Services;
 using EduConnect.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EduConnect.Controllers.Course
 {
@@ -21,6 +23,7 @@ namespace EduConnect.Controllers.Course
     [Route("tutor/course")]
     [AuthenticationGuard(isTutor: true, isAdmin: false, isStudent: false)]
     public class CourseTutorController(
+        DataContext _dataContext,
         ICourseRepository _courseRepository,
         IReferenceRepository _referenceRepository,
         ITutorRepository _tutorRepository,
@@ -1047,6 +1050,151 @@ namespace EduConnect.Controllers.Course
             );
 
 
+
+
+        }
+
+        [HttpPost("lesson/create")]
+        public async Task<IActionResult> CreateCourseLesson(CreateCourseLessonRequest request)
+        {
+
+            //Check if the course exists
+            var course = await _courseRepository.GetCourseById(request.CourseId);
+            if (course == null)
+            {
+                return NotFound(ApiResponse<object>.GetApiResponse("Course not found", null));
+            }
+
+            //Check if the resource if owned by the course tutor
+            var tutor = await _tutorRepository.GetTutorByPersonId(Guid.Parse(HttpContext.Items["PersonId"].ToString()));
+
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the resource, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            if (course.TutorId != tutor.TutorId)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to add lesson to this course",
+                        null
+                    )
+                );
+            }
+
+            var currentCourseCount = await _courseRepository.GetCourseLessonCountByCourseId(request.CourseId);
+            var lessonSequenceOrder = !request.LessonSequenceOrder.HasValue || (request.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.Value > currentCourseCount) ? currentCourseCount + 1 : request.LessonSequenceOrder;
+
+
+            if (request.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.Value <= currentCourseCount)
+            {
+                await _courseRepository.RearrangeCourseLessonSequenceOrder(request.LessonSequenceOrder.Value, request.CourseId);
+            }
+
+            //Check if the course lesson should be updated or created 
+            if (request.CourseLessonId.HasValue)
+            {
+                var existingCourseLesson = await _courseRepository.GetCourseLessonById(request.CourseLessonId.Value);
+
+                if (existingCourseLesson == null)
+                {
+                    return NotFound(ApiResponse<object>.GetApiResponse("Lesson not found", null));
+
+                }
+
+
+                existingCourseLesson.Title = request.Title;
+                existingCourseLesson.ShortSummary = request.ShortSummary;
+                existingCourseLesson.Description = request.Description;
+                existingCourseLesson.Topic = request.Topic;
+                existingCourseLesson.LessonSequenceOrder = request.LessonSequenceOrder;
+                existingCourseLesson.PublishedStatus = request.PublishedStatus;
+                existingCourseLesson.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+                if (existingCourseLesson.CourseLessonContent == null)
+                {
+                    existingCourseLesson.CourseLessonContent = new CourseLessonContent
+                    {
+                        CourseLessonId = existingCourseLesson.CourseLessonId,
+                        Content = request.Content,
+                        CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                        UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+                    };
+                }
+
+                existingCourseLesson.CourseLessonContent.Content = request.Content;
+
+                var updateResult = await _courseRepository.UpdateCourseLesson(existingCourseLesson);
+
+                if (!updateResult)
+                {
+                    return StatusCode(
+                        500,
+                        ApiResponse<object>.GetApiResponse(
+                            "An error occurred while updating the lesson, please try again",
+                            null
+                        )
+                    );
+                }
+
+                return Ok(
+                    ApiResponse<object>.GetApiResponse("Lesson updated successfully", null)
+                );
+
+
+
+
+            }
+
+
+
+            var courseLesson = new CourseLesson
+            {
+                CourseId = request.CourseId,
+                Title = request.Title,
+                ShortSummary = request.ShortSummary,
+                Description = request.Description,
+                Topic = request.Topic,
+                LessonSequenceOrder = lessonSequenceOrder,
+                TutorId = tutor.TutorId,
+
+
+            };
+
+            var createResult = await _courseRepository.CreateCourseLesson(courseLesson);
+
+            var lessonContent = new CourseLessonContent
+            {
+                CourseLessonId = courseLesson.CourseLessonId,
+                Content = request.Content,
+            };
+
+            var createLessonContentResult = await _courseRepository.CreateCourseLessonContent(lessonContent);
+
+
+            if (!createResult || !createLessonContentResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while creating the lesson, please try again",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Lesson created successfully", null)
+            );
 
 
         }

@@ -27,6 +27,8 @@ namespace EduConnect.Entities.Course
         //This is the actual description of the lesson that is displayed in the lesson page
         public string Description { get; set; }
 
+        public string Topic { get; set; }
+
         public int? LessonSequenceOrder { get; set; } = null;
 
         //Status of the lesson, represents a flag that indicates lesson status, with the following values:
@@ -42,11 +44,12 @@ namespace EduConnect.Entities.Course
         [ForeignKey(nameof(TutorId))]
         public EduConnect.Entities.Tutor.Tutor? Tutor { get; set; } = null;
 
+
         public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         public long? UpdatedAt { get; set; } = null;
 
-
+        public virtual CourseLessonContent? CourseLessonContent { get; set; } = null;
 
 
 

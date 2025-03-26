@@ -1,0 +1,58 @@
+<div class="main-container">
+    <h2>New Course Lesson</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+        <button class="delete-action-button">Delete</button>
+        <button class="create-action-button">Publish</button>
+    </div>
+    <form [formGroup]="lessonForm">
+        <div class="form-item">
+            <label for="title">Lesson Title</label>
+            <input type="text" id="title" name="title" formControlName="title"
+                placeholder="Enter the title of the lesson">
+            <div class="error-container">
+                <div class="error-container">
+                    <p>{{titleErrorMessage}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-item">
+            <label for="title">Topic</label>
+            <input type="text" id="topic" name="topic" formControlName="topic"
+                placeholder="Enter the topic this lesson will focus on">
+            <div class="error-container">
+                <div class="error-container">
+                    <p>{{topicErrorMessage}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-item">
+            <label for="shortSummary">Short Summary</label>
+            <textarea id="shortSummary" name="shortSummary" formControlName="shortSummary"
+                placeholder="Describe this lesson in short, this data will appear in course overview"></textarea>
+            <div class="error-container">
+                <p>{{shortSummaryErrorMessage}}</p>
+            </div>
+        </div>
+        <div class="form-item">
+            <label for="description">Detailed Description</label>
+            <textarea id="description" name="description" formControlName="description"
+                placeholder="Enter here information for a detailed explanation of the topic of this course"></textarea>
+            <div class="error-container">
+                <p>{{shortSummaryErrorMessage}}</p>
+            </div>
+        </div>
+        <div class="form-item">
+            <label for="content">Content</label>
+            <div class="editor-container">
+                <div class="editor-menu-container">
+                    <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                </div>
+                <div class="editor-content-container">
+                    <ngx-editor [editor]="editor" [placeholder]="'Enter your lesson content here'"
+                        formControlName="content"></ngx-editor>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

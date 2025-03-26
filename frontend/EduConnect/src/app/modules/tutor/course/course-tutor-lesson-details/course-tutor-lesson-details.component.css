@@ -1,0 +1,141 @@
+.main-container {
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.action-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.go-back-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.go-back-button:hover {
+  background-color: #0056b3;
+}
+
+.create-action-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: green;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.create-action-button:hover {
+  background-color: darkgreen;
+}
+
+.delete-action-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: red;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.delete-action-button:hover {
+  background-color: darkred;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 12px;
+}
+
+.form-item {
+  margin: 24px 0px;
+  width: 100%;
+}
+
+.form-item label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-item input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-item textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 100px;
+  resize: none;
+}
+
+.form-item select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.editor-container {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+}
+
+.editor-warning {
+  color: red;
+  height: 21px;
+  font-size: 12px;
+  padding-left: 10px;
+}
+.editor-row {
+  margin-bottom: 12px;
+}
+.editor-row p:nth-of-type(1) {
+  color: #808080;
+  padding-left: 10px;
+  font-size: 14px;
+}
+
+.editor-menu-container {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.editor-content-container {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  overflow-y: auto;
+}

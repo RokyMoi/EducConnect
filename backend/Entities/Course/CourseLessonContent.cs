@@ -12,23 +12,14 @@ namespace EduConnect.Entities.Course
     public class CourseLessonContent
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid CourseLessonContentId { get; set; } = new Guid();
 
         public Guid CourseLessonId { get; set; }
 
         [ForeignKey("CourseLessonId")]
-        public CourseLesson? Lesson { get; set; } = null;
+        public CourseLesson? CourseLesson { get; set; } = null;
 
-        [Required]
-        [MaxLength(255)]
-        public required string Title { get; set; }
-
-        [Required]
-        [MaxLength(1000)]
-        public required string Description { get; set; }
-
-        public required string ContentData { get; set; }
+        public string Content { get; set; }
 
         public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 

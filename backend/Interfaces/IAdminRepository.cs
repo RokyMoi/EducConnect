@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EduConnect.DTOs;
 
 namespace EduConnect.Interfaces
 {
@@ -9,5 +10,7 @@ namespace EduConnect.Interfaces
     {
         Task<bool> SeedData();
         Task<bool> DataExists();
+
+        Task<List<GetAllUsersResponse>> GetAllUsers();
     }
 }

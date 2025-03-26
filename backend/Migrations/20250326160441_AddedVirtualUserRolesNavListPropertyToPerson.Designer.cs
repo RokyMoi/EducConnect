@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250326160441_AddedVirtualUserRolesNavListPropertyToPerson")]
+    partial class AddedVirtualUserRolesNavListPropertyToPerson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -234,10 +237,6 @@ namespace EduConnect.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Topic")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("TutorId")
                         .HasColumnType("uniqueidentifier");
 
@@ -251,33 +250,6 @@ namespace EduConnect.Migrations
                     b.HasIndex("TutorId");
 
                     b.ToTable("CourseLesson", "Course");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.CourseLessonContent", b =>
-                {
-                    b.Property<Guid>("CourseLessonContentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CourseLessonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("CourseLessonContentId");
-
-                    b.HasIndex("CourseLessonId")
-                        .IsUnique();
-
-                    b.ToTable("CourseLessonContent", "Course");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.CourseTag", b =>
@@ -1717,17 +1689,6 @@ namespace EduConnect.Migrations
                     b.Navigation("Tutor");
                 });
 
-            modelBuilder.Entity("EduConnect.Entities.Course.CourseLessonContent", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Course.CourseLesson", "CourseLesson")
-                        .WithOne("CourseLessonContent")
-                        .HasForeignKey("EduConnect.Entities.Course.CourseLessonContent", "CourseLessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CourseLesson");
-                });
-
             modelBuilder.Entity("EduConnect.Entities.Course.CourseTag", b =>
                 {
                     b.HasOne("EduConnect.Entities.Course.Course", "Course")
@@ -2144,11 +2105,6 @@ namespace EduConnect.Migrations
             modelBuilder.Entity("EduConnect.Entities.Course.Course", b =>
                 {
                     b.Navigation("CourseThumbnail");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.CourseLesson", b =>
-                {
-                    b.Navigation("CourseLessonContent");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Person.Person", b =>

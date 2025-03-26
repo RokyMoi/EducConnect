@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EduConnect.Data;
+using EduConnect.DTOs;
 using EduConnect.Entities.Course;
 using EduConnect.Entities.Person;
 using EduConnect.Interfaces;
@@ -16,6 +17,31 @@ namespace EduConnect.Repositories
         public async Task<bool> DataExists()
         {
             return await _dataContext.Course.AnyAsync();
+        }
+
+        public async Task<List<GetAllUsersResponse>> GetAllUsers()
+        {
+            return await
+            _dataContext.Person
+            .Include(x => x.PersonEmail)
+            .Include(x => x.PersonDetails)
+            .Include(x => x.UserRoles)
+            .Select(
+                x => new GetAllUsersResponse
+                {
+                    PersonId = x.PersonId,
+                    FirstName = x.PersonDetails.FirstName,
+                    LastName = x.PersonDetails.LastName,
+                    Email = x.PersonEmail.Email,
+                    Username = x.PersonDetails.Username,
+                    Role = _dataContext.Roles
+                        .Where(y => x.UserRoles.FirstOrDefault() != null && x.UserRoles.FirstOrDefault().RoleId.Equals(y.Id))
+                        .Select(y => y.Name)
+                        .FirstOrDefault() ?? "Unknown",
+                    PersonPublicId = x.PersonPublicId,
+
+                }
+            ).ToListAsync();
         }
 
         public async Task<bool> SeedData()

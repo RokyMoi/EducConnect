@@ -31,5 +31,13 @@ namespace EduConnect.Controllers.Admin
             return Ok("Data seeded successfully");
         }
 
+        [HttpGet("users/all")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _adminRepository.GetAllUsers();
+
+            return Ok(users);
+        }
+
     }
 }
