@@ -28,6 +28,22 @@
   background-color: #0056b3;
 }
 
+.delete-resource-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: red;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.delete-resource-button:hover {
+  background-color: darkred;
+}
 .course-thumbnail-container {
   width: 100%;
   display: flex;

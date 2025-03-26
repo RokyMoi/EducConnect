@@ -16,6 +16,9 @@ import { CustomHeaderNgContentDialogBoxComponent } from '../../../shared/custom-
 import { UploadCourseTeachingResourceRequest } from '../../../../models/course/course-tutor-controller/upload-course-teaching-resource-request';
 import { GetCourseTeachingResourceResponse } from '../../../../models/course/course-tutor-controller/get-course-teaching-resource-response';
 import formatFileSize from '../../../../helpers/format-file-size.helper';
+import { HttpEventType, HttpResponse } from '@angular/common/http';
+import { ImageCompressionService } from '../../../../services/image-compression.service';
+import { VideoCompressionService } from '../../../../services/video-compression.service';
 @Component({
   selector: 'app-course-tutor-teaching-resources-details',
   standalone: true,
@@ -39,8 +42,12 @@ export class CourseTutorTeachingResourcesDetailsComponent {
   urlToResource: string | null = null;
 
   uploadInProgress: boolean = false;
-  uploadProgress: number = 50;
+  uploadProgress: number = 0;
   uploadStatusMessage: string = '';
+
+  downloadInProgress: boolean = false;
+  downloadProgress: number = 0;
+  downloadStatusMessage: string = '';
 
   fileErrorMessage: string = '';
 
@@ -48,6 +55,9 @@ export class CourseTutorTeachingResourcesDetailsComponent {
 
   showSaveDialog: boolean = false;
   saveDialogMessage: string = '';
+
+  showDeleteDialog: boolean = false;
+  deleteDialogMessage: string = '';
 
   existingResource: GetCourseTeachingResourceResponse | null = null;
 
@@ -84,6 +94,8 @@ export class CourseTutorTeachingResourcesDetailsComponent {
     private router: Router,
     private route: ActivatedRoute,
     private snackboxService: SnackboxService,
+    private imageCompressionService: ImageCompressionService,
+    private videoCompressionService: VideoCompressionService,
     private courseTutorControllerService: CourseTutorControllerService
   ) {
     this.route.paramMap.subscribe((params) => {
@@ -170,9 +182,33 @@ export class CourseTutorTeachingResourcesDetailsComponent {
     this.showSaveDialog = true;
   }
 
-  saveResource() {
+  onCancelSaveDialog() {
+    this.showSaveDialog = false;
+  }
+  async saveResource() {
     const resourceTypeToSave: 'url' | 'file' =
       this.resourceFormGroup.controls['resourceType'].value;
+
+    if (AllowedFileTypes.Images.includes(this.selectedFile?.type as string)) {
+      await this.handleImageCompression();
+    }
+    //  else if (
+    //   AllowedFileTypes.Videos.includes(this.selectedFile?.type as string)
+    // ) {
+    //   console.log('Compressing video...');
+    //   console.log('Video size before compression:', this.selectedFile?.size);
+    //   this.showSaveDialog = false;
+    //   this.snackboxService.showSnackbox(
+    //     'Compression in progress, please wait...',
+    //     'info'
+    //   );
+    //   // await this.videoCompressionService
+    //   //   .compressVideo(this.selectedFile as File)
+    //   //   .then((compressedFile) => {
+    //   //     this.selectedFile = compressedFile;
+    //   //   });
+    //   console.log('Video size after compression:', this.selectedFile?.size);
+    // }
 
     const request: UploadCourseTeachingResourceRequest = {
       courseId: this.courseId,
@@ -188,7 +224,6 @@ export class CourseTutorTeachingResourcesDetailsComponent {
     };
 
     console.log('request', request);
-
     this.showSaveDialog = false;
     this.uploadStatusMessage = 'Preparing to upload...';
     this.uploadInProgress = true;
@@ -261,5 +296,133 @@ export class CourseTutorTeachingResourcesDetailsComponent {
 
   formatFileSizeTemplateFunction() {
     return formatFileSize(this.existingResource?.fileSize as number);
+  }
+
+  onDownloadResource() {
+    this.downloadInProgress = true;
+    this.downloadStatusMessage = 'Preparing to download...';
+    this.courseTutorControllerService
+      .downloadCourseTeachingResource(this.resourceId as string)
+      .subscribe({
+        next: (event) => {
+          if (event.type === HttpEventType.DownloadProgress) {
+            const progress = Math.round(
+              (event.loaded / (event.total || 1)) * 100
+            );
+            this.downloadProgress = progress;
+            this.downloadStatusMessage = 'Downloading...';
+          } else if (event instanceof HttpResponse) {
+            this.downloadInProgress = false;
+            this.downloadStatusMessage = 'Download complete!';
+            this.downloadProgress = 0;
+            this.snackboxService.showSnackbox(
+              'Download completed successfully',
+              'success'
+            );
+
+            const blob = event.body as Blob;
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = this.existingResource?.fileName || 'resource';
+            link.click();
+
+            window.URL.revokeObjectURL(downloadUrl);
+          }
+        },
+        error: (error) => {
+          this.downloadInProgress = false;
+          this.downloadStatusMessage = 'Download failed!';
+          this.downloadProgress = 0;
+          this.snackboxService.showSnackbox(
+            `Download failed: ${error.error.message || 'Unknown error'}`,
+            'error'
+          );
+        },
+      });
+  }
+
+  onDeleteResource() {
+    this.deleteDialogMessage = 'Are you sure you want to delete this resource?';
+    this.showDeleteDialog = true;
+  }
+
+  onCancelDeleteDialog() {
+    this.showDeleteDialog = false;
+  }
+
+  deleteResource() {
+    this.courseTutorControllerService
+      .deleteCourseTeachingResource(this.resourceId as string)
+      .subscribe({
+        next: (response) => {
+          this.snackboxService.showSnackbox(
+            'Resource deleted successfully',
+            'success'
+          );
+          this.router.navigate([
+            '/tutor/course/teaching-resources/' + this.courseId,
+          ]);
+        },
+        error: (error) => {
+          this.snackboxService.showSnackbox(
+            `Failed to delete resource${
+              error.error.message ? ', ' + error.error.message : ''
+            }`,
+            'error'
+          );
+        },
+      });
+  }
+
+  private async handleImageCompression(): Promise<void> {
+    try {
+      const compressedFile = await this.imageCompressionService.compressImage(
+        this.selectedFile as File,
+        {
+          maxWidth: 1024,
+          maxHeight: 1024,
+          quality: 0.5,
+        }
+      );
+
+      console.log(
+        `Original file size: ${this.selectedFile?.size} - Compressed file size: ${compressedFile.size}`
+      );
+
+      this.selectedFile = compressedFile;
+    } catch (error) {
+      console.log('Compression failed: ', error);
+      this.snackboxService.showSnackbox(
+        'We failed to compress the thumbnail image, ' + error,
+        'error'
+      );
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+      const file = event.dataTransfer.files[0];
+      this.selectedFile = file;
+      this.fileValidator();
+
+      event.dataTransfer.clearData();
+    }
   }
 }

@@ -5,11 +5,12 @@ import { GetCourseTeachingResourceResponse } from '../../../../models/course/cou
 import { SnackboxService } from '../../../../services/shared/snackbox.service';
 import { CommonModule } from '@angular/common';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
+import { CustomHeaderNgContentDialogBoxComponent } from '../../../shared/custom-header-ng-content-dialog-box/custom-header-ng-content-dialog-box.component';
 
 @Component({
   selector: 'app-course-teaching-resources',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CustomHeaderNgContentDialogBoxComponent],
   templateUrl: './course-teaching-resources.component.html',
   styleUrl: './course-teaching-resources.component.css',
 })
@@ -20,6 +21,10 @@ export class CourseTutorTeachingResourcesComponent implements OnInit {
 
   downloadProgress: { [key: string]: number } = {};
   currentDownloads: Set<string> = new Set();
+
+  showDeleteDialog: boolean = false;
+  deleteDialogMessage: string = '';
+  selectedResource: GetCourseTeachingResourceResponse | null = null;
 
   constructor(
     private router: Router,
@@ -117,5 +122,49 @@ export class CourseTutorTeachingResourcesComponent implements OnInit {
   private cleanupDownload(resourceId: string) {
     delete this.downloadProgress[resourceId];
     this.currentDownloads.delete(resourceId);
+  }
+
+  onDeleteResource(resource: GetCourseTeachingResourceResponse) {
+    this.selectedResource = resource;
+
+    this.deleteDialogMessage = `Are you sure you want to delete the resource "${
+      resource.resourceUrl ? resource.resourceUrl : resource.fileName
+    }"?`;
+    this.showDeleteDialog = true;
+  }
+
+  onCancelDeleteDialog() {
+    this.showDeleteDialog = false;
+  }
+
+  deleteResource() {
+    this.showDeleteDialog = false;
+    this.deleteDialogMessage = '';
+    if (!this.selectedResource?.courseTeachingResourceId) return;
+
+    this.courseTutorControllerService
+      .deleteCourseTeachingResource(
+        this.selectedResource?.courseTeachingResourceId as string
+      )
+      .subscribe({
+        next: (response) => {
+          this.snackboxService.showSnackbox(
+            'Resource deleted successfully',
+            'success'
+          );
+          this.selectedResource = null;
+          this.loadAllResources();
+        },
+        error: (error) => {
+          this.snackboxService.showSnackbox(
+            `Failed to delete resource${
+              error.error.message ? ', ' + error.error.message : ''
+            }`,
+            'error'
+          );
+
+          this.selectedResource = null;
+        },
+      });
   }
 }

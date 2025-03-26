@@ -62,8 +62,9 @@ namespace EduConnect.Extensions
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
 
-            services.AddScoped<ICourseRepository, CourseRepository>();            services.AddScoped<IMessageRepository,MessageRepository>();
+            services.AddScoped<ICourseRepository, CourseRepository>(); services.AddScoped<IMessageRepository, MessageRepository>();
 
+            services.AddScoped<IAdminRepository, AdminRepository>();
 
 
             services.AddScoped<CountryExtractor>();
@@ -96,7 +97,7 @@ namespace EduConnect.Extensions
 
             services.AddAutoMapper(typeof(AutoMapperProfiles));
             /////////SHOPPING SERVICES
-            services.AddScoped<IShoppingCartService,ShoppingCartService>();
+            services.AddScoped<IShoppingCartService, ShoppingCartService>();
             services.AddScoped<IWishListCourse, WishListService>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 

@@ -985,6 +985,72 @@ namespace EduConnect.Controllers.Course
             return File(resourceFile.FileData, resourceFile.ContentType, resourceFile.FileName);
         }
 
+        [HttpDelete("teaching-resource/delete")]
+        public async Task<IActionResult> DeleteCourseTeachingResource(Guid courseTeachingResourceId)
+        {
+            var resource = await _courseRepository.GetCourseTeachingResourceByIdWithoutFileData(courseTeachingResourceId);
+
+            if (resource == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Resource not found",
+                        null
+                    )
+                );
+
+            }
+
+            //Check if the resource if owned by the course tutor
+            var tutor = await _tutorRepository.GetTutorByPersonId(Guid.Parse(HttpContext.Items["PersonId"].ToString()));
+
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the resource, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            if (tutor.TutorId != resource.Course.TutorId)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to delete this resource",
+                        null
+                    )
+                );
+            }
+
+
+            bool deleteResult = await _courseRepository.DeleteCourseTeachingResourceById(courseTeachingResourceId);
+
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the resource, please try again",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Resource deleted successfully", null)
+            );
+
+
+
+
+        }
+
 
 
 

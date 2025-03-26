@@ -259,4 +259,16 @@ export class CourseTutorControllerService {
       }
     );
   }
+
+  deleteCourseTeachingResource(courseTeachingResourceId: string) {
+    var token = localStorage.getItem('Authorization');
+    return this.httpClient.delete<DefaultServerResponse>(
+      `${this.apiUrl}/teaching-resource/delete?courseTeachingResourceId=${courseTeachingResourceId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
 }

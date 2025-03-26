@@ -45,5 +45,8 @@ namespace EduConnect.Interfaces.Course
         Task<List<GetCourseTeachingResourceResponse>> GetAllCourseTeachingResourcesWithoutFileDataByCourseId(Guid courseId);
 
         Task<GetCourseTeachingResourcesInformationByCourseIdResponseFromRepository?> GetCourseTeachingResourcesInformationByCourseId(Guid courseId);
+
+        Task<GetCourseTeachingResourceByIdIncludeCourseExcludeFileDataIfFile?> GetCourseTeachingResourceByIdWithoutFileData(Guid courseTeachingResourceId);
+        Task<bool> DeleteCourseTeachingResourceById(Guid courseTeachingResourceId);
     }
 }

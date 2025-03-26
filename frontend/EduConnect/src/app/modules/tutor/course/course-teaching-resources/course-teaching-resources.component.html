@@ -31,10 +31,14 @@
                 </div>
             </div>
             <div class="resource-actions">
+                <button class="action-btn delete-btn" (click)="onDeleteResource(resource)">
+                    Delete
+                </button>
                 <button class="action-btn view-btn" (click)="onViewResource(resource.courseTeachingResourceId)">
                     View
                 </button>
-                <button class="action-btn download-btn" (click)="onDownloadResource(resource)">
+                <button *ngIf="resource.fileName && !currentDownloads.has(resource.courseTeachingResourceId)"
+                    class="action-btn download-btn" (click)="onDownloadResource(resource)">
                     Download
                 </button>
             </div>
@@ -50,4 +54,11 @@
             </div>
         </div>
     </div>
+    <app-custom-header-ng-content-dialog-box *ngIf="showDeleteDialog" [title]="'Delete Resource'">
+        <p>{{deleteDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="onCancelDeleteDialog()">Cancel</button>
+            <button class="confirm-button" (click)="deleteResource()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
 </div>

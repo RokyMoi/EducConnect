@@ -99,6 +99,30 @@ namespace EduConnect.Repositories.Course
             }
         }
 
+        public async Task<bool> DeleteCourseTeachingResourceById(Guid courseTeachingResourceId)
+        {
+            var courseTeachingResource = await _dataContext.CourseTeachingResource.Where(x => x.CourseTeachingResourceId == courseTeachingResourceId).FirstOrDefaultAsync();
+
+            if (courseTeachingResource == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                _dataContext.CourseTeachingResource.Remove(courseTeachingResource);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to delete course teaching resource " + courseTeachingResourceId);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
         public async Task<bool> DeleteCourseThumbnail(Guid courseId)
         {
             try
@@ -159,6 +183,30 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.CourseTeachingResource
             .Where(x => x.CourseTeachingResourceId == courseTeachingResourceId)
             .FirstOrDefaultAsync();
+        }
+
+        public async Task<GetCourseTeachingResourceByIdIncludeCourseExcludeFileDataIfFile?> GetCourseTeachingResourceByIdWithoutFileData(Guid courseTeachingResourceId)
+        {
+            return await _dataContext.CourseTeachingResource
+            .Include(x => x.Course)
+            .Where(
+                x => x.CourseTeachingResourceId == courseTeachingResourceId
+            )
+            .Select(
+                x => new GetCourseTeachingResourceByIdIncludeCourseExcludeFileDataIfFile
+                {
+                    CourseTeachingResourceId = x.CourseTeachingResourceId,
+                    Title = x.Title,
+                    Description = x.Description,
+                    ResourceUrl = x.ResourceUrl,
+                    FileName = x.FileName,
+                    ContentType = x.ContentType,
+                    FileSize = x.FileSize,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    Course = x.Course
+                }
+            ).FirstOrDefaultAsync();
         }
 
         public async Task<GetCourseTeachingResourcesInformationByCourseIdResponseFromRepository?> GetCourseTeachingResourcesInformationByCourseId(Guid courseId)

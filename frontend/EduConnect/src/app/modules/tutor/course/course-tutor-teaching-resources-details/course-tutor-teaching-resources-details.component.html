@@ -1,7 +1,9 @@
 <div class="teaching-resources-details-container">
-    <h2>{{this.courseId ? 'New Teaching Resource' : 'Teaching Resource Details'}}</h2>
+    <h2>{{!this.existingResource ? 'New Teaching Resource' : 'Teaching Resource Details'}}</h2>
     <div class="action-buttons-container">
         <button class="go-back-button" (click)="goBack()">← Go Back</button>
+        <button class="delete-resource-button" *ngIf="this.existingResource" (click)="onDeleteResource()">Delete
+            Resource</button>
 
     </div>
     <form [formGroup]="resourceFormGroup">
@@ -58,12 +60,28 @@
                     <button class="preview-button" (click)="$event.preventDefault()">
                         <i class="fas fa-eye"></i> Preview
                     </button>
-                    <button class="download-button" (click)="$event.preventDefault()">
+                    <button *ngIf="this.existingResource?.fileName" class="download-button"
+                        (click)="onDownloadResource()">
                         <i class="fas fa-download"></i> Download
                     </button>
                 </div>
             </div>
 
+        </div>
+
+        <!--Download Area Container-->
+        <div class="upload-progress-area-container" *ngIf="uploadInProgress">
+            <label for="thumbnailFileName">Download Status</label>
+            <div class="upload-progress-container">
+                <div class="progress-status">
+                    <span>{{downloadStatusMessage}}</span>
+
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" [style.width.%]="downloadProgress"></div>
+                </div>
+                <div class="progress-percentage">{{downloadProgress}}%</div>
+            </div>
         </div>
 
 
@@ -89,7 +107,9 @@
         </div>
 
         <!--File Upload Input-->
-        <div class=" form-item" *ngIf="resourceFormGroup.controls['resourceType'].value === 'file'">
+        <div class=" form-item" *ngIf="resourceFormGroup.controls['resourceType'].value === 'file'"
+            (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
+            [class.dragging]="isDragging">
             <div class="file-upload-wrapper">
                 <div class="drag-drop-content">
                     <span class="upload-icon">📤</span>
@@ -133,8 +153,15 @@
     <app-custom-header-ng-content-dialog-box *ngIf="showSaveDialog" [title]="'Save Resource'">
         <p>{{saveDialogMessage}}</p>
         <div class="dialog-actions">
-            <button class="cancel-button">Cancel</button>
+            <button class="cancel-button" (click)="onCancelSaveDialog()">Cancel</button>
             <button class="confirm-button" (click)="saveResource()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+    <app-custom-header-ng-content-dialog-box *ngIf="showDeleteDialog" [title]="'Delete Resource'">
+        <p>{{deleteDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="onCancelDeleteDialog()">Cancel</button>
+            <button class="confirm-button" (click)="deleteResource()">Confirm</button>
         </div>
     </app-custom-header-ng-content-dialog-box>
 </div>
