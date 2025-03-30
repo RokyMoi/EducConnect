@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EduConnect.Data;
 using EduConnect.DTOs;
 using EduConnect.Entities.Course;
+using EduConnect.Enums;
 using EduConnect.Interfaces.Course;
 using Microsoft.EntityFrameworkCore;
 
@@ -215,7 +216,7 @@ namespace EduConnect.Repositories.Course
 
         public async Task<CourseLesson?> GetCourseLessonById(Guid courseLessonId)
         {
-            return await _dataContext.CourseLesson.Include(x => x.CourseLessonContent).Where(x => x.CourseLessonId == courseLessonId).FirstOrDefaultAsync();
+            return await _dataContext.CourseLesson.Include(x => x.CourseLessonContent).Include(x => x.Course).Where(x => x.CourseLessonId == courseLessonId).FirstOrDefaultAsync();
 
         }
 
@@ -224,6 +225,14 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.CourseLesson
             .Where(x => x.CourseId == courseId)
             .CountAsync();
+        }
+
+        public async Task<List<CourseLesson>> GetCourseLessonsByCourseId(Guid courseId)
+        {
+            return await _dataContext.CourseLesson
+            .Include(x => x.CourseLessonContent)
+            .Where(x => x.CourseId == courseId)
+            .ToListAsync();
         }
 
         public async Task<CourseTeachingResource?> GetCourseTeachingResourceById(Guid courseTeachingResourceId)
@@ -298,10 +307,20 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.CourseThumbnail.Include(x => x.Course).Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
         }
 
+        public async Task<long> GetPublishedCourseLessonCountByCourseId(Guid courseId)
+        {
+            return await _dataContext.CourseLesson
+            .Where(
+                x => x.CourseId == courseId &&
+                x.PublishedStatus == PublishedStatus.Published
+            )
+            .LongCountAsync();
+        }
+
         public async Task<bool> RearrangeCourseLessonSequenceOrder(int newLessonPosition, Guid courseId)
         {
             var lessonsToMove = await _dataContext.CourseLesson
-                    .Where(l => l.CourseId == courseId && l.LessonSequenceOrder >= newLessonPosition).ToListAsync();
+                    .Where(l => l.CourseId == courseId && l.LessonSequenceOrder >= newLessonPosition && l.LessonSequenceOrder.HasValue).ToListAsync();
 
             foreach (var lesson in lessonsToMove)
             {

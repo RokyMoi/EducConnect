@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EduConnect.Enums;
 
 namespace EduConnect.DTOs
 {
@@ -18,6 +19,6 @@ namespace EduConnect.DTOs
 
         public int? MaxNumberOfStudents { get; set; } = null;
 
-        public bool? PublishedStatus { get; set; } = false;
+        public PublishedStatus PublishedStatus { get; set; } = PublishedStatus.Draft;
     }
 }

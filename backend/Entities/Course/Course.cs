@@ -4,6 +4,7 @@ using backend.Entities.Reference;
 using backend.Entities.Reference.Language;
 using backend.Entities.Reference.Learning;
 using EduConnect.Entities.Reference;
+using EduConnect.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EduConnect.Entities.Course
@@ -47,14 +48,14 @@ namespace EduConnect.Entities.Course
         //False - draft
         //Null - archived
 
-        public bool? PublishedStatus { get; set; } = false;
+        public PublishedStatus PublishedStatus { get; set; } = PublishedStatus.Draft;
 
 
         public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         public long? UpdatedAt { get; set; } = null;
 
-        
+
         public virtual CourseThumbnail? CourseThumbnail { get; set; } = null;
 
 

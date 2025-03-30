@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using EduConnect.Enums;
 
 namespace EduConnect.DTOs
 {
@@ -40,6 +41,7 @@ namespace EduConnect.DTOs
         [Range(1, int.MaxValue)]
         public int? LessonSequenceOrder { get; set; } = null;
 
-        public bool? PublishedStatus { get; set; } = false;
+        [Range(0, 2)]
+        public PublishedStatus PublishedStatus { get; set; } = PublishedStatus.Draft;
     }
 }

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using EduConnect.Entities.Course;
+using EduConnect.Enums;
 
 namespace EduConnect.Entities.Course
 {
@@ -31,11 +32,8 @@ namespace EduConnect.Entities.Course
 
         public int? LessonSequenceOrder { get; set; } = null;
 
-        //Status of the lesson, represents a flag that indicates lesson status, with the following values:
-        //false - not published
-        //true - published
-        //null - archived
-        public bool? PublishedStatus { get; set; } = false;
+        //Status of the lesson, represents a flag that indicates lesson status
+        public PublishedStatus PublishedStatus { get; set; } = PublishedStatus.Draft;
 
         public DateTime? StatusChangedAt { get; set; } = null;
 

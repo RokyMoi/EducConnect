@@ -9,6 +9,7 @@ import { UpdateCourseBasicsRequest } from '../../models/course/course-tutor-cont
 import { UploadCourseThumbnailRequest } from '../../models/course/course-tutor-controller/upload-course-thumbnail-request';
 import { map } from 'rxjs';
 import { UploadCourseTeachingResourceRequest } from '../../models/course/course-tutor-controller/upload-course-teaching-resource-request';
+import { CreateCourseLessonRequest } from '../../models/course/course-tutor-controller/create-course-lesson-request';
 
 @Injectable({
   providedIn: 'root',
@@ -264,6 +265,44 @@ export class CourseTutorControllerService {
     var token = localStorage.getItem('Authorization');
     return this.httpClient.delete<DefaultServerResponse>(
       `${this.apiUrl}/teaching-resource/delete?courseTeachingResourceId=${courseTeachingResourceId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  createOrUpdateCourseLesson(request: CreateCourseLessonRequest) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.post<DefaultServerResponse>(
+      `${this.apiUrl}/lesson/create`,
+      request,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  getAllCourseLessons(courseId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<DefaultServerResponse>(
+      `${this.apiUrl}/lesson/all?courseId=${courseId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  getCourseLessonById(courseLessonId: string) {
+    const token = localStorage.getItem('Authorization');
+
+    return this.httpClient.get<DefaultServerResponse>(
+      `${this.apiUrl}/lesson?courseLessonId=${courseLessonId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

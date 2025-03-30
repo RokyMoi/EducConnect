@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using backend.Interfaces.Reference;
 using backend.Interfaces.Tutor;
@@ -10,12 +11,14 @@ using EduConnect.DTOs;
 using EduConnect.DTOs.Course;
 using EduConnect.Entities;
 using EduConnect.Entities.Course;
+using EduConnect.Enums;
 using EduConnect.Interfaces.Course;
 using EduConnect.Middleware;
 using EduConnect.Services;
 using EduConnect.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Stripe.Forwarding;
 
 namespace EduConnect.Controllers.Course
 {
@@ -106,7 +109,7 @@ namespace EduConnect.Controllers.Course
                 MinNumberOfStudents = request.MinNumberOfStudents,
                 MaxNumberOfStudents = request.MaxNumberOfStudents,
                 Price = request.Price,
-                PublishedStatus = false,
+                PublishedStatus = Enums.PublishedStatus.Draft,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 UpdatedAt = null
 
@@ -1091,71 +1094,95 @@ namespace EduConnect.Controllers.Course
                 );
             }
 
-            var currentCourseCount = await _courseRepository.GetCourseLessonCountByCourseId(request.CourseId);
-            var lessonSequenceOrder = !request.LessonSequenceOrder.HasValue || (request.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.Value > currentCourseCount) ? currentCourseCount + 1 : request.LessonSequenceOrder;
-
-
-            if (request.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.Value <= currentCourseCount)
+            if (request.CourseLessonId.HasValue && request.CourseLessonId.Value != Guid.Empty)
             {
-                await _courseRepository.RearrangeCourseLessonSequenceOrder(request.LessonSequenceOrder.Value, request.CourseId);
-            }
+                var lesson = await _courseRepository.GetCourseLessonById(request.CourseLessonId.Value);
 
-            //Check if the course lesson should be updated or created 
-            if (request.CourseLessonId.HasValue)
-            {
-                var existingCourseLesson = await _courseRepository.GetCourseLessonById(request.CourseLessonId.Value);
-
-                if (existingCourseLesson == null)
+                if (lesson != null)
                 {
-                    return NotFound(ApiResponse<object>.GetApiResponse("Lesson not found", null));
 
-                }
-
-
-                existingCourseLesson.Title = request.Title;
-                existingCourseLesson.ShortSummary = request.ShortSummary;
-                existingCourseLesson.Description = request.Description;
-                existingCourseLesson.Topic = request.Topic;
-                existingCourseLesson.LessonSequenceOrder = request.LessonSequenceOrder;
-                existingCourseLesson.PublishedStatus = request.PublishedStatus;
-                existingCourseLesson.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
-                if (existingCourseLesson.CourseLessonContent == null)
-                {
-                    existingCourseLesson.CourseLessonContent = new CourseLessonContent
+                    if (lesson.PublishedStatus == PublishedStatus.Draft && request.PublishedStatus != PublishedStatus.Published)
                     {
-                        CourseLessonId = existingCourseLesson.CourseLessonId,
-                        Content = request.Content,
-                        CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                        UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-                    };
-                }
+                        return BadRequest(ApiResponse<object>.GetApiResponse("Lesson's status from draft can only be changed to published", null));
+                    }
 
-                existingCourseLesson.CourseLessonContent.Content = request.Content;
+                    if (lesson.PublishedStatus == PublishedStatus.Published && request.PublishedStatus == PublishedStatus.Draft)
+                    {
+                        return BadRequest(ApiResponse<object>.GetApiResponse("Lesson's status from published can only be changed to archived", null));
+                    }
 
-                var updateResult = await _courseRepository.UpdateCourseLesson(existingCourseLesson);
+                    if (lesson.PublishedStatus == PublishedStatus.Archived && request.PublishedStatus == PublishedStatus.Draft)
+                    {
+                        return BadRequest(ApiResponse<object>.GetApiResponse("Lesson's status from archived can only be changed to published", null));
+                    }
 
-                if (!updateResult)
-                {
-                    return StatusCode(
-                        500,
-                        ApiResponse<object>.GetApiResponse(
-                            "An error occurred while updating the lesson, please try again",
-                            null
-                        )
+                    int? lessonSequenceOrder = request.LessonSequenceOrder;
+
+
+                    if (request.PublishedStatus == PublishedStatus.Published)
+                    {
+
+                        var currentPublishedLessonCount = await _courseRepository.GetPublishedCourseLessonCountByCourseId(request.CourseId);
+
+                        Console.WriteLine("Current Published Lesson Count: " + currentPublishedLessonCount);
+                        Console.WriteLine("Lesson Sequence Order: " + lessonSequenceOrder);
+                        Console.WriteLine("Is lesson sequence order greater than current published lesson count? " + (lessonSequenceOrder > currentPublishedLessonCount));
+
+
+                        if (currentPublishedLessonCount < 2)
+                        {
+                            lessonSequenceOrder = 1;
+                        }
+                        if (currentPublishedLessonCount > 1)
+                        {
+
+                            if (lessonSequenceOrder.HasValue && lessonSequenceOrder.Value > currentPublishedLessonCount || !lessonSequenceOrder.HasValue)
+                            {
+                                lessonSequenceOrder = (int)currentPublishedLessonCount + 1;
+                            }
+                            if (lessonSequenceOrder.HasValue && lessonSequenceOrder.Value < currentPublishedLessonCount)
+                            {
+                                Console.WriteLine("Reorder lessons");
+                                await _courseRepository.RearrangeCourseLessonSequenceOrder(lessonSequenceOrder.Value, request.CourseId);
+                            }
+
+                        }
+                    }
+                    if (request.PublishedStatus != PublishedStatus.Published)
+                    {
+                        lessonSequenceOrder = null;
+                    }
+
+
+
+                    lesson.Title = request.Title;
+                    lesson.ShortSummary = request.ShortSummary;
+                    lesson.Description = request.Description;
+                    lesson.Topic = request.Topic;
+                    lesson.PublishedStatus = request.PublishedStatus;
+                    lesson.LessonSequenceOrder = lessonSequenceOrder;
+                    lesson.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    lesson.StatusChangedAt = request.PublishedStatus != lesson.PublishedStatus ? DateTime.Now : lesson.StatusChangedAt;
+                    var updateResult = await _courseRepository.UpdateCourseLesson(lesson);
+
+                    if (!updateResult)
+                    {
+                        return StatusCode(
+                            500,
+                            ApiResponse<object>.GetApiResponse(
+                                "An error occurred while updating the lesson, please try again",
+                                null
+                            )
+                        );
+
+                    }
+
+                    return Ok(
+                        ApiResponse<object>.GetApiResponse("Lesson updated successfully", lesson)
                     );
+
                 }
-
-                return Ok(
-                    ApiResponse<object>.GetApiResponse("Lesson updated successfully", null)
-                );
-
-
-
-
             }
-
-
 
             var courseLesson = new CourseLesson
             {
@@ -1164,24 +1191,11 @@ namespace EduConnect.Controllers.Course
                 ShortSummary = request.ShortSummary,
                 Description = request.Description,
                 Topic = request.Topic,
-                LessonSequenceOrder = lessonSequenceOrder,
                 TutorId = tutor.TutorId,
-
-
             };
 
             var createResult = await _courseRepository.CreateCourseLesson(courseLesson);
-
-            var lessonContent = new CourseLessonContent
-            {
-                CourseLessonId = courseLesson.CourseLessonId,
-                Content = request.Content,
-            };
-
-            var createLessonContentResult = await _courseRepository.CreateCourseLessonContent(lessonContent);
-
-
-            if (!createResult || !createLessonContentResult)
+            if (!createResult)
             {
                 return StatusCode(
                     500,
@@ -1192,13 +1206,13 @@ namespace EduConnect.Controllers.Course
                 );
             }
 
-            return Ok(
-                ApiResponse<object>.GetApiResponse("Lesson created successfully", null)
-            );
+            return Ok(courseLesson);
+
 
 
         }
-
+        
+    
 
 
 

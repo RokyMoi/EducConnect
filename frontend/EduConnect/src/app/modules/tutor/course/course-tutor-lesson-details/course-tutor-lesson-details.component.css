@@ -139,3 +139,92 @@ form {
   max-height: 500px;
   overflow-y: auto;
 }
+
+.warning-span {
+  color: orange;
+}
+
+.form-actions-row {
+  width: 100%;
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.discard-action-button {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}
+.save-action-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}
+
+.save-action-button:hover {
+  background-color: #45a049;
+  cursor: pointer;
+}
+
+.discard-action-button:hover {
+  background-color: #e53935;
+  cursor: pointer;
+}
+
+.error-container {
+  display: block;
+  color: #ff4d4d;
+  font-size: 0.875em;
+  margin-top: 5px;
+  height: 16px;
+}
+
+.error-container p {
+  margin: 0;
+}
+.dialog-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.negative-confirm-button {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}
+
+.positive-cancel-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}
+
+.positive-confirm-button{
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}
+
+.negative-cancel-button {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}
+
+

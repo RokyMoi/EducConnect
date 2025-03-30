@@ -61,5 +61,9 @@ namespace EduConnect.Interfaces.Course
 
         Task<bool> CreateCourseLessonContent(CourseLessonContent courseLessonContent);
 
+        Task<List<CourseLesson>> GetCourseLessonsByCourseId(Guid courseId);
+
+        Task<long> GetPublishedCourseLessonCountByCourseId(Guid courseId);
+
     }
 }
