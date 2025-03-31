@@ -1101,7 +1101,7 @@ namespace EduConnect.Controllers.Course
                 if (lesson != null)
                 {
 
-                    if (lesson.PublishedStatus == PublishedStatus.Draft && request.PublishedStatus != PublishedStatus.Published)
+                    if (lesson.PublishedStatus == PublishedStatus.Draft && request.PublishedStatus == PublishedStatus.Archived)
                     {
                         return BadRequest(ApiResponse<object>.GetApiResponse("Lesson's status from draft can only be changed to published", null));
                     }
@@ -1119,38 +1119,18 @@ namespace EduConnect.Controllers.Course
                     int? lessonSequenceOrder = request.LessonSequenceOrder;
 
 
-                    if (request.PublishedStatus == PublishedStatus.Published)
+
+
+                    var currentPublishedLessonCount = await _courseRepository.GetPublishedCourseLessonCountByCourseId(request.CourseId);
+
+                    if (!lessonSequenceOrder.HasValue || lessonSequenceOrder.Value > currentPublishedLessonCount + 1)
                     {
-
-                        var currentPublishedLessonCount = await _courseRepository.GetPublishedCourseLessonCountByCourseId(request.CourseId);
-
-                        Console.WriteLine("Current Published Lesson Count: " + currentPublishedLessonCount);
-                        Console.WriteLine("Lesson Sequence Order: " + lessonSequenceOrder);
-                        Console.WriteLine("Is lesson sequence order greater than current published lesson count? " + (lessonSequenceOrder > currentPublishedLessonCount));
-
-
-                        if (currentPublishedLessonCount < 2)
-                        {
-                            lessonSequenceOrder = 1;
-                        }
-                        if (currentPublishedLessonCount > 1)
-                        {
-
-                            if (lessonSequenceOrder.HasValue && lessonSequenceOrder.Value > currentPublishedLessonCount || !lessonSequenceOrder.HasValue)
-                            {
-                                lessonSequenceOrder = (int)currentPublishedLessonCount + 1;
-                            }
-                            if (lessonSequenceOrder.HasValue && lessonSequenceOrder.Value < currentPublishedLessonCount)
-                            {
-                                Console.WriteLine("Reorder lessons");
-                                await _courseRepository.RearrangeCourseLessonSequenceOrder(lessonSequenceOrder.Value, request.CourseId);
-                            }
-
-                        }
+                        lessonSequenceOrder = (int)currentPublishedLessonCount + 1; // Place at the end
                     }
-                    if (request.PublishedStatus != PublishedStatus.Published)
+                    else if (lessonSequenceOrder.Value <= currentPublishedLessonCount)
                     {
-                        lessonSequenceOrder = null;
+                        Console.WriteLine("Reordering lesson sequence order");
+                        await _courseRepository.RearrangeLessonSequenceAsync(lesson.CourseId, lesson.LessonSequenceOrder.Value, lessonSequenceOrder.Value); // Reorder
                     }
 
 
@@ -1163,6 +1143,22 @@ namespace EduConnect.Controllers.Course
                     lesson.LessonSequenceOrder = lessonSequenceOrder;
                     lesson.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                     lesson.StatusChangedAt = request.PublishedStatus != lesson.PublishedStatus ? DateTime.Now : lesson.StatusChangedAt;
+                    if (lesson.CourseLessonContent == null)
+                    {
+                        lesson.CourseLessonContent = new CourseLessonContent
+                        {
+                            CourseLessonId = lesson.CourseLessonId,
+                            Content = request.Content,
+                            UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+                        };
+                    }
+                    if (lesson.CourseLessonContent != null)
+                    {
+
+                        lesson.CourseLessonContent.Content = request.Content;
+                        lesson.CourseLessonContent.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    }
+
                     var updateResult = await _courseRepository.UpdateCourseLesson(lesson);
 
                     if (!updateResult)
@@ -1177,8 +1173,10 @@ namespace EduConnect.Controllers.Course
 
                     }
 
+
+
                     return Ok(
-                        ApiResponse<object>.GetApiResponse("Lesson updated successfully", lesson)
+                        ApiResponse<object>.GetApiResponse("Lesson updated successfully", null)
                     );
 
                 }
@@ -1206,15 +1204,93 @@ namespace EduConnect.Controllers.Course
                 );
             }
 
-            return Ok(courseLesson);
+            var lessonContent = new CourseLessonContent
+            {
+                CourseLessonId = courseLesson.CourseLessonId,
+                Content = request.Content,
+            };
+
+            var createContentResult = await _courseRepository.CreateCourseLessonContent(lessonContent);
+
+            if (!createContentResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "Failed to save the lesson content, but the lesson was created successfully",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Lesson created successfully", null)
+            );
 
 
 
         }
-        
-    
 
 
+
+        [HttpGet("lesson/all")]
+        public async Task<IActionResult> GetAllCourseLessons([FromQuery] Guid courseId)
+        {
+            var courseExists = await _courseRepository.CourseExistsById(courseId);
+
+            if (!courseExists)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course not found",
+                        null
+                    )
+                );
+
+            }
+
+            var lessons = await _courseRepository.GetAllCourseLessons(courseId);
+
+            if (lessons.Count == 0)
+            {
+                return NoContent();
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Lessons retrieved successfully",
+                    lessons
+                )
+            );
+
+
+
+
+        }
+
+        [HttpGet("lesson")]
+        public async Task<IActionResult> GetCourseLessonById([FromQuery] Guid courseLessonId)
+        {
+            var lesson = await _courseRepository.GetCourseLessonByIdForTutorDashboard(courseLessonId);
+
+            if (lesson == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Lesson not found",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Lesson retrieved successfully",
+                    lesson
+                )
+            );
+
+        }
 
 
     }

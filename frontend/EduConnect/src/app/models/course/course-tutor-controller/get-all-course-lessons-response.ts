@@ -1,3 +1,5 @@
+import { PublishedStatus } from '../../../../enums/published-status.enum';
+
 export interface GetAllCourseLessonsResponse {
   courseId: string;
   courseLessonId: string;
@@ -6,9 +8,9 @@ export interface GetAllCourseLessonsResponse {
   description: string;
   topic: string;
   lessonSequenceOrder: number | null;
-  publishedStatus: number | null;
+  publishedStatus: PublishedStatus;
   statusChangedAt: string | null;
   createdAt: string;
   updatedAt: string | null;
-  content: string;
+  courseLessonContent: string;
 }

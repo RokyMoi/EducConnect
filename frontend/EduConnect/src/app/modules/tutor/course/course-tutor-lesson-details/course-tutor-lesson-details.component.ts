@@ -134,7 +134,9 @@ export class CourseTutorLessonDetailsComponent implements OnInit {
       content: this.lessonForm.controls['content'].value,
       lessonSequenceOrder:
         this.lessonForm.controls['lessonSequenceOrder'].value,
-      publishedStatus: PublishedStatus.Draft,
+      publishedStatus: this.existingLesson
+        ? this.existingLesson.publishedStatus
+        : PublishedStatus.Draft,
     };
     console.log(request);
 
@@ -197,10 +199,17 @@ export class CourseTutorLessonDetailsComponent implements OnInit {
             topic: this.existingLesson?.topic,
             shortSummary: this.existingLesson?.shortSummary,
             description: this.existingLesson?.description,
-            content: this.existingLesson?.content,
+            content: this.existingLesson?.courseLessonContent,
             lessonSequenceOrder: this.existingLesson?.lessonSequenceOrder,
             publishedStatus: this.existingLesson?.publishedStatus,
           });
+          this.editorContent = this.existingLesson
+            ?.courseLessonContent as string;
+
+          console.log('Response:', response);
+          console.log('Existing Lesson:', this.existingLesson);
+          console.log('Editor Content:', this.editorContent);
+          console.log('Form Value:', this.lessonForm.value);
         },
         error: (error) => {
           this.snackboxService.showSnackbox(
@@ -212,5 +221,20 @@ export class CourseTutorLessonDetailsComponent implements OnInit {
           console.log(error);
         },
       });
+  }
+
+  get getPublishedStatus() {
+    return this.existingLesson
+      ? PublishedStatus[this.existingLesson?.publishedStatus]
+      : '';
+  }
+
+  onPublishLesson() {
+    this.saveDialogMessage = 'Are you sure you want to publish this lesson?';
+    this.showSaveDialog = true;
+    if (this.existingLesson) {
+      this.existingLesson.publishedStatus = PublishedStatus.Published;
+    }
+    console.log('Before publishing:', this.existingLesson);
   }
 }

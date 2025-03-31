@@ -1,9 +1,14 @@
 <div class="main-container">
-    <h2>{{this.courseLessonId ? 'Course Lesson Details' : 'New Course Lesson'}}</h2>
+    <h2>
+        {{ courseLessonId ? ('Course Lesson Details (' + getPublishedStatus + ')') : 'New Course Lesson' }}
+    </h2>
+
     <div class="action-buttons-container">
         <button class="go-back-button" (click)="goBack()">← Go Back</button>
-        <button class="delete-action-button">Delete</button>
-        <button class="create-action-button">Publish</button>
+        <button class="delete-action-button"
+            *ngIf="this.existingLesson && this.existingLesson.publishedStatus == 1">Delete</button>
+        <button class="create-action-button" *ngIf="this.existingLesson && this.existingLesson.publishedStatus == 0"
+            (click)="onPublishLesson()">Publish</button>
     </div>
     <form [formGroup]="lessonForm">
         <div class="form-item">
@@ -95,17 +100,8 @@
             </div>
         </div>
         <div class="form-item">
-            <label for="publishedStatus">Set the status of the lesson
-                <span class="warning-span">
-                    {{this.courseLessonId ? '' :
-                    '*This options is not available for new lessons and is set to draft by default'}}
-                </span>
-            </label>
-            <select formControlName="publishedStatus">
-                <option value="true" [disabled]="!courseLessonId">Visible to all and available to students</option>
-                <option value="null">Draft</option>
-                <option value="false" [disabled]="!courseLessonId">Archived and visible only to you</option>
-            </select>
+
+
 
 
 

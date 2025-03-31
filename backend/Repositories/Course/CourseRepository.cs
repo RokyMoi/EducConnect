@@ -177,6 +177,27 @@ namespace EduConnect.Repositories.Course
             }
         }
 
+        public async Task<List<GetAllCourseLessonsResponse>> GetAllCourseLessons(Guid courseId)
+        {
+            return await _dataContext.CourseLesson
+            .Where(x => x.CourseId == courseId)
+            .Select(
+                x => new GetAllCourseLessonsResponse
+                {
+                    CourseId = x.CourseId,
+                    CourseLessonId = x.CourseLessonId,
+                    Title = x.Title,
+                    Topic = x.Topic,
+                    ShortSummary = x.ShortSummary,
+                    PublishedStatus = x.PublishedStatus,
+                    LessonSequenceOrder = x.LessonSequenceOrder,
+                    StatusChangedAt = x.StatusChangedAt,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
+                    UpdatedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).UtcDateTime : null
+                }
+            ).ToListAsync();
+        }
+
         public async Task<List<Entities.Course.Course>> GetAllCoursesByTutorId(Guid tutorId)
         {
             return await _dataContext.Course
@@ -218,6 +239,31 @@ namespace EduConnect.Repositories.Course
         {
             return await _dataContext.CourseLesson.Include(x => x.CourseLessonContent).Include(x => x.Course).Where(x => x.CourseLessonId == courseLessonId).FirstOrDefaultAsync();
 
+        }
+
+        public Task<GetCourseLessonByIdResponse?> GetCourseLessonByIdForTutorDashboard(Guid courseLessonId)
+        {
+            return _dataContext.CourseLesson
+            .Include(x => x.CourseLessonContent)
+            .Where(x => x.CourseLessonId == courseLessonId)
+            .Select(
+                x => new GetCourseLessonByIdResponse
+                {
+                    CourseId = x.CourseId,
+                    CourseLessonId = x.CourseLessonId,
+                    Title = x.Title,
+                    Topic = x.Topic,
+                    ShortSummary = x.ShortSummary,
+                    Description = x.Description,
+
+                    PublishedStatus = x.PublishedStatus,
+                    LessonSequenceOrder = x.LessonSequenceOrder,
+                    StatusChangedAt = x.StatusChangedAt,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
+                    UpdatedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).UtcDateTime : null,
+                    CourseLessonContent = x.CourseLessonContent.Content
+                }
+            ).FirstOrDefaultAsync();
         }
 
         public async Task<int> GetCourseLessonCountByCourseId(Guid courseId)
@@ -317,19 +363,57 @@ namespace EduConnect.Repositories.Course
             .LongCountAsync();
         }
 
-        public async Task<bool> RearrangeCourseLessonSequenceOrder(int newLessonPosition, Guid courseId)
+        public async Task<bool> RearrangeLessonSequenceAsync(Guid courseId, int currentPosition, int newPosition)
         {
-            var lessonsToMove = await _dataContext.CourseLesson
-                    .Where(l => l.CourseId == courseId && l.LessonSequenceOrder >= newLessonPosition && l.LessonSequenceOrder.HasValue).ToListAsync();
+            if (currentPosition == newPosition) return true;
 
-            foreach (var lesson in lessonsToMove)
+            using var transaction = await _dataContext.Database.BeginTransactionAsync();
+
+            try
             {
-                lesson.LessonSequenceOrder++;
-            }
+                var lessons = await _dataContext.CourseLesson
+                    .Where(l => l.CourseId == courseId && l.LessonSequenceOrder.HasValue)
+                    .OrderBy(l => l.LessonSequenceOrder)
+                    .ToListAsync();
 
-            _dataContext.CourseLesson.UpdateRange(lessonsToMove);
-            return true;
+                var lessonToMove = lessons.FirstOrDefault(l => l.LessonSequenceOrder == currentPosition);
+                if (lessonToMove == null) return false;
+
+                // Determine movement direction
+                bool movingRight = newPosition > currentPosition;
+
+                foreach (var lesson in lessons)
+                {
+                    if (movingRight)
+                    {
+                        if (lesson.LessonSequenceOrder > currentPosition && lesson.LessonSequenceOrder <= newPosition)
+                        {
+                            lesson.LessonSequenceOrder--;
+                        }
+                    }
+                    else
+                    {
+                        if (lesson.LessonSequenceOrder < currentPosition && lesson.LessonSequenceOrder >= newPosition)
+                        {
+                            lesson.LessonSequenceOrder++;
+                        }
+                    }
+                }
+
+                // Set the new position
+                lessonToMove.LessonSequenceOrder = newPosition;
+
+                await _dataContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
         }
+
 
         public async Task<bool> UpdateCourseBasics(Entities.Course.Course course)
         {

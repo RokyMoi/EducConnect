@@ -55,7 +55,7 @@ namespace EduConnect.Interfaces.Course
 
         Task<bool> CreateCourseLesson(CourseLesson courseLesson);
 
-        Task<bool> RearrangeCourseLessonSequenceOrder(int newLessonPosition, Guid courseId);
+        Task<bool> RearrangeLessonSequenceAsync(Guid courseId, int currentPosition, int newPosition);
 
         Task<bool> UpdateCourseLesson(CourseLesson courseLesson);
 
@@ -65,5 +65,8 @@ namespace EduConnect.Interfaces.Course
 
         Task<long> GetPublishedCourseLessonCountByCourseId(Guid courseId);
 
+        Task<List<GetAllCourseLessonsResponse>> GetAllCourseLessons(Guid courseId);
+
+        Task<GetCourseLessonByIdResponse?> GetCourseLessonByIdForTutorDashboard(Guid courseLessonId);
     }
 }
