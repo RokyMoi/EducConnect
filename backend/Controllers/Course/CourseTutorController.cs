@@ -18,6 +18,7 @@ using EduConnect.Services;
 using EduConnect.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Stripe.Forwarding;
 
 namespace EduConnect.Controllers.Course
@@ -1083,7 +1084,7 @@ namespace EduConnect.Controllers.Course
                 );
             }
 
-            if (course.TutorId != tutor.TutorId)
+            if (tutor == null || course.TutorId != tutor.TutorId)
             {
                 return StatusCode(
                     403,
@@ -1100,38 +1101,62 @@ namespace EduConnect.Controllers.Course
 
                 if (lesson != null)
                 {
+                    var publishedCourseLessonCount = await _courseRepository.GetPublishedCourseLessonCountByCourseId(lesson.CourseId);
+                    var setLessonSequenceOrder = request.LessonSequenceOrder.Value;
 
-                    if (lesson.PublishedStatus == PublishedStatus.Draft && request.PublishedStatus == PublishedStatus.Archived)
+                    var publishedLessons = await _courseRepository.GetAllCourseLessons(lesson.CourseId);
+                    publishedLessons = [.. publishedLessons.Where(l => l.PublishedStatus == PublishedStatus.Published)];
+
+                    //Check if the user wants to update the lesson sequence order position, and if the provided new position is larger than the current max position, if so, then set the lessons position to the max position, and decrement the position of all lessons between the current lesson's position and the max position
+                    if (request.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.Value > lesson.LessonSequenceOrder)
                     {
-                        return BadRequest(ApiResponse<object>.GetApiResponse("Lesson's status from draft can only be changed to published", null));
+                        Console.WriteLine("User tried adding the lesson on a position larger than the current max position, moving the lesson to the end of the list");
+                        var maxValue = publishedLessons.Max(l => l.LessonSequenceOrder);
+                        setLessonSequenceOrder = (int)maxValue;
+
+                        var currentLessonPosition = lesson.LessonSequenceOrder;
+
+                        foreach (var lessonItem in _dataContext.CourseLesson.Where(x => x.CourseId == lesson.CourseId && x.LessonSequenceOrder > currentLessonPosition))
+                        {
+                            Console.WriteLine($"Lesson {lessonItem.Title} - {lessonItem.LessonSequenceOrder} -> {lessonItem.LessonSequenceOrder - 1}");
+                            lessonItem.LessonSequenceOrder--;
+
+                        }
+                        await _dataContext.SaveChangesAsync();
+                    }
+                    //Check if the user wants to update the lesson sequence order position by moving it to a smaller or larger value position, and if so, then update the other lessons positions accordingly
+                    else if (request.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.Value != lesson.LessonSequenceOrder && request.LessonSequenceOrder.Value < publishedCourseLessonCount)
+                    {
+                        Console.WriteLine("Incrementing lessons sequence order");
+                        setLessonSequenceOrder = request.LessonSequenceOrder.Value;
+                        var currentPosition = lesson.LessonSequenceOrder;
+
+                        Console.WriteLine($"Current position: {currentPosition}");
+                        Console.WriteLine($"Set position: {setLessonSequenceOrder}");
+
+                        if (currentPosition < setLessonSequenceOrder)
+                        {
+                            foreach (var lessonItem in _dataContext.CourseLesson.Where(x => x.LessonSequenceOrder > currentPosition && x.LessonSequenceOrder <= setLessonSequenceOrder))
+                            {
+                                Console.WriteLine($"Lesson {lessonItem.Title} - {lessonItem.LessonSequenceOrder} -> {lessonItem.LessonSequenceOrder - 1}");
+                                lessonItem.LessonSequenceOrder--;
+                            }
+                        }
+                        if (currentPosition > setLessonSequenceOrder)
+                        {
+                            foreach (var lessonItem in _dataContext.CourseLesson.Where(x => x.LessonSequenceOrder >= setLessonSequenceOrder && x.LessonSequenceOrder < currentPosition))
+                            {
+                                Console.WriteLine($"Lesson {lessonItem.Title} - {lessonItem.LessonSequenceOrder} -> {lessonItem.LessonSequenceOrder + 1}");
+                                lessonItem.LessonSequenceOrder++;
+                            }
+                        }
+
+                        await _dataContext.SaveChangesAsync();
                     }
 
-                    if (lesson.PublishedStatus == PublishedStatus.Published && request.PublishedStatus == PublishedStatus.Draft)
-                    {
-                        return BadRequest(ApiResponse<object>.GetApiResponse("Lesson's status from published can only be changed to archived", null));
-                    }
-
-                    if (lesson.PublishedStatus == PublishedStatus.Archived && request.PublishedStatus == PublishedStatus.Draft)
-                    {
-                        return BadRequest(ApiResponse<object>.GetApiResponse("Lesson's status from archived can only be changed to published", null));
-                    }
-
-                    int? lessonSequenceOrder = request.LessonSequenceOrder;
 
 
 
-
-                    var currentPublishedLessonCount = await _courseRepository.GetPublishedCourseLessonCountByCourseId(request.CourseId);
-
-                    if (!lessonSequenceOrder.HasValue || lessonSequenceOrder.Value > currentPublishedLessonCount + 1)
-                    {
-                        lessonSequenceOrder = (int)currentPublishedLessonCount + 1; // Place at the end
-                    }
-                    else if (lessonSequenceOrder.Value <= currentPublishedLessonCount)
-                    {
-                        Console.WriteLine("Reordering lesson sequence order");
-                        await _courseRepository.RearrangeLessonSequenceAsync(lesson.CourseId, lesson.LessonSequenceOrder.Value, lessonSequenceOrder.Value); // Reorder
-                    }
 
 
 
@@ -1139,10 +1164,8 @@ namespace EduConnect.Controllers.Course
                     lesson.ShortSummary = request.ShortSummary;
                     lesson.Description = request.Description;
                     lesson.Topic = request.Topic;
-                    lesson.PublishedStatus = request.PublishedStatus;
-                    lesson.LessonSequenceOrder = lessonSequenceOrder;
+                    lesson.LessonSequenceOrder = setLessonSequenceOrder;
                     lesson.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                    lesson.StatusChangedAt = request.PublishedStatus != lesson.PublishedStatus ? DateTime.Now : lesson.StatusChangedAt;
                     if (lesson.CourseLessonContent == null)
                     {
                         lesson.CourseLessonContent = new CourseLessonContent
@@ -1231,6 +1254,232 @@ namespace EduConnect.Controllers.Course
 
         }
 
+        [HttpPatch("lesson/publish")]
+        public async Task<IActionResult> PublishCourseLesson(ChangeCourseLessonPublishedStatusRequest request)
+        {
+            var courseLesson = await _courseRepository.GetCourseLessonById(request.CourseLessonId);
+            if (courseLesson == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Lesson not found",
+                        null
+                    )
+                );
+            }
+
+            if (request.PublishedStatus != PublishedStatus.Published)
+            {
+                return Conflict(
+                    ApiResponse<object>.GetApiResponse(
+                        "This endpoint is only for publishing lessons",
+                        null
+                    )
+                );
+            }
+
+            if (courseLesson.PublishedStatus == PublishedStatus.Published && request.PublishedStatus == PublishedStatus.Published && !request.LessonSequenceOrder.HasValue)
+            {
+                return Ok(
+                    ApiResponse<object>.GetApiResponse(
+                        "Lesson is already published",
+                        null
+                    )
+                );
+            }
+
+            var publishedCourseLessonCount = await _courseRepository.GetPublishedCourseLessonCountByCourseId(courseLesson.CourseId);
+
+            var publishedLessons = await _courseRepository.GetAllCourseLessons(courseLesson.CourseId);
+            publishedLessons = [.. publishedLessons.Where(l => l.PublishedStatus == PublishedStatus.Published)];
+
+
+            Console.WriteLine($"Course lesson sequence order has value: {courseLesson.LessonSequenceOrder.HasValue}");
+            Console.WriteLine($"Request lesson sequence order has value: {request.LessonSequenceOrder.HasValue}");
+            Console.WriteLine($"request.LessonSequenceOrder.Value < publishedCourseLessonCount: {request.LessonSequenceOrder.Value < publishedCourseLessonCount}");
+            Console.WriteLine($"Request lesson sequence order: {request.LessonSequenceOrder.Value}");
+            Console.WriteLine($"Stored lesson sequence order: {courseLesson.LessonSequenceOrder ?? 0}");
+            Console.WriteLine($"Published course lesson count: {publishedCourseLessonCount}");
+            int setLessonSequenceOrder = 0;
+            //Append to the end of the published lessons sequence list
+            if ((!request.LessonSequenceOrder.HasValue || request.LessonSequenceOrder.Value > publishedCourseLessonCount) && publishedCourseLessonCount < 2)
+            {
+                setLessonSequenceOrder = 1;
+            }
+            //Insert into a specified position in the list if the position is less than the current max position, and the lesson is not already in the list (archived)
+            else if (!courseLesson.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.Value <= publishedCourseLessonCount)
+            {
+
+                Console.WriteLine("Inserting the lesson into a specified position in the list, after archiving the lesson");
+                var requestedLessonPosition = request.LessonSequenceOrder.Value;
+                var lessonsToUpdateCount = await _dataContext.CourseLesson.Where(x => x.CourseId == courseLesson.CourseId && x.LessonSequenceOrder > requestedLessonPosition).CountAsync();
+
+                foreach (var lesson in _dataContext.CourseLesson.Where(x => x.CourseId == courseLesson.CourseId && x.LessonSequenceOrder >= requestedLessonPosition))
+                {
+                    Console.WriteLine($"Lesson {lesson.Title} - {lesson.LessonSequenceOrder} -> {lesson.LessonSequenceOrder + 1}");
+                    lesson.LessonSequenceOrder++;
+
+                }
+                setLessonSequenceOrder = request.LessonSequenceOrder.Value;
+                Console.WriteLine($"Lessons to move count: {lessonsToUpdateCount}");
+                await _dataContext.SaveChangesAsync();
+            }
+            //Insert at a specific position and update other lessons sequence order accordingly
+            else if (courseLesson.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.Value < publishedCourseLessonCount)
+            {
+                Console.WriteLine("Incrementing lessons sequence order");
+                setLessonSequenceOrder = request.LessonSequenceOrder.Value;
+                var currentPosition = courseLesson.LessonSequenceOrder;
+
+                Console.WriteLine($"Current position: {currentPosition}");
+                Console.WriteLine($"Set position: {setLessonSequenceOrder}");
+
+                if (currentPosition < setLessonSequenceOrder)
+                {
+                    foreach (var lesson in _dataContext.CourseLesson.Where(x => x.LessonSequenceOrder > currentPosition && x.LessonSequenceOrder <= setLessonSequenceOrder))
+                    {
+                        Console.WriteLine($"Lesson {lesson.Title} - {lesson.LessonSequenceOrder} -> {lesson.LessonSequenceOrder - 1}");
+                        lesson.LessonSequenceOrder--;
+                    }
+                }
+                if (currentPosition > setLessonSequenceOrder)
+                {
+                    foreach (var lesson in _dataContext.CourseLesson.Where(x => x.LessonSequenceOrder >= setLessonSequenceOrder && x.LessonSequenceOrder < currentPosition))
+                    {
+                        Console.WriteLine($"Lesson {lesson.Title} - {lesson.LessonSequenceOrder} -> {lesson.LessonSequenceOrder + 1}");
+                        lesson.LessonSequenceOrder++;
+                    }
+                }
+
+                await _dataContext.SaveChangesAsync();
+
+
+
+
+            }
+            else
+            {
+                Console.WriteLine("User tried adding the lesson on a position larger than the current max position, moving the lesson to the end of the list");
+                var maxValue = publishedLessons.Max(l => l.LessonSequenceOrder);
+                setLessonSequenceOrder = (int)maxValue;
+
+                var currentLessonPosition = courseLesson.LessonSequenceOrder;
+
+                foreach (var lesson in _dataContext.CourseLesson.Where(x => x.CourseId == courseLesson.CourseId && x.LessonSequenceOrder > currentLessonPosition))
+                {
+                    Console.WriteLine($"Lesson {lesson.Title} - {lesson.LessonSequenceOrder} -> {lesson.LessonSequenceOrder - 1}");
+                    lesson.LessonSequenceOrder--;
+
+                }
+                await _dataContext.SaveChangesAsync();
+            }
+            _dataContext.CourseLesson.Where(x => x.CourseLessonId == courseLesson.CourseLessonId).First().LessonSequenceOrder = setLessonSequenceOrder;
+            courseLesson.PublishedStatus = PublishedStatus.Published;
+            await _dataContext.SaveChangesAsync();
+
+
+
+
+
+            return Ok(ApiResponse<object>.GetApiResponse(
+                $"Lesson {courseLesson.Title} published on position {setLessonSequenceOrder} successfully",
+                null
+            ));
+
+
+
+
+
+
+        }
+
+        [HttpPatch("lesson/archive")]
+        public async Task<IActionResult> ArchiveCourseLesson([FromQuery] Guid courseLessonId)
+        {
+            var courseLesson = await _courseRepository.GetCourseLessonById(courseLessonId);
+            if (courseLesson == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Lesson not found",
+                        null
+                    )
+                );
+            }
+
+            if (courseLesson.PublishedStatus == PublishedStatus.Archived)
+            {
+                return Conflict(
+                    ApiResponse<object>.GetApiResponse(
+                        "Lesson already archived",
+                        null
+                    )
+                );
+            }
+
+            if (courseLesson.PublishedStatus == PublishedStatus.Draft)
+            {
+                return Conflict(
+                    ApiResponse<object>.GetApiResponse(
+                        "Lesson to be archived must be published first",
+                        null
+                    )
+                );
+            }
+
+            var course = await _courseRepository.GetCourseById(courseLesson.CourseId);
+
+            //Check if the resource if owned by the course tutor
+            var tutor = await _tutorRepository.GetTutorByPersonId(Guid.Parse(HttpContext.Items["PersonId"].ToString()));
+
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while archiving the lesson, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            if (tutor == null || course.TutorId != tutor.TutorId)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to archive this lesson from this course",
+                        null
+                    )
+                );
+            }
+
+            var maxValue = await _dataContext.CourseLesson.Where(x => x.CourseId == course.CourseId).MaxAsync(x => x.LessonSequenceOrder);
+            var currentPosition = courseLesson.LessonSequenceOrder;
+
+            if (courseLesson.LessonSequenceOrder.Value < maxValue)
+            {
+                foreach (var lesson in _dataContext.CourseLesson.Where(x => x.LessonSequenceOrder > currentPosition))
+                {
+                    Console.WriteLine($"Lesson {lesson.Title} - {lesson.LessonSequenceOrder} -> {lesson.LessonSequenceOrder - 1}");
+                    lesson.LessonSequenceOrder--;
+                }
+            }
+
+            _dataContext.CourseLesson.Where(x => x.CourseLessonId == courseLessonId).FirstOrDefault().PublishedStatus = PublishedStatus.Archived;
+            _dataContext.CourseLesson.Where(x => x.CourseLessonId == courseLessonId).FirstOrDefault().LessonSequenceOrder = null;
+            await _dataContext.SaveChangesAsync();
+
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Lesson archived successfully",
+                    null
+                )
+            );
+
+        }
 
 
         [HttpGet("lesson/all")]

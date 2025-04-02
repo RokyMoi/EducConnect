@@ -37,11 +37,8 @@ namespace EduConnect.DTOs
         [MinLength(100)]
         [MaxLength(100000)]
         public string Content { get; set; }
-
         [Range(1, int.MaxValue)]
         public int? LessonSequenceOrder { get; set; } = null;
 
-        [Range(0, 2)]
-        public PublishedStatus PublishedStatus { get; set; } = PublishedStatus.Draft;
     }
 }

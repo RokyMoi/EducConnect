@@ -63,10 +63,12 @@ namespace EduConnect.Interfaces.Course
 
         Task<List<CourseLesson>> GetCourseLessonsByCourseId(Guid courseId);
 
-        Task<long> GetPublishedCourseLessonCountByCourseId(Guid courseId);
+        Task<int> GetPublishedCourseLessonCountByCourseId(Guid courseId);
 
         Task<List<GetAllCourseLessonsResponse>> GetAllCourseLessons(Guid courseId);
 
         Task<GetCourseLessonByIdResponse?> GetCourseLessonByIdForTutorDashboard(Guid courseLessonId);
+
+        Task<bool> RemoveLessonFromSequenceAsync(Guid courseId, int removedPosition);
     }
 }

@@ -353,14 +353,14 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.CourseThumbnail.Include(x => x.Course).Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
         }
 
-        public async Task<long> GetPublishedCourseLessonCountByCourseId(Guid courseId)
+        public async Task<int> GetPublishedCourseLessonCountByCourseId(Guid courseId)
         {
             return await _dataContext.CourseLesson
             .Where(
                 x => x.CourseId == courseId &&
                 x.PublishedStatus == PublishedStatus.Published
             )
-            .LongCountAsync();
+            .CountAsync();
         }
 
         public async Task<bool> RearrangeLessonSequenceAsync(Guid courseId, int currentPosition, int newPosition)
@@ -414,6 +414,39 @@ namespace EduConnect.Repositories.Course
             }
         }
 
+        public async Task<bool> RemoveLessonFromSequenceAsync(Guid courseId, int removedPosition)
+        {
+            using var transaction = await _dataContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var lessons = await _dataContext.CourseLesson
+                    .Where(l => l.CourseId == courseId && l.LessonSequenceOrder.HasValue)
+                    .OrderBy(l => l.LessonSequenceOrder)
+                    .ToListAsync();
+
+                var lessonToRemove = lessons.FirstOrDefault(l => l.LessonSequenceOrder == removedPosition);
+                if (lessonToRemove == null) return true;
+
+                // Set the removed lesson's sequence to null
+                lessonToRemove.LessonSequenceOrder = null;
+
+                // Shift all lessons after the removed position one step down
+                foreach (var lesson in lessons.Where(l => l.LessonSequenceOrder > removedPosition))
+                {
+                    lesson.LessonSequenceOrder--;
+                }
+
+                await _dataContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+        }
 
         public async Task<bool> UpdateCourseBasics(Entities.Course.Course course)
         {
