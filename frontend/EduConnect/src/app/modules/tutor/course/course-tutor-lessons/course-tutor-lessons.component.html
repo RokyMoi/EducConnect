@@ -11,10 +11,11 @@
                 <div class="lesson-header">
                     <h3 class="lesson-title">{{lesson.title}}</h3>
                     <span class="status-badge" [ngClass]="{
+                        'archived': lesson.publishedStatus === 2,
                         'published': lesson.publishedStatus === 1,
                         'draft': lesson.publishedStatus === 0
                     }">
-                        {{lesson.publishedStatus === 1 ? 'PUBLISHED' : 'DRAFT'}}
+                        {{this.getPublishedStatus(lesson.publishedStatus)}}
                     </span>
                 </div>
                 <div class="lesson-meta">

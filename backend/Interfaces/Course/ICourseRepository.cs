@@ -70,5 +70,14 @@ namespace EduConnect.Interfaces.Course
         Task<GetCourseLessonByIdResponse?> GetCourseLessonByIdForTutorDashboard(Guid courseLessonId);
 
         Task<bool> RemoveLessonFromSequenceAsync(Guid courseId, int removedPosition);
+
+        Task<bool> CourseLessonResourceExists(Guid courseLessonResourceId);
+
+        Task<bool> CourseLessonExistsById(Guid courseLessonId);
+        Task<CourseLessonResource?> GetCourseLessonResourceById(Guid courseLessonResourceId);
+
+        Task<bool> UpdateCourseLessonResource(CourseLessonResource courseLessonResource);
+
+        Task<bool> CreateCourseLessonResource(CourseLessonResource courseLessonResource);
     }
 }

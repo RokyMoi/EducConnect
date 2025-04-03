@@ -9,5 +9,4 @@ export interface CreateCourseLessonRequest {
   topic: string;
   content: string;
   lessonSequenceOrder: number;
-  publishedStatus: PublishedStatus;
 }

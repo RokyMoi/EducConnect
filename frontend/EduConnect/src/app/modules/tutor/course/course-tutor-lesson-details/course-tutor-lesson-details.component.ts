@@ -44,6 +44,12 @@ export class CourseTutorLessonDetailsComponent implements OnInit {
   showSaveDialog: boolean = false;
   saveDialogMessage: string = '';
 
+  showPublishDialog: boolean = false;
+  publishDialogMessage: string = '';
+
+  showArchiveDialog: boolean = false;
+  archiveDialogMessage: string = '';
+
   titleErrorMessage: string = '';
   topicErrorMessage: string = '';
   shortSummaryErrorMessage: string = '';
@@ -134,9 +140,6 @@ export class CourseTutorLessonDetailsComponent implements OnInit {
       content: this.lessonForm.controls['content'].value,
       lessonSequenceOrder:
         this.lessonForm.controls['lessonSequenceOrder'].value,
-      publishedStatus: this.existingLesson
-        ? this.existingLesson.publishedStatus
-        : PublishedStatus.Draft,
     };
     console.log(request);
 
@@ -230,11 +233,85 @@ export class CourseTutorLessonDetailsComponent implements OnInit {
   }
 
   onPublishLesson() {
-    this.saveDialogMessage = 'Are you sure you want to publish this lesson?';
-    this.showSaveDialog = true;
-    if (this.existingLesson) {
-      this.existingLesson.publishedStatus = PublishedStatus.Published;
+    if (this.lessonForm.controls['lessonSequenceOrder'].value === null) {
+      this.snackboxService.showSnackbox(
+        'Please add lesson sequence order',
+        'error'
+      );
+      return;
     }
+    this.publishDialogMessage = 'Are you sure you want to publish this lesson?';
+    this.showPublishDialog = true;
     console.log('Before publishing:', this.existingLesson);
+  }
+
+  onCancelPublishDialog() {
+    this.showPublishDialog = false;
+  }
+
+  onArchiveLesson() {
+    this.archiveDialogMessage = 'Are you sure you want to archive this lesson?';
+    this.showArchiveDialog = true;
+    console.log('Before archiving:', this.existingLesson);
+  }
+
+  onCancelArchiveDialog() {
+    this.showArchiveDialog = false;
+  }
+
+  publishLesson() {
+    console.log('Publishing lesson: ', this.existingLesson);
+    this.showPublishDialog = false;
+    this.courseTutorControllerService
+      .publishCourseLesson({
+        courseLessonId: this.courseLessonId as string,
+        lessonSequenceOrder:
+          this.lessonForm.controls['lessonSequenceOrder'].value,
+      })
+      .subscribe({
+        next: (response) => {
+          console.log('Lesson published successfully');
+          this.snackboxService.showSnackbox(
+            'Lesson published successfully',
+            'success'
+          );
+          this.fetchLesson();
+        },
+        error: (error) => {
+          console.log('Failed to publish lesson:', error);
+          this.snackboxService.showSnackbox(
+            `Error publishing lesson: ${
+              error.error.message ? `, ${error.error.message}` : ''
+            }`,
+            'error'
+          );
+        },
+      });
+  }
+
+  archiveLesson() {
+    console.log('Archiving lesson: ', this.existingLesson);
+    this.showArchiveDialog = false;
+    this.courseTutorControllerService
+      .archiveCourseLesson(this.courseLessonId as string)
+      .subscribe({
+        next: (response) => {
+          console.log('Lesson archived successfully');
+          this.snackboxService.showSnackbox(
+            'Lesson archived successfully',
+            'success'
+          );
+          this.fetchLesson();
+        },
+        error: (error) => {
+          console.log('Failed to archive lesson:', error);
+          this.snackboxService.showSnackbox(
+            `Error archiving lesson${
+              error.error.message ? `, ${error.error.message}` : ''
+            }`,
+            'error'
+          );
+        },
+      });
   }
 }

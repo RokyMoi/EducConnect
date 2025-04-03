@@ -5,9 +5,9 @@
 
     <div class="action-buttons-container">
         <button class="go-back-button" (click)="goBack()">← Go Back</button>
-        <button class="delete-action-button"
-            *ngIf="this.existingLesson && this.existingLesson.publishedStatus == 1">Delete</button>
-        <button class="create-action-button" *ngIf="this.existingLesson && this.existingLesson.publishedStatus == 0"
+        <button class="delete-action-button" *ngIf="this.existingLesson && this.existingLesson.publishedStatus == 1"
+            (click)="onArchiveLesson()">Archive</button>
+        <button class="create-action-button" *ngIf="this.existingLesson && this.existingLesson.publishedStatus != 1"
             (click)="onPublishLesson()">Publish</button>
     </div>
     <form [formGroup]="lessonForm">
@@ -88,7 +88,7 @@
                     content is 100000 characters</p>
             </div>
         </div>
-        <div class="form-item">
+        <div class="form-item" *ngIf="existingLesson">
             <label>Lesson # in Course</label>
             <input type="text" id="lessonSequenceOrder" name="lessonSequenceOrder" formControlName="lessonSequenceOrder"
                 placeholder="Enter the number of the lesson in the course">
@@ -111,11 +111,26 @@
             <button class="save-action-button" *ngIf="this.lessonForm.valid" (click)="onSaveLesson()">Save</button>
         </div>
     </form>
-    <app-custom-header-ng-content-dialog-box *ngIf="showSaveDialog" [title]="'Save Lesson'">
+    <app-custom-header-ng-content-dialog-box *ngIf="showSaveDialog"
+        [title]="(existingLesson ? 'Update Lesson' : 'Save Lesson')">
         <p>{{saveDialogMessage}}</p>
         <div class="dialog-actions">
             <button class="negative-cancel-button" (click)="onCancelSaveDialog()">Cancel</button>
             <button class="positive-confirm-button" (click)="saveLesson()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+    <app-custom-header-ng-content-dialog-box *ngIf="showPublishDialog" [title]="'Publish Lesson'">
+        <p>{{publishDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="negative-cancel-button" (click)="onCancelPublishDialog()">Cancel</button>
+            <button class="positive-confirm-button" (click)="publishLesson()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+    <app-custom-header-ng-content-dialog-box *ngIf="showArchiveDialog" [title]="'Archive Lesson'">
+        <p>{{archiveDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="positive-cancel-button" (click)="onCancelArchiveDialog()">Cancel</button>
+            <button class="negative-confirm-button" (click)="archiveLesson()">Confirm</button>
         </div>
     </app-custom-header-ng-content-dialog-box>
 </div>

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnackboxService } from '../../../../services/shared/snackbox.service';
 import { CourseTutorControllerService } from '../../../../services/course/course-tutor-controller.service';
 import { GetAllCourseLessonsResponse } from '../../../../models/course/course-tutor-controller/get-all-course-lessons-response';
+import { PublishedStatus } from '../../../../../enums/published-status.enum';
 
 @Component({
   selector: 'app-course-tutor-lessons',
@@ -75,5 +76,9 @@ export class CourseTutorLessonsComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/tutor/course', this.courseId]);
+  }
+  
+  getPublishedStatus(publishedStatus: number): string {
+    return PublishedStatus[publishedStatus];
   }
 }

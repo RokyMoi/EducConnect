@@ -1255,7 +1255,7 @@ namespace EduConnect.Controllers.Course
         }
 
         [HttpPatch("lesson/publish")]
-        public async Task<IActionResult> PublishCourseLesson(ChangeCourseLessonPublishedStatusRequest request)
+        public async Task<IActionResult> PublishCourseLesson([FromQuery] ChangeCourseLessonPublishedStatusRequest request)
         {
             var courseLesson = await _courseRepository.GetCourseLessonById(request.CourseLessonId);
             if (courseLesson == null)
@@ -1268,17 +1268,9 @@ namespace EduConnect.Controllers.Course
                 );
             }
 
-            if (request.PublishedStatus != PublishedStatus.Published)
-            {
-                return Conflict(
-                    ApiResponse<object>.GetApiResponse(
-                        "This endpoint is only for publishing lessons",
-                        null
-                    )
-                );
-            }
 
-            if (courseLesson.PublishedStatus == PublishedStatus.Published && request.PublishedStatus == PublishedStatus.Published && !request.LessonSequenceOrder.HasValue)
+
+            if (courseLesson.PublishedStatus == PublishedStatus.Published && request.LessonSequenceOrder.HasValue)
             {
                 return Ok(
                     ApiResponse<object>.GetApiResponse(
@@ -1355,6 +1347,12 @@ namespace EduConnect.Controllers.Course
 
 
 
+
+            }
+            else if (!courseLesson.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.HasValue && request.LessonSequenceOrder.Value >= publishedCourseLessonCount)
+            {
+                Console.WriteLine("User tried adding archived lesson to a position larger than the current max position, moving the lesson to the end of the list");
+                setLessonSequenceOrder = publishedCourseLessonCount + 1;
 
             }
             else
@@ -1541,6 +1539,169 @@ namespace EduConnect.Controllers.Course
 
         }
 
+        [HttpPost("lesson/resource")]
+        public async Task<IActionResult> UploadCourseLessonResource(UploadCourseLessonResourceRequest request)
+        {
+
+            //Check if it is a resource update or create operation, determined by the presence or the absence of the resourceId and the courseLessonId (resourceId is null and courseLessonId is not null - create operation, otherwise update operation)
+
+            //Check if the resource exists (update operation)
+            if (request.CourseLessonResourceId.HasValue && !await _courseRepository.CourseLessonResourceExists(request.CourseLessonResourceId.Value))
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Resource not found",
+                        null
+                    )
+                );
+            }
+
+            //Check if the lesson exists (create operation)
+            if (request.CourseLessonId.HasValue && !await _courseRepository.CourseLessonExistsById(request.CourseLessonId.Value))
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Lesson not found",
+                        null
+                    )
+                );
+            }
+
+            //Check if both the ResourceUrl and ResourceFile fields are provided (only one should be provided)
+
+            if (!string.IsNullOrEmpty(request.ResourceUrl) && request.ResourceFile != null)
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse("A single upload request can only contain either a file or an url for upload", null)
+                );
+            }
+
+            //Check if both of the ResourceUrl and ResourceFile fields are empty
+            if (string.IsNullOrEmpty(request.ResourceUrl) && request.ResourceFile == null)
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse("Resource to upload must be provided", null)
+                );
+            }
+
+            //Check if the ResourceFile is provided, validate file type and size
+            if (request.ResourceFile != null)
+            {
+                long fileSize = request.ResourceFile.Length;
+                string fileType = request.ResourceFile.ContentType;
+
+                var fileCategoryMap = new Dictionary<string[], long>
+                {
+                    { AllowedFileTypes.Documents, MaxFileTypesSizes.MaxDocumentSizeInBytes},
+                    { AllowedFileTypes.Archives, MaxFileTypesSizes.MaxArchiveSizeInBytes},
+                    { AllowedFileTypes.Audio, MaxFileTypesSizes.MaxAudioSizeInBytes},
+                    { AllowedFileTypes.Images, MaxFileTypesSizes.MaxImageSizeInBytes},
+                    { AllowedFileTypes.Videos, MaxFileTypesSizes.MaxVideoSizeInBytes}
+                };
+
+                bool isValidFile = false;
+
+                foreach (var entry in fileCategoryMap)
+                {
+                    if (entry.Key.Contains(fileType))
+                    {
+                        if (fileSize > entry.Value)
+                        {
+                            return BadRequest(ApiResponse<object>.GetApiResponse(
+                                $"File size exceeds the maximum allowed limit of {entry.Value / (1024 * 1024)}MB for this file type", null));
+                        }
+                        isValidFile = true;
+                        break; // No need to check other categories once a match is found
+                    }
+                }
+
+                if (!isValidFile)
+                {
+                    return BadRequest(ApiResponse<object>.GetApiResponse("Invalid file type", null));
+                }
+
+            }
+
+            if (request.CourseLessonResourceId.HasValue)
+            {
+                CourseLessonResource? existingResource = await _courseRepository.GetCourseLessonResourceById(request.CourseLessonResourceId.Value);
+
+                if (existingResource == null)
+                {
+                    return NotFound(
+                        ApiResponse<object>.GetApiResponse(
+                            "Resource not found",
+                            null
+                        )
+                    );
+                }
+
+                existingResource.Title = request.Title;
+                existingResource.Description = request.Description;
+                existingResource.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+                if (!string.IsNullOrEmpty(request.ResourceUrl))
+                {
+                    existingResource.ResourceUrl = request.ResourceUrl;
+                    existingResource.FileData = null;
+                    existingResource.FileName = null;
+                    existingResource.ContentType = null;
+                    existingResource.FileSize = null;
+                }
+                else
+                {
+                    using var memoryStream = new MemoryStream();
+                    await request.ResourceFile.CopyToAsync(memoryStream);
+                    existingResource.FileData = memoryStream.ToArray();
+                    existingResource.FileName = request.ResourceFile.FileName;
+                    existingResource.ContentType = request.ResourceFile.ContentType;
+                    existingResource.FileSize = request.ResourceFile.Length;
+                    existingResource.ResourceUrl = null;
+                }
+
+                var updateResult = await _courseRepository.UpdateCourseLessonResource(existingResource);
+
+                if (!updateResult)
+                {
+                    return StatusCode(500, ApiResponse<object>.GetApiResponse("Failed to update resource, please try again later", null));
+                }
+
+                return Ok(
+                    ApiResponse<object>.GetApiResponse("Resource updated successfully", null)
+                );
+            }
+
+            byte[] tempFileData = null;
+            if (request.ResourceFile != null)
+            {
+                using var memoryStream = new MemoryStream();
+                await request.ResourceFile.CopyToAsync(memoryStream);
+                tempFileData = memoryStream.ToArray();
+            }
+
+            var newResource = new CourseLessonResource
+            {
+                CourseLessonId = request.CourseLessonId.Value,
+                Title = request.Title,
+                Description = request.Description,
+                ResourceUrl = request.ResourceUrl,
+                FileData = tempFileData,
+                FileName = request.ResourceFile?.FileName,
+                ContentType = request.ResourceFile?.ContentType,
+                FileSize = request.ResourceFile?.Length,
+            };
+
+            var createResult = await _courseRepository.CreateCourseLessonResource(newResource);
+
+            if (!createResult)
+            {
+                return StatusCode(500, ApiResponse<object>.GetApiResponse("Failed to create resource, please try again later", null));
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Resource created successfully", null)
+            );
+        }
 
     }
 }

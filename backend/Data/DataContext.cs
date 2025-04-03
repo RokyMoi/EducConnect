@@ -72,6 +72,8 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<CourseEnrollment> CourseEnrollment { get; set; }
 
+    public DbSet<CourseLessonResource> CourseLessonResource { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder builder)

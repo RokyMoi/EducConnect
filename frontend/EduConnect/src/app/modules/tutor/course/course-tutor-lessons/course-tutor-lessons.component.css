@@ -104,6 +104,11 @@
   color: #822727;
 }
 
+.status-badge.archived {
+  background-color: #efefef;
+  color: #aeaeae;
+}
+
 .lesson-meta {
   display: flex;
   gap: 1rem;

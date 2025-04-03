@@ -10,6 +10,7 @@ import { UploadCourseThumbnailRequest } from '../../models/course/course-tutor-c
 import { map } from 'rxjs';
 import { UploadCourseTeachingResourceRequest } from '../../models/course/course-tutor-controller/upload-course-teaching-resource-request';
 import { CreateCourseLessonRequest } from '../../models/course/course-tutor-controller/create-course-lesson-request';
+import { ChangeCourseLessonPublishedStatusRequest } from '../../models/course/course-tutor-controller/change-course-lesson-published-status-request';
 
 @Injectable({
   providedIn: 'root',
@@ -303,6 +304,35 @@ export class CourseTutorControllerService {
 
     return this.httpClient.get<DefaultServerResponse>(
       `${this.apiUrl}/lesson?courseLessonId=${courseLessonId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  publishCourseLesson(request: ChangeCourseLessonPublishedStatusRequest) {
+    const token = localStorage.getItem('Authorization');
+    const params = buildHttpParams(request);
+    return this.httpClient.patch<DefaultServerResponse>(
+      `${this.apiUrl}/lesson/publish`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: params,
+      }
+    );
+  }
+
+  archiveCourseLesson(courseLessonId: string) {
+    const token = localStorage.getItem('Authorization');
+
+    return this.httpClient.patch(
+      `${this.apiUrl}/lesson/archive?courseLessonId=${courseLessonId}`,
+      null,
       {
         headers: {
           Authorization: `Bearer ${token}`,
