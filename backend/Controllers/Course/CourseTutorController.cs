@@ -214,7 +214,8 @@ namespace EduConnect.Controllers.Course
                     PublishedStatus = x.PublishedStatus,
                     CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
                     HasThumbnail = x.CourseThumbnail != null,
-                    ThumbnailUrl = thumbnailUrl
+                    ThumbnailUrl = thumbnailUrl,
+                    NumberOfLessons = await _courseRepository.GetLessonCountByCourseId(x.CourseId),
                 });
             }
             ;
@@ -281,6 +282,10 @@ namespace EduConnect.Controllers.Course
 
             var teachingResourcesInformation = await _courseRepository.GetCourseTeachingResourcesInformationByCourseId(courseId);
 
+
+            var lessonCountResponse = await _courseRepository.GetCourseLessonsCountFilteredByPublishedStatus(courseId);
+
+            var latestLessons = await _courseRepository.GetLatestCourseLessons(courseId);
             var response = new CourseManagementDashboardResponse
             {
                 CourseId = course.CourseId,
@@ -296,7 +301,13 @@ namespace EduConnect.Controllers.Course
                 NumberOfURLs = teachingResourcesInformation == null ? 0 : teachingResourcesInformation.NumberOfURLs,
                 NumberOfFiles = teachingResourcesInformation == null ? 0 : teachingResourcesInformation.NumberOfFiles,
                 TotalSizeOfFilesInBytes = teachingResourcesInformation == null ? 0 : teachingResourcesInformation.TotalSizeOfFilesInBytes,
-                TwoLatestAddedTeachingResources = teachingResourcesInformation == null ? [] : teachingResourcesInformation.TwoLatestAddedTeachingResources
+                TwoLatestAddedTeachingResources = teachingResourcesInformation == null ? [] : teachingResourcesInformation.TwoLatestAddedTeachingResources,
+                NumberOfLessons = lessonCountResponse != null ? lessonCountResponse.TotalNumberOfLessons : 0,
+                NumberOfPublishedLessons = lessonCountResponse != null ? lessonCountResponse.NumberOfPublishedLessons : 0,
+                NumberOfDraftLessons = lessonCountResponse != null ? lessonCountResponse.NumberOfDraftLessons : 0,
+                NumberOfArchivedLessons = lessonCountResponse != null ? lessonCountResponse.NumberOfArchivedLessons : 0,
+                TwoLatestAddedLessons = latestLessons ?? []
+
 
             };
 
@@ -977,7 +988,7 @@ namespace EduConnect.Controllers.Course
         [HttpGet("teaching-resource/download")]
         public async Task<IActionResult> DownloadCourseTeachingResource(Guid courseTeachingResourceId)
         {
-            var resourceFile = await _courseRepository.GetCourseTeachingResourceById(courseTeachingResourceId);
+            var resourceFile = await _courseRepository.GetCourseLessonResourceById(courseTeachingResourceId);
 
             if (resourceFile == null)
             {
@@ -1539,7 +1550,7 @@ namespace EduConnect.Controllers.Course
 
         }
 
-        [HttpPost("lesson/resource")]
+        [HttpPost("lesson/resource/upload")]
         public async Task<IActionResult> UploadCourseLessonResource(UploadCourseLessonResourceRequest request)
         {
 
@@ -1556,6 +1567,8 @@ namespace EduConnect.Controllers.Course
                 );
             }
 
+            Console.WriteLine($"Check for the following lesson ID: {request.CourseLessonId ?? Guid.Empty}");
+            Console.WriteLine($"Above lesson with given ID exists: {await _courseRepository.CourseLessonExistsById(request.CourseLessonId.HasValue ? request.CourseLessonId.Value : Guid.Empty)}");
             //Check if the lesson exists (create operation)
             if (request.CourseLessonId.HasValue && !await _courseRepository.CourseLessonExistsById(request.CourseLessonId.Value))
             {
@@ -1703,5 +1716,137 @@ namespace EduConnect.Controllers.Course
             );
         }
 
+
+        [HttpGet("lesson/resource/all")]
+        public async Task<IActionResult> GetAllCourseLessonResources([FromQuery] Guid courseLessonId)
+        {
+            if (courseLessonId == Guid.Empty)
+            {
+                return BadRequest(ApiResponse<object>.GetApiResponse("Invalid course lesson ID", null));
+            }
+
+            var resources = await _courseRepository.GetAllCourseLessonResourcesByCourseLessonId(courseLessonId);
+
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Resources retrieved successfully", resources)
+            );
+
+        }
+
+        [HttpGet("lesson/resource")]
+        public async Task<IActionResult> GetCourseLessonResourceById([FromQuery] Guid courseLessonResourceId)
+        {
+            var resource = await _courseRepository.GetCourseLessonResourceByIdWithoutFileData(courseLessonResourceId);
+
+            if (resource == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Resource not found",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<GetCourseLessonResourceWithoutFileDataByIdResponse>.GetApiResponse("Resource retrieved successfully", resource)
+            );
+        }
+
+        [HttpGet("lesson/resource/download")]
+        public async Task<IActionResult> DownloadCourseLessonResource([FromQuery] Guid courseLessonResourceId)
+        {
+            var resourceFile = await _courseRepository.GetCourseLessonResourceById(courseLessonResourceId);
+
+            if (resourceFile == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Resource not found",
+                        null
+                    )
+                );
+            }
+
+            if (resourceFile.FileData == null)
+            {
+                return Conflict(ApiResponse<object>.GetApiResponse("Only files hosted on EduConnect server's can be downloaded", null));
+            }
+
+            return File(resourceFile.FileData, resourceFile.ContentType, resourceFile.FileName);
+        }
+
+        [HttpDelete("lesson/resource")]
+        public async Task<IActionResult> DeleteCourseLessonResource([FromQuery] Guid courseLessonResourceId)
+        {
+            var resource = await _courseRepository.GetCourseLessonResourceByIdWithoutFileData(courseLessonResourceId);
+
+            if (resource == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Resource not found",
+                        null
+                    )
+                );
+            }
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(Guid.Parse(HttpContext.Items["PersonId"].ToString()));
+
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the thumbnail, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            var resourceOwner = await _courseRepository.GetCourseLessonTutorByCourseLessonId(resource.CourseLessonId);
+
+            if (resourceOwner == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the resource, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            if (tutor.TutorId != resourceOwner)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to delete this thumbnail",
+                        null
+                    )
+                );
+            }
+
+            var deleteResult = await _courseRepository.DeleteCourseLessonResourceById(courseLessonResourceId);
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the resource, please try again later",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Resource deleted successfully", null)
+            );
+
+        }
     }
 }

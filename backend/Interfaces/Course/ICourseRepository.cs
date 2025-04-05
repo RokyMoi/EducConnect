@@ -79,5 +79,16 @@ namespace EduConnect.Interfaces.Course
         Task<bool> UpdateCourseLessonResource(CourseLessonResource courseLessonResource);
 
         Task<bool> CreateCourseLessonResource(CourseLessonResource courseLessonResource);
+        Task<List<GetAllCourseLessonResourcesResponse>> GetAllCourseLessonResourcesByCourseLessonId(Guid courseLessonId);
+
+        Task<GetCourseLessonResourceWithoutFileDataByIdResponse?> GetCourseLessonResourceByIdWithoutFileData(Guid courseLessonResourceId);
+
+        Task<Guid?> GetCourseLessonTutorByCourseLessonId(Guid courseLessonId);
+
+        Task<bool> DeleteCourseLessonResourceById(Guid courseLessonResourceId);
+        Task<int> GetLessonCountByCourseId(Guid courseId);
+        Task<GetCourseLessonsCountFilteredByPublishedStatusRepositoryResponse?> GetCourseLessonsCountFilteredByPublishedStatus(Guid courseId);
+
+        Task<List<GetCourseLessonByIdResponse>> GetLatestCourseLessons(Guid courseId);
     }
 }

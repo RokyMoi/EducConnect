@@ -5,6 +5,7 @@ import { SnackboxService } from '../../../../services/shared/snackbox.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GetCourseManagementDashboardInfoResponse } from '../../../../models/course/course-tutor-controller/get-course-management-dashboard-info-response';
 import formatFileSize from '../../../../helpers/format-file-size.helper';
+import { PublishedStatus } from '../../../../../enums/published-status.enum';
 
 @Component({
   selector: 'app-course-management-dashboard',
@@ -83,5 +84,29 @@ export class CourseTutorManagementComponent implements OnInit {
 
   onViewLessons() {
     this.router.navigate(['/tutor/course/lessons/' + this.courseId]);
+  }
+  getPublishedStatus(publishedStatus: number): string {
+    return PublishedStatus[publishedStatus];
+  }
+  getLessonDisplayText(lesson: any): string {
+    // Replace 'any' with the actual type of lesson
+    const orderText = lesson.lessonSequenceOrder
+      ? `Lesson ${lesson.lessonSequenceOrder}`
+      : 'No Order Set';
+    return `${lesson.title} - ${orderText} (${this.getPublishedStatus(
+      lesson.publishedStatus
+    )})`;
+  }
+  getLessonStatusColor(lesson: any): string {
+    switch (lesson.publishedStatus) {
+      case PublishedStatus.Published:
+        return '#4CAF50'; // Green
+      case PublishedStatus.Draft:
+        return '#FFC107'; // Amber/Orange
+      case PublishedStatus.Archived:
+        return '#F44336'; // Red
+      default:
+        return 'grey'; // Default color if status is unknown
+    }
   }
 }

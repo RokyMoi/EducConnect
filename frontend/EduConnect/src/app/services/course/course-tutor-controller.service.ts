@@ -7,10 +7,12 @@ import { CheckCourseTitleExistsEmitGivenCourseRequest } from '../../models/cours
 import { buildHttpParams } from '../../helpers/build-http-params.helper';
 import { UpdateCourseBasicsRequest } from '../../models/course/course-tutor-controller/update-course-basics-request';
 import { UploadCourseThumbnailRequest } from '../../models/course/course-tutor-controller/upload-course-thumbnail-request';
-import { map } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { UploadCourseTeachingResourceRequest } from '../../models/course/course-tutor-controller/upload-course-teaching-resource-request';
 import { CreateCourseLessonRequest } from '../../models/course/course-tutor-controller/create-course-lesson-request';
 import { ChangeCourseLessonPublishedStatusRequest } from '../../models/course/course-tutor-controller/change-course-lesson-published-status-request';
+import { GetCourseLessonResourceByIdResponse } from '../../models/course/course-tutor-controller/get-course-lesson-resource-by-id-response';
+import { UploadCourseLessonResourceRequest } from '../../models/course/course-tutor-controller/upload-course-lesson-resource-request';
 
 @Injectable({
   providedIn: 'root',
@@ -333,6 +335,108 @@ export class CourseTutorControllerService {
     return this.httpClient.patch(
       `${this.apiUrl}/lesson/archive?courseLessonId=${courseLessonId}`,
       null,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  getAllCourseLessonResources(courseLessonId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<DefaultServerResponse>(
+      `${this.apiUrl}/lesson/resource/all?courseLessonId=${courseLessonId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  getCourseLessonResourceById(
+    courseLessonResourceId: string
+  ): Observable<
+    DefaultServerResponse<GetCourseLessonResourceByIdResponse | null>
+  > {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<
+      DefaultServerResponse<GetCourseLessonResourceByIdResponse | null>
+    >(
+      `${this.apiUrl}/lesson/resource?courseLessonResourceId=${courseLessonResourceId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  downloadCourseLessonResource(resourceId: string) {
+    var token = localStorage.getItem('Authorization');
+    return this.httpClient.get(
+      `${this.apiUrl}/lesson/resource/download?courseLessonResourceId=${resourceId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+        reportProgress: true,
+        observe: 'events',
+      }
+    );
+  }
+
+  uploadCourseLessonResource(request: UploadCourseLessonResourceRequest) {
+    const token = localStorage.getItem('Authorization');
+    const formData = new FormData();
+    if (request.courseLessonResourceId) {
+      formData.append('courseLessonResourceId', request.courseLessonResourceId);
+    }
+    if (request.courseLessonId) {
+      formData.append('courseLessonId', request.courseLessonId);
+    }
+    formData.append('title', request.title);
+    formData.append('description', request.description);
+    if (request.resourceUrl) {
+      formData.append('resourceUrl', request.resourceUrl);
+    }
+    if (request.file) {
+      formData.append('resourceFile', request.file);
+    }
+    return this.httpClient
+      .post<DefaultServerResponse<null>>(
+        `${this.apiUrl}/lesson/resource/upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          reportProgress: true,
+          observe: 'events',
+        }
+      )
+      .pipe(
+        map((event: HttpEvent<DefaultServerResponse<null>>) => {
+          if (event.type === HttpEventType.UploadProgress) {
+            const progress = event.total
+              ? Math.round((100 * event.loaded) / event.total)
+              : 0;
+            return { progress, response: null };
+          }
+          if (event.type === HttpEventType.Response) {
+            return { progress: 100, response: event.body };
+          }
+          return { progress: 0, response: null };
+        })
+      );
+  }
+
+  deleteCourseLessonResourceById(courseLessonResourceId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.delete(
+      `${this.apiUrl}/lesson/resource?courseLessonResourceId=${courseLessonResourceId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

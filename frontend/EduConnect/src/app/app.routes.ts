@@ -47,6 +47,8 @@ import { CourseTutorTeachingResourcesComponent } from './modules/tutor/course/co
 import { CourseTutorTeachingResourcesDetailsComponent } from './modules/tutor/course/course-tutor-teaching-resources-details/course-tutor-teaching-resources-details.component';
 import { CourseTutorLessonDetailsComponent } from './modules/tutor/course/course-tutor-lesson-details/course-tutor-lesson-details.component';
 import { CourseTutorLessonsComponent } from './modules/tutor/course/course-tutor-lessons/course-tutor-lessons.component';
+import { CourseTutorCourseLessonResourcesComponent } from './modules/tutor/course/course-tutor-course-lesson-resources/course-tutor-course-lesson-resources.component';
+import { CourseTutorLessonResourceDetailsComponent } from './modules/tutor/course/course-tutor-lesson-resource-details/course-tutor-lesson-resource-details.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -177,6 +179,24 @@ export const routes: Routes = [
   {
     path: 'tutor/course/lessons/details/:courseId/:lessonId',
     component: CourseTutorLessonDetailsComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/course/lessons/resources/:courseId/:lessonId',
+    component: CourseTutorCourseLessonResourcesComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/course/lessons/resources/new/:courseId/:lessonId',
+    component: CourseTutorLessonResourceDetailsComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/course/lessons/resources/details/:courseId/:lessonId/:resourceId',
+    component: CourseTutorLessonResourceDetailsComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'tutor' },
   },

@@ -28,7 +28,16 @@ namespace EduConnect.DTOs
 
         public long TotalSizeOfFilesInBytes { get; set; } = 0;
 
+        public int NumberOfLessons { get; set; } = 0;
+        public int NumberOfDraftLessons { get; set; } = 0;
+        public int NumberOfPublishedLessons { get; set; } = 0;
+        public int NumberOfArchivedLessons { get; set; } = 0;
+
         public List<GetCourseTeachingResourceResponse> TwoLatestAddedTeachingResources { get; set; } = new List<GetCourseTeachingResourceResponse>();
+
+        public List<GetCourseLessonByIdResponse> TwoLatestAddedLessons { get; set; } = new List<GetCourseLessonByIdResponse>();
+
+
 
     }
 }

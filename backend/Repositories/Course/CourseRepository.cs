@@ -166,6 +166,30 @@ namespace EduConnect.Repositories.Course
             }
         }
 
+        public async Task<bool> DeleteCourseLessonResourceById(Guid courseLessonResourceId)
+        {
+            var courseLessonResource = await _dataContext.CourseLessonResource.Where(x => x.CourseLessonResourceId == courseLessonResourceId).FirstOrDefaultAsync();
+
+            if (courseLessonResource == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                _dataContext.CourseLessonResource.Remove(courseLessonResource);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to delete course lesson resource " + courseLessonResource.CourseLessonResourceId);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
         public async Task<bool> DeleteCourseTeachingResourceById(Guid courseTeachingResourceId)
         {
             var courseTeachingResource = await _dataContext.CourseTeachingResource.Where(x => x.CourseTeachingResourceId == courseTeachingResourceId).FirstOrDefaultAsync();
@@ -206,6 +230,29 @@ namespace EduConnect.Repositories.Course
                 Console.WriteLine(ex);
                 return false;
             }
+        }
+
+        public async Task<List<GetAllCourseLessonResourcesResponse>> GetAllCourseLessonResourcesByCourseLessonId(Guid courseLessonId)
+        {
+            return await _dataContext.CourseLessonResource
+            .Where(
+                x => x.CourseLessonId == courseLessonId
+            )
+            .Select(
+                x => new GetAllCourseLessonResourcesResponse
+                {
+                    CourseLessonResourceId = x.CourseLessonResourceId,
+                    CourseLessonId = x.CourseLessonId,
+                    Title = x.Title,
+                    Description = x.Description,
+                    ResourceUrl = x.ResourceUrl,
+                    FileName = x.FileName,
+                    ContentType = x.ContentType,
+                    FileSize = x.FileSize,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime
+                }
+            )
+            .ToListAsync();
         }
 
         public async Task<List<GetAllCourseLessonsResponse>> GetAllCourseLessons(Guid courseId)
@@ -311,12 +358,63 @@ namespace EduConnect.Repositories.Course
             ).FirstOrDefaultAsync();
         }
 
+        public async Task<GetCourseLessonResourceWithoutFileDataByIdResponse?> GetCourseLessonResourceByIdWithoutFileData(Guid courseLessonResourceId)
+        {
+            return await _dataContext.CourseLessonResource
+            .Where(
+                x => x.CourseLessonResourceId == courseLessonResourceId
+            )
+            .Select(
+                x => new GetCourseLessonResourceWithoutFileDataByIdResponse
+                {
+                    CourseLessonResourceId = x.CourseLessonResourceId,
+                    CourseLessonId = x.CourseLessonId,
+                    Title = x.Title,
+                    FileName = x.FileName,
+                    ContentType = x.ContentType,
+                    FileSize = x.FileSize,
+                    ResourceUrl = x.ResourceUrl,
+                    Description = x.Description,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime
+                }
+            )
+            .FirstOrDefaultAsync();
+        }
+
         public async Task<List<CourseLesson>> GetCourseLessonsByCourseId(Guid courseId)
         {
             return await _dataContext.CourseLesson
             .Include(x => x.CourseLessonContent)
             .Where(x => x.CourseId == courseId)
             .ToListAsync();
+        }
+
+        public Task<GetCourseLessonsCountFilteredByPublishedStatusRepositoryResponse?> GetCourseLessonsCountFilteredByPublishedStatus(Guid courseId)
+        {
+            return _dataContext.CourseLesson
+            .Where(x => x.CourseId == courseId)
+            .GroupBy(x => 1)
+            .Select(
+                x => new GetCourseLessonsCountFilteredByPublishedStatusRepositoryResponse
+                {
+                    TotalNumberOfLessons = x.Count(),
+                    NumberOfPublishedLessons = x.Where(x => x.PublishedStatus == PublishedStatus.Published).Count(),
+                    NumberOfDraftLessons = x.Where(x => x.PublishedStatus == PublishedStatus.Draft).Count(),
+                    NumberOfArchivedLessons = x.Where(x => x.PublishedStatus == PublishedStatus.Archived).Count()
+                }
+            )
+            .FirstOrDefaultAsync();
+        }
+
+        public async Task<Guid?> GetCourseLessonTutorByCourseLessonId(Guid courseLessonId)
+        {
+            return await _dataContext.CourseLesson.Where(
+                x => x.CourseLessonId == courseLessonId
+            )
+            .Select(
+                x => x.TutorId
+            )
+            .FirstOrDefaultAsync();
         }
 
         public async Task<CourseTeachingResource?> GetCourseTeachingResourceById(Guid courseTeachingResourceId)
@@ -389,6 +487,41 @@ namespace EduConnect.Repositories.Course
         public async Task<CourseThumbnail?> GetCourseThumbnailByCourseId(Guid courseId)
         {
             return await _dataContext.CourseThumbnail.Include(x => x.Course).Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<GetCourseLessonByIdResponse>> GetLatestCourseLessons(Guid courseId)
+        {
+            return await _dataContext
+            .CourseLesson
+            .Include(x => x.CourseLessonContent)
+            .Where(
+                x => x.CourseId == courseId
+            )
+            .OrderByDescending(x => x.CreatedAt)
+            .Take(2)
+            .Select(
+                x => new GetCourseLessonByIdResponse
+                {
+                    CourseId = x.CourseId,
+                    CourseLessonId = x.CourseLessonId,
+                    Title = x.Title,
+                    ShortSummary = x.ShortSummary,
+                    Description = x.Description,
+                    Topic = x.Topic,
+                    LessonSequenceOrder = x.LessonSequenceOrder,
+                    PublishedStatus = x.PublishedStatus,
+                    StatusChangedAt = x.StatusChangedAt,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
+                    UpdatedAt = x.UpdatedAt != null ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).UtcDateTime : null,
+                    CourseLessonContent = x.CourseLessonContent != null ? x.CourseLessonContent.Content : ""
+                }
+            )
+            .ToListAsync();
+        }
+
+        public async Task<int> GetLessonCountByCourseId(Guid courseId)
+        {
+            return await _dataContext.CourseLesson.Where(x => x.CourseId == courseId).CountAsync();
         }
 
         public async Task<int> GetPublishedCourseLessonCountByCourseId(Guid courseId)

@@ -77,8 +77,16 @@ export class CourseTutorLessonsComponent implements OnInit {
   goBack() {
     this.router.navigate(['/tutor/course', this.courseId]);
   }
-  
+
   getPublishedStatus(publishedStatus: number): string {
     return PublishedStatus[publishedStatus];
+  }
+
+  onViewLessonResources(lessonId: string) {
+    this.router.navigate([
+      'tutor/course/lessons/resources',
+      this.courseId,
+      lessonId,
+    ]);
   }
 }

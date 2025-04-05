@@ -13,4 +13,5 @@ export interface GetAllCoursesResponse {
   createdAt: string;
   hasThumbnail: boolean;
   thumbnailUrl: string;
+  numberOfLessons: number;
 }

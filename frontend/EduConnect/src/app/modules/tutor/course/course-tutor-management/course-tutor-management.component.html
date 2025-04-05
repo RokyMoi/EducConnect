@@ -99,15 +99,16 @@
             </div>
             <div class="card-content">
                 <div class="sample-data">
-                    <p><strong>Upcoming Sessions:</strong></p>
-                    <div class="lesson-item">
-                        <i class="fas fa-circle" style="color: #4CAF50;"></i> Week 3: Wave-Particle Duality
-                        (Draft)
+
+                    <p>Number Of Lessons: <strong>{{dashboardInfo.numberOfLessons}}</strong></p>
+                    <p>{{dashboardInfo.numberOfPublishedLessons}} Published • {{dashboardInfo.numberOfDraftLessons}}
+                        Draft • {{dashboardInfo.numberOfArchivedLessons}} Archived</p>
+                    <p><strong>Latest lessons:</strong></p>
+                    <div class="lesson-item" *ngFor="let lesson of dashboardInfo.twoLatestAddedLessons">
+                        <i class="fas fa-circle" [style.color]="getLessonStatusColor(lesson)"></i>
+                        {{getLessonDisplayText(lesson)}}
                     </div>
-                    <div class="lesson-item">
-                        <i class="fas fa-circle" style="color: #FF9800;"></i> Week 4: Schrödinger Equation (In
-                        Review)
-                    </div>
+
                 </div>
                 <div class="quick-actions">
                     <button class="icon-btn">

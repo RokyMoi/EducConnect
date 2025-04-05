@@ -61,6 +61,23 @@
 .delete-action-button:hover {
   background-color: darkred;
 }
+
+.resources-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: blue;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.resources-button:hover {
+  background-color: darkblue;
+}
 form {
   display: flex;
   flex-direction: column;
@@ -211,7 +228,7 @@ form {
   border-radius: 4px;
 }
 
-.positive-confirm-button{
+.positive-confirm-button {
   background-color: #4caf50;
   color: white;
   padding: 8px 16px;
@@ -226,5 +243,3 @@ form {
   border: none;
   border-radius: 4px;
 }
-
-

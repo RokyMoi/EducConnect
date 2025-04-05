@@ -314,4 +314,12 @@ export class CourseTutorLessonDetailsComponent implements OnInit {
         },
       });
   }
+
+  onViewResources() {
+    this.router.navigate([
+      '/tutor/course/lessons/resources',
+      this.courseId,
+      this.courseLessonId,
+    ]);
+  }
 }

@@ -23,6 +23,8 @@
                             }}</strong></span>
                     <span *ngIf="course.maxNumberOfStudents">Max Students: <strong>{{ course.maxNumberOfStudents
                             }}</strong></span>
+                    <span>Lesson Num.: <strong>{{ course.numberOfLessons
+                            }}</strong></span>
                 </div>
                 <div class="course-footer">
                     <span class="price"><strong>{{ course.price !== 0 ? ('$' + course.price.toFixed(2)) : 'Free'

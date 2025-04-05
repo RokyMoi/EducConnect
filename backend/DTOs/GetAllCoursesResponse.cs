@@ -27,6 +27,8 @@ namespace EduConnect.DTOs
 
         public int? MaxNumberOfStudents { get; set; } = null;
 
+        public int NumberOfLessons { get; set; } = 0;
+
         public PublishedStatus PublishedStatus { get; set; } = PublishedStatus.Draft;
 
         public DateTime CreatedAt { get; set; }

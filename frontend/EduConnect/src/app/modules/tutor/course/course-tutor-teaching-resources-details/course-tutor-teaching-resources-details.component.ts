@@ -26,6 +26,7 @@ import { VideoCompressionService } from '../../../../services/video-compression.
     ReactiveFormsModule,
     CommonModule,
     CustomHeaderNgContentDialogBoxComponent,
+    ReactiveFormsModule,
   ],
   templateUrl: './course-tutor-teaching-resources-details.component.html',
   styleUrl: './course-tutor-teaching-resources-details.component.css',

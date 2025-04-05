@@ -1,5 +1,5 @@
-export interface DefaultServerResponse {
+export interface DefaultServerResponse<T = any> {
   message: string;
-  data: any;
+  data: T;
   timestamp: string;
 }

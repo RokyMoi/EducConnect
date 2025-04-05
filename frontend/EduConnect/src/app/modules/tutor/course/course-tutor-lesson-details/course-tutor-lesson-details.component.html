@@ -5,6 +5,7 @@
 
     <div class="action-buttons-container">
         <button class="go-back-button" (click)="goBack()">← Go Back</button>
+        <button class="resources-button" (click)="onViewResources()">Resources</button>
         <button class="delete-action-button" *ngIf="this.existingLesson && this.existingLesson.publishedStatus == 1"
             (click)="onArchiveLesson()">Archive</button>
         <button class="create-action-button" *ngIf="this.existingLesson && this.existingLesson.publishedStatus != 1"
