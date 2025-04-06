@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackboxService } from '../../../../services/shared/snackbox.service';
@@ -9,7 +9,7 @@ import { PublishedStatus } from '../../../../../enums/published-status.enum';
 @Component({
   selector: 'app-course-tutor-lessons',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule],  
   templateUrl: './course-tutor-lessons.component.html',
   styleUrl: './course-tutor-lessons.component.css',
 })

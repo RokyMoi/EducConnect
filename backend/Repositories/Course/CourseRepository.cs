@@ -433,6 +433,69 @@ namespace EduConnect.Repositories.Course
             ).FirstOrDefaultAsync();
         }
 
+        public async Task<List<GetCoursesByQueryResponse>> GetCoursesByQuery(string query, string requestScheme, string requestHost, int pageNumber = 1,
+        int pageSize = 10)
+        {
+
+            var dbQuery = _dataContext.Course
+       .Include(x => x.CourseCategory)
+       .Include(x => x.Tutor)
+       .Include(x => x.Tutor.Person.PersonEmail)
+       .Include(x => x.Tutor.Person.PersonDetails)
+       .Include(x => x.LearningDifficultyLevel)
+       .Include(x => x.CourseThumbnail)
+       .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var lowerQuery = query.Trim().ToLower();
+
+                dbQuery = dbQuery.Where(x =>
+                        // x.PublishedStatus == PublishedStatus.Published &&
+                        // (
+                        x.Title.ToLower().Contains(lowerQuery) ||
+                        x.Tutor.Person.PersonEmail.Email.ToLower().Contains(lowerQuery) ||
+                        x.Tutor.Person.PersonDetails.FirstName.ToLower().Contains(lowerQuery) ||
+                        x.Tutor.Person.PersonDetails.LastName.ToLower().Contains(lowerQuery) ||
+                        x.LearningDifficultyLevel.Name.ToLower().Contains(lowerQuery) ||
+                        x.CourseCategory.Name.ToLower().Contains(lowerQuery)
+                // )
+                );
+            }
+            // else
+            // {
+            //     dbQuery = dbQuery.Where(x => x.PublishedStatus == PublishedStatus.Published);
+            // }
+
+            return await dbQuery
+                .Select(x => new GetCoursesByQueryResponse
+                {
+                    CourseId = x.CourseId,
+                    Title = x.Title,
+                    Description = x.Description,
+                    CourseCategoryId = x.CourseCategoryId,
+                    CourseCategoryName = x.CourseCategory.Name,
+                    LearningDifficultyLevelId = x.LearningDifficultyLevelId,
+                    LearningDifficultyLevelName = x.LearningDifficultyLevel.Name,
+                    Price = x.Price,
+                    MinNumberOfStudents = x.MinNumberOfStudents,
+                    MaxNumberOfStudents = x.MaxNumberOfStudents,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
+                    HasThumbnail = x.CourseThumbnail != null,
+                    ThumbnailUrl = x.CourseThumbnail != null
+                        ? (!string.IsNullOrEmpty(x.CourseThumbnail.ThumbnailUrl)
+                            ? x.CourseThumbnail.ThumbnailUrl
+                            : $"{requestScheme}://{requestHost}/public/course/thumbnail/get?courseId={x.CourseId}")
+                        : null,
+                    NumberOfStudents = 0,
+                    TutorUsername = x.Tutor.Person.PersonDetails.Username,
+                    TutorEmail = x.Tutor.Person.PersonEmail.Email,
+                })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         public async Task<CourseTeachingResource?> GetCourseTeachingResourceById(Guid courseTeachingResourceId)
         {
             return await _dataContext.CourseTeachingResource

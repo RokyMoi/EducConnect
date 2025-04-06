@@ -26,7 +26,7 @@
                 <div class="lesson-dates">
                     <span>Created: {{lesson.createdAt | date:'mediumDate'}}</span>
                     <span *ngIf="lesson.statusChangedAt">Last updated: {{lesson.statusChangedAt |
-                        date:'mediumDate'}}</span>
+                        date:'longDate '}}</span>
                 </div>
             </div>
             <div class="lesson-actions">

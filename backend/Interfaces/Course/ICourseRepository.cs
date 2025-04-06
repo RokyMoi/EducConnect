@@ -92,5 +92,8 @@ namespace EduConnect.Interfaces.Course
         Task<List<GetCourseLessonByIdResponse>> GetLatestCourseLessons(Guid courseId);
 
         Task<GetCourseRequirementsByCourseIdResponseFromRepository?> GetCourseRequirementsByCourseId(Guid courseId);
+
+        Task<List<GetCoursesByQueryResponse>> GetCoursesByQuery(string query, string requestScheme, string requestHost, int pageNumber = 1,
+        int pageSize = 10);
     }
 }
