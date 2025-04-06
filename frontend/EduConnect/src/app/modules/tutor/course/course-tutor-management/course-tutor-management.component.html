@@ -95,7 +95,10 @@
         <div class="management-card">
             <div class="card-header">
                 <h2><i class="fas fa-chalkboard-teacher"></i> Class Lessons</h2>
-                <button class="edit-btn" (click)="onViewLessons()">View Lessons</button>
+                <button *ngIf="dashboardInfo.numberOfLessons === 0" class="add-btn" (click)="onAddNewLesson()">Add New
+                    Lesson</button>
+                <button *ngIf="dashboardInfo.numberOfLessons > 0" class="edit-btn" (click)="onViewLessons()">View
+                    Lessons</button>
             </div>
             <div class="card-content">
                 <div class="sample-data">
@@ -111,16 +114,38 @@
 
                 </div>
                 <div class="quick-actions">
-                    <button class="icon-btn">
-                        <i class="fas fa-video"></i> Record Session
-                    </button>
-                    <button class="icon-btn">
-                        <i class="fas fa-chart-line"></i> Progress Analytics
+                    <button class="icon-btn" (click)="onAddNewLesson()" *ngIf="dashboardInfo.numberOfLessons > 0">
+                        <i class="fas fa-add"></i> Add New Lesson
                     </button>
                 </div>
             </div>
         </div>
-
+        <!--Test And Quiz Card-->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-book-open"></i>Tests, quizzes, assignments</h2>
+                <button class="add-btn">New Campaign</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Active Promotions:</strong></p>
+                    <div class="promo-item">
+                        <i class="fas fa-ad"></i> Social Media Campaign (1,234 Clicks)
+                    </div>
+                    <div class="promo-item">
+                        <i class="fas fa-tag"></i> Early Bird Discount (23 Redemptions)
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn">
+                        <i class="fas fa-chart-pie"></i> Analytics
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-share-alt"></i> Share Links
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <!-- Student Management Card -->
         <div class="management-card">
@@ -149,10 +174,37 @@
             </div>
         </div>
 
-        <!-- Promotion Card -->
+        <!-- Certification Card -->
         <div class="management-card">
             <div class="card-header">
-                <h2><i class="fas fa-bullhorn"></i> Marketing Tools</h2>
+                <h2><i class="fas fa-certificate"></i>Course Certification</h2>
+                <button class="add-btn">Add certificate</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Active Promotions:</strong></p>
+                    <div class="promo-item">
+                        <i class="fas fa-ad"></i> Social Media Campaign (1,234 Clicks)
+                    </div>
+                    <div class="promo-item">
+                        <i class="fas fa-tag"></i> Early Bird Discount (23 Redemptions)
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn">
+                        <i class="fas fa-chart-pie"></i> Analytics
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-share-alt"></i> Share Links
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!--Analytics and Feedback Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-bullhorn"></i>Analytics and Feedback</h2>
                 <button class="add-btn">New Campaign</button>
             </div>
             <div class="card-content">
@@ -175,5 +227,7 @@
                 </div>
             </div>
         </div>
+
+
     </div>
 </div>

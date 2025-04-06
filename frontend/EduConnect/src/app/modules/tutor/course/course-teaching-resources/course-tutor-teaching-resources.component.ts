@@ -6,6 +6,8 @@ import { SnackboxService } from '../../../../services/shared/snackbox.service';
 import { CommonModule } from '@angular/common';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { CustomHeaderNgContentDialogBoxComponent } from '../../../shared/custom-header-ng-content-dialog-box/custom-header-ng-content-dialog-box.component';
+import { MatDialog } from '@angular/material/dialog';
+import { FilePreviewDialogComponent } from '../../../shared/file-preview/file-preview-dialog/file-preview-dialog.component';
 
 @Component({
   selector: 'app-course-teaching-resources',
@@ -30,7 +32,8 @@ export class CourseTutorTeachingResourcesComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private snackboxService: SnackboxService,
-    private courseTutorControllerService: CourseTutorControllerService
+    private courseTutorControllerService: CourseTutorControllerService,
+    
   ) {
     this.courseId = this.route.snapshot.paramMap.get('courseId');
   }
@@ -167,4 +170,6 @@ export class CourseTutorTeachingResourcesComponent implements OnInit {
         },
       });
   }
+
+  
 }

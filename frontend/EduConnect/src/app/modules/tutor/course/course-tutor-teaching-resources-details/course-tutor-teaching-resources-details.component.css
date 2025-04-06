@@ -402,7 +402,8 @@
   gap: 1rem;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
+  width: 100%;
 }
 
 .preview-button,

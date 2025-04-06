@@ -90,5 +90,7 @@ namespace EduConnect.Interfaces.Course
         Task<GetCourseLessonsCountFilteredByPublishedStatusRepositoryResponse?> GetCourseLessonsCountFilteredByPublishedStatus(Guid courseId);
 
         Task<List<GetCourseLessonByIdResponse>> GetLatestCourseLessons(Guid courseId);
+
+        Task<GetCourseRequirementsByCourseIdResponseFromRepository?> GetCourseRequirementsByCourseId(Guid courseId);
     }
 }

@@ -248,6 +248,7 @@ namespace EduConnect.Controllers
         {
             return await db.PersonEmail.AnyAsync(x => x.Email == tutor.Email);
         }
+
     }
 
 }

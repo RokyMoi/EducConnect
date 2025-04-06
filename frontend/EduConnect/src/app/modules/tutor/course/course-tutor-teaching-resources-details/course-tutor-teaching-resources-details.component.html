@@ -57,9 +57,7 @@
                 </div>
 
                 <div class="file-action-buttons">
-                    <button class="preview-button" (click)="$event.preventDefault()">
-                        <i class="fas fa-eye"></i> Preview
-                    </button>
+
                     <button *ngIf="this.existingResource?.fileName" class="download-button"
                         (click)="onDownloadResource()">
                         <i class="fas fa-download"></i> Download
@@ -127,8 +125,15 @@
                 <div class="error-container">
                     <span>{{fileErrorMessage}}</span>
                 </div>
+                <div class="file-action-buttons">
+
+                    <button class="preview-button" (click)="onPreview()" *ngIf="this.selectedFile">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                </div>
             </div>
         </div>
+
 
         <div class="upload-progress-area-container" *ngIf="uploadInProgress">
             <label for="thumbnailFileName">Upload Status</label>

@@ -19,6 +19,8 @@ import formatFileSize from '../../../../helpers/format-file-size.helper';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { ImageCompressionService } from '../../../../services/image-compression.service';
 import { VideoCompressionService } from '../../../../services/video-compression.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { FilePreviewDialogComponent } from '../../../shared/file-preview/file-preview-dialog/file-preview-dialog.component';
 @Component({
   selector: 'app-course-tutor-teaching-resources-details',
   standalone: true,
@@ -27,6 +29,7 @@ import { VideoCompressionService } from '../../../../services/video-compression.
     CommonModule,
     CustomHeaderNgContentDialogBoxComponent,
     ReactiveFormsModule,
+    MatDialogModule,
   ],
   templateUrl: './course-tutor-teaching-resources-details.component.html',
   styleUrl: './course-tutor-teaching-resources-details.component.css',
@@ -63,8 +66,7 @@ export class CourseTutorTeachingResourcesDetailsComponent {
   existingResource: GetCourseTeachingResourceResponse | null = null;
 
   maxSize: number = 0;
-  titleErrorMessage: string = '';
-  descriptionErrorMessage: string = '';
+   descriptionErrorMessage: string = '';
   urlErrorMessage: string = '';
   resourceFormGroup: FormGroup = new FormGroup({
     title: new FormControl(null, {
@@ -97,7 +99,8 @@ export class CourseTutorTeachingResourcesDetailsComponent {
     private snackboxService: SnackboxService,
     private imageCompressionService: ImageCompressionService,
     private videoCompressionService: VideoCompressionService,
-    private courseTutorControllerService: CourseTutorControllerService
+    private courseTutorControllerService: CourseTutorControllerService,
+    private dialog: MatDialog
   ) {
     this.route.paramMap.subscribe((params) => {
       this.courseId = params.get('courseId') as string;
@@ -173,6 +176,7 @@ export class CourseTutorTeachingResourcesDetailsComponent {
     }
     this.fileErrorMessage = '';
     this.resourceFormGroup.controls['file'].setErrors(null);
+
   }
 
   onSaveResource() {
@@ -425,5 +429,15 @@ export class CourseTutorTeachingResourcesDetailsComponent {
 
       event.dataTransfer.clearData();
     }
+  }
+
+  onPreview() {
+    if (!this.selectedFile) return;
+    this.dialog.open(FilePreviewDialogComponent, {
+      data: { file: this.selectedFile },
+      width: '80vw',
+      height: '90vh',
+      maxWidth: '1200px',
+    });
   }
 }

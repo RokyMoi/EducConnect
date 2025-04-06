@@ -109,4 +109,8 @@ export class CourseTutorManagementComponent implements OnInit {
         return 'grey'; // Default color if status is unknown
     }
   }
+
+  onAddNewLesson() {
+    this.router.navigate(['/tutor/course/lessons/new', this.courseId]);
+  }
 }

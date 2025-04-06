@@ -417,6 +417,22 @@ namespace EduConnect.Repositories.Course
             .FirstOrDefaultAsync();
         }
 
+        public async Task<GetCourseRequirementsByCourseIdResponseFromRepository?> GetCourseRequirementsByCourseId(Guid courseId)
+        {
+            return await _dataContext.Course
+            .Where(x => x.CourseId == courseId)
+            .Select(
+                x => new GetCourseRequirementsByCourseIdResponseFromRepository
+                {
+                    CourseId = x.CourseId,
+                    Price = x.Price,
+                    MaxNumberOfStudents = x.MaxNumberOfStudents,
+                    PublishedStatus = x.PublishedStatus
+
+                }
+            ).FirstOrDefaultAsync();
+        }
+
         public async Task<CourseTeachingResource?> GetCourseTeachingResourceById(Guid courseTeachingResourceId)
         {
             return await _dataContext.CourseTeachingResource
