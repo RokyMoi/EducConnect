@@ -13,6 +13,11 @@ namespace EduConnect.Repositories.Course
 {
     public class CourseRepository(DataContext _dataContext) : ICourseRepository
     {
+        public async Task<bool> CheckCoursePromotionImageExists(Guid coursePromotionImageId)
+        {
+            return await _dataContext.CoursePromotionImage.Where(x => x.CoursePromotionImageId == coursePromotionImageId).AnyAsync();
+        }
+
         public async Task<bool> CourseCategoryExistsById(Guid courseCategoryId)
         {
             return await _dataContext.CourseCategory.Where(x => x.CourseCategoryId == courseCategoryId).AnyAsync();
@@ -133,6 +138,23 @@ namespace EduConnect.Repositories.Course
             }
         }
 
+        public async Task<bool> CreateCoursePromotionImage(CoursePromotionImage promotionImage)
+        {
+            try
+            {
+                await _dataContext.CoursePromotionImage.AddAsync(promotionImage);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to create course promotion image " + promotionImage.CourseId);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
         public async Task<bool> CreateCourseTeachingResource(CourseTeachingResource courseTeachingResource)
         {
             try
@@ -185,6 +207,28 @@ namespace EduConnect.Repositories.Course
             {
 
                 Console.WriteLine("Failed to delete course lesson resource " + courseLessonResource.CourseLessonResourceId);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteCoursePromotionImageById(Guid coursePromotionImageId)
+        {
+            var coursePromotionImage = await _dataContext.CoursePromotionImage.Where(x => x.CoursePromotionImageId == coursePromotionImageId).FirstOrDefaultAsync();
+            if (coursePromotionImage == null)
+            {
+                return false;
+            }
+            try
+            {
+                _dataContext.CoursePromotionImage.Remove(coursePromotionImage);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to delete course promotion image " + coursePromotionImage.CoursePromotionImageId);
                 Console.WriteLine(ex);
                 return false;
             }
@@ -457,6 +501,14 @@ namespace EduConnect.Repositories.Course
             .FirstOrDefaultAsync();
         }
 
+        public async Task<CoursePromotionImage?> GetCoursePromotionImageById(Guid coursePromotionImageId)
+        {
+            return await _dataContext.CoursePromotionImage
+            .Include(x => x.Course)
+            .Where(x => x.CoursePromotionImageId == coursePromotionImageId)
+            .FirstOrDefaultAsync();
+        }
+
         public async Task<GetCourseRequirementsByCourseIdResponseFromRepository?> GetCourseRequirementsByCourseId(Guid courseId)
         {
             return await _dataContext.Course
@@ -650,6 +702,11 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.CourseLesson.Where(x => x.CourseId == courseId).CountAsync();
         }
 
+        public async Task<int> GetPromotionImageCountByCourseId(Guid courseId)
+        {
+            return await _dataContext.CoursePromotionImage.Where(x => x.CourseId == courseId).CountAsync();
+        }
+
         public async Task<int> GetPublishedCourseLessonCountByCourseId(Guid courseId)
         {
             return await _dataContext.CourseLesson
@@ -658,6 +715,14 @@ namespace EduConnect.Repositories.Course
                 x.PublishedStatus == PublishedStatus.Published
             )
             .CountAsync();
+        }
+
+        public Task<bool> IsTutorCoursePromotionImageOwner(Guid imageId, Guid tutorId)
+        {
+            return _dataContext.CoursePromotionImage
+            .Include(x => x.Course)
+            .Where(x => x.CoursePromotionImageId == imageId && x.Course.TutorId == tutorId)
+            .AnyAsync();
         }
 
         public async Task<bool> RearrangeLessonSequenceAsync(Guid courseId, int currentPosition, int newPosition)
@@ -792,6 +857,24 @@ namespace EduConnect.Repositories.Course
                 Console.WriteLine("Failed to update course lesson resource " + courseLessonResource.Title);
                 Console.WriteLine(ex);
                 return false;
+            }
+        }
+
+        public async Task<bool> UpdateCoursePromotionImage(CoursePromotionImage promotionImage)
+        {
+            try
+            {
+                _dataContext.CoursePromotionImage.Update(promotionImage);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to update course promotion image " + promotionImage.CoursePromotionImageId);
+                Console.WriteLine(ex);
+                return false;
+
             }
         }
 

@@ -1848,5 +1848,267 @@ namespace EduConnect.Controllers.Course
             );
 
         }
+
+        [HttpPost("promotion/image/upload")]
+        public async Task<IActionResult> UploadPromotionImage(UploadPromotionImageRequest request)
+        {
+            if (request.Image == null || request.Image.Length == 0)
+            {
+                return BadRequest(ApiResponse<object>.GetApiResponse("Invalid image file", null));
+            }
+
+            const int maxFileSize = 5 * 1024 * 1024; // 5MB
+            //Check file size 
+            if (request.Image.Length > maxFileSize)
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Promotion image maximum file size is 5MB, this file has a size of " + request.Image.Length + " bytes",
+                        null
+                    )
+                );
+            }
+
+            //Check if create or update operation
+            //Create - request.CourseId is not null and request.PromotionId is null
+            //Update - request.PromotionId is not null
+            if (request.CourseId == null && request.CoursePromotionImageId == null)
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Invalid request, either CourseId or CoursePromotionImageId must be provided",
+                        null
+                    )
+                );
+            }
+            if ((request.CourseId.HasValue && request.CourseId.Value == Guid.Empty) || (request.CoursePromotionImageId.HasValue && request.CoursePromotionImageId.Value == Guid.Empty))
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Invalid request, both CourseId and CoursePromotionImageId cannot be empty",
+                        null
+                    )
+                );
+            }
+
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while getting the courses, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            //Since the request CoursePromotionImageId is not null, promotion image is being updated
+            if (request.CoursePromotionImageId.HasValue)
+            {
+                var existingPromotionImage = await _courseRepository.GetCoursePromotionImageById(request.CoursePromotionImageId.Value);
+
+                if (existingPromotionImage == null)
+                {
+                    return NotFound(
+                        ApiResponse<object>.GetApiResponse(
+                            "Promotion image not found",
+                            null
+                        )
+                    );
+                }
+
+
+                if (existingPromotionImage.Course.TutorId != tutor.TutorId)
+                {
+                    return Conflict(
+                        ApiResponse<object>.GetApiResponse(
+                            "You are not authorized to update this course",
+                            null
+                        )
+                    );
+                }
+
+                using var memoryStream1 = new MemoryStream();
+                await request.Image.CopyToAsync(memoryStream1);
+                byte[] promotionImageFile1 = memoryStream1.ToArray();
+
+                existingPromotionImage.ContentType = request.Image.ContentType;
+                existingPromotionImage.ImageFile = promotionImageFile1;
+                existingPromotionImage.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+                var updateResult = await _courseRepository.UpdateCoursePromotionImage(existingPromotionImage);
+                if (!updateResult)
+                {
+                    return StatusCode(
+                        500,
+                        ApiResponse<object>.GetApiResponse(
+                            "An error occurred while updating the promotion image, please try again later",
+                            null
+                        )
+                    );
+                }
+
+                return Ok(
+                    ApiResponse<object>.GetApiResponse(
+                        "Promotion image updated successfully",
+                        null
+                    )
+                );
+
+
+            }
+
+            //Check if the course exists
+            var course = await _courseRepository.GetCourseById(request.CourseId.Value);
+            if (course == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course not found",
+                        null
+                    )
+                );
+            }
+
+
+
+            if (course.TutorId != tutor.TutorId)
+            {
+                return Conflict(
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to update this course",
+                        null
+                    )
+                );
+            }
+
+
+            //Check if file type is image
+            if (!request.Image.ContentType.StartsWith("image/"))
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Promotion image must be an image",
+                        null
+                    )
+                );
+            }
+
+            //Check the number of promotion images for the course (default maximum is 5)
+            var promotionImagesCount = await _courseRepository.GetPromotionImageCountByCourseId(course.CourseId);
+
+            if (promotionImagesCount >= 5)
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "You have reached the maximum number of promotion images for this course",
+                        null
+                    )
+                );
+            }
+
+            using var memoryStream = new MemoryStream();
+            await request.Image.CopyToAsync(memoryStream);
+            byte[] promotionImageFile = memoryStream.ToArray();
+            var coursePromotionImage = new CoursePromotionImage
+            {
+                CoursePromotionImageId = Guid.NewGuid(),
+                CourseId = request.CourseId.Value,
+                ContentType = request.Image.ContentType,
+                ImageFile = promotionImageFile,
+
+
+            };
+            var createResult = await _courseRepository.CreateCoursePromotionImage(coursePromotionImage);
+
+            if (!createResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while creating the uploading the image, please try again later",
+                        null
+                    )
+                );
+            }
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Promotion image uploaded successfully", null)
+            );
+
+
+
+
+        }
+
+        [HttpDelete("promotion/image/delete/{coursePromotionImageId}")]
+        public async Task<IActionResult> DeletePromotionImage(Guid coursePromotionImageId)
+        {
+
+            var imageExists = await _courseRepository.CheckCoursePromotionImageExists(coursePromotionImageId);
+
+            if (!imageExists)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Promotion image not found",
+                        null
+                    )
+                );
+            }
+
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while getting the courses, please refer to your administrator, regarding your role",
+                        null
+                    )
+                );
+            }
+
+            var isTutorOwner = await _courseRepository.IsTutorCoursePromotionImageOwner(coursePromotionImageId, tutor.TutorId);
+
+            if (!isTutorOwner)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to delete this promotion image",
+                        null
+                    )
+                );
+            }
+
+            var deleteResult = await _courseRepository.DeleteCoursePromotionImageById(coursePromotionImageId);
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the promotion image, please try again later",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Promotion image deleted successfully", null)
+            );
+
+        }
+
+        
     }
+
+
 }

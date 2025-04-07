@@ -74,6 +74,7 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<CourseLessonResource> CourseLessonResource { get; set; }
 
+    public DbSet<CoursePromotionImage> CoursePromotionImage { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder builder)

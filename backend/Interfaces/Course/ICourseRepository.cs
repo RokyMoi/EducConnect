@@ -97,5 +97,18 @@ namespace EduConnect.Interfaces.Course
         int pageSize = 10);
 
         Task<GetCoursesByQueryResponse?> GetCourseByIdForStudent(Guid courseId, string requestScheme, string requestHost);
+
+        Task<int> GetPromotionImageCountByCourseId(Guid courseId);
+
+        Task<bool> CreateCoursePromotionImage(Entities.Course.CoursePromotionImage promotionImage);
+
+        Task<bool> UpdateCoursePromotionImage(Entities.Course.CoursePromotionImage promotionImage);
+
+        Task<bool> CheckCoursePromotionImageExists(Guid coursePromotionImageId);
+        Task<CoursePromotionImage?> GetCoursePromotionImageById(Guid coursePromotionImageId);
+
+        Task<bool> IsTutorCoursePromotionImageOwner(Guid imageId, Guid tutorId);
+
+        Task<bool> DeleteCoursePromotionImageById(Guid coursePromotionImageId);
     }
 }
