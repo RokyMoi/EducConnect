@@ -26,12 +26,16 @@ namespace EduConnect.Controllers.Course
         public async Task<IActionResult> GetCoursesByQuery([FromQuery] SearchCoursesQueryRequest request)
         {
             var requestSearchQuery = string.IsNullOrEmpty(request.SearchQuery) ? "" : request.SearchQuery;
-            var courses = await _courseRepository.GetCoursesByQuery(requestSearchQuery, Request.Scheme, Request.Host.ToString());
+            var (courses, totalCount) = await _courseRepository.GetCoursesByQuery(requestSearchQuery, Request.Scheme, Request.Host.ToString(), request.PageNumber, request.PageSize);
 
             return Ok(
-                ApiResponse<List<GetCoursesByQueryResponse>>.GetApiResponse(
+                ApiResponse<List<GetCoursesByQueryResponse>>.GetApiPaginatedResponse(
                     "Courses retrieved successfully",
-                    courses
+                    courses,
+                    totalCount,
+                    request.PageNumber,
+                    request.PageSize
+
                 )
             );
         }

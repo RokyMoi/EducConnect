@@ -1,1 +1,58 @@
-<p>student-course-search works!</p>
+<div class="main-container">
+    <h2 class="component-title">My Courses Dashboard</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+    </div>
+    <div class="search-container">
+        <input type="text" placeholder="Search for courses" (input)="onSearch($event)">
+    </div>
+    <div class="paginator-control-container">
+
+
+        <div class="page-control-container">
+            <p><strong>{{currentPage}}</strong> of <strong> {{totalPages}}</strong> pages</p>
+            <div class="page-control-buttons">
+                <button (click)="previousPage()" [disabled]="currentPage === 1 || paginationDisabled">Previous</button>
+                <button (click)="nextPage()" [disabled]="currentPage === totalPages || paginationDisabled">Next</button>
+            </div>
+        </div>
+
+    </div>
+    <div class="no-results-section" *ngIf="courses.length === 0">
+
+        <h2>No results found for <span>{{searchQuery}}</span></h2>
+        <p>*Maybe try changing your search query</p>
+    </div>
+    <div class="dashboard-grid">
+        <div class="course-card" *ngFor="let course of courses">
+            <img class="course-image"
+                [src]="course.thumbnailUrl || 'https://dummyimage.com/320x200/cccccc/969696.png&text=No+Thumbnail'"
+                alt="Course thumbnail placeholder">
+            <div class="course-info">
+                <h2 class="course-title">{{ course.title }}</h2>
+                <p class="course-description">{{ course.description.length > 300 ? (course.description | slice:0:300) +
+                    '...' : course.description }}</p>
+                <div class="course-meta">
+                    <span class="category">Category: <strong>{{ course.courseCategoryName }}</strong></span>
+                    <span class="difficulty">Difficulty: <strong>{{ course.learningDifficultyLevelName
+                            }}</strong></span>
+                    <span class="created">Created On: <strong>{{ course.createdAt | date:'MMM d, yyyy'
+                            }}</strong></span>
+                    <span *ngIf="course.minNumberOfStudents">Min Students: <strong>{{ course.minNumberOfStudents
+                            }}</strong></span>
+                    <span *ngIf="course.maxNumberOfStudents">Max Students: <strong>{{ course.maxNumberOfStudents
+                            }}</strong></span>
+                    <span>Lesson Num.: <strong>{{ course.numberOfLessons
+                            }}</strong></span>
+                </div>
+                <div class="course-footer">
+                    <span class="price"><strong>{{ course.price !== 0 ? ('$' + course.price.toFixed(2)) : 'Free'
+                            }}</strong></span>
+
+                </div>
+                <button class="view-course" (click)="onViewCourse(course.courseId)">View Course</button>
+            </div>
+        </div>
+
+    </div>
+</div>

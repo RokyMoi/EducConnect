@@ -167,4 +167,7 @@ export default class ApiLinks {
 
   //CourseTutorController base link
   public static readonly CourseTutorControllerUrl = `${this.baseUrl}tutor/course`;
+
+  //CourseStudentController base link
+  public static readonly CourseStudentControllerUrl = `${this.baseUrl}student/course`;
 }

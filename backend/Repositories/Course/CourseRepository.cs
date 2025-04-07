@@ -433,9 +433,12 @@ namespace EduConnect.Repositories.Course
             ).FirstOrDefaultAsync();
         }
 
-        public async Task<List<GetCoursesByQueryResponse>> GetCoursesByQuery(string query, string requestScheme, string requestHost, int pageNumber = 1,
+        public async Task<(List<GetCoursesByQueryResponse>, int TotalCount)> GetCoursesByQuery(string query, string requestScheme, string requestHost, int pageNumber = 1,
         int pageSize = 10)
         {
+
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
 
             var dbQuery = _dataContext.Course
        .Include(x => x.CourseCategory)
@@ -467,7 +470,10 @@ namespace EduConnect.Repositories.Course
             //     dbQuery = dbQuery.Where(x => x.PublishedStatus == PublishedStatus.Published);
             // }
 
-            return await dbQuery
+            var totalCount = await dbQuery.CountAsync();
+
+
+            var pagedCourses = await dbQuery
                 .Select(x => new GetCoursesByQueryResponse
                 {
                     CourseId = x.CourseId,
@@ -494,6 +500,7 @@ namespace EduConnect.Repositories.Course
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+            return (pagedCourses, totalCount);
         }
 
         public async Task<CourseTeachingResource?> GetCourseTeachingResourceById(Guid courseTeachingResourceId)
