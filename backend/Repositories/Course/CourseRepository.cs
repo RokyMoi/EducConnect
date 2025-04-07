@@ -313,6 +313,46 @@ namespace EduConnect.Repositories.Course
             .FirstOrDefaultAsync(x => x.CourseId == courseId);
         }
 
+        public async Task<GetCoursesByQueryResponse?> GetCourseByIdForStudent(Guid courseId, string requestScheme, string requestHost)
+        {
+            return await _dataContext.Course
+            .Include(x => x.CourseCategory)
+            .Include(x => x.Tutor)
+                .ThenInclude(x => x.Person)
+                    .ThenInclude(x => x.PersonEmail)
+                        .ThenInclude(x => x.Person.PersonDetails)
+            .Include(x => x.LearningDifficultyLevel)
+            .Include(x => x.CourseThumbnail)
+            .Where(x => x.CourseId == courseId)
+            .Select(
+                x => new GetCoursesByQueryResponse
+                {
+                    CourseId = x.CourseId,
+                    Title = x.Title,
+                    Description = x.Description,
+                    CourseCategoryId = x.CourseCategoryId,
+                    CourseCategoryName = x.CourseCategory.Name,
+                    LearningDifficultyLevelId = x.LearningDifficultyLevelId,
+                    LearningDifficultyLevelName = x.LearningDifficultyLevel.Name,
+                    Price = x.Price,
+                    MinNumberOfStudents = x.MinNumberOfStudents,
+                    MaxNumberOfStudents = x.MaxNumberOfStudents,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
+                    HasThumbnail = x.CourseThumbnail != null,
+                    ThumbnailUrl = x.CourseThumbnail != null
+                                ? (!string.IsNullOrEmpty(x.CourseThumbnail.ThumbnailUrl)
+                                    ? x.CourseThumbnail.ThumbnailUrl
+                                    : $"{requestScheme}://{requestHost}/public/course/thumbnail/get?courseId={x.CourseId}")
+                                : null,
+                    NumberOfStudents = 0,
+                    TutorUsername = x.Tutor.Person.PersonDetails.Username,
+                    TutorEmail = x.Tutor.Person.PersonEmail.Email,
+                }
+            ).FirstOrDefaultAsync();
+
+
+        }
+
         public async Task<CourseLesson?> GetCourseLessonById(Guid courseLessonId)
         {
             return await _dataContext.CourseLesson.Include(x => x.CourseLessonContent).Include(x => x.Course).Where(x => x.CourseLessonId == courseLessonId).FirstOrDefaultAsync();

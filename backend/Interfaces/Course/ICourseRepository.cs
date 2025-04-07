@@ -95,5 +95,7 @@ namespace EduConnect.Interfaces.Course
 
         Task<(List<GetCoursesByQueryResponse>, int TotalCount)> GetCoursesByQuery(string query, string requestScheme, string requestHost, int pageNumber = 1,
         int pageSize = 10);
+
+        Task<GetCoursesByQueryResponse?> GetCourseByIdForStudent(Guid courseId, string requestScheme, string requestHost);
     }
 }

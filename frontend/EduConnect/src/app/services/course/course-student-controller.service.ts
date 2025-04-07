@@ -27,4 +27,19 @@ export class CourseStudentControllerService {
       params: params,
     });
   }
+
+  //Get course student view by course id
+  public GetCourseById(courseId: string) {
+    const token = localStorage.getItem('Authorization');
+    const params = buildHttpParams({ courseId: courseId });
+    return this.http.get<DefaultServerResponse<GetCoursesByQueryResponse>>(
+      `${ApiLinks.CourseStudentControllerUrl}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: params,
+      }
+    );
+  }
 }

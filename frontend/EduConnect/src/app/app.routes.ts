@@ -50,6 +50,7 @@ import { CourseTutorLessonsComponent } from './modules/tutor/course/course-tutor
 import { CourseTutorCourseLessonResourcesComponent } from './modules/tutor/course/course-tutor-course-lesson-resources/course-tutor-course-lesson-resources.component';
 import { CourseTutorLessonResourceDetailsComponent } from './modules/tutor/course/course-tutor-lesson-resource-details/course-tutor-lesson-resource-details.component';
 import { StudentCourseSearchComponent } from './modules/student/course/student-course-search/student-course-search.component';
+import { StudentCourseDetailsComponent } from './modules/student/course/student-course-details/student-course-details.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -70,6 +71,12 @@ export const routes: Routes = [
   {
     path: 'student/dashboard',
     component: StudentDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  {
+    path: 'student/course/details/:courseId',
+    component: StudentCourseDetailsComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'student' },
   },

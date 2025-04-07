@@ -92,7 +92,9 @@ export class StudentCourseSearchComponent implements OnInit {
     this.router.navigate(['/student/dashboard']);
   }
 
-  onViewCourse(courseId: string) {}
+  onViewCourse(courseId: string) {
+    this.router.navigate(['/student/course/details', courseId]);
+  }
 
   onSearch($event: any) {
     console.log($event.target.value);

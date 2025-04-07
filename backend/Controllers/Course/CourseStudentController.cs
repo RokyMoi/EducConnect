@@ -39,5 +39,17 @@ namespace EduConnect.Controllers.Course
                 )
             );
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCourseById([FromQuery] Guid courseId)
+        {
+            var course = await _courseRepository.GetCourseByIdForStudent(courseId, Request.Scheme, Request.Host.ToString());
+            if (course == null)
+            {
+                return NotFound(new ApiResponse<object>("Course not found", null));
+            }
+
+            return Ok(new ApiResponse<GetCoursesByQueryResponse>("Course retrieved successfully", course));
+        }
     }
 }
