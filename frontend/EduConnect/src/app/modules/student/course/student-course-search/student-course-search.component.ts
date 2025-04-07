@@ -38,7 +38,11 @@ export class StudentCourseSearchComponent implements OnInit {
   ngOnInit(): void {
     this.fetchCourses();
 
-    this.selectItemsPerPageFormControl.valueChanges.subscribe(() => {});
+    this.selectItemsPerPageFormControl.valueChanges.subscribe((value) => {
+      this.itemsPerPage = value;
+      this.pageSize = value;
+      this.fetchCourses();
+    });
   }
 
   fetchCourses() {

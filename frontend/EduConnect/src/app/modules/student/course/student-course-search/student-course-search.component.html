@@ -1,5 +1,5 @@
 <div class="main-container">
-    <h2 class="component-title">My Courses Dashboard</h2>
+    <h2 class="component-title">Search Courses</h2>
     <div class="action-buttons-container">
         <button class="go-back-button" (click)="goBack()">← Go Back</button>
     </div>
@@ -8,6 +8,14 @@
     </div>
     <div class="paginator-control-container">
 
+        <div class="number-of-results-container">
+            <h3>Number of results: {{totalItems}}</h3>
+            <p>Items per page:</p>
+            <select name="" id="" [formControl]="selectItemsPerPageFormControl">
+
+                <option *ngFor="let item of numberOfItemsPerPage" [value]="item">{{item}}</option>
+            </select>
+        </div>
 
         <div class="page-control-container">
             <p><strong>{{currentPage}}</strong> of <strong> {{totalPages}}</strong> pages</p>
@@ -30,7 +38,8 @@
                 alt="Course thumbnail placeholder">
             <div class="course-info">
                 <h2 class="course-title">{{ course.title }}</h2>
-                <p class="course-description">{{ course.description.length > 300 ? (course.description | slice:0:300) +
+                <p class="course-description">{{ course.description.length > 300 ? (course.description |
+                    slice:0:300) +
                     '...' : course.description }}</p>
                 <div class="course-meta">
                     <span class="category">Category: <strong>{{ course.courseCategoryName }}</strong></span>
