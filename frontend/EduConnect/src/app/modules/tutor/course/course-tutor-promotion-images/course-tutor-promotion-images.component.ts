@@ -17,6 +17,10 @@ export class CourseTutorPromotionImagesComponent implements OnInit {
 
   coursePromotionImages: GetPromotionImagesResponse[] = [];
 
+  imageCounter = 0;
+  currentImageLink = '';
+
+  isGridView = true;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -39,6 +43,12 @@ export class CourseTutorPromotionImagesComponent implements OnInit {
         next: (response) => {
           console.log(response);
           this.coursePromotionImages = response.data;
+          if (this.coursePromotionImages.length > 0) {
+            this.currentImageLink = this.getImageLink(
+              this.coursePromotionImages[0].coursePromotionImageId
+            );
+            this.imageCounter = 0;
+          }
         },
         error: (error) => {
           console.log(error);
@@ -52,5 +62,39 @@ export class CourseTutorPromotionImagesComponent implements OnInit {
 
   getImageLink(imageId: string) {
     return `http://localhost:5177/public/course/promotion/image/${imageId}`;
+  }
+
+  getNextImageLink() {
+    if (this.imageCounter >= this.coursePromotionImages.length - 1) {
+      this.imageCounter = 0;
+    } else {
+      this.imageCounter++;
+    }
+    this.currentImageLink = this.getImageLink(
+      this.coursePromotionImages[this.imageCounter].coursePromotionImageId
+    );
+  }
+
+  getPreviousImageLink() {
+    if (this.imageCounter <= 0) {
+      this.imageCounter = this.coursePromotionImages.length - 1;
+    } else {
+      this.imageCounter--;
+    }
+    this.currentImageLink = this.getImageLink(
+      this.coursePromotionImages[this.imageCounter].coursePromotionImageId
+    );
+  }
+
+  onAddNewImage() {
+    this.router.navigate(['/tutor/course/promotion/new', this.courseId]);
+  }
+
+  onViewDetails(imageId: string) {
+    this.router.navigate([
+      '/tutor/course/promotion/details',
+      this.courseId,
+      imageId,
+    ]);
   }
 }

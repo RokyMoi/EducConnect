@@ -14,6 +14,8 @@ import { ChangeCourseLessonPublishedStatusRequest } from '../../models/course/co
 import { GetCourseLessonResourceByIdResponse } from '../../models/course/course-tutor-controller/get-course-lesson-resource-by-id-response';
 import { UploadCourseLessonResourceRequest } from '../../models/course/course-tutor-controller/upload-course-lesson-resource-request';
 import { GetPromotionImagesResponse } from '../../models/course/course-tutor-controller/get-promotion-images-response';
+import { GetCoursePromotionImageMetadataByIdResponse } from '../../models/course/course-tutor-controller/get-course-promotion-image-metadata-by-id-response';
+import { UploadCoursePromotionImageRequest } from '../../models/course/course-tutor-controller/upload-course-promotion-image-request';
 
 @Injectable({
   providedIn: 'root',
@@ -455,5 +457,72 @@ export class CourseTutorControllerService {
         Authorization: `Bearer ${token}`,
       },
     });
+  }
+
+  getPromotionImage(coursePromotionImageId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<
+      DefaultServerResponse<GetCoursePromotionImageMetadataByIdResponse | null>
+    >(`${this.apiUrl}/promotion/image/${coursePromotionImageId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  uploadCoursePromotionImage(request: UploadCoursePromotionImageRequest) {
+    var token = localStorage.getItem('Authorization');
+
+    const formData = new FormData();
+
+    formData.append('courseId', request.courseId as string);
+
+    if (
+      request.coursePromotionImageId &&
+      request.coursePromotionImageId.trim().length > 0
+    ) {
+      formData.append('coursePromotionImageId', request.coursePromotionImageId);
+    }
+
+    formData.append('image', request.image);
+
+    return this.httpClient
+      .post<DefaultServerResponse>(
+        `${this.apiUrl}/promotion/image/upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          reportProgress: true,
+          observe: 'events',
+        }
+      )
+      .pipe(
+        map((event: HttpEvent<DefaultServerResponse>) => {
+          if (event.type === HttpEventType.UploadProgress) {
+            const progress = event.total
+              ? Math.round((100 * event.loaded) / event.total)
+              : 0;
+            return { progress, response: null };
+          }
+          if (event.type === HttpEventType.Response) {
+            return { progress: 100, response: event.body };
+          }
+          return { progress: 0, response: null };
+        })
+      );
+  }
+
+  deleteCoursePromotionImage(coursePromotionImageId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.delete<DefaultServerResponse<null>>(
+      `${this.apiUrl}/promotion/image/delete/${coursePromotionImageId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
   }
 }

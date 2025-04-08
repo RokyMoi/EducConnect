@@ -286,6 +286,8 @@ namespace EduConnect.Controllers.Course
             var lessonCountResponse = await _courseRepository.GetCourseLessonsCountFilteredByPublishedStatus(courseId);
 
             var latestLessons = await _courseRepository.GetLatestCourseLessons(courseId);
+
+            var promotionImagesMetadata = await _courseRepository.GetCoursePromotionImagesMetadataForCourseManagementDashboard(courseId);
             var response = new CourseManagementDashboardResponse
             {
                 CourseId = course.CourseId,
@@ -306,7 +308,10 @@ namespace EduConnect.Controllers.Course
                 NumberOfPublishedLessons = lessonCountResponse != null ? lessonCountResponse.NumberOfPublishedLessons : 0,
                 NumberOfDraftLessons = lessonCountResponse != null ? lessonCountResponse.NumberOfDraftLessons : 0,
                 NumberOfArchivedLessons = lessonCountResponse != null ? lessonCountResponse.NumberOfArchivedLessons : 0,
-                TwoLatestAddedLessons = latestLessons ?? []
+                TwoLatestAddedLessons = latestLessons ?? [],
+                NumberOfPromotionImages = promotionImagesMetadata.Item1,
+                LatestPromotionImageUploadedAt = promotionImagesMetadata.Item2.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds((long)promotionImagesMetadata.Item2).UtcDateTime : null,
+
 
 
             };
@@ -2036,7 +2041,7 @@ namespace EduConnect.Controllers.Course
                 );
             }
             return Ok(
-                ApiResponse<object>.GetApiResponse("Promotion image uploaded successfully", null)
+                ApiResponse<Guid>.GetApiResponse("Promotion image uploaded successfully", coursePromotionImage.CoursePromotionImageId)
             );
 
 
@@ -2131,6 +2136,26 @@ namespace EduConnect.Controllers.Course
 
 
 
+        }
+
+        [HttpGet("promotion/image/{coursePromotionImageId}")]
+        public async Task<IActionResult> GetCoursePromotionImageById(Guid coursePromotionImageId)
+        {
+            var image = await _courseRepository.GetCoursePromotionImageMetadataById(coursePromotionImageId);
+
+            if (image == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Promotion image not found",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<GetCoursePromotionImageMetadataByIdResponse?>.GetApiResponse("Promotion image retrieved successfully", image)
+            );
         }
     }
 

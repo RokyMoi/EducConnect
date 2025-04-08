@@ -2,16 +2,46 @@
     <h2>Course Promotion Images</h2>
     <div class="action-buttons-container">
         <button class="go-back-button" (click)="goBack()">← Go Back</button>
-        <button class="publish-course-button">Add New Image</button>
+        <!-- Add view toggle buttons -->
+        <button class="view-toggle" (click)="isGridView = true" [class.active]="isGridView">Grid View</button>
+        <button class="view-toggle" (click)="isGridView = false" [class.active]="!isGridView">Slideshow</button>
+        <button class="publish-course-button" *ngIf="coursePromotionImages.length < 5" (click)="onAddNewImage()">Add New
+            Image</button>
     </div>
 
-    <div class="images-grid">
+    <!-- Grid View -->
+    <div class="images-grid" *ngIf="isGridView">
         <div class="image-wrapper" *ngFor="let image of coursePromotionImages">
             <div class="date">
                 {{ (image.uploadedAt) | date:'medium' }}
             </div>
             <img [src]="getImageLink(image.coursePromotionImageId)" alt="Promotion image" class="promo-image" />
-            <button>View Details</button>
+            <button class="view-details-btn" (click)="onViewDetails(image.coursePromotionImageId)">View Details</button>
         </div>
+    </div>
+
+    <!-- Slideshow View -->
+    <div class="images-slideshow" *ngIf="!isGridView && coursePromotionImages.length > 0">
+        <div class="image-wrapper">
+            <div class="date">
+                {{coursePromotionImages[imageCounter].uploadedAt | date:'medium'}}
+            </div>
+            <label>Image {{imageCounter + 1}} of {{coursePromotionImages.length}}</label>
+            <img [src]="currentImageLink" alt="Promotion image" class="promo-image" />
+            <button class="view-details-btn">View Details</button>
+            <div class="slideshow-controls">
+                <button (click)="getPreviousImageLink()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button (click)="getNextImageLink()">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Show message when no images -->
+    <div *ngIf="coursePromotionImages.length === 0" class="no-images">
+        No promotion images available
     </div>
 </div>

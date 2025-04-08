@@ -112,5 +112,9 @@ namespace EduConnect.Interfaces.Course
         Task<bool> DeleteCoursePromotionImageById(Guid coursePromotionImageId);
 
         Task<List<GetCoursePromotionImagesMetadataResponse>> GetCoursePromotionImagesMetadataByCourseId(Guid courseId);
+
+        Task<GetCoursePromotionImageMetadataByIdResponse?> GetCoursePromotionImageMetadataById(Guid coursePromotionImageId);
+
+        Task<(int, long?)> GetCoursePromotionImagesMetadataForCourseManagementDashboard(Guid courseId);
     }
 }

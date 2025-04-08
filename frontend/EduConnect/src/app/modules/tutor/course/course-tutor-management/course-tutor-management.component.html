@@ -124,17 +124,19 @@
         <div class="management-card">
             <div class="card-header">
                 <h2><i class="fas fa-images"></i>Promotion Images</h2>
-                <button class="add-btn">Add Image</button>
-                <button class="edit-btn" (click)="onViewPromotionImages()">View Images</button>
+                <button class="add-btn" *ngIf="dashboardInfo.numberOfPromotionImages === 0">Add Image</button>
+                <button class="edit-btn" *ngIf="dashboardInfo.numberOfPromotionImages > 0"
+                    (click)="onViewPromotionImages()">View Images</button>
             </div>
             <div class="card-content">
                 <div class="sample-data">
                     <p><strong>Promotion Images Metadata:</strong></p>
-                    <p>Number of images: 0</p>
-                    <p>Last uploaded on: 24.05.2025.</p>
+                    <p>Number of images: {{dashboardInfo.numberOfPromotionImages}}</p>
+                    <p *ngIf="dashboardInfo.latestPromotionImageUploadedAt">Last image uploaded on:
+                        {{dashboardInfo.latestPromotionImageUploadedAt | date:"dd.MM.yyyy."}}</p>
                 </div>
-                <div class="quick-actions">
-                    <button class="icon-btn">
+                <div class="quick-actions" *ngIf="dashboardInfo.numberOfPromotionImages < 5">
+                    <button class="icon-btn" (click)="onAddNewImage()">
                         <i class="fas fa-add"></i> Add New Image
                     </button>
 

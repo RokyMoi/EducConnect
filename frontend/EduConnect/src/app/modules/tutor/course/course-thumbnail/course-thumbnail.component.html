@@ -67,14 +67,14 @@
             <button class="save-action-button" (click)="onSaveThumbnail()">Save</button>
         </div>
     </div>
-    <app-custom-header-ng-content-dialog-box *ngIf="showSaveDialog">
+    <app-custom-header-ng-content-dialog-box *ngIf="showSaveDialog" [title]="'Save Changes'">
         <p>{{saveDialogMessage}}</p>
         <div class="dialog-actions">
             <button class="cancel-button" (click)="onCancelSaveDialog()">Cancel</button>
             <button class="confirm-button" (click)="saveThumbnail()">Confirm</button>
         </div>
     </app-custom-header-ng-content-dialog-box>
-    <app-custom-header-ng-content-dialog-box *ngIf="showRemoveDialog">
+    <app-custom-header-ng-content-dialog-box *ngIf="showRemoveDialog" [title]="'Delete Image'">
         <p>Are you sure you want to remove the thumbnail for this course?</p>
         <div class="dialog-actions">
             <button class="cancel-button" (click)="onCancelRemoveDialog()">Cancel</button>

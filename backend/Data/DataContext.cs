@@ -16,6 +16,7 @@ using EduConnect.Entities.Shopping;
 using EduConnect.Entities.Course;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using EduConnect.Controllers.Course;
 
 namespace EduConnect.Data;
 
@@ -76,7 +77,7 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<CoursePromotionImage> CoursePromotionImage { get; set; }
 
-
+    public DbSet<CourseViewershipData> CourseViewershipData { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

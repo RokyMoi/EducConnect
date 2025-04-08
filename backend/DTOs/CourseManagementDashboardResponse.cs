@@ -37,6 +37,9 @@ namespace EduConnect.DTOs
 
         public List<GetCourseLessonByIdResponse> TwoLatestAddedLessons { get; set; } = new List<GetCourseLessonByIdResponse>();
 
+        public int NumberOfPromotionImages { get; set; } = 0;
+        public DateTime? LatestPromotionImageUploadedAt { get; set; }
+
 
 
     }

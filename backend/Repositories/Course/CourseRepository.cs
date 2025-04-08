@@ -509,6 +509,26 @@ namespace EduConnect.Repositories.Course
             .FirstOrDefaultAsync();
         }
 
+        public async Task<GetCoursePromotionImageMetadataByIdResponse?> GetCoursePromotionImageMetadataById(Guid coursePromotionImageId)
+        {
+            return await _dataContext
+            .CoursePromotionImage
+            .Include(x => x.Course)
+            .Where(
+                x => x.CoursePromotionImageId == coursePromotionImageId
+            )
+            .Select(
+                x => new GetCoursePromotionImageMetadataByIdResponse
+                {
+                    CoursePromotionImageId = x.CoursePromotionImageId,
+                    CourseId = x.CourseId,
+                    CourseTitle = x.Course.Title,
+                    UploadedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).UtcDateTime : DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime
+                }
+            )
+            .FirstOrDefaultAsync();
+        }
+
         public async Task<List<GetCoursePromotionImagesMetadataResponse>> GetCoursePromotionImagesMetadataByCourseId(Guid courseId)
         {
             return await _dataContext
@@ -524,6 +544,23 @@ namespace EduConnect.Repositories.Course
                     UploadedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).UtcDateTime : DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime
                 }
             ).ToListAsync();
+        }
+
+        public async Task<(int, long?)> GetCoursePromotionImagesMetadataForCourseManagementDashboard(Guid courseId)
+        {
+            var query = _dataContext.CoursePromotionImage
+            .Where(x => x.CourseId == courseId);
+
+            var result = await query
+            .GroupBy(x => 1)
+            .Select(group => new
+            {
+                TotalCount = group.Count(),
+                LatestUploadedAt = group.Max(x => x.UpdatedAt ?? x.CreatedAt)
+            })
+            .FirstOrDefaultAsync();
+
+            return (result?.TotalCount ?? 0, result?.LatestUploadedAt ?? null);
         }
 
         public async Task<GetCourseRequirementsByCourseIdResponseFromRepository?> GetCourseRequirementsByCourseId(Guid courseId)
