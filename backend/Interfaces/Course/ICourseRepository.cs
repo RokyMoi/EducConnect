@@ -110,5 +110,7 @@ namespace EduConnect.Interfaces.Course
         Task<bool> IsTutorCoursePromotionImageOwner(Guid imageId, Guid tutorId);
 
         Task<bool> DeleteCoursePromotionImageById(Guid coursePromotionImageId);
+
+        Task<List<GetCoursePromotionImagesMetadataResponse>> GetCoursePromotionImagesMetadataByCourseId(Guid courseId);
     }
 }

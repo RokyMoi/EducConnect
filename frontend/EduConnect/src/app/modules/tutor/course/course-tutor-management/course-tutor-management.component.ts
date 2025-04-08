@@ -113,4 +113,8 @@ export class CourseTutorManagementComponent implements OnInit {
   onAddNewLesson() {
     this.router.navigate(['/tutor/course/lessons/new', this.courseId]);
   }
+
+  onViewPromotionImages() {
+    this.router.navigate(['/tutor/course/promotion', this.courseId]);
+  }
 }

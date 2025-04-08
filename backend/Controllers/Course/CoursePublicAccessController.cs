@@ -58,6 +58,25 @@ namespace EduConnect.Controllers.Course
 
         }
 
-        
+        [HttpGet("promotion/image/{imageId}")]
+        public async Task<IActionResult> GetCoursePromotionImage([FromRoute] Guid imageId)
+        {
+            var coursePromotionImage = await _courseRepository.GetCoursePromotionImageById(imageId);
+
+            if (coursePromotionImage == null)
+            {
+
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course promotion image not found",
+                        null
+                    )
+                );
+            }
+
+            return File(coursePromotionImage.ImageFile, coursePromotionImage.ContentType);
+        }
+
+
     }
 }

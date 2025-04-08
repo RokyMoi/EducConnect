@@ -2107,8 +2107,33 @@ namespace EduConnect.Controllers.Course
 
         }
 
-        
+
+        [HttpGet("promotion/image/all")]
+        public async Task<IActionResult> GetPromotionImages([FromQuery] Guid courseId)
+        {
+            var courseExists = await _courseRepository.CourseExistsById(courseId);
+
+            if (!courseExists)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course not found",
+                        null
+                    )
+                );
+            }
+
+            var coursePromotionImagesMetadata = await _courseRepository.GetCoursePromotionImagesMetadataByCourseId(courseId);
+
+            return Ok(
+                ApiResponse<List<GetCoursePromotionImagesMetadataResponse>>.GetApiResponse("Promotion images retrieved successfully", coursePromotionImagesMetadata)
+            );
+
+
+
+        }
     }
+
 
 
 }

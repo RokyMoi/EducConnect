@@ -509,6 +509,23 @@ namespace EduConnect.Repositories.Course
             .FirstOrDefaultAsync();
         }
 
+        public async Task<List<GetCoursePromotionImagesMetadataResponse>> GetCoursePromotionImagesMetadataByCourseId(Guid courseId)
+        {
+            return await _dataContext
+            .CoursePromotionImage
+            .Where(
+                x => x.CourseId == courseId
+            )
+            .Select(
+                x => new GetCoursePromotionImagesMetadataResponse
+                {
+                    CoursePromotionImageId = x.CoursePromotionImageId,
+                    CourseId = x.CourseId,
+                    UploadedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).UtcDateTime : DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime
+                }
+            ).ToListAsync();
+        }
+
         public async Task<GetCourseRequirementsByCourseIdResponseFromRepository?> GetCourseRequirementsByCourseId(Guid courseId)
         {
             return await _dataContext.Course
