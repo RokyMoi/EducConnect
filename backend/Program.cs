@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using EduConnect.Services;
 
 namespace EduConnect
 {
@@ -49,6 +50,25 @@ namespace EduConnect
 
 
             builder.Services.AddControllers();
+
+            //Add SignalR services
+            builder.Services.AddSignalR(
+                options =>
+                {
+                    options.EnableDetailedErrors = true;
+                    options.ClientTimeoutInterval = TimeSpan.FromMinutes(1);
+                }
+            ).AddHubOptions<CourseAnalyticsHub>(
+                options =>
+                {
+                    options.EnableDetailedErrors = true;
+                    options.MaximumReceiveMessageSize = 65_536; //64KB
+                }
+            );
+
+            builder.Services.AddSingleton<ViewershipUpdateBufferService>();
+            builder.Services.AddHostedService<ViewershipChangeService>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(
@@ -174,6 +194,11 @@ namespace EduConnect
                 }
             }
 
+            app.MapHub<CourseAnalyticsHub>("/tutor/course/analytics/hub", options =>
+            {
+                options.ApplicationMaxBufferSize = 65_536;
+                options.TransportMaxBufferSize = 65_536;
+            });
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -184,6 +209,8 @@ namespace EduConnect
                     options.EnablePersistAuthorization();
                 });
             }
+
+
 
             app.UseHttpsRedirection();
 

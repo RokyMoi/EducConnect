@@ -116,5 +116,9 @@ namespace EduConnect.Interfaces.Course
         Task<GetCoursePromotionImageMetadataByIdResponse?> GetCoursePromotionImageMetadataById(Guid coursePromotionImageId);
 
         Task<(int, long?)> GetCoursePromotionImagesMetadataForCourseManagementDashboard(Guid courseId);
+
+        Task<bool> CreateCourseViewershipData(CourseViewershipData courseViewershipData);
+        Task<CourseViewershipData?> GetCourseViewershipDataById(Guid courseViewershipDataId);
+        Task<bool> UpdateCourseViewershipData(CourseViewershipData courseViewershipData);
     }
 }

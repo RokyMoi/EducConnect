@@ -5,6 +5,7 @@ import { CourseStudentControllerService } from '../../../../services/course/cour
 import { GetCoursesByQueryResponse } from '../../../../models/course/course-student-controller/get-courses-by-query-response';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { UserCourseSourceType } from '../../../../../enums/user-course-source-type.enum';
 
 @Component({
   selector: 'app-student-course-search',
@@ -93,7 +94,19 @@ export class StudentCourseSearchComponent implements OnInit {
   }
 
   onViewCourse(courseId: string) {
-    this.router.navigate(['/student/course/details', courseId]);
+    this.courseStudentControllerService
+      .addCourseViewershipData({
+        courseId: courseId,
+        userCameFrom: UserCourseSourceType.Search,
+        clickedOn: new Date().toISOString(),
+      })
+      .subscribe((response) => {
+        console.log('Course  viewership data response:', response);
+        if (response.data) {
+          localStorage.setItem('viewId', response.data);
+        }
+        this.router.navigate(['/student/course/details', courseId]);
+      });
   }
 
   onSearch($event: any) {

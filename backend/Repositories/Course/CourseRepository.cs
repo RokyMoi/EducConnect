@@ -188,6 +188,23 @@ namespace EduConnect.Repositories.Course
             }
         }
 
+        public async Task<bool> CreateCourseViewershipData(CourseViewershipData courseViewershipData)
+        {
+            try
+            {
+                await _dataContext.CourseViewershipData.AddAsync(courseViewershipData);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to create course viewership data " + courseViewershipData.CourseId);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
         public async Task<bool> DeleteCourseLessonResourceById(Guid courseLessonResourceId)
         {
             var courseLessonResource = await _dataContext.CourseLessonResource.Where(x => x.CourseLessonResourceId == courseLessonResourceId).FirstOrDefaultAsync();
@@ -721,6 +738,11 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.CourseThumbnail.Include(x => x.Course).Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
         }
 
+        public async Task<CourseViewershipData?> GetCourseViewershipDataById(Guid courseViewershipDataId)
+        {
+            return await _dataContext.CourseViewershipData.Where(x => x.CourseViewershipDataId == courseViewershipDataId).FirstOrDefaultAsync();
+        }
+
         public async Task<List<GetCourseLessonByIdResponse>> GetLatestCourseLessons(Guid courseId)
         {
             return await _dataContext
@@ -961,6 +983,23 @@ namespace EduConnect.Repositories.Course
             {
 
                 Console.WriteLine("Failed to update course thumbnail " + courseThumbnail.CourseId);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateCourseViewershipData(CourseViewershipData courseViewershipData)
+        {
+            try
+            {
+                _dataContext.CourseViewershipData.Update(courseViewershipData);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to update course viewership data " + courseViewershipData.CourseId);
                 Console.WriteLine(ex);
                 return false;
             }

@@ -6,6 +6,7 @@ import { DefaultServerResponse } from '../../models/shared/default-server-respon
 import { GetCoursesByQueryResponse } from '../../models/course/course-student-controller/get-courses-by-query-response';
 import ApiLinks from '../../../assets/api/link.api';
 import { DefaultServerPaginatedResponse } from '../../models/shared/default-server-paginated-response';
+import { AddCourseViewershipDataRequest } from '../../models/course/course-student-controller/add-course-viewership-data-request';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +40,50 @@ export class CourseStudentControllerService {
           Authorization: `Bearer ${token}`,
         },
         params: params,
+      }
+    );
+  }
+
+  public addCourseViewershipData(request: AddCourseViewershipDataRequest) {
+    const token = localStorage.getItem('Authorization');
+    console.log('Adding course viewership data:', request);
+    return this.http.post<DefaultServerResponse>(
+      `${ApiLinks.CourseStudentControllerUrl}/analytics`,
+      request,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  public setEnteredOnCourseViewershipData() {
+    const token = localStorage.getItem('Authorization');
+    const viewId = localStorage.getItem('viewId');
+
+    return this.http.patch<DefaultServerResponse>(
+      `${ApiLinks.CourseStudentControllerUrl}/analytics/entered?courseViewershipDataId=${viewId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  public setLeftOnCourseViewershipData() {
+    const token = localStorage.getItem('Authorization');
+    const viewId = localStorage.getItem('viewId');
+
+    return this.http.patch<DefaultServerResponse>(
+      `${ApiLinks.CourseStudentControllerUrl}/analytics/exited?courseViewershipDataId=${viewId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
   }

@@ -13,10 +13,8 @@ using backend.Entities.Reference.Language;
 using backend.Entities.Course;
 using EduConnect.Entities.Messenger;
 using EduConnect.Entities.Shopping;
-using EduConnect.Entities.Course;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using EduConnect.Controllers.Course;
 
 namespace EduConnect.Data;
 

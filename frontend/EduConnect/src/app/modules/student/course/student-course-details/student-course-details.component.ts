@@ -27,9 +27,30 @@ export class StudentCourseDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getCourse();
+    this.courseStudentControllerService
+      .setEnteredOnCourseViewershipData()
+      .subscribe({
+        next: (response) => {
+          console.log(response);
+        },
+        error: (error) => {
+          console.log(error);
+        },
+      });
   }
   goBack() {
-    this.router.navigate(['/student/course/search']);
+    this.courseStudentControllerService
+      .setLeftOnCourseViewershipData()
+      .subscribe({
+        next: (response) => {
+          console.log(response);
+          this.router.navigate(['/student/course/search']);
+        },
+        error: (error) => {
+          console.log(error);
+          this.router.navigate(['/student/course/search']);
+        },
+      });
   }
 
   getCourse() {

@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using backend.Interfaces.Person;
 using backend.Interfaces.Tutor;
 using EduConnect.DTOs;
 using EduConnect.Entities;
+using EduConnect.Entities.Course;
 using EduConnect.Interfaces;
 using EduConnect.Interfaces.Course;
 using EduConnect.Middleware;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EduConnect.Controllers.Course
@@ -18,7 +22,9 @@ namespace EduConnect.Controllers.Course
     public class CourseStudentController(
         ITutorRepository tutorRepository,
         IStudentRepository _studentRepository,
-        ICourseRepository _courseRepository
+        ICourseRepository _courseRepository,
+        IPersonRepository _personRepository,
+        IHttpContextAccessor _httpContextAccessor
 
     ) : ControllerBase
     {
@@ -50,6 +56,78 @@ namespace EduConnect.Controllers.Course
             }
 
             return Ok(new ApiResponse<GetCoursesByQueryResponse>("Course retrieved successfully", course));
+        }
+
+        [HttpPost("analytics")]
+        public async Task<IActionResult> AddCourseViewershipData([FromBody] AddCourseViewershipDataRequest request)
+        {
+            var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+
+            var nameIdentifierClaim = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            Console.WriteLine(nameIdentifierClaim);
+
+            if (string.IsNullOrEmpty(nameIdentifierClaim.Value) || !Guid.TryParse(nameIdentifierClaim.Value, out var publicPersonId))
+            {
+                return Ok();
+            }
+
+            var person = await _personRepository.GetPersonByPublicPersonId(Guid.Parse(nameIdentifierClaim.Value));
+
+            var courseViewershipData = new CourseViewershipData
+            {
+                ViewedByPersonId = person.PersonId,
+                ClickedOn = request.ClickedOn,
+                CourseId = request.CourseId,
+                UserCameFrom = request.UserCameFrom,
+
+            };
+            var createResult = await _courseRepository.CreateCourseViewershipData(courseViewershipData);
+            return Ok(
+                ApiResponse<Guid>.GetApiResponse(
+                    "Course viewership data added successfully",
+                    courseViewershipData.CourseViewershipDataId
+                )
+            );
+        }
+
+        [HttpPatch("analytics/entered")]
+        public async Task<IActionResult> SetEnteredOnCourseViewershipData([FromQuery] Guid courseViewershipDataId)
+        {
+            var courseViewershipData = await _courseRepository.GetCourseViewershipDataById(courseViewershipDataId);
+
+            if (courseViewershipData == null)
+            {
+                return Ok();
+            }
+
+            courseViewershipData.EnteredDetailsAt = DateTime.UtcNow;
+            courseViewershipData.UpdatedAt = DateTime.UtcNow.ToUnixTimeMilliseconds();
+            var updateResult = await _courseRepository.UpdateCourseViewershipData(courseViewershipData);
+
+            Console.WriteLine("Update course viewership data result: " + updateResult);
+
+            return Ok();
+
+        }
+
+        [HttpPatch("analytics/exited")]
+        public async Task<IActionResult> SetLeftOnCourseViewershipData([FromQuery] Guid courseViewershipDataId)
+        {
+            var courseViewershipData = await _courseRepository.GetCourseViewershipDataById(courseViewershipDataId);
+
+            if (courseViewershipData == null)
+            {
+                return Ok();
+            }
+
+            courseViewershipData.LeftDetailsAt = DateTime.UtcNow;
+            courseViewershipData.UpdatedAt = DateTime.UtcNow.ToUnixTimeMilliseconds();
+            var updateResult = await _courseRepository.UpdateCourseViewershipData(courseViewershipData);
+
+            Console.WriteLine("Update course viewership data result: " + updateResult);
+
+            return Ok();
+
         }
     }
 }

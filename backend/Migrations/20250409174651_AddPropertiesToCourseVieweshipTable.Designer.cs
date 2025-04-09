@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250409174651_AddPropertiesToCourseVieweshipTable")]
+    partial class AddPropertiesToCourseVieweshipTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -463,40 +466,31 @@ namespace EduConnect.Migrations
                 {
                     b.Property<Guid>("CourseViewershipDataId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("CourseViewershipDataId");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ClickedOn")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("ClickedOn");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("CourseId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("CourseId");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint")
-                        .HasColumnName("CreatedAt");
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime?>("EnteredDetailsAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("EnteredDetailsAt");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("LeftDetailsAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("LeftDetailsAt");
+                        .HasColumnType("datetime2");
 
                     b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint")
-                        .HasColumnName("UpdatedAt");
+                        .HasColumnType("bigint");
 
                     b.Property<int>("UserCameFrom")
-                        .HasColumnType("int")
-                        .HasColumnName("UserCameFrom");
+                        .HasColumnType("int");
 
                     b.Property<Guid>("ViewedByPersonId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ViewedByPersonId");
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("CourseViewershipDataId");
 
