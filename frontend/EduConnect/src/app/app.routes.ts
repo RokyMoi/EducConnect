@@ -53,6 +53,7 @@ import { StudentCourseSearchComponent } from './modules/student/course/student-c
 import { StudentCourseDetailsComponent } from './modules/student/course/student-course-details/student-course-details.component';
 import { CourseTutorPromotionImagesComponent } from './modules/tutor/course/course-tutor-promotion-images/course-tutor-promotion-images.component';
 import { CoursePromotionImagesDetailsComponent } from './modules/tutor/course/course-promotion-images-details/course-promotion-images-details.component';
+import { CourseTutorAnalyticsDashboardComponent } from './modules/tutor/course/course-tutor-analytics-dashboard/course-tutor-analytics-dashboard.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -237,6 +238,12 @@ export const routes: Routes = [
   {
     path: 'tutor/course/promotion/details/:courseId/:imageId',
     component: CoursePromotionImagesDetailsComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/course/analytics/:courseId',
+    component: CourseTutorAnalyticsDashboardComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'tutor' },
   },
