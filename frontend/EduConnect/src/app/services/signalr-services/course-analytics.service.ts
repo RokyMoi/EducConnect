@@ -3,52 +3,52 @@ import * as signalR from '@microsoft/signalr';
 import { Subject } from 'rxjs';
 import { CourseViewershipUpdate } from '../../models/course/course-analytics-hub/course-viewership-update';
 import { CourseStatistics } from '../../models/course/course-analytics-hub/course-statistics';
+import ApiLinks from '../../../assets/api/link.api';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CourseAnalyticsService {
-  public connection: signalR.HubConnection;
-  private _updates = new Subject<CourseViewershipUpdate>();
+  private connection!: signalR.HubConnection;
+  private isConnectionReady: boolean = false;
+  private pendingSubscriptions: number[] = [];
 
-  public get updates$() {
-    return this._updates.asObservable();
-  }
-
+  /**
+   *
+   */
   constructor() {
-    this.connection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5177/tutor/course/analytics/hub')
-      .withAutomaticReconnect()
-      .build();
+    this.startConnection();
   }
+  public startConnection = () => {
+    this.connection = new signalR.HubConnectionBuilder()
+      .withUrl(`http://localhost:5177/course-analytics-hub`)
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
 
-  public startConnection(): Promise<void> {
-    return this.connection
+    this.connection
       .start()
       .then(() => {
-        console.log('Course Analytics SignalR Hub Connected');
-        this.registerListeners();
+        console.log('Connection started');
+        // Invoke the server-side method after the connection is started
       })
-      .catch((error) =>
-        console.error('Course Analytics SignalR Hub Connection Error:', error)
-      );
-  }
-
-  private registerListeners(): void {
-    this.connection.on('UpdateViewership', (update: CourseViewershipUpdate) => {
-      this._updates.next(update);
+      .catch((err) => {
+        console.log('Error while starting connection: ' + err);
+      });
+  };
+  public requestAnalyticsData = (courseId: string) => {
+    if (this.connection.state === signalR.HubConnectionState.Connected) {
+      this.connection
+        .invoke('SendAnalyticsData', courseId) // Call the server-side method
+        .catch((err) => {
+          console.error('Error invoking SendAnalyticsData', err);
+        });
+    } else {
+      console.warn('SignalR connection not established yet.');
+    }
+  };
+  public getAnalyticsData = (callback: (message: string) => void) => {
+    this.connection.on('GetAnalyticsData', (data) => {
+      callback(data);
     });
-
-    this.connection.on('BatchUpdate', (updates: CourseViewershipUpdate[]) => {
-      updates.forEach((update) => this._updates.next(update));
-    });
-  }
-
-  public subscribeToCourse(courseId: string): Promise<void> {
-    return this.connection.invoke('SubscribeToCourse', courseId);
-  }
-
-  public get currentState(): Promise<CourseStatistics> {
-    return this.connection.invoke('GetCurrentState');
-  }
+  };
 }

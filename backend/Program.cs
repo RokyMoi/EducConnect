@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using EduConnect.Services;
+using Microsoft.AspNetCore.Builder;
 
 namespace EduConnect
 {
@@ -51,23 +52,8 @@ namespace EduConnect
 
             builder.Services.AddControllers();
 
-            //Add SignalR services
-            builder.Services.AddSignalR(
-                options =>
-                {
-                    options.EnableDetailedErrors = true;
-                    options.ClientTimeoutInterval = TimeSpan.FromMinutes(1);
-                }
-            ).AddHubOptions<CourseAnalyticsHub>(
-                options =>
-                {
-                    options.EnableDetailedErrors = true;
-                    options.MaximumReceiveMessageSize = 65_536; //64KB
-                }
-            );
+            builder.Services.AddSignalR();
 
-            builder.Services.AddSingleton<ViewershipUpdateBufferService>();
-            builder.Services.AddHostedService<ViewershipChangeService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -194,11 +180,7 @@ namespace EduConnect
                 }
             }
 
-            app.MapHub<CourseAnalyticsHub>("/tutor/course/analytics/hub", options =>
-            {
-                options.ApplicationMaxBufferSize = 65_536;
-                options.TransportMaxBufferSize = 65_536;
-            });
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -214,6 +196,8 @@ namespace EduConnect
 
             app.UseHttpsRedirection();
 
+            app.UseRouting();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -228,7 +212,7 @@ namespace EduConnect
             }
 
             app.MapControllers();
-
+            app.MapHub<CourseAnalyticsHub>("/course-analytics-hub");
 
             using (var scope = app.Services.CreateScope())
             {

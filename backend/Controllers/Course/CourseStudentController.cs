@@ -11,6 +11,7 @@ using EduConnect.Entities.Course;
 using EduConnect.Interfaces;
 using EduConnect.Interfaces.Course;
 using EduConnect.Middleware;
+using EduConnect.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -81,6 +82,10 @@ namespace EduConnect.Controllers.Course
                 UserCameFrom = request.UserCameFrom,
 
             };
+
+            Console.WriteLine($"Add CourseViewershipData for " + person.PersonId + " for course " + request.CourseId + " with following properties: ");
+            PrintObjectUtility.PrintObjectProperties(courseViewershipData);
+
             var createResult = await _courseRepository.CreateCourseViewershipData(courseViewershipData);
             return Ok(
                 ApiResponse<Guid>.GetApiResponse(
@@ -102,6 +107,8 @@ namespace EduConnect.Controllers.Course
 
             courseViewershipData.EnteredDetailsAt = DateTime.UtcNow;
             courseViewershipData.UpdatedAt = DateTime.UtcNow.ToUnixTimeMilliseconds();
+
+            Console.WriteLine("Set Student CourseViewershipData EnteredOn: " + courseViewershipData.EnteredDetailsAt + " for " + courseViewershipData.CourseViewershipDataId);
             var updateResult = await _courseRepository.UpdateCourseViewershipData(courseViewershipData);
 
             Console.WriteLine("Update course viewership data result: " + updateResult);
