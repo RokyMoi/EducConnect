@@ -77,7 +77,7 @@ public class PaymentController : ControllerBase
                     Currency = "usd",
                     ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
-                        Name = course.CourseName,
+                        Name = course.Title,
                         Description = course.CourseDetails.CourseDescription
                     },
                     UnitAmount = (long)(course.CourseDetails.Price * 100) // convert dollars to cents

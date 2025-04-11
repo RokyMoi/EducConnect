@@ -9,16 +9,10 @@ using EduConnect.Entities.Shopping;
 
 namespace EduConnect.Services
 {
-    public class WishlistService : IWishlistService
+    public class WishlistService(DataContext _context) : IWishlistService
     {
-        private readonly DataContext _context;
-        private readonly IShoppingCartService _shoppingCartService;
-
-        public WishlistService(DataContext context, IShoppingCartService shoppingCartService)
-        {
-            _context = context;
-            _shoppingCartService = shoppingCartService;
-        }
+       
+       
 
         private async Task<Student> GetStudentByEmailAsync(string email)
         {
@@ -111,34 +105,41 @@ namespace EduConnect.Services
         {
             var student = await GetStudentByEmailAsync(email);
 
+            // Dohvat wishlist-a studenta
             var wishlist = await _context.WishList
                 .Include(w => w.Items)
                 .FirstOrDefaultAsync(w => w.StudentID == student.StudentId)
                 ?? throw new InvalidOperationException("Wishlist not found for student");
 
+            // Dohvat kursa na osnovu courseId-a
             var course = await _context.Course.FindAsync(courseId)
                 ?? throw new ArgumentException("Course not found");
 
-            // Remove from wishlist
+            // Uklanjanje kursa iz wishlist-a
             if (!wishlist.Items.Remove(course))
             {
-                return false;
+                return false; // Ako kurs nije pronađen u wishlist-u
             }
 
-            // Add to shopping cart
-            bool addedToCart = await _shoppingCartService.AddCourseToShoppingCartAsync(email, courseId);
+            // Dohvat shopping cart-a studenta
+            var shoppingCart = await _context.ShoppingCart
+                .Include(sc => sc.Items)
+                .FirstOrDefaultAsync(sc => sc.StudentID == student.StudentId)
+                ?? throw new InvalidOperationException("Shopping cart not found for student");
 
-            if (addedToCart)
+            // Dodavanje kursa u shopping cart ako nije već prisutan
+            if (!shoppingCart.Items.Contains(course))
             {
+                shoppingCart.Items.Add(course);
                 await _context.SaveChangesAsync();
                 return true;
             }
 
-            // If adding to cart fails, add back to wishlist
+            // Ako je kurs već u shopping cart-u, vraćamo ga nazad u wishlist
             wishlist.Items.Add(course);
             await _context.SaveChangesAsync();
 
-            return false;
+            return false; // Kurs je već bio u shopping cart-u
         }
 
         public async Task<Wishlist?> GetWishlistForStudentAsync(string email)
