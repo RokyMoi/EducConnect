@@ -27,6 +27,7 @@ namespace EduConnect.Entities.Course
 
         public long? UpdatedAt { get; set; } = null;
 
+        public CourseDetails CourseDetails { get; set; }
 
 
 

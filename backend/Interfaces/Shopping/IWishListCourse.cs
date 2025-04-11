@@ -2,11 +2,12 @@
 
 namespace EduConnect.Interfaces.Shopping
 {
-    public interface IWishListCourse
+    public interface IWishlistService
     {
-        public Task<WishList> CreateWishListCartAsync(string email);
-        public Task<bool> DeleteWishlistItemAsync(string email, Guid courseID);
-        public Task<WishList?> GetWishListForStudentAsync(string email);
-        public Task<bool> SetWishlistAsync(string email, Guid courseID);
+        Task<Wishlist> CreateWishlistAsync(string email);
+        Task<bool> AddCourseToWishlistAsync(string email, Guid courseId);
+        Task<bool> RemoveCourseFromWishlistAsync(string email, Guid courseId);
+        Task<bool> MoveCourseToShoppingCartAsync(string email, Guid courseId);
+        Task<Wishlist?> GetWishlistForStudentAsync(string email);
     }
 }

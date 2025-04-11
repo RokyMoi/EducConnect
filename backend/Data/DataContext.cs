@@ -36,12 +36,15 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<TutorRegistrationStatus> TutorRegistrationStatus { get; set; }
     public DbSet<Student> Student { get; set; }
     public DbSet<Message> Message { get; set; }
+
     public DbSet<StudentDetails> StudentDetails { get; set; }
 
     public DbSet<Country> Country { get; set; }
     public DbSet<Course> Course { get; set; }
+ //SHOPPING PARTA
     public DbSet<ShoppingCart> ShoppingCart { get; set; }
-    public DbSet<WishList> WishList { get; set; }
+    public DbSet<Wishlist> WishList { get; set; }
+    public DbSet<StudentEnrollment> StudentEnrollment { get; set; }
 
 
 

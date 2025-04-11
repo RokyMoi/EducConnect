@@ -82,7 +82,8 @@ namespace EduConnect.Extensions
             services.AddAutoMapper(typeof(AutoMapperProfiles));
             /////////SHOPPING SERVICES
             services.AddScoped<IShoppingCartService,ShoppingCartService>();
-            services.AddScoped<IWishListCourse, WishListService>();
+            services.AddScoped<IWishlistService, WishlistService>();
+            services.AddScoped<IStudentEnrollmentService, StudentEnrollmentService>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 

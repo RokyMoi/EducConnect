@@ -31,6 +31,7 @@ import { CartItemsComponent } from './ShoppingCart/cart-items/cart-items.compone
 import { WishlistComponent } from './ShoppingCart/wishlist/wishlist.component';
 import { CreateCourseComponent } from './tutor/course/create-course/create-course.component';
 import { CourseSupportedLanguagesComponent } from './tutor/course/course-supported-languages/course-supported-languages.component';
+import {CoursePreviewComponent} from './Student/course-preview/course-preview.component';
 
 export const routes: Routes = [
   { path: '', component: BodyComponent },
@@ -51,6 +52,7 @@ export const routes: Routes = [
   {path: 'Shopping-Cart', component: CartItemsComponent},
   {path: 'course-wishlist', component: WishlistComponent},
   {path: 'ListOfUsers', component: ListOfUsersComponent},
+  {path: 'course-preview', component: CoursePreviewComponent},
 
   {
     path: 'signup/phone-number',

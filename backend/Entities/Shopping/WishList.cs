@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using EduConnect.Entities.Course;
+using EduConnect.Entities.Student;
 
 namespace EduConnect.Entities.Shopping
 {
-    public class WishList
+    public class Wishlist
     {
         [Key]
-        public required Guid WishListId { get; set; }
-
+        public required Guid WishlistID { get; set; }
 
         public ICollection<Course.Course> Items { get; set; } = new List<Course.Course>();
 
