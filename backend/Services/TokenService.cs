@@ -22,9 +22,16 @@ namespace EduConnect.Services
 
         public async Task<AuthenticationToken?> CreateTokenAsync(Person person)
         {
+            var personId = person.PersonPublicId;
+            var email = db.PersonEmail.Where(x => x.PersonId == person.PersonId).FirstOrDefault();
+            var role = await GetRole(email);
+
             var claims = new List<Claim>()
             {
-                new (ClaimTypes.NameIdentifier, person.PersonPublicId.ToString())
+                new (ClaimTypes.NameIdentifier, person.PersonPublicId.ToString()),
+                new (ClaimTypes.Email, email.Email),
+                new (ClaimTypes.Role, role)
+
             };
 
 
@@ -99,7 +106,7 @@ namespace EduConnect.Services
 
             return true;
         }
-        public async Task<string> GetRole(Person person)
+        public async Task<string> GetRole(PersonEmail person)
         {
             if (person == null)
             {
@@ -111,18 +118,24 @@ namespace EduConnect.Services
                 throw new ArgumentException("Invalid PersonId.", nameof(person));
             }
 
-            var userRoles = await _db.UserRoles.Where(x => x.UserId == person.PersonId).FirstOrDefaultAsync();
+            Console.WriteLine("PersonId from TokenService: " + person.PersonId);
+            var tutor = await _db.Tutor.Where(x => x.PersonId == person.PersonId).FirstOrDefaultAsync();
 
-            if (userRoles == null)
+            Console.WriteLine(tutor != null ? $"Tutor found: {tutor.PersonId}" : "No tutor found");
+            if (tutor != null)
             {
-                Console.WriteLine("User does not have a role");
-                return null;
+                return "tutor";
             }
 
-            var role = await _db.Roles.Where(x => x.Id == userRoles.RoleId).FirstOrDefaultAsync();
+            var student = await _db.Student.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+            if (student != null)
+            {
+                return "student";
+            }
 
-            return role.Name;
+            return "admin";
         }
+
 
         public async Task<bool> ValidateToken(string authenticationToken)
         {
