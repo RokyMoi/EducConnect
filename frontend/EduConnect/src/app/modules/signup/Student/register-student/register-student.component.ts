@@ -94,17 +94,16 @@ export class RegisterStudentComponent implements OnInit {
         email: this.registerForm.get('email')?.value,
         password: this.registerForm.get('password')?.value,
         username: this.registerForm.get('username')?.value,
-        phoneNumberCountryCode: this.registerForm.get(
-          'phoneNumberCountryCode'
-        )?.value,
+        phoneNumberCountryCode: this.registerForm.get('phoneNumberCountryCode')
+          ?.value,
         phoneNumber: this.registerForm.get('phoneNumber')?.value,
-        countryOfOrigin:
-          this.registerForm.get('CountryOfOrigin')?.value,
+        countryOfOrigin: this.registerForm.get('CountryOfOrigin')?.value,
       };
 
       this.accountService.register(requestBody).subscribe({
         next: (response) => {
           console.log('Registration successful:', response);
+          this.routerNav.navigate(['/student/dashboard']);
         },
         error: (err) => {
           console.error('Registration error:', err);
