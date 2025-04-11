@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { HeaderComponent } from './landingPage/header/header.component';
 import { HttpClient } from '@angular/common/http';
 import { BodyComponent } from './landingPage/body/body.component';
 import { ServerHealthCheckService } from './services/server-health-check.service';
@@ -9,18 +8,21 @@ import { ServerOfflineComponent } from './error/server-offline/server-offline.co
 import { RouterModule } from '@angular/router';
 import { AccountService } from './services/account.service';
 import { HeaderTemplateComponent } from './common/header/header-template/header-template.component';
+import { HeaderComponent } from './modules/shared/header/header.component';
+import { SnackboxComponent } from "./modules/shared/snackbox/snackbox.component";
 
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet,
     RouterModule,
-    HeaderComponent,
     CommonModule,
     NgIf,
     ServerOfflineComponent,
     HeaderTemplateComponent,
-  ],
+    HeaderComponent,
+    SnackboxComponent
+],
   standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],

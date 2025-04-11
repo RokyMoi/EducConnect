@@ -15,9 +15,7 @@ public class PersonPassword
     public Person? Person { get; set; }
 
 
-    public byte[] Hash { get; set; } = []; // Prazan niz
-
-    public byte[] Salt { get; set; } = []; // Prazan niz
+    public string PasswordHash { get; set; } 
 
     public long CreatedAt { get; set; }
 

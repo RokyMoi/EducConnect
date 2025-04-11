@@ -2,7 +2,7 @@
     <h2 class="sidebar-title">{{sidebarTitle}}</h2>
     <ul>
         <li *ngFor="let item of sidebarItems; let i = index" (click)="selectOption(item.link, i)"
-            [ngClass]="{ 'selected': selectedOption === i }">
+            [ngClass]="{ 'selected' : i === selectedIndex}">
             {{item.title}}
         </li>
     </ul>

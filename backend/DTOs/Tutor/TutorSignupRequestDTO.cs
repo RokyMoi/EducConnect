@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace backend.DTOs.Tutor
 {
-    public class TutorSignupRequestDTO
+    public class RegisterTutorRequest
     {
         [Required]
         [EmailAddress]
@@ -16,9 +16,6 @@ namespace backend.DTOs.Tutor
         [MinLength(8)]
         public string? Password { get; set; }
 
-        public override string ToString()
-        {
-            return "Email " + this.Email + " Password " + this.Password;
-        }
+
     }
 }

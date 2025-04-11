@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import ApiLinks from '../../../../assets/api/link.api';
-import ITutorRegistrationStatus from '../../../_models/Tutor/tutorRegistrationStatus.tutor';
+import ITutorRegistrationStatus from '../../../models/Tutor/tutorRegistrationStatus.tutor';
 import { AccountService } from '../../account.service';
 import { forkJoin, catchError, of, map, Observable } from 'rxjs';
-import SuccessHttpResponseData from '../../../_models/data/http.response.data/success.http.response.data';
-import ErrorHttpResponseData from '../../../_models/data/http.response.data/error.http.response.data';
+import SuccessHttpResponseData from '../../../models/data/http.response.data/success.http.response.data';
+import ErrorHttpResponseData from '../../../models/data/http.response.data/error.http.response.data';
 
 @Injectable({
   providedIn: 'root',

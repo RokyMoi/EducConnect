@@ -1,0 +1,38 @@
+<div class="dialog-overlay">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            Delete lesson
+
+        </div>
+        <div class="dialog-body">
+            <div class="dialog-message">
+                <p class="warning-question">Are you sure you want to delete lesson with following properties?</p>
+                <p class="warning-note">Deleting the lesson will also delete all data associated with the lesson
+                    (content, files, etc...)</p>
+                <div class="warning-info">
+
+                    <p>Lesson title: {{lessonTitle}}</p>
+                    <p>Lesson tag: #{{lessonTag}}</p>
+                    <p>Lesson position: {{lessonPosition}}</p>
+                    <p>Created at: {{formatDate(createdAt)}}</p>
+                    <p>Number of materials: {{numberOfMaterials}}</p>
+                </div>
+                <div class="delete-operation-status">
+                    <p [style.color]="operationStatusColor" [style.font-size]="'24px'">{{operationStatus}}</p>
+                </div>
+            </div>
+            <div class="button-container">
+                <app-submit-button *ngIf="!isDataTransmissionActive && !isDataTransmissionComplete"
+                    [submitButtonText]="confirmDeleteButtonText" [buttonBackgroundColor]="confirmDeleteButtonColor"
+                    (buttonClick)="confirmDelete()"></app-submit-button>
+                <app-submit-button *ngIf="!isDataTransmissionActive && !isDataTransmissionComplete"
+                    [submitButtonText]="cancelDeleteButtonText" [buttonBackgroundColor]="cancelDeleteButtonColor"
+                    (buttonClick)="closeDialog()"></app-submit-button>
+                <app-submit-button *ngIf="isDataTransmissionComplete" [submitButtonText]="closeButtonText"
+                    [buttonBackgroundColor]="closeButtonColor"
+                    (buttonClick)="closeDialogAndRefreshCourseLessonList()"></app-submit-button>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -3,6 +3,7 @@ using EduConnect.Data;
 using EduConnect.Entities.Person;
 using EduConnect.Entities.Student;
 using EduConnect.Helpers;
+using EduConnect.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -36,8 +37,7 @@ namespace EduConnect.Controllers.Student
 
             using (var hmac = new HMACSHA512())
             {
-                currentPasswordRecord.Hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(input));
-                currentPasswordRecord.Salt = hmac.Key;
+                currentPasswordRecord.PasswordHash = EncryptionUtilities.HashPassword(input);
                 currentPasswordRecord.ModifiedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
                 _db.PersonPassword.Update(currentPasswordRecord);
@@ -47,9 +47,9 @@ namespace EduConnect.Controllers.Student
             return Ok(new { message = "Password successfully changed", timestamp = DateTime.UtcNow });
         }
 
-       
 
-     
+
+
         [HttpPost("ChangeFirstName")]
         [CheckPersonLoginSignup]
         public async Task<ActionResult> ChangeFirstName([FromQuery] string input)

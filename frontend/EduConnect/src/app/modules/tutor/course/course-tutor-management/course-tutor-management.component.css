@@ -1,0 +1,167 @@
+.course-tutor-management-container {
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.action-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.go-back-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.go-back-button:hover {
+  background-color: #0056b3;
+}
+
+.publish-course-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: green;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.publish-course-button:hover {
+  background-color: darkgreen;
+}
+.management-console {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 20px;
+}
+
+.management-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #2196f3;
+  transition: transform 0.2s ease;
+}
+
+.management-card:hover {
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #333;
+}
+
+.card-header i {
+  margin-right: 10px;
+  color: #2196f3;
+}
+
+.card-content {
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+}
+
+.sample-data {
+  color: #666;
+  line-height: 1.6;
+}
+
+.quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: 200px;
+}
+
+.icon-btn {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: #2196f3;
+  color: white;
+  border-color: #2196f3;
+}
+
+.edit-btn,
+.add-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.edit-btn {
+  background: blue;
+  color: white;
+}
+
+.add-btn {
+  background: green;
+  color: white;
+}
+
+.material-item,
+.lesson-item,
+.student-item,
+.promo-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.material-item:hover {
+  color: blue;
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .card-content {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

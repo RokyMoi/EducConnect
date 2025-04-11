@@ -1,0 +1,86 @@
+body {
+  padding: 40px;
+  height: calc(100% - 80px);
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.title {
+  font-size: 36px;
+  color: blue;
+  font-weight: bold;
+  margin-bottom: 2%;
+}
+
+form {
+  width: 100%;
+  margin-top: 2%;
+  overflow-y: auto; /* Enables scrolling within the form */
+  box-sizing: border-box;
+}
+.button-row {
+  display: flex;
+  flex-direction: column;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden; /* Ensures rounded corners work with borders */
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+thead tr {
+  background-color: #0078d7;
+  color: white;
+}
+tr,
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+th:first-child,
+td:first-child {
+  border-left: 1px solid #ddd;
+}
+
+th:last-child,
+td:last-child {
+  border-right: 1px solid #ddd;
+}
+
+th,
+td {
+  border-left: 1px solid #ddd;
+}
+tbody tr:hover {
+  background-color: #f1f1f1;
+}
+tbody tr:last-child td {
+  border-bottom: none;
+}
+td:hover {
+  background-color: #e3e2e2;
+  cursor: pointer;
+}
+td {
+  width: 20%;
+}
+
+td button {
+  width: 100%;
+  border: none;
+  background-color: #ededed;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+td button:hover {
+  background-color: #d4d4d4;
+  font-weight: 900;
+}

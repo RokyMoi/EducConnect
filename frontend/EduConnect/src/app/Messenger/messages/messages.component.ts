@@ -1,35 +1,35 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { MessageService } from "../../services/message.service";
-import { AccountService } from "../../services/account.service";
-import { Component, inject, OnInit } from "@angular/core";
-import { RouterLink } from "@angular/router";
-import { Message } from "../../_models/messenger/message";
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { MessageService } from '../../services/message.service';
+import { AccountService } from '../../services/account.service';
+import { Component, inject, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { Message } from '../../models/messenger/message';
 
 @Component({
   selector: 'app-messages',
   standalone: true,
   imports: [RouterLink],
   templateUrl: './messages.component.html',
-  styleUrls: ['./messages.component.css']
+  styleUrls: ['./messages.component.css'],
 })
 export class MessagesComponent implements OnInit {
-GetRouter(_t17: Message) {
-throw new Error('Method not implemented.');
-}
+  GetRouter(_t17: Message) {
+    throw new Error('Method not implemented.');
+  }
   message: any;
   Container = 'Outbox';
   pageNumber = 1;
-  messages: any[] = []; 
+  messages: any[] = [];
   pageSize = 5;
-  photourl = "";
-  UserPhotoEmai = "";
-  
+  photourl = '';
+  UserPhotoEmai = '';
+
   // Keš za slike korisnika
   private userPhotosCache: Map<string, string> = new Map();
-  
+
   // Keš za poruke (ako želite da keširate stranice)
   private messagesCache: Map<string, any[]> = new Map();
-  
+
   messageService = inject(MessageService);
   AccountService = inject(AccountService);
   http = inject(HttpClient);
@@ -45,22 +45,23 @@ throw new Error('Method not implemented.');
 
   InitiliazeUserForPhoto(message: any) {
     const currentUserEmail = this.AccountService.CurrentUser()?.Email;
-    this.UserPhotoEmai = currentUserEmail === message.senderEmail
-      ? message.recipientEmail
-      : message.senderEmail;
-    
+    this.UserPhotoEmai =
+      currentUserEmail === message.senderEmail
+        ? message.recipientEmail
+        : message.senderEmail;
+
     // Proverite da li je slika već keširana
     if (!this.userPhotosCache.has(this.UserPhotoEmai)) {
       this.GetImageForUser(this.UserPhotoEmai);
     } else {
-      this.photourl = this.userPhotosCache.get(this.UserPhotoEmai) || ''; 
+      this.photourl = this.userPhotosCache.get(this.UserPhotoEmai) || '';
     }
   }
 
   GetImageForUser(email: string) {
     let headers = new HttpHeaders();
     const token = this.AccountService.getAccessToken();
-    
+
     if (token) {
       headers = headers.append('Authorization', `Bearer ${token}`);
     } else {
@@ -68,7 +69,11 @@ throw new Error('Method not implemented.');
     }
 
     // Poziv za sliku korisnika
-    this.http.get<{ data: { url: string } }>(`http://localhost:5177/Photo/GetPhotoForUser/${email}`, { headers })
+    this.http
+      .get<{ data: { url: string } }>(
+        `http://localhost:5177/Photo/GetPhotoForUser/${email}`,
+        { headers }
+      )
       .subscribe({
         next: (response) => {
           this.photourl = response.data.url;
@@ -77,18 +82,18 @@ throw new Error('Method not implemented.');
         },
         error: (error) => {
           console.error('Error fetching photo:', error);
-        }
+        },
       });
   }
 
   timeAgo(date: Date): string {
     const now = new Date();
-    const then = new Date(date); 
+    const then = new Date(date);
     const seconds = Math.floor((now.getTime() - then.getTime()) / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-    const months = Math.floor(days / 30); 
+    const months = Math.floor(days / 30);
     const years = Math.floor(months / 12);
 
     if (seconds < 60) {
@@ -113,7 +118,11 @@ throw new Error('Method not implemented.');
     if (this.messagesCache.has(cacheKey)) {
       this.messages = this.messagesCache.get(cacheKey)!;
     } else {
-      this.messageService.getMessages(this.pageNumber, this.pageSize, this.Container);
+      this.messageService.getMessages(
+        this.pageNumber,
+        this.pageSize,
+        this.Container
+      );
     }
   }
 

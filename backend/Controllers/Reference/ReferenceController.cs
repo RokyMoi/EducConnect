@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using backend.DTOs.LearningCategory;
 using backend.DTOs.Reference.EmploymentType;
 using backend.DTOs.Reference.IndustryClassification;
@@ -10,6 +11,8 @@ using backend.DTOs.Reference.Tutor;
 using backend.DTOs.Reference.WorkType;
 using backend.Entities.Reference;
 using backend.Interfaces.Reference;
+using EduConnect.DTOs;
+using EduConnect.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers.Reference
@@ -370,50 +373,44 @@ namespace backend.Controllers.Reference
                 );
             }
             return Ok(
-                new
-                {
-                    success = "true",
-                    message = $"Found {learningDifficultyLevels.Count} learning difficulty levels",
-                    data = new
-                    {
-                        learningDifficultyLevel = learningDifficultyLevels
-                    },
-                    timestamp = DateTime.Now,
-                }
+                ApiResponse<object>.GetApiResponse(
+                    "Found " + learningDifficultyLevels.Count + " learning difficulty levels",
+                    learningDifficultyLevels
+                )
             );
         }
 
-        [HttpGet("course-type/all")]
-        public async Task<IActionResult> GetAllCourseTypes()
-        {
-            var courseTypes = await _referenceRepository.GetAllCourseTypesAsync();
+        // [HttpGet("course-type/all")]
+        // public async Task<IActionResult> GetAllCourseTypes()
+        // {
+        //     var courseTypes = await _referenceRepository.GetAllCourseTypesAsync();
 
-            if (courseTypes == null)
-            {
-                return NotFound(
-                    new
-                    {
-                        success = "false",
-                        message = "No course types found",
-                        data = new { },
-                        timestamp = DateTime.Now
-                    }
-                );
-            }
-            return Ok(
-                new
-                {
-                    success = "true",
-                    message = $"Found {courseTypes.Count} course types",
-                    data = new
-                    {
-                        courseType = courseTypes
-                    },
-                    timestamp = DateTime.Now,
-                }
-            );
+        //     if (courseTypes == null)
+        //     {
+        //         return NotFound(
+        //             new
+        //             {
+        //                 success = "false",
+        //                 message = "No course types found",
+        //                 data = new { },
+        //                 timestamp = DateTime.Now
+        //             }
+        //         );
+        //     }
+        //     return Ok(
+        //         new
+        //         {
+        //             success = "true",
+        //             message = $"Found {courseTypes.Count} course types",
+        //             data = new
+        //             {
+        //                 courseType = courseTypes
+        //             },
+        //             timestamp = DateTime.Now,
+        //         }
+        //     );
 
-        }
+        // }
 
         [HttpGet("language/all")]
         public async Task<IActionResult> GetAllLanguages()
@@ -443,6 +440,32 @@ namespace backend.Controllers.Reference
                     },
                     timestamp = DateTime.Now,
                 }
+            );
+        }
+
+        [HttpGet("course/category/all")]
+        public async Task<IActionResult> GetAllCourseCategories()
+        {
+            var courseCategories = await _referenceRepository.GetAllCourseCategories();
+
+            if (courseCategories == null || courseCategories.Count == 0)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse("No course categories have been found", null)
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "Course categories have been found",
+                    courseCategories.Select(
+                        x => new GetAllCourseCategoriesResponse
+                        {
+                            CourseCategoryId = x.CourseCategoryId,
+                            Name = x.Name
+                        }
+                    )
+                )
             );
         }
     }

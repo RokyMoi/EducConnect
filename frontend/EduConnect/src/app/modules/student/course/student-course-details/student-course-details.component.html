@@ -1,0 +1,80 @@
+<div class="details-container" *ngIf="course">
+    <div class="details-header">
+        <h2 class="component-title">{{course.title}}</h2>
+        <div class="action-buttons-container">
+            <button class="go-back-button" (click)="goBack()">← Back to Courses</button>
+            <button class="enroll-button">Enroll Now</button>
+        </div>
+    </div>
+
+    <div class="course-details-panel">
+        <div class="course-hero">
+            <img class="course-hero-image"
+                [src]="course.thumbnailUrl || 'https://dummyimage.com/1200x400/cccccc/969696.png&text=No+Thumbnail'"
+                alt="Course thumbnail">
+            <div class="course-basic-info">
+                <div class="price-badge">
+                    {{ course.price !== 0 ? ('$' + course.price.toFixed(2)) : 'Free' }}
+                </div>
+                <div class="status-badge" [ngClass]="{'published': course.publishedStatus === 1}">
+                    {{ course.publishedStatus }}
+                </div>
+            </div>
+        </div>
+
+        <div class="details-content">
+            <section class="course-meta-section">
+                <h3>Course Details</h3>
+                <div class="detailed-meta-grid">
+                    <div class="meta-item">
+                        <span class="meta-label">Category:</span>
+                        <span class="meta-value">{{ course.courseCategoryName }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Difficulty:</span>
+                        <span class="meta-value">{{ course.learningDifficultyLevelName }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Created Date:</span>
+                        <span class="meta-value">{{ course.createdAt | date:'MMM d, yyyy' }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Total Lessons:</span>
+                        <span class="meta-value">{{ course.numberOfLessons }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tutor-info-section">
+                <h3>Tutor</h3>
+                <div class="tutor-details">
+                    <span class="tutor-name">{{ course.tutorUsername }}</span>
+                    <span class="tutor-email">{{ course.tutorEmail }}</span>
+                </div>
+            </section>
+
+            <section class="enrollment-details">
+                <h3>Enrollment Information</h3>
+                <div class="enrollment-limits">
+                    <div class="limit-item" *ngIf="course.minNumberOfStudents">
+                        <span class="limit-label">Minimum Students:</span>
+                        <span class="limit-value">{{ course.minNumberOfStudents }}</span>
+                    </div>
+                    <div class="limit-item" *ngIf="course.maxNumberOfStudents">
+                        <span class="limit-label">Maximum Students:</span>
+                        <span class="limit-value">{{ course.maxNumberOfStudents }}</span>
+                    </div>
+                    <div class="limit-item">
+                        <span class="limit-label">Eligible to enroll:</span>
+                        <span class="limit-value">Yes</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="full-description">
+                <h3>Course Description</h3>
+                <p class="description-text">{{ course.description }}</p>
+            </section>
+        </div>
+    </div>
+</div>

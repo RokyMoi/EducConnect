@@ -1,0 +1,137 @@
+<div class="main-container">
+    <h2>
+        {{ courseLessonId ? ('Course Lesson Details (' + getPublishedStatus + ')') : 'New Course Lesson' }}
+    </h2>
+
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+        <button class="resources-button" (click)="onViewResources()">Resources</button>
+        <button class="delete-action-button" *ngIf="this.existingLesson && this.existingLesson.publishedStatus == 1"
+            (click)="onArchiveLesson()">Archive</button>
+        <button class="create-action-button" *ngIf="this.existingLesson && this.existingLesson.publishedStatus != 1"
+            (click)="onPublishLesson()">Publish</button>
+    </div>
+    <form [formGroup]="lessonForm">
+        <div class="form-item">
+            <label for="title">Lesson Title</label>
+            <input type="text" id="title" name="title" formControlName="title"
+                placeholder="Enter the title of the lesson">
+            <div class="error-container"
+                *ngIf="lessonForm.controls['title'].errors && lessonForm.controls['title'].dirty">
+
+                <p *ngIf="lessonForm.controls['title'].getError('required')">This field is required</p>
+                <p *ngIf="lessonForm.controls['title'].getError('minlength')">Minimum length for
+                    title is 15 characters</p>
+                <p *ngIf="lessonForm.controls['title'].getError('maxlength')">Maximum length for
+                    title is 50 characters</p>
+            </div>
+        </div>
+        <div class="form-item">
+            <label for="title">Topic</label>
+            <input type="text" id="topic" name="topic" formControlName="topic"
+                placeholder="Enter the topic this lesson will focus on">
+            <div class="error-container"
+                *ngIf="lessonForm.controls['topic'].errors && lessonForm.controls['topic'].dirty">
+
+                <p *ngIf="lessonForm.controls['topic'].getError('required')">This field is required</p>
+                <p *ngIf="lessonForm.controls['topic'].getError('minlength')">Minimum length for
+                    topic is 10 characters</p>
+                <p *ngIf="lessonForm.controls['topic'].getError('maxlength')">Maximum length for
+                    topic is 100 characters</p>
+            </div>
+        </div>
+        <div class="form-item">
+            <label for="shortSummary">Short Summary</label>
+            <textarea id="shortSummary" name="shortSummary" formControlName="shortSummary"
+                placeholder="Describe this lesson in short, this data will appear in course overview"></textarea>
+            <div class="error-container"
+                *ngIf="lessonForm.controls['shortSummary'].errors && lessonForm.controls['shortSummary'].dirty">
+
+                <p *ngIf="lessonForm.controls['shortSummary'].getError('required')">This field is required</p>
+                <p *ngIf="lessonForm.controls['shortSummary'].getError('minlength')">Minimum length for
+                    short summary is 45 characters</p>
+                <p *ngIf="lessonForm.controls['shortSummary'].getError('maxlength')">Maximum length for
+                    short summary is 250 characters</p>
+            </div>
+        </div>
+        <div class="form-item">
+            <label for="description">Detailed Description</label>
+            <textarea id="description" name="description" formControlName="description"
+                placeholder="Enter here information for a detailed explanation of the topic of this course"></textarea>
+            <div class="error-container"
+                *ngIf="lessonForm.controls['description'].errors && lessonForm.controls['description'].dirty">
+
+                <p *ngIf="lessonForm.controls['description'].getError('required')">This field is required</p>
+                <p *ngIf="lessonForm.controls['description'].getError('minlength')">Minimum length for
+                    description summary is 70 characters</p>
+                <p *ngIf="lessonForm.controls['description'].getError('maxlength')">Maximum length for
+                    short summary is 1000 characters</p>
+            </div>
+        </div>
+        <div class="form-item">
+            <label for="content">Content</label>
+            <div class="editor-container">
+                <div class="editor-menu-container">
+                    <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                </div>
+                <div class="editor-content-container">
+                    <ngx-editor [editor]="editor" [placeholder]="'Enter your lesson content here'"
+                        formControlName="content" [ngModel]="editorContent"></ngx-editor>
+                </div>
+            </div>
+            <div class="error-container"
+                *ngIf="lessonForm.controls['content'].errors && lessonForm.controls['content'].dirty">
+
+                <p *ngIf="lessonForm.controls['content'].getError('required')">This field is required</p>
+                <p *ngIf="lessonForm.controls['content'].getError('minlength')">Minimum length for
+                    content is 100 characters</p>
+                <p *ngIf="lessonForm.controls['content'].getError('maxlength')">Maximum length for
+                    content is 100000 characters</p>
+            </div>
+        </div>
+        <div class="form-item" *ngIf="existingLesson">
+            <label>Lesson # in Course</label>
+            <input type="text" id="lessonSequenceOrder" name="lessonSequenceOrder" formControlName="lessonSequenceOrder"
+                placeholder="Enter the number of the lesson in the course">
+            <div class="error-container"
+                *ngIf="lessonForm.controls['lessonSequenceOrder'].errors && lessonForm.controls['lessonSequenceOrder'].dirty">
+
+
+                <p *ngIf="lessonForm.controls['lessonSequenceOrder'].getError('min')">Minimum value is 1</p>
+            </div>
+        </div>
+        <div class="form-item">
+
+
+
+
+
+        </div>
+        <div class="form-actions-row">
+            <button class="discard-action-button">Discard</button>
+            <button class="save-action-button" *ngIf="this.lessonForm.valid" (click)="onSaveLesson()">Save</button>
+        </div>
+    </form>
+    <app-custom-header-ng-content-dialog-box *ngIf="showSaveDialog"
+        [title]="(existingLesson ? 'Update Lesson' : 'Save Lesson')">
+        <p>{{saveDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="negative-cancel-button" (click)="onCancelSaveDialog()">Cancel</button>
+            <button class="positive-confirm-button" (click)="saveLesson()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+    <app-custom-header-ng-content-dialog-box *ngIf="showPublishDialog" [title]="'Publish Lesson'">
+        <p>{{publishDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="negative-cancel-button" (click)="onCancelPublishDialog()">Cancel</button>
+            <button class="positive-confirm-button" (click)="publishLesson()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+    <app-custom-header-ng-content-dialog-box *ngIf="showArchiveDialog" [title]="'Archive Lesson'">
+        <p>{{archiveDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="positive-cancel-button" (click)="onCancelArchiveDialog()">Cancel</button>
+            <button class="negative-confirm-button" (click)="archiveLesson()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+</div>

@@ -1,12 +1,9 @@
-* {
-  padding: 0;
-  margin: 0;
-}
-
-body {
+.index-container {
+  width: calc(100% - 4%);
   margin: 2%;
   display: flex;
   flex-direction: column;
+  
 }
 
 .hero {

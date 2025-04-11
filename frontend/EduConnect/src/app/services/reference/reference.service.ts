@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import ApiLinks from '../../../assets/api/link.api';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, of } from 'rxjs';
+import { DefaultServerResponse } from '../../models/shared/default-server-response';
 
 @Injectable({
   providedIn: 'root',
@@ -219,6 +220,12 @@ export class ReferenceService {
           statusCode: (error as any).status,
         });
       })
+    );
+  }
+
+  getAllCourseCategories() {
+    return this.http.get<DefaultServerResponse>(
+      ApiLinks.ReferenceControllerUrl + '/course/category/all'
     );
   }
 }

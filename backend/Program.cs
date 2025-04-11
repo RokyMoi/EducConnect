@@ -1,37 +1,111 @@
 using backend.Data.DataSeeder;
 using backend.Entities.Reference.Country;
 using backend.Extensions;
-using backend.Utilities;
 using EduConnect.Data;
+using EduConnect.Entities.Person;
 using EduConnect.Extensions;
+using EduConnect.Utilities;
+using Microsoft.AspNetCore.Identity;
 using EduConnect.SignalIR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+using EduConnect.Services;
 
 namespace EduConnect
 {
     public class Program
     {
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+
+            builder.Services.AddHttpContextAccessor();
+
             Console.WriteLine(RuntimeInformation.OSDescription);
 
-
+            Console.WriteLine(RuntimeInformation.OSArchitecture);
+            //Configure Kestrel to allow request body up to 100MB in size
+            builder.WebHost.ConfigureKestrel(
+                options =>
+                {
+                    options.Limits.MaxRequestBodySize = 120 * 1024 * 1024;
+                }
+            );
 
             // Extension for services implemented
             builder.Services.AddApplicationServices(builder.Configuration);
             builder.Services.AddJWTAuthService(builder.Configuration);
             builder.Services.AddDatabaseConnectionServices(builder.Configuration, builder.Environment);
 
+            builder.Services.AddScoped<UserManager<Person>, PersonManager>();
+            builder.Services.AddScoped<PersonManager>();
+
 
             builder.Services.AddControllers();
+
+            //Add SignalR services
+            builder.Services.AddSignalR(
+                options =>
+                {
+                    options.EnableDetailedErrors = true;
+                    options.ClientTimeoutInterval = TimeSpan.FromMinutes(1);
+                }
+            ).AddHubOptions<CourseAnalyticsHub>(
+                options =>
+                {
+                    options.EnableDetailedErrors = true;
+                    options.MaximumReceiveMessageSize = 65_536; //64KB
+                }
+            );
+
+            builder.Services.AddSingleton<ViewershipUpdateBufferService>();
+            builder.Services.AddHostedService<ViewershipChangeService>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(
+                c =>
+                {
+
+                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Library API", Version = "v1" });
+
+                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                    {
+                        In = ParameterLocation.Header,
+                        Description = "Please enter a valid token",
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.Http,
+                        BearerFormat = "JWT",
+                        Scheme = "Bearer"
+                    });
+
+                    c.AddSecurityRequirement(
+                        new OpenApiSecurityRequirement
+                        {
+                            {
+                                new OpenApiSecurityScheme
+                                {
+                                    Reference = new OpenApiReference
+                                        {
+                                            Type=ReferenceType.SecurityScheme,
+                                            Id="Bearer"
+                                        }
+                                },
+                                Array.Empty<string>()
+                            }
+                        }
+                    );
+
+                }
+            );
 
             //Setup CORS Policy, for request originating from frontend application origin only (http://localhost:4200)
 
@@ -111,9 +185,6 @@ namespace EduConnect
                     var languageDatabaseSeeder = scope.ServiceProvider.GetRequiredService<LanguageDatabaseSeeder>();
                     languageDatabaseSeeder.SeedLanguageDataToDatabase().GetAwaiter().GetResult();
 
-                    //Get the CourseType database seeder scoped service from the service container
-                    var courseTypeDatabaseSeeder = scope.ServiceProvider.GetRequiredService<CourseTypeDatabaseSeeder>();
-                    courseTypeDatabaseSeeder.SeedCourseTypeDataToDatabase().GetAwaiter().GetResult();
 
                 }
                 catch (Exception ex)
@@ -123,13 +194,23 @@ namespace EduConnect
                 }
             }
 
+            app.MapHub<CourseAnalyticsHub>("/tutor/course/analytics/hub", options =>
+            {
+                options.ApplicationMaxBufferSize = 65_536;
+                options.TransportMaxBufferSize = 65_536;
+            });
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(options =>
+                {
+                    options.EnablePersistAuthorization();
+                });
             }
+
+
 
             app.UseHttpsRedirection();
 
@@ -143,12 +224,133 @@ namespace EduConnect
             if (app.Environment.IsDevelopment())
             {
                 app.UseCors("SwaggerDevelopmentEnvironmentPolicy");
+
             }
 
             app.MapControllers();
-            app.MapHub<PresenceHub>("hubs/presence");
-            app.MapHub<MessageHub>("hubs/message");
 
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Person>>();
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+                var roles = new[] { "Admin", "Tutor", "Student" };
+
+                foreach (var role in roles)
+                {
+                    if (!await roleManager.RoleExistsAsync(role))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+                    }
+                }
+
+                var superAdminEmail = "superadmin@educonnect.com";
+                var superAdminUsername = "superadmin";
+                var superAdminPassword = "1234";
+
+                var superAdmin = await dbContext.PersonEmail.Where(x => x.Email == superAdminEmail).AnyAsync();
+
+                Console.WriteLine("SuperAdmin user exists: " + superAdmin);
+                if (!superAdmin)
+                {
+
+                    //Create new Person
+                    var Person = new EduConnect.Entities.Person.Person
+                    {
+                        PersonId = Guid.NewGuid(),
+                        PersonPublicId = Guid.NewGuid(),
+                        Email = superAdminEmail,
+                        UserName = superAdminUsername,
+                        IsActive = false,
+                        CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                        ModifiedAt = null
+                    };
+
+
+
+                    var result = await userManager.CreateAsync(Person, superAdminPassword);
+                    await dbContext.SaveChangesAsync();
+
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(Person, "Admin");
+
+                        Console.WriteLine("Added SuperAdmin user, set role to Admin");
+
+                        //Create new PersonEmail
+                        var PersonEmail = new PersonEmail
+                        {
+                            PersonId = Person.PersonId,
+                            PersonEmailId = Guid.NewGuid(),
+                            Email = superAdminEmail,
+                            CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                            ModifiedAt = null
+
+                        };
+
+                        //Create new PersonDetails
+                        var PersonDetails = new PersonDetails
+                        {
+                            PersonDetailsId = Guid.NewGuid(),
+                            PersonId = Person.PersonId,
+                            FirstName = "SuperAdmin",
+                            LastName = "SuperAdmin",
+                            Username = superAdminUsername,
+                            CountryOfOriginCountryId = null,
+                            CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                            ModifiedAt = null,
+                        };
+
+
+
+
+
+
+                        //Create new PersonPassword 
+                        var PersonPassword = new PersonPassword
+                        {
+                            PersonId = Person.PersonId,
+                            PersonPasswordId = Guid.NewGuid(),
+                            PasswordHash = EncryptionUtilities.HashPassword(superAdminPassword),
+                            CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                            ModifiedAt = null
+                        };
+
+                        //Create new PersonSalt 
+                        var PersonSalt = new PersonSalt
+                        {
+                            PersonSaltId = Guid.NewGuid(),
+                            PersonId = Person.PersonId,
+                            NumberOfRounds = 12,
+                            Salt = EncryptionUtilities.GenerateSalt(),
+                            CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                            ModifiedAt = null
+                        };
+
+                        await dbContext.PersonEmail.AddAsync(PersonEmail);
+                        await dbContext.PersonPassword.AddAsync(PersonPassword);
+                        await dbContext.PersonSalt.AddAsync(PersonSalt);
+                        await dbContext.PersonDetails.AddAsync(PersonDetails);
+                        await dbContext.SaveChangesAsync();
+                    }
+
+                    if (!result.Succeeded)
+                    {
+                        Console.WriteLine("Failed to create SuperAdmin user");
+
+                        Console.WriteLine("Error list: ");
+                        foreach (var error in result.Errors)
+                        {
+                            Console.WriteLine("Code: " + error.Code);
+                            Console.WriteLine("Description:" + error.Description);
+                        }
+                    }
+
+
+                }
+            }
             app.Run();
         }
     }

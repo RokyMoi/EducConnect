@@ -8,13 +8,15 @@ using backend.DTOs.Person.PersonPhoneNumber;
 using backend.DTOs.Tutor;
 using backend.Entities.Person;
 using EduConnect.Entities.Person;
+using Microsoft.AspNetCore.Identity;
+using EduConnect.Entities;
+using EduConnect.DTOs;
 
 namespace backend.Interfaces.Person
 {
     public interface IPersonRepository
     {
         Task<PersonEmailDTO> GetPersonEmailByEmail(string email);
-        Task<PersonEmailPasswordSaltDTOGroup> CreateNewPersonWithHelperTables(EduConnect.Entities.Person.Person person, PersonEmail personEmail, PersonPassword personPassword, PersonSalt personSalt, PersonVerificationCode personVerificationCode);
         public Task<PersonVerificationCodeDTO> GetPersonVerificationCodeByEmail(string email);
         Task<PersonVerificationCodeDTO> VerifyPersonVerificationCode(PersonVerificationCodeDTO personVerificationCodeDTO);
         Task<PersonEmailWithPersonObjectDTO> GetPersonEmailWithPersonObjectByEmail(string email);
@@ -36,5 +38,26 @@ namespace backend.Interfaces.Person
 
         Task<PersonPhoneNumberDTO?> GetPersonPhoneNumberByPersonId(Guid personId);
 
+        Task<List<IdentityRole<Guid>>?> GetRolesByPersonId(Guid personId);
+
+        Task<EduConnect.Entities.Person.Person?> GetPersonByEmailOrUsername(string emailOrUsername);
+
+
+        Task<bool> EmailExists(string email);
+
+        Task<bool> CreatePerson(EduConnect.Entities.Person.Person person);
+
+        Task<bool> CreatePersonEmail(PersonEmail personEmail);
+
+        Task<bool> CreatePersonPassword(PersonPassword personPassword);
+        Task<bool> CreatePersonDetails(PersonDetails personDetails);
+
+        Task<bool> CreatePersonPhoneNumber(PersonPhoneNumber personPhoneNumber);
+
+        Task<PersonPassword?> GetPersonPasswordByPersonId(Guid personId);
+
+        Task<EduConnect.Entities.Person.Person?> GetPersonByPublicPersonId(Guid publicPersonId);
+
+        Task<GetDashboardPersonInfoResponse?> GetDashboardPersonInfo(Guid personId);
     }
 }

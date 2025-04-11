@@ -1,0 +1,256 @@
+<div class="course-tutor-management-container">
+    <h2>Course Management Dashboard</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+        <button class="publish-course-button">Publish</button>
+    </div>
+    <div class="management-console" *ngIf="dashboardInfo">
+        <!-- Course Information Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-book-open"></i> Course Basics</h2>
+                <button class="edit-btn" (click)="onViewBasics()">View Basics</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Current Data:</strong></p>
+                    <p>Course Title: <strong>{{dashboardInfo.title}}</strong></p>
+                    <p>Difficulty Level: {{dashboardInfo.difficultyLevel}}</p>
+                    <p>Category: {{dashboardInfo.category}}</p>
+                </div>
+                <div class="quick-actions">
+                    <p>Created At: {{dashboardInfo.createdAt | date:'longDate'}}</p>
+                    <p *ngIf="dashboardInfo.updatedAt">Last Updated: {{dashboardInfo.updatedAt | date:'longDate'}}</p>
+                </div>
+            </div>
+        </div>
+        <!--Course Thumbnail Card-->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fa fa-images"></i>Course Thumbnail</h2>
+                <button
+                    [ngClass]="{'add-btn': !dashboardInfo.isThumbnailAdded, 'edit-btn': dashboardInfo.isThumbnailAdded}"
+                    (click)="onViewThumbnail()">
+                    {{dashboardInfo.isThumbnailAdded ? 'View Thumbnail' : 'Add Thumbnail'}}</button>
+                <!-- <button class="edit-btn">View Thumbnail</button> -->
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p *ngIf="dashboardInfo.isThumbnailAdded"><strong>Thumbnail Metadata:</strong></p>
+                    <p *ngIf="dashboardInfo.isThumbnailAdded">Uploaded On: {{dashboardInfo.thumbnailAddedOn |
+                        date:'longDate'}}</p>
+                    <p *ngIf="dashboardInfo.isThumbnailAdded">Storage Type: {{dashboardInfo.isUsingAzureStorage ?
+                        'Azure Blob Storage' : 'Database'}}</p>
+                    <h3 *ngIf="!dashboardInfo.isThumbnailAdded">No thumbnail provided</h3>
+                </div>
+                <div class="quick-actions">
+                    <p *ngIf="!dashboardInfo.isThumbnailAdded">No metadata available</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Teaching Resources Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-file-alt"></i> Teaching Resources</h2>
+                <button
+                    [ngClass]="{'add-btn': dashboardInfo.totalNumberOfTeachingResources === 0, 'edit-btn': dashboardInfo.totalNumberOfTeachingResources !== 0}"
+                    (click)="onViewTeachingResources()">
+
+                    {{dashboardInfo.totalNumberOfTeachingResources === 0 ? 'Add New Resource' : 'View Resources'}}
+                </button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data" *ngIf="dashboardInfo.totalNumberOfTeachingResources > 0">
+                    <p><strong>Current Materials:</strong></p>
+
+                    <div class="material-item" *ngFor="let resource of dashboardInfo.twoLatestAddedTeachingResources"
+                        (click)="onViewResource(resource.courseTeachingResourceId)">
+                        <i class="fas"
+                            [ngClass]="{'fa-link': resource.resourceUrl, 'fa-book': !resource.resourceUrl }"></i>{{resource.fileName
+                        ? resource.fileName : resource.resourceUrl}}
+                    </div>
+
+
+                    <p><strong>Resources Metadata</strong></p>
+                    <p>Number Of Resources: <strong>{{dashboardInfo.totalNumberOfTeachingResources}}</strong></p>
+
+                    <p>Number Of Files: <strong>{{dashboardInfo.numberOfFiles}}</strong></p>
+
+                    <p>Number Of URLs: <strong>{{dashboardInfo.numberOfURLs}}</strong></p>
+
+                    <p>Total file size: <strong>{{getFileSize(dashboardInfo.totalSizeOfFilesInBytes)}}</strong></p>
+
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn" (click)="onAddNewResource()">
+                        <i class="fas fa-file-pen"></i> Add New Resource
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Lessons Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-chalkboard-teacher"></i> Class Lessons</h2>
+                <button *ngIf="dashboardInfo.numberOfLessons === 0" class="add-btn" (click)="onAddNewLesson()">Add New
+                    Lesson</button>
+                <button *ngIf="dashboardInfo.numberOfLessons > 0" class="edit-btn" (click)="onViewLessons()">View
+                    Lessons</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+
+                    <p>Number Of Lessons: <strong>{{dashboardInfo.numberOfLessons}}</strong></p>
+                    <p>{{dashboardInfo.numberOfPublishedLessons}} Published • {{dashboardInfo.numberOfDraftLessons}}
+                        Draft • {{dashboardInfo.numberOfArchivedLessons}} Archived</p>
+                    <p><strong>Latest lessons:</strong></p>
+                    <div class="lesson-item" *ngFor="let lesson of dashboardInfo.twoLatestAddedLessons">
+                        <i class="fas fa-circle" [style.color]="getLessonStatusColor(lesson)"></i>
+                        {{getLessonDisplayText(lesson)}}
+                    </div>
+
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn" (click)="onAddNewLesson()" *ngIf="dashboardInfo.numberOfLessons > 0">
+                        <i class="fas fa-add"></i> Add New Lesson
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!--Promotion Images Card-->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-images"></i>Promotion Images</h2>
+                <button class="add-btn" *ngIf="dashboardInfo.numberOfPromotionImages === 0">Add Image</button>
+                <button class="edit-btn" *ngIf="dashboardInfo.numberOfPromotionImages > 0"
+                    (click)="onViewPromotionImages()">View Images</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Promotion Images Metadata:</strong></p>
+                    <p>Number of images: {{dashboardInfo.numberOfPromotionImages}}</p>
+                    <p *ngIf="dashboardInfo.latestPromotionImageUploadedAt">Last image uploaded on:
+                        {{dashboardInfo.latestPromotionImageUploadedAt | date:"dd.MM.yyyy."}}</p>
+                </div>
+                <div class="quick-actions" *ngIf="dashboardInfo.numberOfPromotionImages < 5">
+                    <button class="icon-btn" (click)="onAddNewImage()">
+                        <i class="fas fa-add"></i> Add New Image
+                    </button>
+
+                </div>
+            </div>
+        </div>
+        <!--Test And Quiz Card-->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-book-open"></i>Tests, quizzes, assignments</h2>
+                <button class="add-btn">New Campaign</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Active Promotions:</strong></p>
+                    <div class="promo-item">
+                        <i class="fas fa-ad"></i> Social Media Campaign (1,234 Clicks)
+                    </div>
+                    <div class="promo-item">
+                        <i class="fas fa-tag"></i> Early Bird Discount (23 Redemptions)
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn">
+                        <i class="fas fa-chart-pie"></i> Analytics
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-share-alt"></i> Share Links
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Management Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-users"></i> Participants</h2>
+                <button class="add-btn">Enroll Student</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Recent Enrollments:</strong></p>
+                    <div class="student-item">
+                        <i class="fas fa-user-graduate"></i> Emily Johnson (85% Completed)
+                    </div>
+                    <div class="student-item">
+                        <i class="fas fa-user-clock"></i> Michael Chen (Pending Assessment)
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn">
+                        <i class="fas fa-envelope"></i> Message Group
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-chart-bar"></i> Performance Report
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certification Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-certificate"></i>Course Certification</h2>
+                <button class="add-btn">Add certificate</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Active Promotions:</strong></p>
+                    <div class="promo-item">
+                        <i class="fas fa-ad"></i> Social Media Campaign (1,234 Clicks)
+                    </div>
+                    <div class="promo-item">
+                        <i class="fas fa-tag"></i> Early Bird Discount (23 Redemptions)
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn">
+                        <i class="fas fa-chart-pie"></i> Analytics
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-share-alt"></i> Share Links
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!--Analytics and Feedback Card -->
+        <div class="management-card">
+            <div class="card-header">
+                <h2><i class="fas fa-bullhorn"></i>Analytics and Feedback</h2>
+                <button class="add-btn" (click)="onViewAnalytics()">View Analytics</button>
+            </div>
+            <div class="card-content">
+                <div class="sample-data">
+                    <p><strong>Active Promotions:</strong></p>
+                    <div class="promo-item">
+                        <i class="fas fa-ad"></i> Social Media Campaign (1,234 Clicks)
+                    </div>
+                    <div class="promo-item">
+                        <i class="fas fa-tag"></i> Early Bird Discount (23 Redemptions)
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn">
+                        <i class="fas fa-chart-pie"></i> Analytics
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-share-alt"></i> Share Links
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>

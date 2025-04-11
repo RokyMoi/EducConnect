@@ -1,21 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, Signal, signal } from '@angular/core';
-import { User } from '../_models/User';
+import { User } from '../models/User';
 import { map, Subject, Observable, catchError, of } from 'rxjs';
 import ApiLinks from '../../assets/api/link.api';
 import { Router } from '@angular/router';
 
-import ErrorHttpResponseData from '../_models/data/http.response.data/error.http.response.data';
-import EducationInformation from '../_models/person/education/educationInformation.education.person';
-import SuccessHttpResponseData from '../_models/data/http.response.data/success.http.response.data';
-import EducationInformationHttpSaveRequest from '../_models/person/education/educationInformationSaveRequst';
-import EducationInformationHttpSaveResponse from '../_models/person/education/educationInformationHttpSaveResponse';
-import EducationInformationHttpUpdateRequest from '../_models/person/education/EducationInformationHttpUpdateRequest';
-import CareerInformationHttpSaveRequest from '../_models/person/career/careerInformationHttpSaveRequest';
-import CareerInformationHttpUpdateRequest from '../_models/person/career/careerInformationHttpUpdateRequest';
-import { TimeAvailability } from '../_models/person/time-availabilty/time-availability';
-import { TimeAvailabilityHttpSaveRequest } from '../_models/person/time-availabilty/time-availability-http-save-request';
-import { TutorTeachingStyleSaveHttpRequestTutor } from '../_models/Tutor/tutor-teaching-style/tutor-teaching-style-save-http-request.tutor';
+import ErrorHttpResponseData from '../models/data/http.response.data/error.http.response.data';
+import EducationInformation from '../models/person/education/educationInformation.education.person';
+import SuccessHttpResponseData from '../models/data/http.response.data/success.http.response.data';
+import EducationInformationHttpSaveRequest from '../models/person/education/educationInformationSaveRequst';
+import EducationInformationHttpSaveResponse from '../models/person/education/educationInformationHttpSaveResponse';
+import EducationInformationHttpUpdateRequest from '../models/person/education/EducationInformationHttpUpdateRequest';
+import CareerInformationHttpSaveRequest from '../models/person/career/careerInformationHttpSaveRequest';
+import CareerInformationHttpUpdateRequest from '../models/person/career/careerInformationHttpUpdateRequest';
+import { TimeAvailability } from '../models/person/time-availabilty/time-availability';
+import { TimeAvailabilityHttpSaveRequest } from '../models/person/time-availabilty/time-availability-http-save-request';
+import { TutorTeachingStyleSaveHttpRequestTutor } from '../models/Tutor/tutor-teaching-style/tutor-teaching-style-save-http-request.tutor';
 import { PresenceService } from './SignalIR/presence.service';
 
 @Injectable({

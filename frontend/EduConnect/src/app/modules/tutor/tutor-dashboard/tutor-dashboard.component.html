@@ -1,0 +1,22 @@
+<div class="subheader">
+    <h3>Logged in</h3>
+    <h3>Email: {{dashboardUserInfo.email}}</h3>
+    <h3 *ngIf="dashboardUserInfo.username">Username: {{dashboardUserInfo.username}}
+    </h3>
+    <h3 *ngIf="dashboardUserInfo.firstName">Name: {{dashboardUserInfo.firstName}} {{dashboardUserInfo.lastName}}
+    </h3>
+    <button class="logout-button" (click)="logout()">Logout</button>
+</div>
+<div class="tutor-dashboard">
+
+    <h2>Tutor Dashboard</h2>
+    <div class="dashboard-grid">
+        <div class="dashboard-card" *ngFor="let item of dashboardItems; let i=index">
+
+            <h3>{{item.title}}</h3>
+            <p>{{item.description}}</p>
+            <p>{{item.dataInfo}}</p>
+            <button (click)="goTo(item.link)">{{item.buttonText}}</button>
+        </div>
+    </div>
+</div>

@@ -12,7 +12,6 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using EduConnect.Entities.Person;
 using System.Text;
 using System.Security.Cryptography;
-using backend.Utilities;
 using EduConnect.Entities;
 using EduConnect.Entities.Tutor;
 using backend.DTOs.Person;
@@ -28,231 +27,115 @@ using backend.Middleware.Tutor;
 using backend.Middleware;
 using backend.DTOs.Tutor;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.AspNetCore.Identity;
+using EduConnect.Utilities;
 
 namespace backend.Controllers.Tutor
 {
     [ApiController]
     [Route("/tutor")]
-    public class TutorController(DataContext _databaseContext, ITokenService _tokenService, IPersonRepository _personRepository, ITutorRepository _tutorRepository, ICountryRepository _countryRepository, IReferenceRepository _referenceRepository) : ControllerBase
+    public class TutorController(DataContext _databaseContext, ITokenService _tokenService, IPersonRepository _personRepository, ITutorRepository _tutorRepository, ICountryRepository _countryRepository, IReferenceRepository _referenceRepository, PersonManager personManager) : ControllerBase
     {
 
         [HttpPost("signup")]
-        public async Task<IActionResult> RegisterTutor(TutorSignupRequestDTO tutorSingupRequest, DataContext databaseContext)
+        public async Task<IActionResult> RegisterTutor(RegisterTutorRequest request)
         {
-            Console.WriteLine("Register new tutor with following details: " + tutorSingupRequest.ToString());
-            //Check is email taken
 
-            var existingEmail = await _personRepository.GetPersonEmailByEmail(tutorSingupRequest.Email);
+            //Check if the email is taken
+            var emailExists = await _personRepository.EmailExists(request.Email);
 
-            //Check is email taken
-            if (existingEmail != null)
+            if (emailExists)
             {
-                return BadRequest(new
-                {
-                    success = "false",
-                    message = "Email already taken",
-                    data = new { },
-                    timestamp = DateTime.Now
-
-                });
+                return Conflict(
+                    ApiResponse<object>.GetApiResponse(
+                        "Email address is already taken",
+                        new { }
+                    )
+                );
             }
 
+            var hashedPassword = EncryptionUtilities.HashPassword(request.Password);
 
-
-
-            //Create new Person
             var Person = new EduConnect.Entities.Person.Person
             {
                 PersonId = Guid.NewGuid(),
+                PersonPublicId = Guid.NewGuid(),
                 IsActive = false,
+                UserName = request.Email.Split("@")[0],
+                SecurityStamp = Guid.NewGuid().ToString(),
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
+
             };
 
-            //Create new PersonEmail
-            var PersonEmail = new PersonEmail
+            var PersonEmail = new EduConnect.Entities.Person.PersonEmail
             {
-                PersonId = Person.PersonId,
                 PersonEmailId = Guid.NewGuid(),
-                Email = tutorSingupRequest.Email,
+                Email = request.Email,
+                PersonId = Person.PersonId,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
-
             };
 
-
-
-            //Initialize HMACSHA512 hashing algorithm for password hashing
-            using var hmac = new HMACSHA512();
-            var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(tutorSingupRequest.Password));
-
-            //Create new PersonPassword 
-            var PersonPassword = new PersonPassword
+            var PersonPassword = new EduConnect.Entities.Person.PersonPassword
             {
-                PersonId = Person.PersonId,
                 PersonPasswordId = Guid.NewGuid(),
-                Hash = passwordHash,
-                Salt = hmac.Key,
-                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                ModifiedAt = null
-            };
-
-            //Create new PersonSalt 
-            var PersonSalt = new PersonSalt
-            {
-                PersonSaltId = Guid.NewGuid(),
                 PersonId = Person.PersonId,
-                NumberOfRounds = 12,
-                Salt = EncryptionUtilities.GenerateSalt(),
+                PasswordHash = hashedPassword,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
             };
 
+            var createPersonResult = await _personRepository.CreatePerson(Person);
 
-            //Create new PersonVerificationCode
-            var PersonVerificationCode = new PersonVerificationCode
+            if (!createPersonResult)
             {
-                PersonVerificationCodeId = Guid.NewGuid(),
-                PersonId = Person.PersonId,
-                Person = Person,
-                VerificationCode = EncryptionUtilities.GenerateRandomString(),
-                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                ModifiedAt = null
-            };
-
-            //Get the first step in tutor registration (TutorRegistrationStatus with status 1)
-            var TutorRegistrationStatus = await _referenceRepository.GetTutorRegistrationStatusByIdAsync(1);
-
-            if (TutorRegistrationStatus == null)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        success = "error",
-                        message = "We are not able to register you at the moment. Please try again later.",
-                        data = new { },
-                        timestamp = DateTime.Now,
-                    }
-                );
+                return StatusCode(500, ApiResponse<object>.GetApiResponse("Failed to register you, please try again later", new { }));
             }
 
-            //Create new Tutor 
-            var Tutor = new EduConnect.Entities.Tutor.Tutor
+            var createPersonEmailResult = await _personRepository.CreatePersonEmail(PersonEmail);
+            var createPersonPasswordResult = await _personRepository.CreatePersonPassword(PersonPassword);
+
+            if (!createPersonEmailResult || !createPersonPasswordResult)
             {
-                PersonId = Person.PersonId,
-                Person = Person,
+                return StatusCode(500, ApiResponse<object>.GetApiResponse("Failed to register you, please try again later", new { }));
+            }
+
+            var roleAddResult = await personManager.AddToRoleAsync(Person, "Tutor");
+
+            Console.WriteLine("Was user added to the Tutor role: " + roleAddResult.Succeeded);
+
+            foreach (var role in roleAddResult.Errors)
+            {
+                Console.WriteLine(role.Code);
+                Console.WriteLine(role.Description);
+            }
+
+            var tutor = new EduConnect.Entities.Tutor.Tutor
+            {
                 TutorId = Guid.NewGuid(),
+                PersonId = Person.PersonId,
                 TutorRegistrationStatusId = 1,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ModifiedAt = null
-            };
-
-
-            var savedPersonDataDTO = new PersonEmailPasswordSaltDTOGroup
-            {
 
             };
-            var savedTutorDTO = new TutorDTO { };
-            //Add Person, PersonEmail, PersonPassword, PersonSalt, Tutor to database
-            try
-            {
-                savedPersonDataDTO = await _personRepository.CreateNewPersonWithHelperTables(
-                    Person,
-                    PersonEmail,
-                    PersonPassword,
-                    PersonSalt,
-                    PersonVerificationCode
-                );
 
-                savedTutorDTO = await _tutorRepository.CreateTutor(Tutor);
+            var createTutorResult = await _tutorRepository.CreateTutor(tutor);
 
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return StatusCode(500, "We are not able to register you at the moment. Please try again later.");
-            }
-            //Return created Tutor
-            var tutorSignupResponseDTO = new TutorSignupResponseDTO
-            {
-                TutorId = savedTutorDTO.TutorId,
-                Email = savedPersonDataDTO.PersonEmailDTO.Email
-            };
+            
+
+            var token = await _tokenService.CreateTokenAsync(Person);
 
 
-            //Template for successful signup to platform as Tutor
-            /*
-            Dear [Tutor's Name],
+            Response.Headers.Append("Authorization", "Bearer " + token.Token);
 
-Congratulations on joining EduConnect! We are thrilled to welcome you as part of our global community of knowledge sharers.
-
-As a tutor on EduConnect, you have the opportunity to make a meaningful impact by sharing your expertise with eager learners worldwide. We're excited to see the amazing courses and lessons you will create to inspire and educate others.
-
-Before you can fully explore the platform and start sharing your knowledge, we need to verify your email address. This is an important step to secure your account and ensure smooth communication.
-
-Please verify your email by clicking the link below:
-[Verification Link]
-
-If you didn’t sign up for EduConnect, please ignore this email.
-
-Thank you for choosing EduConnect as your platform to spread knowledge. Together, we’re shaping the future of education.
-
-Best regards,  
-The EduConnect Team  
-
-P.S. Need help or have questions? Feel free to reach out to us at support@educonnect.com.  
-
-            */
-            //Attempt to send email to given email address
-            var emailResult = await EmailService.SendEmailToAsync(tutorSingupRequest.Email, "Welcome to EduConnect!",
-
-                    "Hello, \n\n"
-                    + "Congratulations on joining EduConnect! We are thrilled to welcome you as part of our global community of knowledge sharers.\n\n"
-                    + "As a tutor on EduConnect, you have the opportunity to make a meaningful impact by sharing your expertise with eager learners worldwide. We're excited to see the amazing courses and lessons you will create to inspire and educate others.\n\n"
-                    + "Before you can fully explore the platform and start sharing your knowledge, we need to verify your email address. This is an important step to secure your account and ensure smooth communication.\n\n"
-                    + $"Your verification code is: {savedPersonDataDTO.PersonVerificationCodeDTO.VerificationCode}\n\n"
-                    + $"Notice: This code expires at {DateTimeOffset.FromUnixTimeMilliseconds(savedPersonDataDTO.PersonVerificationCodeDTO.ExpiryDateTime).ToUniversalTime().ToString("HH:mm:ss dd.MM.yyyy.  'UTC'")}\n\n"
-                    + "Please use this code to verify your email within the platform.\n\n"
-                    + "If you didn’t sign up for EduConnect, please ignore this email.\n\n"
-                    + "Thank you for choosing EduConnect as your platform to spread knowledge. Together, we’re shaping the future of education.\n\n"
-                    + "Best regards,\n"
-                    + "The EduConnect Team\n\n"
-                    + "P.S. Need help or have questions? Feel free to reach out to us at support@educonnect.com.\n"
+            return Ok(
+                ApiResponse<object>.GetApiResponse(
+                    "You have registered successfully as a tutor",
+                    new { }
+                )
             );
-
-            if (!emailResult)
-            {
-                return BadRequest("Email address is not a registered email address");
-            }
-            string role = "";
-            // Check if the user is a Student or Tutor by looking up the appropriate tables
-            var student = await _databaseContext.Student.FirstOrDefaultAsync(x => x.PersonId == Person.PersonId);
-            var tutor = await _databaseContext.Tutor.FirstOrDefaultAsync(x => x.PersonId == Person.PersonId);
-
-            if (student != null)
-            {
-                role = "student";  // User is a student
-            }
-            else if (tutor != null)
-            {
-                role = "tutor";  // User is a tutor
-            }
-            var token = await _tokenService.CreateTokenAsync(PersonEmail);
-            return Ok(new
-            {
-                success = "true",
-                message = "You have successfully registered as a tutor on EduConnect, please verify your email address using the verification code sent to your email address",
-                data = new UserDTO
-                {
-
-                    Email = PersonEmail.Email,
-                    Token = token,
-                    Role = role
-                },
-                timestamp = DateTime.Now
-            });
-
         }
 
         [HttpPost("verify")]
