@@ -12,7 +12,7 @@ namespace EduConnect.SignalIR
     {
         private readonly DataContext _dataContext = dataContext;
 
-        public async Task SendAnalyticsData(Guid courseId)
+        public async Task SubscribeToCourse(Guid courseId)
         {
             Console.WriteLine("Received analytics data for course: " + courseId);
 
@@ -20,6 +20,7 @@ namespace EduConnect.SignalIR
     .Where(cvd => cvd.CourseId == courseId)
     .GroupBy(cvd => 1) // dummy grouping to enable aggregation
     .Select(g => new
+
     {
         TotalViews = g.Count(),
         ActiveViewers = g.Count(cvd => cvd.EnteredDetailsAt != null && cvd.LeftDetailsAt == null),

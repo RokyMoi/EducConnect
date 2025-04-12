@@ -1,1 +1,9 @@
-<p>course-tutor-analytics-dashboard works!</p>
+<div class="main-container">
+    <h2>Course Analytics</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+    </div>
+    <p>{{courseStatistics.totalViews}}</p>
+    <p>{{courseStatistics.averageViewDurationInMinutes}}</p>
+    <p>{{courseStatistics.activeViewers}}</p>
+</div>

@@ -1,5 +1,5 @@
 export interface CourseStatistics {
   totalViews: number;
-  activeNow: number;
-  avgTimeSpent: number;
+  activeViewers: number;
+  averageViewDurationInMinutes: number;
 }

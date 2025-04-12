@@ -44,16 +44,17 @@ namespace EduConnect.Services
                     .Where(x => x.CourseId == courseId)
                     .GroupBy(x => 1)
                     .Select(
-                        x => new CourseViewershipAnalyticsData(
+                        x => new
+                        {
                             courseId,
-                            x.Count(),
-                            x.Where(y => y.EnteredDetailsAt.HasValue && !y.LeftDetailsAt.HasValue).Count(),
-                            x.Where(y => y.EnteredDetailsAt.HasValue && y.LeftDetailsAt.HasValue).Average(y => EF.Functions.DateDiffMinute(y.EnteredDetailsAt.Value, y.LeftDetailsAt.Value))
-                        )
+                            TotalViews = x.Count(),
+                            ActiveViewers = x.Where(y => y.EnteredDetailsAt.HasValue && !y.LeftDetailsAt.HasValue).Count(),
+                            AverageViewDurationInMinutes = x.Where(y => y.EnteredDetailsAt.HasValue && y.LeftDetailsAt.HasValue).Average(y => EF.Functions.DateDiffMinute(y.EnteredDetailsAt.Value, y.LeftDetailsAt.Value))
+                        }
                     ).FirstOrDefaultAsync();
                     Console.WriteLine($"Updating analytics data for course {courseId}");
                     await _hubContext.Clients.Group(courseId.ToString()).SendAsync("GetAnalyticsData", analyticsData, cancellationToken: stoppingToken);
-                    
+
 
                 }
 

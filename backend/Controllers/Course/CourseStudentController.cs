@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using backend.Interfaces.Person;
 using backend.Interfaces.Tutor;
+using EduConnect.Data;
 using EduConnect.DTOs;
 using EduConnect.Entities;
 using EduConnect.Entities.Course;
@@ -16,6 +17,7 @@ using EduConnect.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace EduConnect.Controllers.Course
 {
@@ -28,7 +30,8 @@ namespace EduConnect.Controllers.Course
         ICourseRepository _courseRepository,
         IPersonRepository _personRepository,
         IHttpContextAccessor _httpContextAccessor,
-        IHubContext<CourseAnalyticsHub> _courseAnalyticsHubContext
+        IHubContext<CourseAnalyticsHub> _courseAnalyticsHubContext,
+        IServiceScopeFactory _scopeFactory
 
     ) : ControllerBase
     {
@@ -116,6 +119,29 @@ namespace EduConnect.Controllers.Course
 
             Console.WriteLine("Update course viewership data result: " + updateResult);
 
+            if (updateResult)
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                var analyticsData = await dataContext.CourseViewershipData
+                   .Where(x => x.CourseId == courseViewershipData.CourseId)
+                   .GroupBy(x => 1)
+                   .Select(
+                       x => new
+                       {
+                           courseViewershipData.CourseId,
+                           TotalViews = x.Count(),
+                           ActiveViewers = x.Where(y => y.EnteredDetailsAt.HasValue && !y.LeftDetailsAt.HasValue).Count(),
+                           AverageViewDurationInMinutes = x.Where(y => y.EnteredDetailsAt.HasValue && y.LeftDetailsAt.HasValue).Average(y => EF.Functions.DateDiffMinute(y.EnteredDetailsAt.Value, y.LeftDetailsAt.Value))
+                       }
+                   ).FirstOrDefaultAsync();
+
+                await _courseAnalyticsHubContext.Clients.Group(courseViewershipData.CourseId.ToString()).SendAsync("GetAnalyticsData", analyticsData);
+
+                Console.WriteLine("Updating analytics data for course " + courseViewershipData.CourseId);
+
+            }
+
 
             return Ok();
 
@@ -135,6 +161,28 @@ namespace EduConnect.Controllers.Course
             courseViewershipData.UpdatedAt = DateTime.UtcNow.ToUnixTimeMilliseconds();
             var updateResult = await _courseRepository.UpdateCourseViewershipData(courseViewershipData);
 
+            if (updateResult)
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                var analyticsData = await dataContext.CourseViewershipData
+                   .Where(x => x.CourseId == courseViewershipData.CourseId)
+                   .GroupBy(x => 1)
+                   .Select(
+                       x => new
+                       {
+                           courseViewershipData.CourseId,
+                           TotalViews = x.Count(),
+                           ActiveViewers = x.Where(y => y.EnteredDetailsAt.HasValue && !y.LeftDetailsAt.HasValue).Count(),
+                           AverageViewDurationInMinutes = x.Where(y => y.EnteredDetailsAt.HasValue && y.LeftDetailsAt.HasValue).Average(y => EF.Functions.DateDiffMinute(y.EnteredDetailsAt.Value, y.LeftDetailsAt.Value))
+                       }
+                   ).FirstOrDefaultAsync();
+
+                await _courseAnalyticsHubContext.Clients.Group(courseViewershipData.CourseId.ToString()).SendAsync("GetAnalyticsData", analyticsData);
+
+                Console.WriteLine("Updating analytics data for course " + courseViewershipData.CourseId);
+
+            }
             Console.WriteLine("Update course viewership data result: " + updateResult);
 
             return Ok();
