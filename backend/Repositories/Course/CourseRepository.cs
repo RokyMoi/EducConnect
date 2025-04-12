@@ -365,6 +365,24 @@ namespace EduConnect.Repositories.Course
             ).ToListAsync();
         }
 
+        public async Task<List<GetCourseAnalyticsHistoryResponse>> GetCourseAnalyticsHistory(Guid courseId)
+        {
+            return await _dataContext.CourseViewershipDataSnapshot
+            .Where(x => x.CourseId == courseId)
+            .Select(
+                x => new GetCourseAnalyticsHistoryResponse
+                {
+                    CourseViewershipDataSnapshotId = x.CourseViewershipDataSnapshotId,
+                    CourseId = x.CourseId,
+                    TotalViews = x.TotalViews,
+                    NumberOfUniqueVisitors = x.NumberOfUniqueVisitors,
+                    CurrentlyViewing = x.CurrentlyViewing,
+                    AverageViewDurationInMinutes = x.AverageViewDurationInMinutes,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime
+                }
+            ).ToListAsync();
+        }
+
         public async Task<Entities.Course.Course?> GetCourseById(Guid courseId)
         {
             return await _dataContext.Course

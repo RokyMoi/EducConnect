@@ -126,15 +126,17 @@ namespace EduConnect.Controllers.Course
                 var analyticsData = await dataContext.CourseViewershipData
                    .Where(x => x.CourseId == courseViewershipData.CourseId)
                    .GroupBy(x => 1)
-                   .Select(
-                       x => new
-                       {
-                           courseViewershipData.CourseId,
-                           TotalViews = x.Count(),
-                           ActiveViewers = x.Where(y => y.EnteredDetailsAt.HasValue && !y.LeftDetailsAt.HasValue).Count(),
-                           AverageViewDurationInMinutes = x.Where(y => y.EnteredDetailsAt.HasValue && y.LeftDetailsAt.HasValue).Average(y => EF.Functions.DateDiffMinute(y.EnteredDetailsAt.Value, y.LeftDetailsAt.Value))
-                       }
-                   ).FirstOrDefaultAsync();
+                   .Select(g => new GetAnalyticsDataResponse
+
+                   {
+                       CourseId = courseViewershipData.CourseId,
+                       TotalViews = g.Count(),
+                       NumberOfUniqueVisitors = g.Select(cvd => cvd.ViewedByPersonId).Distinct().Count(),
+                       CurrentlyViewing = g.Count(cvd => cvd.EnteredDetailsAt != null && cvd.LeftDetailsAt == null),
+                       AverageViewDurationInMinutes = g
+            .Where(cvd => cvd.EnteredDetailsAt != null && cvd.LeftDetailsAt != null)
+            .Average(cvd => EF.Functions.DateDiffMinute(cvd.EnteredDetailsAt.Value, cvd.LeftDetailsAt.Value))
+                   }).FirstOrDefaultAsync();
 
                 await _courseAnalyticsHubContext.Clients.Group(courseViewershipData.CourseId.ToString()).SendAsync("GetAnalyticsData", analyticsData);
 
@@ -168,15 +170,17 @@ namespace EduConnect.Controllers.Course
                 var analyticsData = await dataContext.CourseViewershipData
                    .Where(x => x.CourseId == courseViewershipData.CourseId)
                    .GroupBy(x => 1)
-                   .Select(
-                       x => new
-                       {
-                           courseViewershipData.CourseId,
-                           TotalViews = x.Count(),
-                           ActiveViewers = x.Where(y => y.EnteredDetailsAt.HasValue && !y.LeftDetailsAt.HasValue).Count(),
-                           AverageViewDurationInMinutes = x.Where(y => y.EnteredDetailsAt.HasValue && y.LeftDetailsAt.HasValue).Average(y => EF.Functions.DateDiffMinute(y.EnteredDetailsAt.Value, y.LeftDetailsAt.Value))
-                       }
-                   ).FirstOrDefaultAsync();
+                   .Select(g => new GetAnalyticsDataResponse
+
+                   {
+                       CourseId = courseViewershipData.CourseId,
+                       TotalViews = g.Count(),
+                       NumberOfUniqueVisitors = g.Select(cvd => cvd.ViewedByPersonId).Distinct().Count(),
+                       CurrentlyViewing = g.Count(cvd => cvd.EnteredDetailsAt != null && cvd.LeftDetailsAt == null),
+                       AverageViewDurationInMinutes = g
+            .Where(cvd => cvd.EnteredDetailsAt != null && cvd.LeftDetailsAt != null)
+            .Average(cvd => EF.Functions.DateDiffMinute(cvd.EnteredDetailsAt.Value, cvd.LeftDetailsAt.Value))
+                   }).FirstOrDefaultAsync();
 
                 await _courseAnalyticsHubContext.Clients.Group(courseViewershipData.CourseId.ToString()).SendAsync("GetAnalyticsData", analyticsData);
 

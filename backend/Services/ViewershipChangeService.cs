@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EduConnect.Data;
+using EduConnect.DTOs;
 using EduConnect.Entities.Course;
 using EduConnect.SignalIR;
 using Microsoft.AspNetCore.SignalR;
@@ -43,15 +44,17 @@ namespace EduConnect.Services
                     var analyticsData = await db.CourseViewershipData
                     .Where(x => x.CourseId == courseId)
                     .GroupBy(x => 1)
-                    .Select(
-                        x => new
-                        {
-                            courseId,
-                            TotalViews = x.Count(),
-                            ActiveViewers = x.Where(y => y.EnteredDetailsAt.HasValue && !y.LeftDetailsAt.HasValue).Count(),
-                            AverageViewDurationInMinutes = x.Where(y => y.EnteredDetailsAt.HasValue && y.LeftDetailsAt.HasValue).Average(y => EF.Functions.DateDiffMinute(y.EnteredDetailsAt.Value, y.LeftDetailsAt.Value))
-                        }
-                    ).FirstOrDefaultAsync();
+                    .Select(g => new GetAnalyticsDataResponse
+
+                    {
+                        CourseId = courseId,
+                        TotalViews = g.Count(),
+                        NumberOfUniqueVisitors = g.Select(cvd => cvd.ViewedByPersonId).Distinct().Count(),
+                        CurrentlyViewing = g.Count(cvd => cvd.EnteredDetailsAt != null && cvd.LeftDetailsAt == null),
+                        AverageViewDurationInMinutes = g
+            .Where(cvd => cvd.EnteredDetailsAt != null && cvd.LeftDetailsAt != null)
+            .Average(cvd => EF.Functions.DateDiffMinute(cvd.EnteredDetailsAt.Value, cvd.LeftDetailsAt.Value))
+                    }).FirstOrDefaultAsync();
                     Console.WriteLine($"Updating analytics data for course {courseId}");
                     await _hubContext.Clients.Group(courseId.ToString()).SendAsync("GetAnalyticsData", analyticsData, cancellationToken: stoppingToken);
 

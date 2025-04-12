@@ -3,7 +3,36 @@
     <div class="action-buttons-container">
         <button class="go-back-button" (click)="goBack()">← Go Back</button>
     </div>
-    <p>{{courseStatistics.totalViews}}</p>
-    <p>{{courseStatistics.averageViewDurationInMinutes}}</p>
-    <p>{{courseStatistics.activeViewers}}</p>
+    <div>
+        <h3 *ngIf="lastUpdated">Last updated: {{lastUpdated | date:'medium'}}</h3>
+    </div>
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3>Total Views</h3>
+
+            </div>
+            <div class="metric-value">{{ courseStatistics.totalViews | number }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3>Active Viewers</h3>
+            </div>
+            <div class="metric-value">{{ courseStatistics.currentlyViewing| number }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3>Users on average view this course for (minutes)</h3>
+
+            </div>
+            <div class="metric-value">{{ courseStatistics.averageViewDurationInMinutes| number:'1.1-1' }}m</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3>Number of unique visitors</h3>
+
+            </div>
+            <div class="metric-value">{{ courseStatistics.numberOfUniqueVisitors| number }}</div>
+        </div>
+    </div>
 </div>

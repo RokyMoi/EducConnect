@@ -1,5 +1,7 @@
 export interface CourseStatistics {
+  courseId: string;
+  numberOfUniqueVisitors: number;
   totalViews: number;
-  activeViewers: number;
+  currentlyViewing: number;
   averageViewDurationInMinutes: number;
 }
