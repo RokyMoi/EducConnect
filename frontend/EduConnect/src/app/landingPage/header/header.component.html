@@ -1,57 +1,54 @@
 <header>
- 
-   
-    @if(AccountService.CurrentUser()){
-         @if( AccountService.CurrentUser()?.Role === "student"){
-            <p routerLink='/student-dashboard' class = "headerLogo">
-                EduConnects
-            </p>
-            <div class="RouterLinks">
-                <mat-icon routerLink="/direct-message" class="IconAllDevices" >sms</mat-icon>
+
+
+    <div class="student-section" *ngIf="currentUser()?.Role === 'Student'">
+
+
+        <p routerLink='/student-dashboard' class="headerLogo">
+            EduConnects
+        </p>
+        <div class="RouterLinks">
+            <mat-icon routerLink="/direct-message" class="IconAllDevices">sms</mat-icon>
 
             <mat-icon routerLink="/Shopping-Cart" class="iconComp">shopping_cart_checkout</mat-icon>
 
-            <mat-icon  routerLink='/learning-student' class="iconComp">school</mat-icon> 
-            <div mat-card-avatar routerLink='/student-profile'  class="StudentPhoto iconComp" [style.background-image]="'url(' + profilePicture + ')'"></div>
+            <mat-icon routerLink='/learning-student' class="iconComp">school</mat-icon>
+            <div mat-card-avatar routerLink='/student-profile' class="StudentPhoto iconComp"
+                [style.background-image]="'url(' + profilePicture + ')'"></div>
         </div>
-    }
 
-        <!---MOBILE SECTION -->
-       
-         @if(AccountService.CurrentUser()?.Role == "tutor"){
-            <p class = "headerLogo">
-                EduConnects
-            </p>
-              <!-- ADD TUTOR ROUTERLINKS--->
-               <div class="RouterLinks">
-
-
-
-
-
-               </div>
-         }
-    }
-    @else {
-        <div class="RouterLinks">
-        <button class = "useServiceButton">
-            Use EduConnect
-        </button>
     </div>
-    }
+    <!---MOBILE SECTION -->
+
+    <div class="tutor-section" *ngIf="currentUser()?.Role === 'Tutor'">
+
+        <p class="headerLogo">
+            EduConnects
+        </p>
+        <!-- ADD TUTOR ROUTERLINKS--->
+        <div class="RouterLinks">
+        </div>
+
+
+
+
+
+    </div>
+
+    <p class="headerLogo" *ngIf="!currentUser()">EduConnect</p>
+
+
+
 </header>
 
 
 <!---MOBILE SECTION FOR STUDENT -->
-@if(AccountService.CurrentUser()){
-    @if( AccountService.CurrentUser()?.Role === "student"){
-      
-<div class="phoneMenu">
+
+<div class="phoneMenu" *ngIf="currentUser() && currentUser()?.Role === 'Student'">
     <mat-icon routerLink='/student-dashboard' class="icon">shopping_cart_checkout</mat-icon>
-    <mat-icon   routerLink='/learning-student' class="icon">school</mat-icon> 
-  
+    <mat-icon routerLink='/learning-student' class="icon">school</mat-icon>
+
     <!-- Mobile Avatar Image -->
-    <div mat-card-avatar routerLink='/student-profile' class="StudentPhotoPhone"  [style.background-image]="'url(' + profilePicture + ')'"></div>
-  </div>
-}
-}
+    <div mat-card-avatar routerLink='/student-profile' class="StudentPhotoPhone"
+        [style.background-image]="'url(' + profilePicture + ')'"></div>
+</div>

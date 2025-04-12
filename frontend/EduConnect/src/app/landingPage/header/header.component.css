@@ -8,7 +8,7 @@ header {
   top: 0;
 
   width: 100%;
-  max-height: 30px;
+  max-height: 40px;
   display: flex;
   flex-direction: row;
   background-color: rgb(2, 80, 176);
@@ -16,17 +16,19 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 2%;
-  overflow: hidden; 
+  overflow: hidden;
 }
 .RouterLinks {
   display: flex;
   flex-direction: row;
   gap: 20px;
+  align-items: center;
 }
 .headerLogo {
   font-size: 32px;
   font-weight: 900;
   text-decoration: none;
+  color: white;
 }
 
 .useServiceButton {
@@ -78,6 +80,23 @@ header {
   margin-top: 5px;
 }
 
+.student-section {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  margin-left: 10px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.tutor-section {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  margin-left: 10px;
+}
 /* Phone Menu Styles */
 .phoneMenu {
   display: none; /* Hide by default */

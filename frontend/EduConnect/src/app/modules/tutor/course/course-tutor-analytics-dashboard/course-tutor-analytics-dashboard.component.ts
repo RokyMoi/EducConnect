@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, take, takeUntil } from 'rxjs';
 import { CourseStatistics } from '../../../../models/course/course-analytics-hub/course-statistics';
 import { CourseAnalyticsService } from '../../../../services/signalr-services/course-analytics.service';
 import { CourseViewershipUpdate } from '../../../../models/course/course-analytics-hub/course-viewership-update';
@@ -27,6 +27,12 @@ export class CourseTutorAnalyticsDashboardComponent implements OnInit {
       console.log('Received message:', message);
     });
 
-    this.analyticsService.requestAnalyticsData(this.courseId);
+    this.analyticsService
+      .onConnectionEstablished()
+
+      .pipe(take(1))
+      .subscribe(() => {
+        this.analyticsService.requestAnalyticsData(this.courseId);
+      });
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { CourseViewershipUpdate } from '../../models/course/course-analytics-hub/course-viewership-update';
 import { CourseStatistics } from '../../models/course/course-analytics-hub/course-statistics';
 import ApiLinks from '../../../assets/api/link.api';
@@ -12,6 +12,8 @@ export class CourseAnalyticsService {
   private connection!: signalR.HubConnection;
   private isConnectionReady: boolean = false;
   private pendingSubscriptions: number[] = [];
+
+  public connectionEstablished = new Subject<void>();
 
   /**
    *
@@ -30,6 +32,7 @@ export class CourseAnalyticsService {
       .then(() => {
         console.log('Connection started');
         // Invoke the server-side method after the connection is started
+        this.connectionEstablished.next();
       })
       .catch((err) => {
         console.log('Error while starting connection: ' + err);
@@ -46,9 +49,13 @@ export class CourseAnalyticsService {
       console.warn('SignalR connection not established yet.');
     }
   };
-  public getAnalyticsData = (callback: (message: string) => void) => {
+  public getAnalyticsData = (callback: (data: any) => void) => {
     this.connection.on('GetAnalyticsData', (data) => {
       callback(data);
     });
   };
+
+  public onConnectionEstablished(): Observable<void> {
+    return this.connectionEstablished.asObservable();
+  }
 }

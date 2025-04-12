@@ -25,7 +25,7 @@ export class AccountService {
   http = inject(HttpClient);
   baseUrl = 'http://localhost:5177/';
   CurrentUser = signal<User | null>(null);
-presenceService = inject(PresenceService);
+  presenceService = inject(PresenceService);
   router = inject(Router);
 
   login(model: any) {
@@ -35,6 +35,7 @@ presenceService = inject(PresenceService);
       })
       .pipe(
         map((response) => {
+          console.log('This is data from the login');
           const userData = (response.body as any)?.data;
 
           if (userData) {
@@ -75,19 +76,19 @@ presenceService = inject(PresenceService);
       .pipe(
         map((response) => {
           const userData = (response.body as any)?.data;
-  
+
           if (userData) {
             const loggedInUser: User = {
               Email: userData.email,
               Role: userData.role,
               Token: userData.token,
             };
-  
+
             this.CurrentUser.set(loggedInUser);
             this.presenceService.createHubConnection(userData);
-  
+
             localStorage.setItem('user', JSON.stringify(loggedInUser));
-  
+
             // Postavljanje autorizacije u localStorage
             const token = response.headers.get('Authorization');
             if (token) {
@@ -98,7 +99,7 @@ presenceService = inject(PresenceService);
               );
             }
           }
-  
+
           return response;
         })
       );
@@ -107,7 +108,6 @@ presenceService = inject(PresenceService);
     localStorage.clear();
     this.CurrentUser.set(null);
     this.presenceService.stopHubConnection();
-    
   }
 
   //Method for registering a new user as a tutor
