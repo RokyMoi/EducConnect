@@ -16,17 +16,28 @@ namespace EduConnect.SignalIR
         {
             Console.WriteLine("Received analytics data for course: " + courseId);
 
-            int count = await _dataContext.CourseViewershipData
-            .Where(x => x.CourseId == courseId)
-            .CountAsync();
-
-            Console.WriteLine("Count: " + count);
-
-            await Clients.Caller.SendAsync("GetAnalyticsData", count);
+            var data = await _dataContext.CourseViewershipData
+    .Where(cvd => cvd.CourseId == courseId)
+    .GroupBy(cvd => 1) // dummy grouping to enable aggregation
+    .Select(g => new
+    {
+        TotalViews = g.Count(),
+        ActiveViewers = g.Count(cvd => cvd.EnteredDetailsAt != null && cvd.LeftDetailsAt == null),
+        AverageViewDurationInMinutes = g
+            .Where(cvd => cvd.EnteredDetailsAt != null && cvd.LeftDetailsAt != null)
+            .Average(cvd => EF.Functions.DateDiffMinute(cvd.EnteredDetailsAt.Value, cvd.LeftDetailsAt.Value))
+    })
+    .FirstOrDefaultAsync();
+            await Clients.Caller.SendAsync("GetAnalyticsData", data);
         }
 
-        public record CourseViewershipAnalyticsData(Guid courseId, string courseName, int clickedOn);
-
+        public record CourseViewershipAnalyticsData(Guid CourseId, int TotalViews = 0, int CurrentlyViewing = 0, double AvgTimeSpent = 0);
+        public record ViewershipUpdate(
+            Guid CourseId,
+            int NewViews,
+            int ActiveViewersChange,
+            double UpdatedAvgTime
+        );
     }
 
 

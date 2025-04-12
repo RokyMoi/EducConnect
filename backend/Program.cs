@@ -49,6 +49,7 @@ namespace EduConnect
             builder.Services.AddScoped<UserManager<Person>, PersonManager>();
             builder.Services.AddScoped<PersonManager>();
 
+            builder.Services.AddHostedService<ViewershipChangeService>();
 
             builder.Services.AddControllers();
 

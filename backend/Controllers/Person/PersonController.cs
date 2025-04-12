@@ -104,7 +104,9 @@ namespace backend.Controllers.Person
                     "You have logged in successfully",
                     new
                     {
+                        email = personEmail.Email,
                         role = roles.FirstOrDefault().Name,
+                        token = token.Token,
                     }
                 )
             );
