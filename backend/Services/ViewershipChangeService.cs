@@ -22,6 +22,7 @@ namespace EduConnect.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            Console.WriteLine("ViewershipChangeService is running.");
 
             using var scope = _scopeFactory.CreateScope();
             var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -50,8 +51,9 @@ namespace EduConnect.Services
                             x.Where(y => y.EnteredDetailsAt.HasValue && y.LeftDetailsAt.HasValue).Average(y => EF.Functions.DateDiffMinute(y.EnteredDetailsAt.Value, y.LeftDetailsAt.Value))
                         )
                     ).FirstOrDefaultAsync();
-
+                    Console.WriteLine($"Updating analytics data for course {courseId}");
                     await _hubContext.Clients.Group(courseId.ToString()).SendAsync("GetAnalyticsData", analyticsData, cancellationToken: stoppingToken);
+                    
 
                 }
 

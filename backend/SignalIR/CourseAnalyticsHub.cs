@@ -28,6 +28,8 @@ namespace EduConnect.SignalIR
             .Average(cvd => EF.Functions.DateDiffMinute(cvd.EnteredDetailsAt.Value, cvd.LeftDetailsAt.Value))
     })
     .FirstOrDefaultAsync();
+            await Groups.AddToGroupAsync(Context.ConnectionId, courseId.ToString());
+            Console.WriteLine($"Connection {Context.ConnectionId} subscribed to group {courseId}");
             await Clients.Caller.SendAsync("GetAnalyticsData", data);
         }
 

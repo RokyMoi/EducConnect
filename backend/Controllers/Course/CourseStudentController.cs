@@ -11,9 +11,11 @@ using EduConnect.Entities.Course;
 using EduConnect.Interfaces;
 using EduConnect.Interfaces.Course;
 using EduConnect.Middleware;
+using EduConnect.SignalIR;
 using EduConnect.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace EduConnect.Controllers.Course
 {
@@ -25,7 +27,8 @@ namespace EduConnect.Controllers.Course
         IStudentRepository _studentRepository,
         ICourseRepository _courseRepository,
         IPersonRepository _personRepository,
-        IHttpContextAccessor _httpContextAccessor
+        IHttpContextAccessor _httpContextAccessor,
+        IHubContext<CourseAnalyticsHub> _courseAnalyticsHubContext
 
     ) : ControllerBase
     {
@@ -112,6 +115,7 @@ namespace EduConnect.Controllers.Course
             var updateResult = await _courseRepository.UpdateCourseViewershipData(courseViewershipData);
 
             Console.WriteLine("Update course viewership data result: " + updateResult);
+
 
             return Ok();
 
