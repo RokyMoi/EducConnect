@@ -9,7 +9,7 @@ namespace EduConnect.Interfaces
         Task<AuthenticationToken?> CreateTokenAsync(Person person);
         Task<bool> ValidateToken(string authenticationToken);
 
-        Task<string?> GetRole(Person person);
+        Task<string?> GetRole(PersonEmail person);
 
         Task<AuthenticationToken?> GetTokenByPersonPublicId(Guid publicId);
 

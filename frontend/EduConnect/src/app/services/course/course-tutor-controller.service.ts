@@ -16,6 +16,7 @@ import { UploadCourseLessonResourceRequest } from '../../models/course/course-tu
 import { GetPromotionImagesResponse } from '../../models/course/course-tutor-controller/get-promotion-images-response';
 import { GetCoursePromotionImageMetadataByIdResponse } from '../../models/course/course-tutor-controller/get-course-promotion-image-metadata-by-id-response';
 import { UploadCoursePromotionImageRequest } from '../../models/course/course-tutor-controller/upload-course-promotion-image-request';
+import { GetCourseAnalyticsHistoryResponse } from '../../models/course/course-tutor-controller/get-course-analytics-history-response';
 
 @Injectable({
   providedIn: 'root',
@@ -524,5 +525,16 @@ export class CourseTutorControllerService {
         },
       }
     );
+  }
+
+  getCourseAnalyticsHistory(courseId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<
+      DefaultServerResponse<GetCourseAnalyticsHistoryResponse[]>
+    >(`${this.apiUrl}/analytics/history?courseId=${courseId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 }

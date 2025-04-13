@@ -17,7 +17,7 @@ import { SnackboxService } from '../../../services/shared/snackbox.service';
   standalone: true,
 })
 export class LoginComponent implements OnInit {
-  private accountService = inject(AccountService);
+  private accountService = inject(PersonControllerService);
   private routerNav = inject(Router);
   loggedIn = false;
   model: any = {};
@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit {
 
           const role = response.body?.data.role;
           const roleString = String(role).toLowerCase();
-
+          this.accountService.CurrentUser.set(response.body?.data);
           this.routerNav.navigate([`/${roleString}/dashboard`]);
         },
         error: (error) => {

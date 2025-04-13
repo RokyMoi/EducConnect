@@ -8,8 +8,9 @@ import { ServerOfflineComponent } from './error/server-offline/server-offline.co
 import { RouterModule } from '@angular/router';
 import { AccountService } from './services/account.service';
 import { HeaderTemplateComponent } from './common/header/header-template/header-template.component';
-import { HeaderComponent } from './modules/shared/header/header.component';
-import { SnackboxComponent } from "./modules/shared/snackbox/snackbox.component";
+
+import { SnackboxComponent } from './modules/shared/snackbox/snackbox.component';
+import { HeaderComponent } from './landingPage/header/header.component';
 
 @Component({
   selector: 'app-root',
@@ -17,12 +18,9 @@ import { SnackboxComponent } from "./modules/shared/snackbox/snackbox.component"
     RouterOutlet,
     RouterModule,
     CommonModule,
-    NgIf,
-    ServerOfflineComponent,
-    HeaderTemplateComponent,
+    SnackboxComponent,
     HeaderComponent,
-    SnackboxComponent
-],
+  ],
   standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],

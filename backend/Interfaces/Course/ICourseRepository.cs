@@ -120,5 +120,7 @@ namespace EduConnect.Interfaces.Course
         Task<bool> CreateCourseViewershipData(CourseViewershipData courseViewershipData);
         Task<CourseViewershipData?> GetCourseViewershipDataById(Guid courseViewershipDataId);
         Task<bool> UpdateCourseViewershipData(CourseViewershipData courseViewershipData);
+
+        Task<List<GetCourseAnalyticsHistoryResponse>> GetCourseAnalyticsHistory(Guid courseId);
     }
 }

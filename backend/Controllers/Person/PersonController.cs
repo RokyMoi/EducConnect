@@ -92,6 +92,8 @@ namespace backend.Controllers.Person
 
             }
 
+            var personEmail = await db.PersonEmail.Where(x => x.PersonId == person.PersonId).FirstOrDefaultAsync();
+
             var token = await _tokenService.CreateTokenAsync(person);
 
             Response.Headers.Append("Authorization", "Bearer " + token.Token);
@@ -102,7 +104,9 @@ namespace backend.Controllers.Person
                     "You have logged in successfully",
                     new
                     {
+                        email = personEmail.Email,
                         role = roles.FirstOrDefault().Name,
+                        token = token.Token,
                     }
                 )
             );

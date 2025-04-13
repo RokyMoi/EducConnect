@@ -2157,6 +2157,28 @@ namespace EduConnect.Controllers.Course
                 ApiResponse<GetCoursePromotionImageMetadataByIdResponse?>.GetApiResponse("Promotion image retrieved successfully", image)
             );
         }
+
+        [HttpGet("analytics/history")]
+        public async Task<IActionResult> GetCourseAnalyticsHistory([FromQuery] Guid courseId)
+        {
+            var courseExists = await _courseRepository.CourseExistsById(courseId);
+
+            if (!courseExists)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course not found",
+                        null
+                    )
+                );
+            }
+
+            var analyticsHistory = await _courseRepository.GetCourseAnalyticsHistory(courseId);
+
+            return Ok(
+                ApiResponse<List<GetCourseAnalyticsHistoryResponse>>.GetApiResponse("Analytics history retrieved successfully", analyticsHistory)
+            );
+        }
     }
 
 

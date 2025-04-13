@@ -223,6 +223,22 @@ namespace EduConnect.Controllers
                 Console.WriteLine(role.Description);
             }
 
+            //Add to student table
+            var addToStudentTable = await db.Student.AddAsync(
+                new Entities.Student.Student
+                {
+                    StudentId = Guid.NewGuid(),
+                    PersonId = Person.PersonId,
+                    CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    ModifiedAt = null
+                }
+            );
+
+            Console.WriteLine("Person added to the Student table: " + addToStudentTable.IsKeySet);
+            PrintObjectUtility.PrintObjectProperties(addToStudentTable);
+
+            await db.SaveChangesAsync();
+
             var token = await _tokenService.CreateTokenAsync(Person);
 
 

@@ -49,7 +49,8 @@ namespace EduConnect
             builder.Services.AddScoped<UserManager<Person>, PersonManager>();
             builder.Services.AddScoped<PersonManager>();
 
-
+            builder.Services.AddHostedService<ViewershipChangeService>();
+            builder.Services.AddHostedService<CourseViewershipDataSnapshotService>();
             builder.Services.AddControllers();
 
             builder.Services.AddSignalR();

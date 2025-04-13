@@ -14,7 +14,7 @@ namespace EduConnect.SignalIR
 
             await tracker.UserConnected(Context.User?.FindFirst(ClaimTypes.Email)?.Value, Context.ConnectionId);
             
-            await Clients.Others.SendAsync("UserIsOnline",Context.User?.FindFirst(ClaimTypes.Email)?.Value);
+            await Clients.Others.SendAsync("UserIsOnline", Context.User?.FindFirst(ClaimTypes.Email)?.Value);
             var currentUsers = await tracker.GetOnlineUsers();
             await Clients.All.SendAsync("GetOnlineUsers", currentUsers);
         }
