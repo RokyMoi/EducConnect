@@ -530,7 +530,7 @@ export class CourseTutorControllerService {
   getCourseAnalyticsHistory(courseId: string) {
     const token = localStorage.getItem('Authorization');
     return this.httpClient.get<
-      DefaultServerResponse<GetCourseAnalyticsHistoryResponse[]>
+      DefaultServerResponse<GetCourseAnalyticsHistoryResponse>
     >(`${this.apiUrl}/analytics/history?courseId=${courseId}`, {
       headers: {
         Authorization: `Bearer ${token}`,

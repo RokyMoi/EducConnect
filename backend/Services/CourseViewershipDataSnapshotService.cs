@@ -18,7 +18,7 @@ namespace EduConnect.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(ExecuteTask, null, 0, (int)TimeSpan.FromMinutes(5).TotalMilliseconds);
+            _timer = new Timer(ExecuteTask, null, 0, (int)TimeSpan.FromMinutes(60).TotalMilliseconds);
             return Task.CompletedTask;
         }
 

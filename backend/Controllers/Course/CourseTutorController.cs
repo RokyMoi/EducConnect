@@ -2174,9 +2174,14 @@ namespace EduConnect.Controllers.Course
             }
 
             var analyticsHistory = await _courseRepository.GetCourseAnalyticsHistory(courseId);
-
+            (int usersCameFromFeedCount, int usersCameFromSearchCount) = await _courseRepository.GetCourseUsersCameFromCounts(courseId);
             return Ok(
-                ApiResponse<List<GetCourseAnalyticsHistoryResponse>>.GetApiResponse("Analytics history retrieved successfully", analyticsHistory)
+                ApiResponse<GetCourseAnalyticsHistoryControllerResponse>.GetApiResponse("Analytics history retrieved successfully", new GetCourseAnalyticsHistoryControllerResponse
+                {
+                    CourseAnalyticsHistory = analyticsHistory,
+                    UsersCameFromFeedCount = usersCameFromFeedCount,
+                    UsersCameFromSearchCount = usersCameFromSearchCount
+                })
             );
         }
     }

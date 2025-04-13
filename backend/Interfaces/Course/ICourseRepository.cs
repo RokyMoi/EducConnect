@@ -122,5 +122,6 @@ namespace EduConnect.Interfaces.Course
         Task<bool> UpdateCourseViewershipData(CourseViewershipData courseViewershipData);
 
         Task<List<GetCourseAnalyticsHistoryResponse>> GetCourseAnalyticsHistory(Guid courseId);
+        Task<(int usersCameFromFeedCount, int usersCameFromSearchCount)> GetCourseUsersCameFromCounts(Guid courseId);
     }
 }

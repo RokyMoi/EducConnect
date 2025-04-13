@@ -35,4 +35,22 @@
             <div class="metric-value">{{ courseStatistics.numberOfUniqueVisitors| number }}</div>
         </div>
     </div>
+
+
+    <p>Graphical analytics overview</p>
+    <div class="charts-container">
+        <div class="chart-wrapper">
+            <h4>Course Engagement</h4>
+            <canvas id="lineChart">{{lineCtx}}</canvas>
+        </div>
+        <div class="chart-wrapper">
+            <h4>Average View Comparison</h4>
+            <canvas id="barChart">{{barCtx}}</canvas>
+        </div>
+        <div class="chart-wrapper">
+            <h4>Users Viewed Course (Feed VS Search)</h4>
+            <canvas id="pieChart">{{pieCtx}}</canvas>
+        </div>
+
+    </div>
 </div>

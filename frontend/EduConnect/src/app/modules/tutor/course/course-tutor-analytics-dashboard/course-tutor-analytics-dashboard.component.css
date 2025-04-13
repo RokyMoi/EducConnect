@@ -64,3 +64,38 @@
     color: #d63031;
   }
 }
+
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(300px, 650px)
+  ); /* Ensures flexibility */
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.chart-wrapper {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the chart inside the wrapper */
+}
+
+.chart-wrapper h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #343a40;
+  text-align: center;
+}
+
+canvas {
+  width: 100% !important;
+  max-width: 100%; /* Prevents the chart from being too wide */
+  height: 350px !important; /* Ensures consistent height */
+  margin: 0 auto; /* Centers the canvas inside the wrapper */
+}

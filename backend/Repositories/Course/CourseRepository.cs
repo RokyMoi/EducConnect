@@ -756,6 +756,25 @@ namespace EduConnect.Repositories.Course
             return await _dataContext.CourseThumbnail.Include(x => x.Course).Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
         }
 
+        public async Task<(int usersCameFromFeedCount, int usersCameFromSearchCount)> GetCourseUsersCameFromCounts(Guid courseId)
+        {
+
+            var data = await _dataContext.CourseViewershipData
+            .Where(x => x.CourseId == courseId)
+            .GroupBy(x => x.UserCameFrom)
+            .Select(g => new
+            {
+                Source = g.Key,
+                Count = g.Count()
+            })
+            .ToListAsync();
+
+            int usersCameFromFeedCount = data.FirstOrDefault(x => x.Source == UserCourseSourceType.Feed)?.Count ?? 0;
+            int usersCameFromSearchCount = data.FirstOrDefault(x => x.Source == UserCourseSourceType.Search)?.Count ?? 0;
+
+            return (usersCameFromFeedCount, usersCameFromSearchCount);
+        }
+
         public async Task<CourseViewershipData?> GetCourseViewershipDataById(Guid courseViewershipDataId)
         {
             return await _dataContext.CourseViewershipData.Where(x => x.CourseViewershipDataId == courseViewershipDataId).FirstOrDefaultAsync();

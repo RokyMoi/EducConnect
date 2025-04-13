@@ -21,7 +21,7 @@ namespace EduConnect.Entities.Course
         public int NumberOfUniqueVisitors { get; set; }
         public int CurrentlyViewing { get; set; }
         public double AverageViewDurationInMinutes { get; set; }
-        public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         public long? UpdatedAt { get; set; } = null;
     }
 }
