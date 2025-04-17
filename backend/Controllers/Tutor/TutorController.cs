@@ -29,12 +29,13 @@ using backend.DTOs.Tutor;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.AspNetCore.Identity;
 using EduConnect.Utilities;
+using EduConnect.Middleware;
 
 namespace backend.Controllers.Tutor
 {
     [ApiController]
     [Route("/tutor")]
-    public class TutorController(DataContext _databaseContext, ITokenService _tokenService, IPersonRepository _personRepository, ITutorRepository _tutorRepository, ICountryRepository _countryRepository, IReferenceRepository _referenceRepository, PersonManager personManager) : ControllerBase
+    public class TutorController(DataContext _databaseContext, ITokenService _tokenService, IPersonRepository _personRepository, ITutorRepository _tutorRepository, ICountryRepository _countryRepository, IReferenceRepository _referenceRepository, PersonManager personManager, IHttpContextAccessor httpContextAccessor) : ControllerBase
     {
 
         [HttpPost("signup")]
@@ -123,7 +124,7 @@ namespace backend.Controllers.Tutor
 
             var createTutorResult = await _tutorRepository.CreateTutor(tutor);
 
-            
+
 
             var token = await _tokenService.CreateTokenAsync(Person);
 
@@ -856,5 +857,7 @@ namespace backend.Controllers.Tutor
 
 
         }
+
+
     }
 }

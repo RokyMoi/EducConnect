@@ -288,6 +288,8 @@ namespace EduConnect.Controllers.Course
             var latestLessons = await _courseRepository.GetLatestCourseLessons(courseId);
 
             var promotionImagesMetadata = await _courseRepository.GetCoursePromotionImagesMetadataForCourseManagementDashboard(courseId);
+
+            (int totalViews, int uniqueUsers) = await _courseRepository.GetCourseAnalyticsForCourseManagementDashboard(courseId);
             var response = new CourseManagementDashboardResponse
             {
                 CourseId = course.CourseId,
@@ -311,6 +313,8 @@ namespace EduConnect.Controllers.Course
                 TwoLatestAddedLessons = latestLessons ?? [],
                 NumberOfPromotionImages = promotionImagesMetadata.Item1,
                 LatestPromotionImageUploadedAt = promotionImagesMetadata.Item2.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds((long)promotionImagesMetadata.Item2).UtcDateTime : null,
+                TotalViews = totalViews,
+                UniqueUsers = uniqueUsers
 
 
 
@@ -2184,6 +2188,373 @@ namespace EduConnect.Controllers.Course
                 })
             );
         }
+
+        [HttpPost("tags/create")]
+        public async Task<IActionResult> CreateOrUpdateCourseTag([FromQuery] CreateOrUpdateCourseTagRequest request)
+        {
+
+            //Check if it is create or update operation 
+            if (request.TagId.HasValue && request.TagId.Value != Guid.Empty)
+            {
+                //Check if the tag exists and the user created the tag
+                var existingTag = await _courseRepository.GetTagById(request.TagId.Value);
+
+                //Check if the tag exists, and if it does not then, consider this a create operation
+
+                if (existingTag != null)
+                {
+                    //
+                    var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+
+
+                    if (personId == Guid.Empty)
+                    {
+                        return StatusCode(
+                            500,
+                            ApiResponse<object>.GetApiResponse(
+                                "An error occurred while updating the tag, please refer to your administrator, regarding your role",
+                                null
+                            )
+                        );
+                    }
+
+                    if (personId != existingTag.CreatedByPersonId)
+                    {
+                        return StatusCode(
+                            403,
+                            ApiResponse<object>.GetApiResponse(
+                                "You are not authorized to update this tag",
+                                null
+                            )
+                        );
+                    }
+
+                    var nameTakenExcludingThis = await _courseRepository.TagExistsByNameExcludingId(request.TagId.Value, request.Name);
+
+                    if (nameTakenExcludingThis)
+                    {
+                        return Conflict(
+                            ApiResponse<object>.GetApiResponse(
+                                "A tag with this name already exists",
+                                null
+                            )
+                        );
+                    }
+
+                    existingTag.Name = request.Name;
+                    existingTag.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+                    var updateResult = await _courseRepository.UpdateTag(existingTag);
+
+                    if (!updateResult)
+                    {
+                        return StatusCode(
+                            500,
+                            ApiResponse<object>.GetApiResponse(
+                                "An error occurred while updating the tag, please try again",
+                                null
+                            )
+                        );
+                    }
+
+                    return Ok(
+                        ApiResponse<object>.GetApiResponse("Tag updated successfully", null)
+                    );
+
+
+
+
+                }
+            }
+
+            var nameTaken = await _courseRepository.TagExistsByName(request.Name);
+
+            if (nameTaken)
+            {
+                return Conflict(
+                    ApiResponse<object>.GetApiResponse(
+                        "A tag with this name already exists",
+                        null
+                    )
+                );
+            }
+
+            var tag = new Tag
+            {
+                Name = request.Name,
+                CreatedByPersonId = Guid.Parse(HttpContext.Items["PersonId"].ToString()),
+            };
+
+            bool createResult = await _courseRepository.CreateTag(tag);
+            if (!createResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while creating the tag, please try again",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Tag created successfully", null)
+            );
+
+        }
+
+        [HttpGet("tags/search")]
+        public async Task<IActionResult> GetTagsBySearchPaginated([FromQuery] GetTagsBySearchPaginatedRequest request)
+        {
+            var requestQuery = string.IsNullOrEmpty(request.SearchQuery) ? "" : request.SearchQuery;
+            request.SearchQuery = requestQuery;
+            var result = await _courseRepository.GetTagsBySearch(request);
+            return Ok(ApiResponse<PaginatedResponse<GetTagsBySearchResponse>>.GetApiResponse("Search results retrieved successfully", result));
+
+        }
+
+        [HttpPost("tags/assign")]
+        public async Task<IActionResult> AssignTagToCourse([FromQuery] AssignTagToCourseRequest request)
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tag = await _courseRepository.GetTagById(request.TagId);
+
+            if (tag == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Tag not found",
+                        null
+                    )
+                );
+
+            }
+
+            var course = await _courseRepository.GetCourseById(request.CourseId);
+
+            if (course == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course not found",
+                        null
+                    )
+                );
+            }
+
+            if (course.Tutor.PersonId != personId)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to assign this tag to this course",
+                        null
+                    )
+                );
+            }
+
+            var tagAssigned = await _courseRepository.CheckTagAssignedToCourse(request.TagId, request.CourseId);
+
+            if (tagAssigned)
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "Tag already assigned to course",
+                        null
+                    )
+                );
+
+            }
+
+            var courseTag = new CourseTag
+            {
+                CourseId = request.CourseId,
+                TagId = request.TagId,
+
+            };
+
+            bool createResult = await _courseRepository.CreateCourseTag(courseTag);
+
+            if (!createResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while assigning the tag to the course, please try again",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Tag assigned to course successfully", null)
+            );
+        }
+
+        [HttpDelete("tags/remove")]
+        public async Task<IActionResult> RemoveTagFromCourse([FromQuery] RemoveTagFromCourseRequest request)
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while removing the tag from the course, regarding your role, please contact an administrator for details",
+                        null
+                    )
+                );
+            }
+
+            CourseTag? courseTag = await _courseRepository.GetCourseTagByCourseIdAndTagId(request.CourseId, request.TagId);
+
+            if (courseTag == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Tag or course not found",
+                        null
+                    )
+                );
+            }
+
+            if (courseTag.Course?.TutorId != tutor.TutorId)
+            {
+                return Unauthorized(
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to remove this tag from this course",
+                        null
+                    )
+                );
+            }
+
+            bool deleteResult = await _courseRepository.DeleteCourseTag(courseTag);
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while removing the tag from the course, please try again",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Tag removed from course successfully", null)
+            );
+
+        }
+
+        [HttpDelete("tags/delete")]
+        public async Task<IActionResult> DeleteTag([FromQuery] Guid tagId)
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the tag, regarding your role, please contact an administrator for details",
+                        null
+                    )
+                );
+            }
+
+            Tag? tag = await _courseRepository.GetTagById(tagId);
+
+            if (tag == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Tag not found",
+                        null
+                    )
+                );
+            }
+
+            if (tag.CreatedByPersonId != personId)
+            {
+                return Unauthorized(
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to delete this tag",
+                        null
+                    )
+                );
+            }
+
+            bool deleteResult = await _courseRepository.DeleteTag(tag);
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the tag, please try again",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Tag deleted successfully", null)
+            );
+        }
+
+        [HttpGet("tags/course/all")]
+        public async Task<IActionResult> GetAllTagsByCourseId([FromQuery] Guid courseId)
+        {
+            if (!await _courseRepository.CourseExistsById(courseId))
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course not found",
+                        null
+                    )
+                );
+
+            }
+            var courseTags = await _courseRepository.GetAllCourseTagsByCourseId(courseId);
+
+            return Ok(
+                ApiResponse<List<GetAllCourseTagsByCourseId>>.GetApiResponse("Tags retrieved successfully", courseTags)
+            );
+
+        }
+
+        [HttpGet("tags/tutor/all")]
+        public async Task<IActionResult> GetAllTagsByTutor()
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+            if (tutor == null)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while getting the tags, regarding your role, please contact an administrator for details",
+                        null
+                    )
+                );
+            }
+
+            List<GetAllTagsByTutorResponse> tags = await _courseRepository.GetAllTagsByTutor(tutor.TutorId);
+
+            return Ok(
+                ApiResponse<List<GetAllTagsByTutorResponse>>.GetApiResponse("Tags by tutor retrieved successfully", tags)
+            );
+        }
+
     }
 
 

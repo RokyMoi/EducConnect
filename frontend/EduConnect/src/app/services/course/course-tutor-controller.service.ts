@@ -17,6 +17,14 @@ import { GetPromotionImagesResponse } from '../../models/course/course-tutor-con
 import { GetCoursePromotionImageMetadataByIdResponse } from '../../models/course/course-tutor-controller/get-course-promotion-image-metadata-by-id-response';
 import { UploadCoursePromotionImageRequest } from '../../models/course/course-tutor-controller/upload-course-promotion-image-request';
 import { GetCourseAnalyticsHistoryResponse } from '../../models/course/course-tutor-controller/get-course-analytics-history-response';
+import { GetAllCourseTagsByCourseIdResponse } from '../../models/course/course-tutor-controller/get-all-course-tags-by-course-id-response';
+import { RemoveTagFromCourseRequest } from '../../models/course/course-tutor-controller/remove-tag-from-course-request';
+import { GetAllTagsByTutorResponse } from '../../models/course/course-tutor-controller/get-all-tags-by-tutor-response';
+import { GetTagsBySearchRequest } from '../../models/course/course-tutor-controller/get-tags-by-search-request';
+import { PaginatedResponse } from '../../models/shared/paginated-response';
+import { GetTagsBySearchResponse } from '../../models/course/course-tutor-controller/get-tags-by-search-response';
+import { AssignTagToCourseRequest } from '../../models/course/course-tutor-controller/assign-tag-to-course-request';
+import { CreateOrUpdateCourseTagRequest } from '../../models/course/course-tutor-controller/create-or-update-course-tag-request';
 
 @Injectable({
   providedIn: 'root',
@@ -536,5 +544,90 @@ export class CourseTutorControllerService {
         Authorization: `Bearer ${token}`,
       },
     });
+  }
+
+  getAllCourseTagsByCourseId(courseId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<
+      DefaultServerResponse<GetAllCourseTagsByCourseIdResponse[]>
+    >(`${this.apiUrl}/tags/course/all?courseId=${courseId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  removeTagFromCourse(request: RemoveTagFromCourseRequest) {
+    const token = localStorage.getItem('Authorization');
+    const params = buildHttpParams(request);
+    return this.httpClient.delete<DefaultServerResponse<null>>(
+      `${this.apiUrl}/tags/remove`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: params,
+      }
+    );
+  }
+
+  getAllTagsByTutor(courseId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<
+      DefaultServerResponse<GetAllTagsByTutorResponse[]>
+    >(`${this.apiUrl}/tags/tutor/all?usedByCourseId=${courseId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  getTagsBySearch(
+    request: GetTagsBySearchRequest
+  ): Observable<
+    DefaultServerResponse<PaginatedResponse<GetTagsBySearchResponse>>
+  > {
+    const token = localStorage.getItem('Authorization');
+    const params = buildHttpParams(request);
+
+    return this.httpClient.get<
+      DefaultServerResponse<PaginatedResponse<GetTagsBySearchResponse>>
+    >(`${this.apiUrl}/tags/search`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: params,
+    });
+  }
+
+  assignTagToCourse(request: AssignTagToCourseRequest) {
+    const token = localStorage.getItem('Authorization');
+    const params = buildHttpParams(request);
+
+    return this.httpClient.post<DefaultServerResponse>(
+      `${this.apiUrl}/tags/assign`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: params,
+      }
+    );
+  }
+
+  createOrUpdateCourseTag(request: CreateOrUpdateCourseTagRequest) {
+    const token = localStorage.getItem('Authorization');
+    const params = buildHttpParams(request);
+    return this.httpClient.post<DefaultServerResponse>(
+      `${this.apiUrl}/tags/create`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: params,
+      }
+    );
   }
 }

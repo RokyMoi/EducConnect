@@ -214,7 +214,8 @@ namespace EduConnect
 
             app.MapControllers();
             app.MapHub<CourseAnalyticsHub>("/course-analytics-hub");
-
+            app.MapHub<PresenceHub>("hubs/presence");
+            app.MapHub<MessageHub>("hubs/message");
             using (var scope = app.Services.CreateScope())
             {
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Person>>();

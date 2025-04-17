@@ -17,7 +17,7 @@ namespace EduConnect.Extensions
         var tokenKey = config["Jwt:SecretKey"] ?? throw new Exception("Token not found");
         options.TokenValidationParameters = new TokenValidationParameters
         {
-           
+
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey)),
@@ -32,11 +32,13 @@ namespace EduConnect.Extensions
                 var path = context.Request.Path;
                 if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
                 {
+                    Console.WriteLine("Populating signalr context with access token");
+                    Console.WriteLine(accessToken);
                     context.Token = accessToken;
                 }
                 return Task.CompletedTask;
             }
-            
+
         };
     });
             return services;

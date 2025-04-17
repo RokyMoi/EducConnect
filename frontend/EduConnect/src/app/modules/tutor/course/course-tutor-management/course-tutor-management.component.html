@@ -143,15 +143,16 @@
                 </div>
             </div>
         </div>
-        <!--Test And Quiz Card-->
+        <!--Tags Card-->
         <div class="management-card">
             <div class="card-header">
-                <h2><i class="fas fa-book-open"></i>Tests, quizzes, assignments</h2>
-                <button class="add-btn">New Campaign</button>
+                <h2><i class="fas fa-tag"></i>Tags</h2>
+                <button class="add-btn">New Tag</button>
+                <button class="edit-btn" (click)="onViewTags()">View Tags</button>
             </div>
             <div class="card-content">
                 <div class="sample-data">
-                    <p><strong>Active Promotions:</strong></p>
+                    <p><strong>Latest tags:</strong></p>
                     <div class="promo-item">
                         <i class="fas fa-ad"></i> Social Media Campaign (1,234 Clicks)
                     </div>
@@ -161,10 +162,7 @@
                 </div>
                 <div class="quick-actions">
                     <button class="icon-btn">
-                        <i class="fas fa-chart-pie"></i> Analytics
-                    </button>
-                    <button class="icon-btn">
-                        <i class="fas fa-share-alt"></i> Share Links
+                        <i class="fas fa-add"></i> Add new tag
                     </button>
                 </div>
             </div>
@@ -232,22 +230,15 @@
             </div>
             <div class="card-content">
                 <div class="sample-data">
-                    <p><strong>Active Promotions:</strong></p>
+                    <p><strong>Current Data:</strong></p>
                     <div class="promo-item">
-                        <i class="fas fa-ad"></i> Social Media Campaign (1,234 Clicks)
+                        <i class="fas fa-eye"></i> Total Views: {{dashboardInfo.totalViews}}
                     </div>
                     <div class="promo-item">
-                        <i class="fas fa-tag"></i> Early Bird Discount (23 Redemptions)
+                        <i class="fas fa-users"></i> Unique Visitors: {{dashboardInfo.uniqueViews}}
                     </div>
                 </div>
-                <div class="quick-actions">
-                    <button class="icon-btn">
-                        <i class="fas fa-chart-pie"></i> Analytics
-                    </button>
-                    <button class="icon-btn">
-                        <i class="fas fa-share-alt"></i> Share Links
-                    </button>
-                </div>
+
             </div>
         </div>
 

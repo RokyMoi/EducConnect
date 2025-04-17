@@ -1,0 +1,146 @@
+<div class="main-container">
+    <h2>Course Tags</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+    </div>
+    <section class="section-card">
+        <div class="section-header">
+            <h3>Current Course Tags</h3>
+            <span class="badge">{{courseTags.length}}</span>
+        </div>
+        <div class="tags-grid" *ngIf="courseTags.length; else noCourseTags">
+            <div class="tag-card" *ngFor="let tag of courseTags">
+                <div class="tag-content">
+
+                    <span class="tag-name">{{tag.name}}</span>
+                    <button class="icon-button danger" (click)="removeTagFromCourse(tag)"
+                        title="Remove tag from course"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+        </div>
+        <ng-template #noCourseTags>
+            <div class="empty-state">
+                <i class="fas fa-tag"></i>
+                <p>No tags assigned to this course yet</p>
+            </div>
+        </ng-template>
+    </section>
+    <section class="section-card">
+        <div class="section-header">
+            <h3>Tags Created By You</h3>
+            <div class="search-container">
+                <input type="text" placeholder="Search your tags..." class="search-input"
+                    [(ngModel)]="searchQueryTagsByTutor" (input)="searchTagsByTutor()">
+                <button class="icon-button primary" title="Create new tag">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="tags-grid" *ngIf="filteredTagsByTutor.length; else noTutorTags">
+            <div class="tag-card" *ngFor="let tag of filteredTagsByTutor">
+                <div class="tag-content">
+                    <span class="tag-name">{{tag.name}}</span>
+                    <div class="tag-actions">
+                        <button class="icon-button success" title="Assign to course"
+                            (click)="assignTagToCourse(tag.tagId, tag.name)">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <button class="icon-button danger" title="Delete tag" (click)="deleteTag(tag)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="tag-meta">
+                    <span class="usage-count">
+                        <i class="fas fa-book"></i>
+                        {{tag.courseCount}} courses
+                    </span>
+                </div>
+            </div>
+        </div>
+        <ng-template #noTutorTags>
+            <div class="empty-state">
+                <i class="fas fa-tags"></i>
+                <p>You haven't created any tags yet</p>
+                <button class="primary-btn">
+                    <i class="fas fa-plus"></i>
+                    Create Your First Tag
+                </button>
+            </div>
+        </ng-template>
+    </section>
+    <section class="section-card">
+        <div class="section-header">
+            <h3>Add Tags By Other Users</h3>
+            <div class="search-container">
+                <input type="text" placeholder="Search tags..." class="search-input" [(ngModel)]="searchQueryTagsByAll"
+                    (input)="fetchTagsByAllBySearch()">
+                <button class="icon-button primary" title="Create new tag"
+                    (click)="createTag(this.searchQueryTagsByAll)">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="tags-grid" *ngIf="tagsByAll.length; else noTagsByOtherUsers">
+            <div class="tag-card" *ngFor="let tag of tagsByAll">
+                <div class="tag-content">
+                    <span class="tag-name">{{ tag.name }}</span>
+                    <div class="tag-actions">
+                        <button [disabled]="tag.isAssigned" class="icon-button success"
+                            [title]="tag.isAssigned ? 'Tag already assigned to course' : 'Assign tag to course'"
+                            (click)="assignTagToCourse(tag.tagId, tag.name)">
+                            <i class="fas fa-link"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="tag-meta">
+                    <span class="usage-count">
+                        <i class="fas fa-book"></i>
+                        {{ tag.courseCount }} courses
+                    </span>
+                    <span class="created-by">
+                        <i class="fas fa-user"></i>
+                        {{ tag.createdBy || 'Unknown' }}
+                    </span>
+                    <span class="created-at">
+                        <i class="fas fa-clock"></i>
+                        {{ tag.createdAt | date }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="pagination-container" *ngIf="tagsByAll.length > 0">
+            <button class="pagination-button" [disabled]="this.currentPageTagsByAll === 1"
+                (click)="onChangePageTagsByAll(this.currentPageTagsByAll - 1)">
+                Previous
+            </button>
+            <span class="page-info">
+                Page {{ currentPageTagsByAll }} of {{ totalPagesTagsByAll }}
+            </span>
+            <button class="pagination-button" [disabled]="currentPageTagsByAll === totalPagesTagsByAll"
+                (click)="onChangePageTagsByAll(this.currentPageTagsByAll + 1)">
+                Next
+            </button>
+            <div class="select-pagination-container">
+
+                <label for="">Items per page:</label>
+                <select (change)="onChangeNumberOfPagesTagsByAll()" [(ngModel)]="pageSizeTagsByAll">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
+
+
+        <ng-template #noTagsByOtherUsers>
+            <div class="empty-state">
+                <i class="fas fa-tags"></i>
+                <p>No tags found matching your search</p>
+                <p>*Create this tag</p>
+            </div>
+        </ng-template>
+    </section>
+</div>

@@ -7,6 +7,7 @@ using EduConnect.DTOs;
 using EduConnect.Entities.Course;
 using EduConnect.Enums;
 using EduConnect.Interfaces.Course;
+using EduConnect.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace EduConnect.Repositories.Course
@@ -16,6 +17,12 @@ namespace EduConnect.Repositories.Course
         public async Task<bool> CheckCoursePromotionImageExists(Guid coursePromotionImageId)
         {
             return await _dataContext.CoursePromotionImage.Where(x => x.CoursePromotionImageId == coursePromotionImageId).AnyAsync();
+        }
+
+        public async Task<bool> CheckTagAssignedToCourse(Guid tagId, Guid courseId)
+        {
+            return await _dataContext.CourseTag
+            .Where(x => x.CourseId == courseId && x.TagId == tagId).AnyAsync();
         }
 
         public async Task<bool> CourseCategoryExistsById(Guid courseCategoryId)
@@ -155,6 +162,23 @@ namespace EduConnect.Repositories.Course
             }
         }
 
+        public async Task<bool> CreateCourseTag(CourseTag courseTag)
+        {
+            try
+            {
+                await _dataContext.CourseTag.AddAsync(courseTag);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to create course tag " + courseTag.CourseId);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
         public async Task<bool> CreateCourseTeachingResource(CourseTeachingResource courseTeachingResource)
         {
             try
@@ -200,6 +224,23 @@ namespace EduConnect.Repositories.Course
             {
 
                 Console.WriteLine("Failed to create course viewership data " + courseViewershipData.CourseId);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> CreateTag(Tag tag)
+        {
+            try
+            {
+                await _dataContext.Tag.AddAsync(tag);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to create tag " + tag.Name);
                 Console.WriteLine(ex);
                 return false;
             }
@@ -251,6 +292,24 @@ namespace EduConnect.Repositories.Course
             }
         }
 
+        public async Task<bool> DeleteCourseTag(CourseTag courseTag)
+        {
+            try
+            {
+                _dataContext.CourseTag.Remove(courseTag);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to delete course tag " + courseTag.CourseId);
+                Console.WriteLine(ex);
+                return false;
+
+            }
+        }
+
         public async Task<bool> DeleteCourseTeachingResourceById(Guid courseTeachingResourceId)
         {
             var courseTeachingResource = await _dataContext.CourseTeachingResource.Where(x => x.CourseTeachingResourceId == courseTeachingResourceId).FirstOrDefaultAsync();
@@ -288,6 +347,23 @@ namespace EduConnect.Repositories.Course
             {
 
                 Console.WriteLine("Failed to delete course thumbnail " + courseId);
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteTag(Tag tag)
+        {
+            try
+            {
+                _dataContext.Tag.Remove(tag);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to delete tag " + tag.Name);
                 Console.WriteLine(ex);
                 return false;
             }
@@ -346,6 +422,22 @@ namespace EduConnect.Repositories.Course
             .Where(x => x.TutorId == tutorId).ToListAsync();
         }
 
+        public async Task<List<GetAllCourseTagsByCourseId>> GetAllCourseTagsByCourseId(Guid courseId)
+        {
+            return await _dataContext.CourseTag
+            .Include(x => x.Tag)
+            .Where(x => x.CourseId == courseId && x.Tag != null)
+            .Select(
+                x => new GetAllCourseTagsByCourseId
+                {
+                    CourseTagId = x.CourseTagId,
+                    TagId = x.TagId,
+                    CourseId = x.CourseId,
+                    Name = x.Tag.Name,
+                }
+            ).ToListAsync();
+        }
+
         public Task<List<GetCourseTeachingResourceResponse>> GetAllCourseTeachingResourcesWithoutFileDataByCourseId(Guid courseId)
         {
             return _dataContext.CourseTeachingResource
@@ -363,6 +455,41 @@ namespace EduConnect.Repositories.Course
                     CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime
                 }
             ).ToListAsync();
+        }
+
+
+
+
+        public async Task<List<GetAllTagsByTutorResponse>?> GetAllTagsByTutor(Guid tutorId)
+        {
+            var tutor = await _dataContext.Tutor.Where(x => x.TutorId == tutorId).FirstOrDefaultAsync();
+
+            if (tutor == null)
+            {
+                return null;
+            }
+            return await _dataContext.Tag
+            .Where(x => x.CreatedByPersonId == tutor.PersonId)
+            .Select(
+                x => new GetAllTagsByTutorResponse
+                {
+                    TagId = x.TagId,
+                    Name = x.Name,
+                    CourseCount = _dataContext.CourseTag.Count(ct => ct.TagId == x.TagId),
+                    TutorId = tutor.TutorId,
+                }
+            ).ToListAsync();
+        }
+
+
+
+        public async Task<(int totalViews, int uniqueUsers)> GetCourseAnalyticsForCourseManagementDashboard(Guid courseId)
+        {
+            var totalViews = await _dataContext.CourseViewershipData.Where(x => x.CourseId == courseId).CountAsync();
+
+            var uniqueUsers = await _dataContext.CourseViewershipData.Where(x => x.CourseId == courseId).Select(x => x.ViewedByPersonId).Distinct().CountAsync();
+
+            return (totalViews, uniqueUsers);
         }
 
         public async Task<List<GetCourseAnalyticsHistoryResponse>> GetCourseAnalyticsHistory(Guid courseId)
@@ -386,6 +513,7 @@ namespace EduConnect.Repositories.Course
         public async Task<Entities.Course.Course?> GetCourseById(Guid courseId)
         {
             return await _dataContext.Course
+            .Include(x => x.Tutor)
             .Include(x => x.CourseCategory)
             .Include(x => x.LearningDifficultyLevel)
             .Include(x => x.CourseThumbnail)
@@ -684,6 +812,15 @@ namespace EduConnect.Repositories.Course
             return (pagedCourses, totalCount);
         }
 
+        public async Task<CourseTag?> GetCourseTagByCourseIdAndTagId(Guid courseId, Guid tagId)
+        {
+            return await _dataContext.CourseTag
+            .Include(x => x.Course)
+            .Include(x => x.Tag)
+            .Where(x => x.CourseId == courseId && x.TagId == tagId)
+            .FirstOrDefaultAsync();
+        }
+
         public async Task<CourseTeachingResource?> GetCourseTeachingResourceById(Guid courseTeachingResourceId)
         {
             return await _dataContext.CourseTeachingResource
@@ -830,6 +967,11 @@ namespace EduConnect.Repositories.Course
             .CountAsync();
         }
 
+        public async Task<Tag?> GetTagById(Guid? tagId)
+        {
+            return await _dataContext.Tag.Where(x => x.TagId == tagId).FirstOrDefaultAsync();
+        }
+
         public Task<bool> IsTutorCoursePromotionImageOwner(Guid imageId, Guid tutorId)
         {
             return _dataContext.CoursePromotionImage
@@ -921,6 +1063,22 @@ namespace EduConnect.Repositories.Course
                 await transaction.RollbackAsync();
                 return false;
             }
+        }
+
+
+        public async Task<bool> TagExistsById(Guid? tagId)
+        {
+            return await _dataContext.Tag.Where(x => x.TagId == tagId).AnyAsync();
+        }
+
+        public async Task<bool> TagExistsByName(string tagName)
+        {
+            return await _dataContext.Tag.Where(x => x.Name == tagName).AnyAsync();
+        }
+
+        public Task<bool> TagExistsByNameExcludingId(Guid tagId, string tagName)
+        {
+            return _dataContext.Tag.Where(x => x.TagId != tagId && x.Name == tagName).AnyAsync();
         }
 
         public async Task<bool> UpdateCourseBasics(Entities.Course.Course course)
@@ -1040,6 +1198,69 @@ namespace EduConnect.Repositories.Course
                 Console.WriteLine(ex);
                 return false;
             }
+        }
+
+        public async Task<bool> UpdateTag(Tag tag)
+        {
+            try
+            {
+                _dataContext.Tag.Update(tag);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Failed to update tag " + tag.Name);
+                Console.WriteLine(ex);
+                return false;
+
+            }
+        }
+
+        public async Task<PaginatedResponse<GetTagsBySearchResponse>> GetTagsBySearch(GetTagsBySearchPaginatedRequest request)
+        {
+            var query = _dataContext.Tag
+                        .Include(x => x.CourseTags)
+                        .ThenInclude(x => x.Course)
+                        .ThenInclude(x => x.Tutor)
+                        .ThenInclude(x => x.Person)
+                        .ThenInclude(x => x.PersonEmail)
+                        .AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.SearchQuery.Trim()))
+            {
+                query = query.Where(x => x.Name.Trim().Contains(request.SearchQuery.Trim().ToLower()));
+            }
+
+            var items = await query
+            .OrderBy(x => x.Name)
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .Select(
+                x => new GetTagsBySearchResponse
+                {
+                    TagId = x.TagId,
+                    Name = x.Name,
+                    CourseCount = _dataContext.CourseTag.Where(y => y.TagId == x.TagId).Count(),
+                    CreatedBy = x.Person != null && x.Person.PersonEmail != null ? x.Person.PersonEmail.Email : "",
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
+                    IsAssigned = request.ContainsTagCourseId.HasValue && _dataContext.CourseTag.Where(y => y.CourseId == request.ContainsTagCourseId.Value && x.TagId == y.TagId).Any(),
+                }
+            ).ToListAsync();
+
+
+
+
+            var totalCount = await _dataContext.Tag.CountAsync();
+            return new PaginatedResponse<GetTagsBySearchResponse>
+            {
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount,
+                Items = items,
+            };
+
         }
     }
 }

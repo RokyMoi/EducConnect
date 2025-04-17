@@ -39,6 +39,8 @@ namespace EduConnect.DTOs
 
         public int NumberOfPromotionImages { get; set; } = 0;
         public DateTime? LatestPromotionImageUploadedAt { get; set; }
+        public int TotalViews { get; set; } = 0;
+        public int UniqueUsers { get; set; } = 0;
 
 
 

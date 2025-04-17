@@ -25,4 +25,6 @@ export interface GetCourseManagementDashboardInfoResponse {
   twoLatestAddedLessons: GetAllCourseLessonsResponse[];
   numberOfPromotionImages: number;
   latestPromotionImageUploadedAt: string | null;
+  totalViews: number;
+  uniqueViews: number;
 }

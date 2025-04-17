@@ -30,9 +30,10 @@ export class MessageService {
   messageThread = signal<Message[]>([]);
 
   ceateHubConnection(user: User, otherEmail: string) {
+    var token = localStorage.getItem('Authorization');
     this.HubConnection = new HubConnectionBuilder()
       .withUrl(this.hubUrl + 'message?user=' + otherEmail, {
-        accessTokenFactory: () => user.Token,
+        accessTokenFactory: () => token as string,
       })
       .withAutomaticReconnect()
       .build();
@@ -89,7 +90,12 @@ export class MessageService {
     );
   }
   async SendMessageToUser(email: string, content: string) {
+    const token = localStorage.getItem('Authorization');
+    console.log('Sending message to user: ' + email, content);
+    console.log('Token', token);
     this.HubConnection?.invoke('SendMessage', {
+
+      
       RecipientEmail: email,
       Content: content,
     });

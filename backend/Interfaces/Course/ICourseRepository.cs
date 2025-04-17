@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EduConnect.DTOs;
 using EduConnect.Entities.Course;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EduConnect.Interfaces.Course
 {
@@ -123,5 +124,22 @@ namespace EduConnect.Interfaces.Course
 
         Task<List<GetCourseAnalyticsHistoryResponse>> GetCourseAnalyticsHistory(Guid courseId);
         Task<(int usersCameFromFeedCount, int usersCameFromSearchCount)> GetCourseUsersCameFromCounts(Guid courseId);
+        Task<(int totalViews, int uniqueUsers)> GetCourseAnalyticsForCourseManagementDashboard(Guid courseId);
+        Task<bool> TagExistsById(Guid? tagId);
+        Task<bool> TagExistsByName(string tagName);
+        Task<Tag?> GetTagById(Guid? tagId);
+        Task<bool> UpdateTag(Tag tag);
+        Task<bool> CreateTag(Tag tag);
+
+        Task<bool> CheckTagAssignedToCourse(Guid tagId, Guid courseId);
+        Task<bool> CreateCourseTag(CourseTag courseTag);
+        Task<bool> TagExistsByNameExcludingId(Guid tagId, string tagName);
+
+        Task<CourseTag?> GetCourseTagByCourseIdAndTagId(Guid courseId, Guid tagId);
+        Task<bool> DeleteCourseTag(CourseTag courseTag);
+        Task<bool> DeleteTag(Tag tag);
+        Task<List<GetAllCourseTagsByCourseId>> GetAllCourseTagsByCourseId(Guid courseId);
+        Task<List<GetAllTagsByTutorResponse>?> GetAllTagsByTutor(Guid tutorId);
+        Task<PaginatedResponse<GetTagsBySearchResponse>> GetTagsBySearch(GetTagsBySearchPaginatedRequest request);
     }
 }

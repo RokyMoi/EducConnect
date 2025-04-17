@@ -24,6 +24,9 @@ namespace EduConnect.Entities.Course
 
         public long? UpdatedAt { get; set; } = null;
 
+        public virtual ICollection<CourseTag> CourseTags { get; set; } = new List<CourseTag>();
+
+
 
     }
 }

@@ -125,4 +125,7 @@ export class CourseTutorManagementComponent implements OnInit {
   onViewAnalytics() {
     this.router.navigate(['/tutor/course/analytics', this.courseId]);
   }
+  onViewTags() {
+    this.router.navigate(['/tutor/course/tags', this.courseId]);
+  }
 }
