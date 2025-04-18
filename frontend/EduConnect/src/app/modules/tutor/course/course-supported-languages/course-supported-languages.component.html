@@ -1,0 +1,36 @@
+<body>
+    <p class="title">{{componentTitle}}</p>
+    <form action="" *ngIf="supportedLanguagesOptions.length > 0">
+        <app-select-dropdown [options]="supportedLanguagesOptions" [label]="selectLanguageDropdownLabel"
+            [placeholder]="selectLanguageDropdownPlaceholder"
+            [formControl]="supportedLanguageFormControl"></app-select-dropdown>
+    </form>
+    <p *ngIf="supportedLanguagesOptions.length === 0">You have added support for all the available languages</p>
+    <table *ngIf="selectedLanguages.length > 0">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Language</th>
+                <th>Code</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of selectedLanguages; let i=index">
+                <td>{{i + 1}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.code}}</td>
+                <td><button (click)="removeLanguage(item.languageId)">Remove</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <p>{{warningText}}</p>
+    <div class="button-row">
+
+        <app-submit-button [submitButtonText]="addLanguageButtonText" [buttonBackgroundColor]="addLanguageButtonColor"
+            [buttonMargin]="buttonMargin" (buttonClick)="addSelectedLanguage()"></app-submit-button>
+        <app-submit-button *ngIf="selectedLanguages.length > 0" [submitButtonText]="nextStepButtonText"
+            [buttonBackgroundColor]="nextStepButtonColor" [buttonMargin]="buttonMargin"
+            (buttonClick)="nextStep()"></app-submit-button>
+    </div>
+</body>

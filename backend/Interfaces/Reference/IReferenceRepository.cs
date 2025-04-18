@@ -10,8 +10,10 @@ using backend.DTOs.Reference.LearningSubcategory;
 using backend.Entities.Course;
 using backend.Entities.Learning;
 using backend.Entities.Reference;
+using backend.Entities.Reference.Country;
 using backend.Entities.Reference.Language;
 using backend.Entities.Reference.Learning;
+using EduConnect.Entities.Course;
 using EduConnect.Entities.Reference;
 using EduConnect.Entities.Tutor;
 
@@ -58,7 +60,7 @@ namespace backend.Interfaces.Reference
             Guid id
         );
 
-        public Task<CourseType?> GetCourseTypeByIdAsync(int id);
+        // public Task<CourseType?> GetCourseTypeByIdAsync(int id);
 
         public Task<Language?> GetLanguageByIdAsync(Guid id);
 
@@ -67,8 +69,22 @@ namespace backend.Interfaces.Reference
 
         public Task<List<LearningDifficultyLevel>> GetAllLearningDifficultyLevelsAsync();
 
-        public Task<List<CourseType>> GetAllCourseTypesAsync();
+        // public Task<List<CourseType>> GetAllCourseTypesAsync();
 
         public Task<List<LanguageDTO?>> GetAllLanguagesAsync();
+
+        // public Task<CourseCreationCompletenessStep?>
+        // GetCourseCreationCompletenessStepDTOByStepOrderAsync(int stepOrder);
+
+        public Task<Country?> GetCountryByName(string name);
+
+        public Task<Country?> GetCountryByNationalCallingCode(string nationalCallingCode);
+
+        public Task<bool> LearningDifficultyLevelExistsById(int levelId);
+
+        public Task<List<CourseCategory>> GetAllCourseCategories();
+
+        public Task<bool> CourseCategoryExistsById(Guid courseCategoryId);
+
     }
 }

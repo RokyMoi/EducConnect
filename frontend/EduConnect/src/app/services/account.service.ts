@@ -1,21 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, Signal, signal } from '@angular/core';
-import { User } from '../_models/User';
+import { User } from '../models/User';
 import { map, Subject, Observable, catchError, of } from 'rxjs';
 import ApiLinks from '../../assets/api/link.api';
 import { Router } from '@angular/router';
 
-import ErrorHttpResponseData from '../_models/data/http.response.data/error.http.response.data';
-import EducationInformation from '../_models/person/education/educationInformation.education.person';
-import SuccessHttpResponseData from '../_models/data/http.response.data/success.http.response.data';
-import EducationInformationHttpSaveRequest from '../_models/person/education/educationInformationSaveRequst';
-import EducationInformationHttpSaveResponse from '../_models/person/education/educationInformationHttpSaveResponse';
-import EducationInformationHttpUpdateRequest from '../_models/person/education/EducationInformationHttpUpdateRequest';
-import CareerInformationHttpSaveRequest from '../_models/person/career/careerInformationHttpSaveRequest';
-import CareerInformationHttpUpdateRequest from '../_models/person/career/careerInformationHttpUpdateRequest';
-import { TimeAvailability } from '../_models/person/time-availabilty/time-availability';
-import { TimeAvailabilityHttpSaveRequest } from '../_models/person/time-availabilty/time-availability-http-save-request';
-import { TutorTeachingStyleSaveHttpRequestTutor } from '../_models/Tutor/tutor-teaching-style/tutor-teaching-style-save-http-request.tutor';
+import ErrorHttpResponseData from '../models/data/http.response.data/error.http.response.data';
+import EducationInformation from '../models/person/education/educationInformation.education.person';
+import SuccessHttpResponseData from '../models/data/http.response.data/success.http.response.data';
+import EducationInformationHttpSaveRequest from '../models/person/education/educationInformationSaveRequst';
+import EducationInformationHttpSaveResponse from '../models/person/education/educationInformationHttpSaveResponse';
+import EducationInformationHttpUpdateRequest from '../models/person/education/EducationInformationHttpUpdateRequest';
+import CareerInformationHttpSaveRequest from '../models/person/career/careerInformationHttpSaveRequest';
+import CareerInformationHttpUpdateRequest from '../models/person/career/careerInformationHttpUpdateRequest';
+import { TimeAvailability } from '../models/person/time-availabilty/time-availability';
+import { TimeAvailabilityHttpSaveRequest } from '../models/person/time-availabilty/time-availability-http-save-request';
+import { TutorTeachingStyleSaveHttpRequestTutor } from '../models/Tutor/tutor-teaching-style/tutor-teaching-style-save-http-request.tutor';
 import { PresenceService } from './SignalIR/presence.service';
 
 @Injectable({
@@ -25,7 +25,7 @@ export class AccountService {
   http = inject(HttpClient);
   baseUrl = 'http://localhost:5177/';
   CurrentUser = signal<User | null>(null);
-presenceService = inject(PresenceService);
+  presenceService = inject(PresenceService);
   router = inject(Router);
 
   login(model: any) {
@@ -35,6 +35,7 @@ presenceService = inject(PresenceService);
       })
       .pipe(
         map((response) => {
+          console.log('This is data from the login');
           const userData = (response.body as any)?.data;
 
           if (userData) {
@@ -75,19 +76,19 @@ presenceService = inject(PresenceService);
       .pipe(
         map((response) => {
           const userData = (response.body as any)?.data;
-  
+
           if (userData) {
             const loggedInUser: User = {
               Email: userData.email,
               Role: userData.role,
               Token: userData.token,
             };
-  
+
             this.CurrentUser.set(loggedInUser);
             this.presenceService.createHubConnection(userData);
-  
+
             localStorage.setItem('user', JSON.stringify(loggedInUser));
-  
+
             // Postavljanje autorizacije u localStorage
             const token = response.headers.get('Authorization');
             if (token) {
@@ -98,7 +99,7 @@ presenceService = inject(PresenceService);
               );
             }
           }
-  
+
           return response;
         })
       );
@@ -107,7 +108,6 @@ presenceService = inject(PresenceService);
     localStorage.clear();
     this.CurrentUser.set(null);
     this.presenceService.stopHubConnection();
-    
   }
 
   //Method for registering a new user as a tutor

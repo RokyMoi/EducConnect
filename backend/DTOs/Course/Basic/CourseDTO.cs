@@ -13,5 +13,7 @@ namespace backend.DTOs.Course.Basic
         public string CourseName { get; set; }
 
         public string CourseSubject { get; set; }
+
+        public Guid CourseCreationCompletenessStepId { get; set; }
     }
 }

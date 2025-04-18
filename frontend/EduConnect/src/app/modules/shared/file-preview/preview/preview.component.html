@@ -1,0 +1,11 @@
+<div class="preview-container">
+    @if (file) {
+    @switch (file | contentType) {
+    @case ('image') { <app-image-preview [file]="file" /> }
+    @case ('video') { <app-video-preview [file]="file" /> }
+    @case ('audio') { <app-audio-preview [file]="file" /> }
+    @case ('pdf') { <app-pdf-preview [file]="file" /> }
+    @default { <div class="unsupported-type">Preview not available for this file type</div> }
+    }
+    }
+</div>

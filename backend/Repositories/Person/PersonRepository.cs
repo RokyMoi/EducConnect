@@ -10,7 +10,9 @@ using backend.DTOs.Tutor;
 using backend.Entities.Person;
 using backend.Interfaces.Person;
 using EduConnect.Data;
+using EduConnect.DTOs;
 using EduConnect.Entities.Person;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Identity.Client;
@@ -50,74 +52,6 @@ namespace backend.Repositories.Person
 
 
         }
-        public async Task<PersonEmailPasswordSaltDTOGroup> CreateNewPersonWithHelperTables(EduConnect.Entities.Person.Person person, PersonEmail personEmail, PersonPassword personPassword, PersonSalt personSalt, PersonVerificationCode personVerificationCode)
-        {
-
-            try
-            {
-
-                await _databaseContext.Person.AddAsync(person);
-                await _databaseContext.PersonEmail.AddAsync(personEmail);
-                await _databaseContext.PersonPassword.AddAsync(personPassword);
-                await _databaseContext.PersonSalt.AddAsync(personSalt);
-                await _databaseContext.PersonVerificationCode.AddAsync(personVerificationCode);
-                await _databaseContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
-            var personDTO = new PersonDTO
-            {
-                PersonId = person.PersonId.ToString(),
-                IsActive = person.IsActive,
-
-            };
-
-            var personEmailDTO = new PersonEmailDTO
-            {
-                PersonId = personEmail.PersonId,
-                PersonEmailId = personEmail.PersonEmailId,
-                Email = personEmail.Email,
-            };
-
-            var personPasswordDTO = new PersonPasswordDTO
-            {
-                PersonPasswordId = personPassword.PersonPasswordId,
-                PersonId = personPassword.PersonId,
-                Hash = personPassword.Hash,
-                Salt = personPassword.Salt,
-            };
-
-            var personSaltDTO = new PersonSaltDTO
-            {
-                PersonSaltId = personSalt.PersonSaltId,
-                PersonId = personSalt.PersonId,
-                Salt = personSalt.Salt,
-            };
-
-            var personVerificationCodeDTO = new PersonVerificationCodeDTO
-            {
-                PersonVerificationCodeId = personVerificationCode.PersonVerificationCodeId,
-                PersonId = personVerificationCode.PersonId,
-                VerificationCode = personVerificationCode.VerificationCode,
-                ExpiryDateTime = personVerificationCode.ExpiryDateTime,
-                IsVerified = personVerificationCode.IsVerified,
-
-            };
-
-            return new PersonEmailPasswordSaltDTOGroup
-            {
-                PersonDTO = personDTO,
-                PersonEmailDTO = personEmailDTO,
-                PersonPasswordDTO = personPasswordDTO,
-                PersonSaltDTO = personSaltDTO,
-                PersonVerificationCodeDTO = personVerificationCodeDTO,
-            };
-        }
-
-
 
 
 
@@ -485,6 +419,148 @@ namespace backend.Repositories.Person
                 NationalCallingCodeCountryId = personPhoneNumber.NationalCallingCodeCountryId,
                 PhoneNumber = personPhoneNumber.PhoneNumber,
             };
+        }
+
+        public async Task<List<IdentityRole<Guid>>?> GetRolesByPersonId(Guid personId)
+        {
+            var roleIds = await _databaseContext.UserRoles.Where(x => x.UserId == personId).Select(x => x.RoleId).ToListAsync();
+
+            return await _databaseContext.Roles.Where(x => roleIds.Contains(x.Id)).ToListAsync();
+
+        }
+
+        public Task<EduConnect.Entities.Person.Person?> GetPersonByEmailOrUsername(string emailOrUsername)
+        {
+            return
+            _databaseContext
+            .Person
+            .Include(x => x.PersonDetails)
+            .Include(x => x.PersonEmail)
+            .Where(x => x.PersonEmail.Email.Equals(emailOrUsername.Trim()) || x.PersonDetails.Username.Equals(emailOrUsername.TrimEnd())).FirstOrDefaultAsync();
+
+
+
+        }
+
+
+        public async Task<bool> EmailExists(string email)
+        {
+            return await _databaseContext.PersonEmail.Where(x => x.Email.Equals(email.Trim())).AnyAsync();
+        }
+
+        public async Task<bool> CreatePerson(EduConnect.Entities.Person.Person person)
+        {
+            try
+            {
+                await _databaseContext.Person.AddAsync(person);
+                await _databaseContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error creating new person");
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> CreatePersonEmail(PersonEmail personEmail)
+        {
+            try
+            {
+                await _databaseContext.PersonEmail.AddAsync(personEmail);
+                await _databaseContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error creating new person email");
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> CreatePersonDetails(PersonDetails personDetails)
+        {
+            try
+            {
+                await _databaseContext.PersonDetails.AddAsync(personDetails);
+                await _databaseContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error creating new person details");
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> CreatePersonPhoneNumber(PersonPhoneNumber personPhoneNumber)
+        {
+            try
+            {
+                await _databaseContext.PersonPhoneNumber.AddAsync(personPhoneNumber);
+                await _databaseContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error creating new person phone number");
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> CreatePersonPassword(PersonPassword personPassword)
+        {
+            try
+            {
+                await _databaseContext.PersonPassword.AddAsync(personPassword);
+                await _databaseContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                Console.WriteLine("Error creating new person password");
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+        public async Task<PersonPassword?> GetPersonPasswordByPersonId(Guid personId)
+        {
+            return await _databaseContext.PersonPassword.Where(x => x.PersonId == personId).FirstOrDefaultAsync();
+        }
+
+        public async Task<EduConnect.Entities.Person.Person?> GetPersonByPublicPersonId(Guid publicPersonId)
+        {
+            return await _databaseContext.Person.Where(x => x.PersonPublicId == publicPersonId).FirstOrDefaultAsync();
+        }
+
+        public async Task<GetDashboardPersonInfoResponse?> GetDashboardPersonInfo(Guid personId)
+        {
+            return await _databaseContext
+            .Person
+            .Include(x => x.PersonDetails)
+            .Include(x => x.PersonEmail)
+            .Where(x => x.PersonId == personId)
+            .Select(
+                x => new GetDashboardPersonInfoResponse
+                {
+                    Email = x.PersonEmail.Email,
+                    FirstName = x.PersonDetails.FirstName,
+                    LastName = x.PersonDetails.LastName,
+                    Username = x.PersonDetails.Username,
+                }
+            )
+            .FirstOrDefaultAsync();
+
         }
     }
 }

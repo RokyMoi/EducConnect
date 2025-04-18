@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MessageService } from '../../services/message.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Message } from '../../_models/messenger/message';
+import { Message } from '../../models/messenger/message';
 import { AccountService } from '../../services/account.service';
 import { NgFor, NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -12,7 +12,7 @@ import { SendMessageComponent } from "../send-message/send-message.component";
   standalone:true,
   imports: [NgFor, NgIf, RouterLink, SendMessageComponent],
   templateUrl: './direct-messagings.component.html',
-  styleUrls: ['./direct-messagings.component.css']
+  styleUrls: ['./direct-messagings.component.css'],
 })
 export class DirectMessagingsComponent implements OnInit {
 HandleThis($event: boolean) {
@@ -29,8 +29,8 @@ this.router.navigateByUrl("/ListOfUsers");
   messageService = inject(MessageService);
   AccountService = inject(AccountService);
   http = inject(HttpClient);
-  photourl = "";
-  UserPhotoEmai = "";
+  photourl = '';
+  UserPhotoEmai = '';
   messagesArray: any[] = [];
 
 
@@ -42,17 +42,20 @@ this.router.navigateByUrl("/ListOfUsers");
 
   OpenAThread(message: any): void {
     this.router.navigate(['/studentMessageThread', message.id], {
-      queryParams: { senderEmail: message.senderEmail, recipientEmail: message.recipientEmail },
+      queryParams: {
+        senderEmail: message.senderEmail,
+        recipientEmail: message.recipientEmail,
+      },
     });
   }
 
   InitiliazeUserForPhoto(message: any) {
     const currentUserEmail = this.AccountService.CurrentUser()?.Email;
-    this.UserPhotoEmai = currentUserEmail === message.senderEmail
-      ? message.recipientEmail
-      : message.senderEmail;
+    this.UserPhotoEmai =
+      currentUserEmail === message.senderEmail
+        ? message.recipientEmail
+        : message.senderEmail;
 
-  
     if (!this.userPhotosCache.has(this.UserPhotoEmai)) {
       this.GetImageForUser(this.UserPhotoEmai);
     } else {
@@ -70,16 +73,20 @@ this.router.navigateByUrl("/ListOfUsers");
       console.error('No access token found.');
     }
 
-    this.http.get<{ data: { url: string } }>(`http://localhost:5177/Photo/GetPhotoForUser/${email}`, { headers })
+    this.http
+      .get<{ data: { url: string } }>(
+        `http://localhost:5177/Photo/GetPhotoForUser/${email}`,
+        { headers }
+      )
       .subscribe({
         next: (response) => {
           this.photourl = response.data.url;
-          this.userPhotosCache.set(email, this.photourl); 
+          this.userPhotosCache.set(email, this.photourl);
           console.log(response);
         },
         error: (error) => {
           console.error('Error fetching photo:', error);
-        }
+        },
       });
   }
 
@@ -93,14 +100,18 @@ this.router.navigateByUrl("/ListOfUsers");
       console.error('No access token found.');
     }
 
-    this.http.get<Message[]>("http://localhost:5177/Messenger/GetLastMessagesForDirectMessaging", { headers })
+    this.http
+      .get<Message[]>(
+        'http://localhost:5177/Messenger/GetLastMessagesForDirectMessaging',
+        { headers }
+      )
       .subscribe({
         next: (response) => {
           this.messagesArray = response;
         },
         error: (error) => {
           console.error('Error loading messages:', error);
-        }
+        },
       });
   }
 

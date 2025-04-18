@@ -1,0 +1,177 @@
+.create-course-details-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+}
+
+.create-course-details-container h2 {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.action-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 12px;
+}
+.go-back-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.go-back-button:hover {
+  background-color: #0056b3;
+}
+
+.author-details {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 12px;
+}
+.form-item {
+  margin: 24px 0px;
+  width: 100%;
+}
+
+.form-item label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-item input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-item textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 100px;
+  resize: none;
+}
+
+.form-item select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.error-container {
+  display: block;
+  color: #ff4d4d;
+  font-size: 0.875em;
+  margin-top: 5px;
+  height: 16px;
+}
+
+.error-container p {
+  margin: 0;
+}
+
+.form-actions-row {
+  width: 100%;
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.discard-action-button {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}
+.save-action-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}
+
+.save-action-button:hover {
+  background-color: #45a049;
+  cursor: pointer;
+}
+
+.discard-action-button:hover {
+  background-color: #e53935;
+  cursor: pointer;
+}
+
+.delete-author-button {
+}
+.delete-author-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #d12a2a;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.delete-author-button:hover {
+  background-color: red;
+}
+
+.form-item-metadata {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: grey;
+  font-size: 0.8em;
+}
+
+.dialog-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.confirm-button {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}
+
+.cancel-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}

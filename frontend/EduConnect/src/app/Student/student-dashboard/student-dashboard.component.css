@@ -1,9 +1,39 @@
-body{
-    height: 100%;
-    width: 100%;
+body {
+  height: 100%;
+  width: 100%;
 }
-.MainDIV{
-    display: flex;
-    height: 100%;
-    width: 100%;
+
+.subheader {
+  background-color: #0057c9;
+  color: #ffffff;
+  padding: 0px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logout-button {
+  display: inline-block;
+  margin: 12px 0;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #d12a2a;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: red;
+}
+
+.MainDIV {
+  display: flex;
+  height: 100%;
+  width: 100%;
 }

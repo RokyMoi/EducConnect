@@ -108,6 +108,9 @@ export default class ApiLinks {
   //Add language support to the course
   public static readonly addLanguageSupportToCourse =
     ApiLinks.baseUrl + 'course/create/language';
+  //Upload course main material
+  public static readonly uploadCourseMainMaterial =
+    ApiLinks.baseUrl + 'course/create/main-materials';
 
   //Course controller
   //Get Course basic information by course id
@@ -119,4 +122,52 @@ export default class ApiLinks {
   //Delete language support from the course
   public static readonly deleteLanguageSupportFromCourse =
     ApiLinks.baseUrl + 'course/supported-language/remove';
+  //Get all main materials of the course
+  public static readonly getCourseMainMaterials =
+    ApiLinks.baseUrl + 'course/main-material/all';
+  //Delete main material from the course
+  public static readonly deleteCourseMainMaterial =
+    ApiLinks.baseUrl + 'course/main-material';
+  //Download main material from the course
+  public static readonly downloadCourseMainMaterial =
+    ApiLinks.baseUrl + 'course/main-material/download';
+  //Update course type
+  public static readonly updateCourseTypeByCourseId =
+    ApiLinks.baseUrl + 'course/basic/course-type';
+
+  //CourseLesson controller
+  //Create course lesson
+  public static readonly createCourseLesson =
+    ApiLinks.baseUrl + 'course/lesson/create';
+  //Create course lesson content
+  public static readonly createCourseLessonContent =
+    ApiLinks.baseUrl + 'course/lesson/content';
+  public static readonly uploadCourseLessonSupplementaryMaterial =
+    ApiLinks.baseUrl + 'course/lesson/supplementary-material';
+  public static readonly getCourseLessonSupplementaryMaterial =
+    ApiLinks.baseUrl + 'course/lesson/supplementary-material/all';
+  public static readonly downloadCourseLessonSupplementaryMaterial =
+    ApiLinks.baseUrl + 'course/lesson/supplementary-material/download';
+  public static readonly deleteCourseLessonSupplementaryMaterial =
+    ApiLinks.baseUrl + 'course/lesson/supplementary-material';
+  public static readonly getAllCourseLessonsByCourse =
+    ApiLinks.baseUrl + 'course/lesson/all';
+  public static readonly deleteCourseLessonAndAssociatedData =
+    ApiLinks.baseUrl + 'course/lesson/delete';
+  public static readonly getCourseLessonWithContentAndSupplementaryMaterialsByCourseLesson =
+    ApiLinks.baseUrl + 'course/lesson';
+  public static readonly updateCourseLessonAndCourseLessonContent =
+    ApiLinks.baseUrl + 'course/lesson';
+
+  //PersonController base link
+  public static readonly PersonControllerUrl = `${this.baseUrl}person`;
+
+  //ReferenceController base link
+  public static readonly ReferenceControllerUrl = `${this.baseUrl}reference`;
+
+  //CourseTutorController base link
+  public static readonly CourseTutorControllerUrl = `${this.baseUrl}tutor/course`;
+
+  //CourseStudentController base link
+  public static readonly CourseStudentControllerUrl = `${this.baseUrl}student/course`;
 }

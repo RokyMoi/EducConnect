@@ -1,0 +1,56 @@
+<div class="main-container">
+    <h2>Course Analytics</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+    </div>
+    <div>
+        <h3 *ngIf="lastUpdated">Last updated: {{lastUpdated | date:'medium'}}</h3>
+    </div>
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3>Total Views</h3>
+
+            </div>
+            <div class="metric-value">{{ courseStatistics.totalViews | number }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3>Active Viewers</h3>
+            </div>
+            <div class="metric-value">{{ courseStatistics.currentlyViewing| number }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3>Users on average view this course for (minutes)</h3>
+
+            </div>
+            <div class="metric-value">{{ courseStatistics.averageViewDurationInMinutes| number:'1.1-1' }}m</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3>Number of unique visitors</h3>
+
+            </div>
+            <div class="metric-value">{{ courseStatistics.numberOfUniqueVisitors| number }}</div>
+        </div>
+    </div>
+
+
+    <p>Graphical analytics overview</p>
+    <div class="charts-container">
+        <div class="chart-wrapper">
+            <h4>Course Engagement</h4>
+            <canvas id="lineChart">{{lineCtx}}</canvas>
+        </div>
+        <div class="chart-wrapper">
+            <h4>Average View Comparison</h4>
+            <canvas id="barChart">{{barCtx}}</canvas>
+        </div>
+        <div class="chart-wrapper">
+            <h4>Users Viewed Course (Feed VS Search)</h4>
+            <canvas id="pieChart">{{pieCtx}}</canvas>
+        </div>
+
+    </div>
+</div>

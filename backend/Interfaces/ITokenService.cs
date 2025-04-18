@@ -6,8 +6,17 @@ namespace EduConnect.Interfaces
     public interface ITokenService
     {
 
-        Task<string> CreateTokenAsync(PersonEmail person);
-        ClaimsPrincipal? ValidateToken(string token);
+        Task<AuthenticationToken?> CreateTokenAsync(Person person);
+        Task<bool> ValidateToken(string authenticationToken);
 
+        Task<string?> GetRole(PersonEmail person);
+
+        Task<AuthenticationToken?> GetTokenByPersonPublicId(Guid publicId);
+
+        ClaimsPrincipal? ValidateTokenWithClaims(string token);
+
+        Task<bool> CheckIfExistsByPersonId(Guid personId);
+
+        Task<bool> RevokeTokenByPersonId(Guid personId);
     }
 }

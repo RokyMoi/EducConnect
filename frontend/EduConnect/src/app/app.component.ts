@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { HeaderComponent } from './landingPage/header/header.component';
 import { HttpClient } from '@angular/common/http';
 import { BodyComponent } from './landingPage/body/body.component';
 import { ServerHealthCheckService } from './services/server-health-check.service';
@@ -10,16 +9,17 @@ import { RouterModule } from '@angular/router';
 import { AccountService } from './services/account.service';
 import { HeaderTemplateComponent } from './common/header/header-template/header-template.component';
 
+import { SnackboxComponent } from './modules/shared/snackbox/snackbox.component';
+import { HeaderComponent } from './landingPage/header/header.component';
+
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet,
     RouterModule,
-    HeaderComponent,
     CommonModule,
-    NgIf,
-    ServerOfflineComponent,
-    HeaderTemplateComponent,
+    SnackboxComponent,
+    HeaderComponent,
   ],
   standalone: true,
   templateUrl: './app.component.html',

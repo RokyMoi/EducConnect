@@ -12,18 +12,18 @@ export class LeftSideBarComponent {
   @Input() sidebarItems: { title: string; link: string }[] = [];
   @Input() sidebarTitle: string = 'Title';
   @Input() showSidebar: boolean = true;
-  @Input() set selectedOption(value: number) {
-    this._selectedOption = value;
-  }
-  get selectedOption(): number {
-    return this._selectedOption;
-  }
-  private _selectedOption: number = 0;
+  @Input() selectedIndex: number = 0;
 
-  @Output() optionSelected: EventEmitter<string> = new EventEmitter<string>();
+  @Output() requestOptionChange: EventEmitter<{
+    option: string;
+    index: number;
+  }> = new EventEmitter<{ option: string; index: number }>();
 
   selectOption(option: string, index: number) {
-    this.selectedOption = index;
-    this.optionSelected.emit(option);
+    this.requestOptionChange.emit({ option, index });
+  }
+
+  updateSelectedIndex(index: number) {
+    this.selectedIndex = index;
   }
 }

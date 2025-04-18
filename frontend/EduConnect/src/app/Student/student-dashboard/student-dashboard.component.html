@@ -1,1 +1,11 @@
+<div class="subheader">
+    <h3>Logged in</h3>
+    <h3>Email: {{dashboardUserInfo.email}}</h3>
+    <h3 *ngIf="dashboardUserInfo.username">Username: {{dashboardUserInfo.username}}
+    </h3>
+    <h3 *ngIf="dashboardUserInfo.firstName">Name: {{dashboardUserInfo.firstName}} {{dashboardUserInfo.lastName}}
+    </h3>
+
+    <button class="logout-button" (click)="logout()">Logout</button>
+</div>
 <app-for-you-page></app-for-you-page>

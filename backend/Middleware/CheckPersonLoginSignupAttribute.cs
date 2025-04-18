@@ -64,7 +64,7 @@ namespace backend.Middleware
             }
 
             //Validate the token
-            var claimsPrincipal = jwtValidator.ValidateToken(token);
+            var claimsPrincipal = jwtValidator.ValidateTokenWithClaims(token);
             if (claimsPrincipal == null)
             {
                 context.Result = new UnauthorizedObjectResult(

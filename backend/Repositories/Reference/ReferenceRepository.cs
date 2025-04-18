@@ -9,10 +9,12 @@ using backend.DTOs.Reference.LearningSubcategory;
 using backend.Entities.Course;
 using backend.Entities.Learning;
 using backend.Entities.Reference;
+using backend.Entities.Reference.Country;
 using backend.Entities.Reference.Language;
 using backend.Entities.Reference.Learning;
 using backend.Interfaces.Reference;
 using EduConnect.Data;
+using EduConnect.Entities.Course;
 using EduConnect.Entities.Reference;
 using EduConnect.Entities.Tutor;
 using Microsoft.EntityFrameworkCore;
@@ -95,15 +97,25 @@ namespace backend.Repositories.Reference
             }
         }
 
+        public async Task<bool> CourseCategoryExistsById(Guid courseCategoryId)
+        {
+            return await _dataContext.CourseCategory.Where(x => x.CourseCategoryId == courseCategoryId).AnyAsync();
+        }
+
         public async Task<List<CommunicationType>> GetAllCommunicationTypesAsync()
         {
             return await _dataContext.CommunicationType.ToListAsync();
         }
 
-        public Task<List<CourseType>> GetAllCourseTypesAsync()
+        public async Task<List<CourseCategory>> GetAllCourseCategories()
         {
-            return _dataContext.CourseType.ToListAsync();
+            return await _dataContext.CourseCategory.ToListAsync();
         }
+
+        // public Task<List<CourseType>> GetAllCourseTypesAsync()
+        // {
+        //     return _dataContext.CourseType.ToListAsync();
+        // }
 
         public async Task<List<EmploymentType>> GetAllEmploymentTypesAsync()
         {
@@ -187,10 +199,25 @@ namespace backend.Repositories.Reference
             return await _dataContext.CommunicationType.Where(x => x.CommunicationTypeId == id).FirstOrDefaultAsync();
         }
 
-        public async Task<CourseType?> GetCourseTypeByIdAsync(int id)
+        public async Task<Country?> GetCountryByName(string name)
         {
-            return await _dataContext.CourseType.Where(x => x.CourseTypeId == id).FirstOrDefaultAsync();
+            return await _dataContext.Country.Where(c => c.Name == name).FirstOrDefaultAsync();
         }
+
+        public async Task<Country?> GetCountryByNationalCallingCode(string nationalCallingCode)
+        {
+            return await _dataContext.Country.Where(c => c.NationalCallingCode == nationalCallingCode).FirstOrDefaultAsync();
+        }
+
+        // public async Task<CourseCreationCompletenessStep?> GetCourseCreationCompletenessStepDTOByStepOrderAsync(int stepOrder)
+        // {
+        //     return await _dataContext.CourseCreationCompletenessStep.Where(x => x.StepOrder == stepOrder).FirstOrDefaultAsync();
+        // }
+
+        // public async Task<CourseType?> GetCourseTypeByIdAsync(int id)
+        // {
+        //     return await _dataContext.CourseType.Where(x => x.CourseTypeId == id).FirstOrDefaultAsync();
+        // }
 
         public async Task<EmploymentType?> GetEmploymentTypeByIdAsync(int id)
         {
@@ -262,6 +289,13 @@ namespace backend.Repositories.Reference
         public async Task<WorkType?> GetWorkTypeByIdAsync(int id)
         {
             return await _dataContext.WorkType.Where(w => w.WorkTypeId == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> LearningDifficultyLevelExistsById(int levelId)
+        {
+            return await _dataContext.LearningDifficultyLevel.Where(
+                x => x.LearningDifficultyLevelId == levelId
+            ).AnyAsync();
         }
     }
 }
