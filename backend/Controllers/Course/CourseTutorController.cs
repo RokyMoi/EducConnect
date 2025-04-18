@@ -2491,6 +2491,19 @@ namespace EduConnect.Controllers.Course
                     )
                 );
             }
+            Console.WriteLine($"CourseTag count: {tag.CourseTags.Count}");
+
+            //Check are any courses using this tag
+            if (tag.CourseTags.Count > 0)
+            {
+                return Conflict(
+                    ApiResponse<object>.GetApiResponse(
+                        $"This tag is assigned to {(tag.CourseTags.Count > 1 ?
+                        "multiple courses" : "a course")} and cannot be deleted",
+                        null
+                    )
+                );
+            }
 
             bool deleteResult = await _courseRepository.DeleteTag(tag);
 
@@ -2532,7 +2545,7 @@ namespace EduConnect.Controllers.Course
         }
 
         [HttpGet("tags/tutor/all")]
-        public async Task<IActionResult> GetAllTagsByTutor()
+        public async Task<IActionResult> GetAllTagsByTutor(Guid? isAssignedToCourseId)
         {
             var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
 
@@ -2548,7 +2561,7 @@ namespace EduConnect.Controllers.Course
                 );
             }
 
-            List<GetAllTagsByTutorResponse> tags = await _courseRepository.GetAllTagsByTutor(tutor.TutorId);
+            List<GetAllTagsByTutorResponse> tags = await _courseRepository.GetAllTagsByTutor(tutor.TutorId, isAssignedToCourseId);
 
             return Ok(
                 ApiResponse<List<GetAllTagsByTutorResponse>>.GetApiResponse("Tags by tutor retrieved successfully", tags)

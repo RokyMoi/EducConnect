@@ -460,7 +460,7 @@ namespace EduConnect.Repositories.Course
 
 
 
-        public async Task<List<GetAllTagsByTutorResponse>?> GetAllTagsByTutor(Guid tutorId)
+        public async Task<List<GetAllTagsByTutorResponse>?> GetAllTagsByTutor(Guid tutorId, Guid? isAssignedToCourseId)
         {
             var tutor = await _dataContext.Tutor.Where(x => x.TutorId == tutorId).FirstOrDefaultAsync();
 
@@ -477,6 +477,7 @@ namespace EduConnect.Repositories.Course
                     Name = x.Name,
                     CourseCount = _dataContext.CourseTag.Count(ct => ct.TagId == x.TagId),
                     TutorId = tutor.TutorId,
+                    IsAssigned = isAssignedToCourseId.HasValue && _dataContext.CourseTag.Where(y => y.TagId == x.TagId && y.CourseId == isAssignedToCourseId.Value).Any()
                 }
             ).ToListAsync();
         }
@@ -969,7 +970,13 @@ namespace EduConnect.Repositories.Course
 
         public async Task<Tag?> GetTagById(Guid? tagId)
         {
-            return await _dataContext.Tag.Where(x => x.TagId == tagId).FirstOrDefaultAsync();
+            var tag = await _dataContext.Tag.Where(x => x.TagId == tagId).FirstOrDefaultAsync();
+
+            if (tag == null) return null;
+
+            tag.CourseTags = await _dataContext.CourseTag.Where(x => x.TagId == tag.TagId).ToListAsync();
+
+            return tag;
         }
 
         public Task<bool> IsTutorCoursePromotionImageOwner(Guid imageId, Guid tutorId)

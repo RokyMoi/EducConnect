@@ -139,7 +139,7 @@ namespace EduConnect.Interfaces.Course
         Task<bool> DeleteCourseTag(CourseTag courseTag);
         Task<bool> DeleteTag(Tag tag);
         Task<List<GetAllCourseTagsByCourseId>> GetAllCourseTagsByCourseId(Guid courseId);
-        Task<List<GetAllTagsByTutorResponse>?> GetAllTagsByTutor(Guid tutorId);
+        Task<List<GetAllTagsByTutorResponse>?> GetAllTagsByTutor(Guid tutorId, Guid? assignedToCourseId);
         Task<PaginatedResponse<GetTagsBySearchResponse>> GetTagsBySearch(GetTagsBySearchPaginatedRequest request);
     }
 }

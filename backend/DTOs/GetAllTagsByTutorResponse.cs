@@ -11,6 +11,7 @@ namespace EduConnect.DTOs
         public string Name { get; set; }
         public int CourseCount { get; set; }
         public Guid TutorId { get; set; }
+        public bool IsAssigned { get; set; }
 
 
     }
