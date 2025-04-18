@@ -575,7 +575,7 @@ export class CourseTutorControllerService {
     const token = localStorage.getItem('Authorization');
     return this.httpClient.get<
       DefaultServerResponse<GetAllTagsByTutorResponse[]>
-    >(`${this.apiUrl}/tags/tutor/all?usedByCourseId=${courseId}`, {
+    >(`${this.apiUrl}/tags/tutor/all?isAssignedToCourseId=${courseId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -622,6 +622,20 @@ export class CourseTutorControllerService {
     return this.httpClient.post<DefaultServerResponse>(
       `${this.apiUrl}/tags/create`,
       null,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: params,
+      }
+    );
+  }
+
+  deleteTag(tagId: string) {
+    const token = localStorage.getItem('Authorization');
+    const params = buildHttpParams({ tagId: tagId });
+    return this.httpClient.delete<DefaultServerResponse<null>>(
+      `${this.apiUrl}/tags/delete`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -98,23 +98,25 @@ export class CourseTutorTagsComponent implements OnInit {
   }
 
   fetchTagsByTutor() {
-    this.courseTutorControllerService.getAllTagsByTutor(this.courseId).subscribe({
-      next: (response) => {
-        console.log(response);
-        this.tagsByTutor = response.data;
-        this.filteredTagsByTutor = [...this.tagsByTutor];
-        this.searchTagsByTutor();
-      },
-      error: (error) => {
-        console.log(error);
-        this.snackboxService.showSnackbox(
-          `Failed to load tags by tutor${
-            error.error.message ? `: ${error.error.message}` : ''
-          }`,
-          'error'
-        );
-      },
-    });
+    this.courseTutorControllerService
+      .getAllTagsByTutor(this.courseId)
+      .subscribe({
+        next: (response) => {
+          console.log(response);
+          this.tagsByTutor = response.data;
+          this.filteredTagsByTutor = [...this.tagsByTutor];
+          this.searchTagsByTutor();
+        },
+        error: (error) => {
+          console.log(error);
+          this.snackboxService.showSnackbox(
+            `Failed to load tags by tutor${
+              error.error.message ? `: ${error.error.message}` : ''
+            }`,
+            'error'
+          );
+        },
+      });
   }
 
   fetchTagsByAllBySearch() {
@@ -157,8 +159,6 @@ export class CourseTutorTagsComponent implements OnInit {
     console.log(this.pageSizeTagsByAll);
     this.fetchTagsByAllBySearch();
   }
-
-  deleteTag(tag: GetAllTagsByTutorResponse) {}
 
   assignTagToCourse(tagId: string, tagName: string) {
     this.courseTutorControllerService
@@ -235,5 +235,24 @@ export class CourseTutorTagsComponent implements OnInit {
     this.filteredTagsByTutor = this.tagsByTutor.filter((tag) =>
       tag.name.toLowerCase().includes(searchTerm)
     );
+  }
+
+  deleteTag(tagId: string, tagName: string) {
+    return this.courseTutorControllerService.deleteTag(tagId).subscribe({
+      next: (response) => {
+        console.log(response);
+        this.snackboxService.showSnackbox(`Tag ${tagName} deleted`, 'success');
+        this.fetchTagsByTutor();
+      },
+      error: (error) => {
+        console.log(error);
+        this.snackboxService.showSnackbox(
+          `Failed to delete tag ${tagName}${
+            error.error.message ? `: ${error.error.message}` : ''
+          }`,
+          'error'
+        );
+      },
+    });
   }
 }

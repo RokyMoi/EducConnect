@@ -31,7 +31,8 @@
             <div class="search-container">
                 <input type="text" placeholder="Search your tags..." class="search-input"
                     [(ngModel)]="searchQueryTagsByTutor" (input)="searchTagsByTutor()">
-                <button class="icon-button primary" title="Create new tag">
+                <button class="icon-button primary" title="Create new tag"
+                    (click)="createTag(this.searchQueryTagsByTutor)">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -42,11 +43,12 @@
                 <div class="tag-content">
                     <span class="tag-name">{{tag.name}}</span>
                     <div class="tag-actions">
-                        <button class="icon-button success" title="Assign to course"
+                        <button class="icon-button success" [disabled]="tag.isAssigned" class="icon-button success"
+                            [title]="tag.isAssigned ? 'Tag already assigned to course' : 'Assign tag to course'"
                             (click)="assignTagToCourse(tag.tagId, tag.name)">
                             <i class="fas fa-link"></i>
                         </button>
-                        <button class="icon-button danger" title="Delete tag" (click)="deleteTag(tag)">
+                        <button class="icon-button danger" title="Delete tag" (click)="deleteTag(tag.tagId, tag.name)">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
