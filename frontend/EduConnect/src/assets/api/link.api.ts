@@ -170,4 +170,7 @@ export default class ApiLinks {
 
   //CourseStudentController base link
   public static readonly CourseStudentControllerUrl = `${this.baseUrl}student/course`;
+
+  //CollaborationDocumentController base link
+  public static readonly CollaborationDocumentControllerUrl = `${this.baseUrl}collaboration-document`;
 }

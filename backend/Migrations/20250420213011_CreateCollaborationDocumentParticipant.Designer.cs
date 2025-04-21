@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250420213011_CreateCollaborationDocumentParticipant")]
+    partial class CreateCollaborationDocumentParticipant
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,9 +70,6 @@ namespace EduConnect.Migrations
                     b.Property<Guid>("DocumentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("DocumentId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("InvitedByPersonId")
                         .HasColumnType("uniqueidentifier");
 
@@ -88,8 +88,6 @@ namespace EduConnect.Migrations
                     b.HasKey("CollaborationDocumentInvitationId");
 
                     b.HasIndex("DocumentId");
-
-                    b.HasIndex("DocumentId1");
 
                     b.HasIndex("InvitedByPersonId");
 
@@ -1899,7 +1897,7 @@ namespace EduConnect.Migrations
                         .HasForeignKey("ActiveUserPersonId");
 
                     b.HasOne("EduConnect.Entities.CollaborationDocument.Document", "Document")
-                        .WithMany("CollaborationDocumentActiveUsers")
+                        .WithMany()
                         .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1916,10 +1914,6 @@ namespace EduConnect.Migrations
                         .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("EduConnect.Entities.CollaborationDocument.Document", null)
-                        .WithMany("CollaborationDocumentInvitations")
-                        .HasForeignKey("DocumentId1");
 
                     b.HasOne("EduConnect.Entities.Person.Person", "InvitedByPerson")
                         .WithMany()
@@ -1947,7 +1941,7 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.HasOne("EduConnect.Entities.CollaborationDocument.Document", "Document")
-                        .WithMany("CollaborationDocumentParticipants")
+                        .WithMany()
                         .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2576,15 +2570,6 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.CollaborationDocument.Document", b =>
-                {
-                    b.Navigation("CollaborationDocumentActiveUsers");
-
-                    b.Navigation("CollaborationDocumentInvitations");
-
-                    b.Navigation("CollaborationDocumentParticipants");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.Course", b =>

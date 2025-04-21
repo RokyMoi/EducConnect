@@ -94,8 +94,6 @@ export class MessageService {
     console.log('Sending message to user: ' + email, content);
     console.log('Token', token);
     this.HubConnection?.invoke('SendMessage', {
-
-      
       RecipientEmail: email,
       Content: content,
     });

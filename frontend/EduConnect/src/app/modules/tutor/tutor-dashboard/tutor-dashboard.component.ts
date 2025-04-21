@@ -58,6 +58,13 @@ export class TutorDashboardComponent implements OnInit {
         buttonText: 'View My Courses',
         link: '/tutor/course',
       },
+      {
+        title: 'Collaboration Document',
+        description: 'Manage and work with other on a shared document',
+        dataInfo: '',
+        buttonText: 'View',
+        link: '/tutor/collaboration',
+      },
     ];
   }
 

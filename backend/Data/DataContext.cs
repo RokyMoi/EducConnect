@@ -15,6 +15,7 @@ using EduConnect.Entities.Messenger;
 using EduConnect.Entities.Shopping;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using EduConnect.Entities.CollaborationDocument;
 
 namespace EduConnect.Data;
 
@@ -78,6 +79,14 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
     public DbSet<CourseViewershipData> CourseViewershipData { get; set; }
 
     public DbSet<CourseViewershipDataSnapshot> CourseViewershipDataSnapshot { get; set; }
+
+    public DbSet<Document> Document { get; set; }
+
+    public DbSet<CollaborationDocumentInvitation> CollaborationDocumentInvitation { get; set; }
+
+    public DbSet<CollaborationDocumentParticipant> CollaborationDocumentParticipant { get; set; }
+    public DbSet<CollaborationDocumentActiveUser> CollaborationDocumentActiveUser { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -147,5 +156,37 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
             .WithMany()
             .HasForeignKey(c => c.LearningDifficultyLevelId)
             .OnDelete(DeleteBehavior.ClientSetNull);
+
+
+        builder.Entity<Document>()
+        .HasOne(i => i.Person)
+        .WithMany()
+        .HasForeignKey(i => i.CreatedByPersonId)
+        .OnDelete(DeleteBehavior.NoAction);
+
+
+        builder.Entity<CollaborationDocumentInvitation>()
+            .HasOne(i => i.InvitedPerson)
+            .WithMany()
+            .HasForeignKey(i => i.InvitedPersonId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CollaborationDocumentInvitation>()
+       .HasOne(e => e.InvitedPerson)
+       .WithMany()
+       .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CollaborationDocumentInvitation>()
+            .HasOne(e => e.InvitedByPerson)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CollaborationDocumentInvitation>()
+        .HasOne(e => e.Document)
+        .WithMany()
+        .HasForeignKey(e => e.DocumentId)
+        .OnDelete(DeleteBehavior.NoAction);
+
+
     }
 }

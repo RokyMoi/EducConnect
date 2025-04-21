@@ -31,7 +31,6 @@ import { CartItemsComponent } from './ShoppingCart/cart-items/cart-items.compone
 import { WishlistComponent } from './modules/ShoppingCart/wishlist/wishlist.component';
 import { CourseSupportedLanguagesComponent } from './modules/tutor/course/course-supported-languages/course-supported-languages.component';
 import { CourseMainMaterialsComponent } from './modules/tutor/course/course-main-materials/course-main-materials.component';
-import { ConfirmCourseTypeComponent } from './modules/tutor/course/confirm-course-type/confirm-course-type.component';
 import { CourseLessonsComponent } from './modules/tutor/course/self-paced-course/course-lessons/course-lessons.component';
 
 import { CreateCourse } from '../../../../.history/frontend/EduConnect/src/app/_models/course/create-course/create-course.create-course.course.model_20250107000517';
@@ -55,6 +54,8 @@ import { CourseTutorPromotionImagesComponent } from './modules/tutor/course/cour
 import { CoursePromotionImagesDetailsComponent } from './modules/tutor/course/course-promotion-images-details/course-promotion-images-details.component';
 import { CourseTutorAnalyticsDashboardComponent } from './modules/tutor/course/course-tutor-analytics-dashboard/course-tutor-analytics-dashboard.component';
 import { CourseTutorTagsComponent } from './modules/tutor/course/course-tutor-tags/course-tutor-tags.component';
+import { CollaborationDocumentDashboardComponent } from './modules/shared/collaboration-document/collaboration-document-dashboard/collaboration-document-dashboard.component';
+import { CollaborationDocumentLiveEditorComponent } from './modules/shared/collaboration-document/collaboration-document-live-editor/collaboration-document-live-editor.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -259,6 +260,44 @@ export const routes: Routes = [
   {
     path: 'admin/dashboard',
     component: AdminDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'admin' },
+  },
+
+  //Shared routes
+  {
+    path: 'tutor/collaboration',
+    component: CollaborationDocumentDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'student/collaboration',
+    component: CollaborationDocumentDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  {
+    path: 'admin/collaboration',
+    component: CollaborationDocumentDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'admin' },
+  },
+  {
+    path: 'tutor/collaboration/document/:documentId',
+    component: CollaborationDocumentLiveEditorComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'student/collaboration/document/:documentId',
+    component: CollaborationDocumentLiveEditorComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  {
+    path: 'admin/collaboration/document/:documentId',
+    component: CollaborationDocumentLiveEditorComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'admin' },
   },
