@@ -252,5 +252,25 @@ namespace EduConnect.Repositories
                 }
             ).ToListAsync();
         }
+
+        public async Task<GetCollaborationDocumentInviteInfoResponse?> GetCollaborationDocumentInviteInfoByDocumentId(Guid documentId)
+        {
+            return await _dataContext
+            .Document
+            .Where(x => x.DocumentId == documentId)
+            .Select(
+                x => new GetCollaborationDocumentInviteInfoResponse
+                {
+                    DocumentId = x.DocumentId,
+                    Title = x.Title,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).DateTime,
+                    NumberOfParticipants = _dataContext.CollaborationDocumentParticipant.Where(x => x.DocumentId == x.DocumentId).Count(),
+                    TotalNumberOfInvitations = _dataContext.CollaborationDocumentInvitation.Where(x => x.DocumentId == x.DocumentId).Count(),
+                    NumberOfAcceptedInvitations = _dataContext.CollaborationDocumentInvitation.Where(x => x.DocumentId == x.DocumentId && x.Status == true).Count(),
+                    NumberOfRejectedInvitations = _dataContext.CollaborationDocumentInvitation.Where(x => x.DocumentId == x.DocumentId && x.Status == false).Count(),
+                    NumberOfPendingInvitations = _dataContext.CollaborationDocumentInvitation.Where(x => x.DocumentId == x.DocumentId && x.Status == null).Count(),
+                }
+            ).FirstOrDefaultAsync();
+        }
     }
 }

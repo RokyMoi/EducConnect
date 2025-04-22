@@ -1,0 +1,47 @@
+<div class="main-container">
+    <h2>Invite Users {{documentInfo ? 'to ' + documentInfo.title : ''}}</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+
+    </div>
+    <section class="info-section">
+        <div class="info-card" *ngIf="documentInfo">
+            <div class="info-item created-at">
+                <span class="label">Created At:</span>
+                <span class="value">{{documentInfo.createdAt | date}}</span>
+            </div>
+            <div class="info-item participants">
+                <span class="label">Participants:</span>
+                <span class="value">{{documentInfo.numberOfParticipants}}</span>
+            </div>
+            <div class="info-item total-invitations">
+                <span class="label">Total Invitations:</span>
+                <span class="value">{{documentInfo.totalNumberOfInvitations}}</span>
+            </div>
+            <div class="info-item accepted">
+                <span class="label">Accepted:</span>
+                <span class="value">{{documentInfo.numberOfAcceptedInvitations}}</span>
+            </div>
+            <div class="info-item rejected">
+                <span class="label">Rejected:</span>
+                <span class="value">{{documentInfo.numberOfRejectedInvitations}}</span>
+            </div>
+            <div class="info-item pending">
+                <span class="label">Pending:</span>
+                <span class="value">{{documentInfo.numberOfPendingInvitations}}</span>
+            </div>
+        </div>
+    </section>
+    <section class="invite-section">
+        <div class="search-container">
+            <div class="form-item">
+                <label for="search">Search Users</label>
+                <input type="text" placeholder="Search by email, username, or name.">
+                <div class="error-container"></div>
+            </div>
+        </div>
+        <div class="search-result">
+            
+        </div>
+    </section>
+</div>

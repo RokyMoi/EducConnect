@@ -343,4 +343,8 @@ export class CollaborationDocumentDashboardComponent implements OnInit {
         },
       });
   }
+
+  onOpenInviteUsers(documentId: string) {
+    this.router.navigate(['/tutor/collaboration/invite', documentId]);
+  }
 }

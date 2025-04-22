@@ -7,6 +7,7 @@ import { GetAllDocumentsByCreatedByPersonIdResponse } from '../../models/shared/
 import { GetAllDocumentsByParticipantPersonIdResponse } from '../../models/shared/collaboration-document-controller/get-all-documents-by-participant-person-id-response';
 import { GetAllInvitationsForPersonIdResponse } from '../../models/shared/collaboration-document-controller/get-all-invitations-for-person-id-response';
 import { GetAllInvitationsSentByPersonIdResponse } from '../../models/shared/collaboration-document-controller/get-all-invitations-sent-by-person-id-response';
+import { GetCollaborationDocumentInviteInfoResponse } from '../../models/shared/collaboration-document-controller/get-collaboration-document-invite-info-response';
 
 @Injectable({
   providedIn: 'root',
@@ -127,6 +128,29 @@ export class CollaborationDocumentControllerService {
     const token = localStorage.getItem('Authorization');
     return this.httpClient.delete<DefaultServerResponse<null>>(
       `${this.apiUrl}/invite/delete/${invitationId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  public getCollaborationDocumentInviteInfo(documentId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<
+      DefaultServerResponse<GetCollaborationDocumentInviteInfoResponse>
+    >(`${this.apiUrl}/document/info/${documentId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  public checkCollaborationDocumentOwner(documentId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<DefaultServerResponse<boolean>>(
+      `${this.apiUrl}/document/owner/${documentId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

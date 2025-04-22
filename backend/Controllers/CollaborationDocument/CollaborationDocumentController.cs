@@ -582,6 +582,103 @@ namespace EduConnect.Controllers.CollaborationDocument
             );
         }
 
+        [HttpGet("document/info/{documentId}")]
+        public async Task<IActionResult> GetCollaborationDocumentInviteInfo(Guid documentId)
+        {
+            var personId = Guid.Parse(_httpContextAccessor.HttpContext.Items["PersonId"].ToString());
+
+            if (personId == Guid.Empty)
+            {
+                return Unauthorized(
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to perform this action",
+                        null
+                    )
+                );
+            }
+
+            var document = await _collaborationDocumentRepository.GetDocumentById(documentId, true);
+
+            if (document == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Document not found",
+                        null
+                    )
+                );
+            }
+
+            GetCollaborationDocumentInviteInfoResponse? collabDocInfo = await _collaborationDocumentRepository.GetCollaborationDocumentInviteInfoByDocumentId(documentId);
+
+            if (collabDocInfo == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Collaboration document info not found",
+                        null
+                    )
+                );
+            }
+            return Ok(
+                ApiResponse<GetCollaborationDocumentInviteInfoResponse>.GetApiResponse(
+                    "Collaboration document info retrieved successfully",
+                    collabDocInfo
+                )
+            );
+
+
+        }
+
+        [HttpGet("document/owner/{documentId}")]
+        public async Task<IActionResult> CheckCollaborationDocumentOwner(Guid documentId)
+        {
+            var personId = Guid.Parse(_httpContextAccessor.HttpContext.Items["PersonId"].ToString());
+            if (personId == Guid.Empty)
+            {
+                return Unauthorized(
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to perform this action",
+                        null
+                    )
+                );
+            }
+            var document = await _collaborationDocumentRepository.GetDocumentById(documentId, true);
+            if (document == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Document not found",
+                        null
+                    )
+                );
+            }
+            return Ok(
+                ApiResponse<bool>.GetApiResponse(
+                    $"User is {(document.CreatedByPersonId == personId ? "" : "not ")}the owner of the document",
+                    document.CreatedByPersonId == personId
+                )
+            );
+        }
+
+        [HttpGet("user/search")]
+        public async Task<IActionResult> SearchUsersToInvite([FromQuery] string searchQuery)
+        {
+            var personId = Guid.Parse(_httpContextAccessor.HttpContext.Items["PersonId"].ToString());
+            if (personId == Guid.Empty)
+            {
+                return Unauthorized(
+                    ApiResponse<object>.GetApiResponse(
+                        "You are not authorized to perform this action",
+                        null
+                    )
+                );
+            }
+            searchQuery = string.IsNullOrEmpty(searchQuery.Trim()) ? "" : searchQuery.Trim();
+
+            
+        }
+
 
     }
 }

@@ -56,6 +56,7 @@ import { CourseTutorAnalyticsDashboardComponent } from './modules/tutor/course/c
 import { CourseTutorTagsComponent } from './modules/tutor/course/course-tutor-tags/course-tutor-tags.component';
 import { CollaborationDocumentDashboardComponent } from './modules/shared/collaboration-document/collaboration-document-dashboard/collaboration-document-dashboard.component';
 import { CollaborationDocumentLiveEditorComponent } from './modules/shared/collaboration-document/collaboration-document-live-editor/collaboration-document-live-editor.component';
+import { CollaborationDocumentInviteUsersComponent } from './modules/shared/collaboration-document/collaboration-document-invite-users/collaboration-document-invite-users.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -298,6 +299,24 @@ export const routes: Routes = [
   {
     path: 'admin/collaboration/document/:documentId',
     component: CollaborationDocumentLiveEditorComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'admin' },
+  },
+  {
+    path: 'tutor/collaboration/invite/:documentId',
+    component: CollaborationDocumentInviteUsersComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'student/collaboration/invite/:documentId',
+    component: CollaborationDocumentInviteUsersComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  {
+    path: 'admin/collaboration/invite/:documentId',
+    component: CollaborationDocumentInviteUsersComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'admin' },
   },

@@ -26,5 +26,8 @@ namespace EduConnect.Interfaces
         public Task<bool> DeleteCollaborationDocumentInvitation(Guid collaborationDocumentInvitationId);
 
         public Task<List<GetAllInvitationsSentByPersonIdResponse>> GetAllInvitationsSentByPersonId(Guid personId);
+        public Task<GetCollaborationDocumentInviteInfoResponse?> GetCollaborationDocumentInviteInfoByDocumentId(Guid documentId);
+
+        public Task<List<SearchUsersToInviteResponse>> GetUsersBySearchQuery(string searchQuery);
     }
 }
