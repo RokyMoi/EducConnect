@@ -36,12 +36,29 @@
         <div class="search-container">
             <div class="form-item">
                 <label for="search">Search Users</label>
-                <input type="text" placeholder="Search by email, username, or name.">
+                <input type="text" placeholder="Search by email, username, or name." [(ngModel)]="searchQuery"
+                    (input)="onSearchUsers()" />
                 <div class="error-container"></div>
             </div>
         </div>
         <div class="search-result">
-            
+            <div *ngIf="users.length === 0" class="no-results">
+                No users found matching your search criteria
+            </div>
+
+            <div class="search-result-item" *ngFor="let item of users">
+                <div class="user-info">
+                    <div class="user-name">{{item.name}}</div>
+                    <div class="user-details">
+                        <span class="user-email">{{item.email}}</span>
+                        <span>|</span>
+                        <span class="user-username">{{item.username}}</span>
+                    </div>
+                </div>
+                <button class="invite-button" (click)="inviteUser(item.personId)">
+                    Invite
+                </button>
+            </div>
         </div>
     </section>
 </div>

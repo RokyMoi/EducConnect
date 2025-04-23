@@ -662,7 +662,7 @@ namespace EduConnect.Controllers.CollaborationDocument
         }
 
         [HttpGet("user/search")]
-        public async Task<IActionResult> SearchUsersToInvite([FromQuery] string searchQuery)
+        public async Task<IActionResult> SearchUsersToInvite([FromQuery] SearchUsersToInviteRequest request)
         {
             var personId = Guid.Parse(_httpContextAccessor.HttpContext.Items["PersonId"].ToString());
             if (personId == Guid.Empty)
@@ -674,11 +674,34 @@ namespace EduConnect.Controllers.CollaborationDocument
                     )
                 );
             }
-            searchQuery = string.IsNullOrEmpty(searchQuery.Trim()) ? "" : searchQuery.Trim();
 
-            
+            if (request.DocumentId == Guid.Empty)
+            {
+                return BadRequest(
+                    ApiResponse<object>.GetApiResponse(
+                        "DocumentId is required",
+                        null
+                    )
+                );
+            }
+
+            var users = await _collaborationDocumentRepository.GetUsersBySearchQuery(request.SearchQuery, request.DocumentId);
+
+            return Ok(
+                ApiResponse<List<SearchUsersToInviteResponse>>.GetApiResponse(
+                    "Users retrieved successfully",
+                    users
+                )
+            );
+
+
+
+
+
+
         }
 
+        
 
     }
 }

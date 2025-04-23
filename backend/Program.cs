@@ -29,8 +29,8 @@ namespace EduConnect
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
 
-            builder.Logging.SetMinimumLevel(LogLevel.Information); 
-            
+            builder.Logging.SetMinimumLevel(LogLevel.Information);
+
             builder.Services.AddHttpContextAccessor();
 
             Console.WriteLine(RuntimeInformation.OSDescription);
@@ -200,13 +200,16 @@ namespace EduConnect
 
             app.UseHttpsRedirection();
 
+
+
             app.UseRouting();
+
+            app.UseCors("FrontEndPolicy");
 
             app.UseAuthentication();
             app.UseAuthorization();
 
             //Set backend application to use CORS policy for requests originating only from specific origin (frontend application)
-            app.UseCors("FrontEndPolicy");
 
             //Set backend application to use CORS policy for requests originating only from specific origin (swagger) in development environment
             if (app.Environment.IsDevelopment())
@@ -217,8 +220,11 @@ namespace EduConnect
 
             app.MapControllers();
             app.MapHub<CourseAnalyticsHub>("/course-analytics-hub");
+            app.MapHub<CollaborationDocumentHub>("hubs/collaboration-document").RequireAuthorization()
+            .RequireCors("FrontEndPolicy");
             app.MapHub<PresenceHub>("hubs/presence");
             app.MapHub<MessageHub>("hubs/message");
+
             using (var scope = app.Services.CreateScope())
             {
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Person>>();

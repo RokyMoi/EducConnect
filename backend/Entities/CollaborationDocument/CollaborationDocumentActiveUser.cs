@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace EduConnect.Entities.CollaborationDocument
 {
+    [Table("CollaborationDocumentActiveUser", Schema = "Document")]
     public class CollaborationDocumentActiveUser
     {
         [Key]

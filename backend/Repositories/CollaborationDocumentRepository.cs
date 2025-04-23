@@ -60,73 +60,33 @@ namespace EduConnect.Repositories
 
         public async Task<List<GetAllDocumentsByCreatedByPersonIdRepositoryResponse>> GetAllDocumentsByCreatedByPersonId(Guid personId)
         {
-            var documents = await _dataContext.Document
-       .Where(doc => doc.CreatedByPersonId == personId)
-       .Select(doc => new
-       {
-           doc.DocumentId,
-           doc.Title,
-           doc.CreatedAt
-       })
-       .ToListAsync();
-
-            var documentIds = documents.Select(d => d.DocumentId).ToList();
-
-            // Fetch invitations in one go
-            var invitations = await _dataContext.CollaborationDocumentInvitation
-                .Where(i => documentIds.Contains(i.DocumentId))
-                .ToListAsync();
-
-            // Fetch participants in one go
-            var participants = await _dataContext.CollaborationDocumentParticipant
-                .Where(p => documentIds.Contains(p.DocumentId))
-                .ToListAsync();
+            var result = await _dataContext.Document
+           .Where(x => x.CreatedByPersonId == personId)
+           .Select(
+            x => new GetAllDocumentsByCreatedByPersonIdRepositoryResponse
+            {
+                DocumentId = x.DocumentId,
+                Title = x.Title,
+                CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).UtcDateTime,
+                NumberOfParticipants = _dataContext.CollaborationDocumentParticipant.Where(y => y.DocumentId == x.DocumentId).Count(),
+                TotalNumberOfInvitedUsers = _dataContext.CollaborationDocumentInvitation.Where(y => y.DocumentId == x.DocumentId).Count(),
+                NumberOfAcceptedInvitations = _dataContext.CollaborationDocumentInvitation.Where(y => y.DocumentId == x.DocumentId && y.Status == true).Count(),
+                NumberOfRejectedInvitations = _dataContext.CollaborationDocumentInvitation.Where(y => y.DocumentId == x.DocumentId && y.Status == false).Count(),
+                NumberOfPendingInvitations = _dataContext.CollaborationDocumentInvitation.Where(y => y.DocumentId == x.DocumentId && y.Status == null).Count(),
 
 
+            }
+           )
+           .ToListAsync();
 
-
-            var result = documents.Select(doc =>
-   {
-       var docInvitations = invitations.Where(i => i.DocumentId == doc.DocumentId).ToList();
-
-       return new GetAllDocumentsByCreatedByPersonIdRepositoryResponse
-       {
-           DocumentId = doc.DocumentId,
-           Title = doc.Title,
-           CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(doc.CreatedAt).DateTime,
-
-           NumberOfParticipants = participants.Count(p => p.DocumentId == doc.DocumentId),
-           TotalNumberOfInvitedUsers = docInvitations.Count,
-           NumberOfAcceptedInvitations = docInvitations.Count(i => i.Status == true),
-           NumberOfRejectedInvitations = docInvitations.Count(i => i.Status == false),
-           NumberOfPendingInvitations = docInvitations.Count(i => i.Status == null)
-       };
-   }).ToList();
+            foreach (var document in result)
+            {
+                _logger.LogInformation($"Document {document.DocumentId} - {document.Title} created at {document.CreatedAt} by person ID: {personId} has following: {document.NumberOfParticipants} participants, {document.TotalNumberOfInvitedUsers} total invited users, {document.NumberOfAcceptedInvitations} accepted invitations, {document.NumberOfRejectedInvitations} rejected invitations and {document.NumberOfPendingInvitations} pending invitations.");
+            }
 
             return result;
 
-        }
 
-        public async Task<List<GetAllDocumentsByParticipantPersonIdResponse>> GetAllDocumentsByParticipantPersonId(Guid personId)
-        {
-            return await _dataContext.CollaborationDocumentParticipant
-            .Include(x => x.Document)
-            .Include(x => x.Document.Person)
-            .Include(x => x.Document.Person.PersonDetails)
-            .Include(x => x.Document.Person.PersonEmail)
-            .Where(x => x.ParticipantPersonId == personId)
-            .Select(
-                x => new GetAllDocumentsByParticipantPersonIdResponse
-                {
-                    DocumentId = x.DocumentId,
-                    Title = x.Document.Title,
-                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.Document.CreatedAt).DateTime,
-                    CreatedByIdentificationData = IdentificationDataGetter.GetIdentificationData
-                    (x.Document.Person.PersonEmail, x.Document.Person.PersonDetails),
-                    NumberOfParticipants = _dataContext.CollaborationDocumentParticipant.Where(x => x.DocumentId == x.DocumentId).Count(),
-                    JoinedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).DateTime,
-                }
-            ).ToListAsync();
         }
 
         public async Task<List<GetAllInvitationsForPersonIdResponse>> GetAllInvitationsForPersonId(Guid personId)
@@ -271,6 +231,147 @@ namespace EduConnect.Repositories
                     NumberOfPendingInvitations = _dataContext.CollaborationDocumentInvitation.Where(x => x.DocumentId == x.DocumentId && x.Status == null).Count(),
                 }
             ).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<SearchUsersToInviteResponse>> GetUsersBySearchQuery(string? searchQuery, Guid documentId)
+        {
+            var oneDayAgo = DateTimeOffset.UtcNow.AddDays(-1);
+            var oneDayAgoTimestamp = oneDayAgo.ToUnixTimeMilliseconds();
+
+            searchQuery = string.IsNullOrEmpty(searchQuery) ? string.Empty : searchQuery.Trim().ToLower();
+            var query = _dataContext
+            .Person
+            .Include(x => x.PersonDetails)
+            .Include(x => x.PersonEmail).AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                query = query
+                .Where(x => (
+                    x.PersonDetails.FirstName.ToLower().Contains(searchQuery) ||
+                    x.PersonDetails.LastName.ToLower().Contains(searchQuery) ||
+                    (x.PersonDetails.FirstName + " " + x.PersonDetails.LastName).ToLower().Contains(searchQuery) ||
+                    (x.PersonDetails.LastName + " " + x.PersonDetails.FirstName).ToLower().Contains(searchQuery) ||
+                    x.PersonDetails.Username.ToLower().Contains(searchQuery) ||
+                    x.PersonEmail.Email.ToLower().Contains(searchQuery)) &&
+                    (
+                        !_dataContext.CollaborationDocumentInvitation.Where(
+                            y => y.DocumentId == documentId && y.InvitedPersonId == x.PersonId
+                        ).Any() ||
+                         _dataContext.CollaborationDocumentInvitation.Where(y =>
+                            y.DocumentId == documentId &&
+                            y.InvitedPersonId == x.PersonId &&
+                            y.Status == false &&
+                            y.StatusChangedAt.HasValue &&
+                            y.StatusChangedAt.Value < oneDayAgo)
+                            .Any()
+                    )
+
+                ).AsQueryable();
+            }
+            ;
+
+            if (string.IsNullOrEmpty(searchQuery))
+            {
+                query = query
+                .Where(x =>
+                    !_dataContext.CollaborationDocumentInvitation.Where(
+                        y => y.DocumentId == documentId && y.InvitedPersonId == x.PersonId
+                    ).Any() ||
+                    _dataContext.CollaborationDocumentInvitation.Where(y =>
+                        y.DocumentId == documentId &&
+                        y.InvitedPersonId == x.PersonId &&
+                        y.Status == false &&
+                        y.StatusChangedAt.HasValue &&
+                        y.StatusChangedAt.Value < oneDayAgo)
+                        .Any()
+                ).AsQueryable();
+            }
+
+            return await query
+            .Select(
+                x => new SearchUsersToInviteResponse
+                {
+                    PersonId = x.PersonId,
+                    Name = x.PersonDetails.FirstName + " " + x.PersonDetails.LastName,
+                    Email = x.PersonEmail.Email,
+                    Username = x.PersonDetails.Username
+                }
+            )
+            .Take(10)
+            .ToListAsync();
+        }
+
+        public async Task<List<GetAllDocumentsByParticipantPersonIdResponse>> GetAllDocumentsByParticipantPersonId(Guid personId)
+        {
+            return await _dataContext
+            .CollaborationDocumentParticipant
+            .Include(x => x.Document)
+            .Where(x => x.ParticipantPersonId == personId)
+            .Select(
+                x => new GetAllDocumentsByParticipantPersonIdResponse
+                {
+                    DocumentId = x.DocumentId,
+                    Title = x.Document.Title,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.Document.CreatedAt).DateTime,
+                    CreatedByIdentificationData = IdentificationDataGetter.GetIdentificationData(x.Document.Person.PersonEmail, x.Document.Person.PersonDetails),
+                    NumberOfParticipants = _dataContext.CollaborationDocumentParticipant.Where(y => y.DocumentId == x.DocumentId).Count(),
+                    JoinedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).DateTime
+                }
+            ).ToListAsync();
+        }
+
+        public async Task UpdateUserActiveStatus(Guid documentId, Guid personId, bool isActive)
+        {
+            var activeUser = await _dataContext.CollaborationDocumentActiveUser
+            .Where(x => x.DocumentId == documentId && x.ActiveUserPersonId == personId)
+            .FirstOrDefaultAsync();
+
+            if (activeUser == null)
+            {
+                activeUser = new CollaborationDocumentActiveUser
+                {
+                    DocumentId = documentId,
+                    ActiveUserPersonId = personId,
+                    Status = isActive,
+
+                };
+
+                await _dataContext.CollaborationDocumentActiveUser.AddAsync(activeUser);
+            }
+            else
+            {
+                activeUser.Status = isActive;
+                activeUser.StatusChangedAt = DateTime.UtcNow;
+                _dataContext.CollaborationDocumentActiveUser.Update(activeUser);
+
+            }
+
+            await _dataContext.SaveChangesAsync();
+
+        }
+
+        public async Task<List<GetAllActiveCollaboratorsByDocumentId>> GetAllActiveCollaboratorsByDocumentId(Guid documentId)
+        {
+            return await _dataContext
+            .CollaborationDocumentActiveUser
+            .Include(x => x.Person)
+            .Include(x => x.Person.PersonDetails)
+            .Include(x => x.Person.PersonEmail)
+            .Where(
+                x => x.DocumentId == documentId && x.Status == true
+            )
+            .Select(
+                x => new GetAllActiveCollaboratorsByDocumentId
+                {
+                    PersonId = (Guid)x.ActiveUserPersonId,
+                    IdentificationData = IdentificationDataGetter.GetIdentificationData(x.Person.PersonEmail, x.Person.PersonDetails),
+                    JoinedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).DateTime
+                }
+            )
+            .ToListAsync();
+
+
         }
     }
 }

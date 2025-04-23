@@ -8,6 +8,10 @@ import { GetAllDocumentsByParticipantPersonIdResponse } from '../../models/share
 import { GetAllInvitationsForPersonIdResponse } from '../../models/shared/collaboration-document-controller/get-all-invitations-for-person-id-response';
 import { GetAllInvitationsSentByPersonIdResponse } from '../../models/shared/collaboration-document-controller/get-all-invitations-sent-by-person-id-response';
 import { GetCollaborationDocumentInviteInfoResponse } from '../../models/shared/collaboration-document-controller/get-collaboration-document-invite-info-response';
+import { GetUsersBySearchQueryRequest } from '../../models/shared/collaboration-document-controller/get-users-by-search-query-request';
+import { buildHttpParams } from '../../helpers/build-http-params.helper';
+import { GetUsersBySearchQueryResponse } from '../../models/shared/collaboration-document-controller/get-users-by-search-query-response';
+import { InviteUserToDocumentRequest } from '../../models/shared/collaboration-document-controller/invite-user-to-document-request';
 
 @Injectable({
   providedIn: 'root',
@@ -151,6 +155,33 @@ export class CollaborationDocumentControllerService {
     const token = localStorage.getItem('Authorization');
     return this.httpClient.get<DefaultServerResponse<boolean>>(
       `${this.apiUrl}/document/owner/${documentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  public GetUsersBySearchQuery(request: GetUsersBySearchQueryRequest) {
+    const token = localStorage.getItem('Authorization');
+    const params = buildHttpParams(request);
+    return this.httpClient.get<
+      DefaultServerResponse<GetUsersBySearchQueryResponse[]>
+    >(`${this.apiUrl}/user/search`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: params,
+    });
+  }
+
+  public inviteUserToDocument(request: InviteUserToDocumentRequest) {
+    const token = localStorage.getItem('Authorization');
+    const params = buildHttpParams(request);
+    return this.httpClient.post<DefaultServerResponse<string>>(
+      `${this.apiUrl}/invite`,
+      request,
       {
         headers: {
           Authorization: `Bearer ${token}`,

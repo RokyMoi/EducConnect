@@ -261,6 +261,7 @@ export class CollaborationDocumentDashboardComponent implements OnInit {
           console.log(response);
           this.snackboxService.showSnackbox('Invitation accepted', 'success');
           this.fetchInvitationsForUser();
+          this.fetchDocumentsWhereUserIsParticipant();
         },
         error: (error) => {
           console.log(error);

@@ -28,6 +28,10 @@ namespace EduConnect.Interfaces
         public Task<List<GetAllInvitationsSentByPersonIdResponse>> GetAllInvitationsSentByPersonId(Guid personId);
         public Task<GetCollaborationDocumentInviteInfoResponse?> GetCollaborationDocumentInviteInfoByDocumentId(Guid documentId);
 
-        public Task<List<SearchUsersToInviteResponse>> GetUsersBySearchQuery(string searchQuery);
+        public Task<List<SearchUsersToInviteResponse>> GetUsersBySearchQuery(string? searchQuery, Guid documentId);
+
+        public Task UpdateUserActiveStatus(Guid documentId, Guid personId, bool isActive);
+        public Task<List<GetAllActiveCollaboratorsByDocumentId>> GetAllActiveCollaboratorsByDocumentId(Guid documentId);
+
     }
 }
