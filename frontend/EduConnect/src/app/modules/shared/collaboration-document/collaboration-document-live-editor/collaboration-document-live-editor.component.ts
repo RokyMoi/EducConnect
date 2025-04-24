@@ -56,9 +56,13 @@ export class CollaborationDocumentLiveEditorComponent
       });
   }
 
-  ngOnDestroy(): void {
+  async ngOnDestroy(): Promise<void> {
     // Clean up subscriptions when component is destroyed
     this.subscription.unsubscribe();
+    await this.collaborationDocumentHubService.leaveDocumentGroup(
+      this.documentId
+    );
+    this.collaborationDocumentHubService.stopConnection();
   }
 
   async goBack() {

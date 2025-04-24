@@ -26,6 +26,7 @@ namespace EduConnect.SignalIR
         private readonly ICollaborationDocumentRepository _collaborationDocumentRepository = collaborationDocumentRepository;
 
         private readonly ConcurrentDictionary<string, Guid> _connections = new();
+        private readonly ConcurrentDictionary<Guid, List<Guid>> _documentGroups = new();
 
         public override async Task OnConnectedAsync()
         {
@@ -40,18 +41,50 @@ namespace EduConnect.SignalIR
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            var personId = GetPersonIdFromToken();
-            _connections.TryRemove(Context.ConnectionId, out _);
-            _logger.LogInformation($"User {personId} disconnected with connection ID {Context.ConnectionId}");
+            string connectionId = Context.ConnectionId;
+
+            if (_connections.TryRemove(connectionId, out var personId))
+            {
+                _logger.LogInformation($"User {personId} disconnected with connection ID {connectionId}");
+
+                var documentIds = _documentGroups
+                    .Where(x => x.Value.Contains(personId))
+                    .Select(x => x.Key)
+                    .ToList();
+
+                foreach (var documentId in documentIds)
+                {
+                    _documentGroups[documentId].Remove(personId);
+                    await _collaborationDocumentRepository.UpdateUserActiveStatus(documentId, personId, false);
+                    await Clients.Group(documentId.ToString()).SendAsync("UserLeft", $"User {connectionId} left the group {documentId}");
+                    await this.GetActiveDocumentCollaborators(documentId);
+                }
+            }
+
             await base.OnDisconnectedAsync(exception);
         }
-
         public async Task JoinDocumentGroup(Guid documentId)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, documentId.ToString());
             _logger.LogInformation($"User {Context.ConnectionId} joined the group {documentId}");
             var personId = GetPersonIdFromToken();
             await _collaborationDocumentRepository.UpdateUserActiveStatus(documentId, personId, true);
+            _documentGroups.AddOrUpdate(documentId, new List<Guid> { personId }, (key, list) =>
+            {
+                if (!list.Contains(personId))
+                {
+                    list.Add(personId);
+                }
+                return list;
+            });
+
+            _logger.LogInformation($"User {personId} joined the group {documentId} and added to the list of active users for this document.");
+
+            foreach (var documentGroup in _documentGroups)
+            {
+                _logger.LogInformation($"Document ID: {documentGroup.Key}, Active Users: {string.Join(", ", documentGroup.Value)}");
+            }
+
             await Clients.Group(documentId.ToString()).SendAsync("UserJoined", $"User {Context.ConnectionId} joined the group {documentId}");
             await this.GetActiveDocumentCollaborators(documentId);
         }
@@ -64,6 +97,21 @@ namespace EduConnect.SignalIR
 
             await _collaborationDocumentRepository.UpdateUserActiveStatus(documentId, personId, false);
 
+            _documentGroups.AddOrUpdate(documentId, new List<Guid> { personId }, (key, list) =>
+            {
+                if (list.Contains(personId))
+                {
+                    list.Remove(personId);
+                }
+                return list;
+            });
+            _logger.LogInformation($"User {personId} left the group {documentId} and removed from the list of active users for this document.");
+
+            foreach (var documentGroup in _documentGroups)
+            {
+                _logger.LogInformation($"Document ID: {documentGroup.Key}, Active Users: {string.Join(", ", documentGroup.Value)}");
+            }
+
             await Clients.Group(documentId.ToString()).SendAsync("UserLeft", $"User {Context.ConnectionId} left the group {documentId}");
             await this.GetActiveDocumentCollaborators(documentId);
         }
@@ -73,6 +121,8 @@ namespace EduConnect.SignalIR
             var activeCollaborators = await _collaborationDocumentRepository.GetAllActiveCollaboratorsByDocumentId(documentId);
             await Clients.Group(documentId.ToString()).SendAsync("ActiveCollaborators", activeCollaborators);
         }
+
+
 
         private Guid GetPersonIdFromToken()
         {

@@ -61,4 +61,9 @@ export class CollaborationDocumentHubService {
   async leaveDocumentGroup(documentId: string): Promise<void> {
     await this.connection.invoke('LeaveDocumentGroup', documentId);
   }
+
+  stopConnection(): Promise<void> {
+    console.log('Stopping SignalR connection');
+    return this.connection?.stop();
+  }
 }

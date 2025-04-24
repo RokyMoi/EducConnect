@@ -347,6 +347,7 @@ namespace EduConnect.Repositories
 
             }
 
+            _logger.LogInformation($"User {personId} active status updated to {isActive} for document {documentId}");
             await _dataContext.SaveChangesAsync();
 
         }
