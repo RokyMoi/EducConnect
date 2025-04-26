@@ -1,7 +1,16 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { BehaviorSubject, from, Observable } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounce,
+  debounceTime,
+  from,
+  Observable,
+} from 'rxjs';
 import { GetActiveUsersResponse } from './get-active-users-response';
+import { GetDocumentContentResponse } from '../../models/shared/signalr/collaboration-document-hub/get-document-content-response';
+import { DocumentDelta } from '../../models/shared/signalr/collaboration-document-hub/document-delta';
+import { DocumentUpdateRequest } from '../../models/shared/signalr/collaboration-document-hub/document-update-request';
 @Injectable({
   providedIn: 'root',
 })
@@ -15,6 +24,15 @@ export class CollaborationDocumentHubService {
   );
   public activeUsers$ = this.activeUsersSubject.asObservable();
 
+  public contentSubject = new BehaviorSubject<string>('');
+  public content$ = this.contentSubject.asObservable();
+
+  //Array representing queue of updates from the client to be sent to the server
+  private updateQueue: DocumentDelta[] = [];
+  private currentVersion: number = 1;
+  private isSending: boolean = false;
+  private documentId: string = '';
+
   constructor() {}
 
   startConnection(documentId: string): Promise<void> {
@@ -27,6 +45,7 @@ export class CollaborationDocumentHubService {
       .withAutomaticReconnect()
       .build();
 
+    this.documentId = documentId;
     // Register event handlers once during connection setup
     this.connection.on('UserJoined', (data) => {
       console.log('User joined:', data);
@@ -62,8 +81,27 @@ export class CollaborationDocumentHubService {
     await this.connection.invoke('LeaveDocumentGroup', documentId);
   }
 
+  updateDocumentContent(documentId: string, content: string) {
+    console.log('Updating document ' + documentId + ' with content:', content);
+    this.connection.invoke('UpdateDocumentContent', documentId, content);
+  }
+
+  getDocumentContent(documentId: string) {
+    console.log('Getting document ' + documentId + ' content');
+    this.connection.on(
+      'DocumentContentUpdated',
+      (content: GetDocumentContentResponse) => {
+        console.log('Received document content:', content);
+        this.contentSubject.next(content.content);
+      }
+    );
+  }
+
   stopConnection(): Promise<void> {
     console.log('Stopping SignalR connection');
     return this.connection?.stop();
   }
+
+  
+  
 }

@@ -6,6 +6,15 @@
         <button class="go-back-button" (click)="goBack()">← Go Back</button>
         <button class="invite-users-button">Invite users</button>
     </div>
+    <section class="editor-container">
+        <div class="editor-menu-container">
+            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"></ngx-editor-menu>
+        </div>
+        <div class="editor-content-container">
+            <ngx-editor class="live-editor" [editor]="editor" [placeholder]="'Start typing so the others can see it'"
+                [formControl]="content" [(ngModel)]="editorContent" (ngModelChange)="onContentChange()"></ngx-editor>
+        </div>
+    </section>
     <section class="users-section">
         <div class="joined-users">
             <h3>Active Collaborators ({{ activeUsers.length }})</h3>

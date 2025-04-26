@@ -5,6 +5,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using EduConnect.Data;
+using EduConnect.DTOs;
+using EduConnect.Helpers;
 using EduConnect.Interfaces;
 using EduConnect.Middleware;
 using EduConnect.Utilities;
@@ -86,6 +88,15 @@ namespace EduConnect.SignalIR
             }
 
             await Clients.Group(documentId.ToString()).SendAsync("UserJoined", $"User {Context.ConnectionId} joined the group {documentId}");
+
+            var document = await _collaborationDocumentRepository.GetDocumentContent(documentId);
+            await Clients.Caller.SendAsync("DocumentContentUpdated", document ?? new UpdateDocumentContentResponse
+            {
+                DocumentId = documentId,
+                Content = string.Empty,
+                UpdatedByIdentificationData = string.Empty,
+                UpdatedAt = DateTime.UtcNow
+            });
             await this.GetActiveDocumentCollaborators(documentId);
         }
 
@@ -113,6 +124,7 @@ namespace EduConnect.SignalIR
             }
 
             await Clients.Group(documentId.ToString()).SendAsync("UserLeft", $"User {Context.ConnectionId} left the group {documentId}");
+
             await this.GetActiveDocumentCollaborators(documentId);
         }
 
@@ -120,6 +132,48 @@ namespace EduConnect.SignalIR
         {
             var activeCollaborators = await _collaborationDocumentRepository.GetAllActiveCollaboratorsByDocumentId(documentId);
             await Clients.Group(documentId.ToString()).SendAsync("ActiveCollaborators", activeCollaborators);
+        }
+
+        public async Task UpdateDocumentContent(Guid documentId, string content)
+        {
+            var personId = GetPersonIdFromToken();
+
+            if (!await ValidateAccessRights(documentId, personId))
+            {
+                _logger.LogError($"User {personId} does not have access rights to document {documentId}");
+                throw new HubException("User does not have access rights to this document");
+            }
+
+
+            UpdateDocumentContentResponse updatedDocument = await _collaborationDocumentRepository.UpdateDocumentContent(documentId, personId, content);
+
+            await Clients.GroupExcept(documentId.ToString(), Context.ConnectionId).SendAsync("DocumentContentUpdated", updatedDocument);
+            _logger.LogInformation($"Document {documentId} content updated by user {personId}");
+        }
+
+        public async Task SendDocumentUpdate(DocumentUpdateRepositoryRequest update)
+        {
+            var personId = GetPersonIdFromToken();
+
+            if (!await ValidateAccessRights(update.DocumentId, personId))
+            {
+                _logger.LogError($"User {personId} does not have access rights to document {update.DocumentId}");
+                throw new HubException("User does not have access rights to this document");
+            }
+
+            var result = await _collaborationDocumentRepository.ApplyDocumentUpdate(update);
+
+            if (result == null)
+            {
+
+                //Client needs to resync 
+                _logger.LogWarning("Client with connection ID {ConnectionId} needs to resync", Context.ConnectionId);
+                var currentState = await _collaborationDocumentRepository.GetDocumentContent(update.DocumentId);
+                await Clients.Caller.SendAsync("ForceResync", currentState);
+                return;
+            }
+
+            await Clients.GroupExcept(update.DocumentId.ToString(), Context.ConnectionId).SendAsync("DocumentUpdateReceived", result);
         }
 
 
@@ -150,7 +204,14 @@ namespace EduConnect.SignalIR
             return person.PersonId;
         }
 
-
+        private async Task<bool> ValidateAccessRights(Guid documentId, Guid personId)
+        {
+            return await _dataContext
+            .CollaborationDocumentParticipant
+            .Include(x => x.Document)
+            .Where(x => x.Document.DocumentId == documentId && (x.ParticipantPersonId == personId || x.Document.CreatedByPersonId == personId))
+            .AnyAsync();
+        }
 
 
     }

@@ -98,3 +98,51 @@
   border: 1px dashed #dee2e6;
   border-radius: 6px;
 }
+
+.editor-container {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+}
+
+.editor-warning {
+  color: red;
+  height: 21px;
+  font-size: 12px;
+  padding-left: 10px;
+}
+.editor-row {
+  margin-bottom: 12px;
+}
+.editor-row p:nth-of-type(1) {
+  color: #808080;
+  padding-left: 10px;
+  font-size: 14px;
+}
+
+.editor-menu-container {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.editor-content-container {
+  width: 100%;
+  min-height: 500px;
+  max-height: 1500px;
+  overflow-y: auto;
+}
+
+.warning-span {
+  color: orange;
+}
+
+.live-editor {
+  min-height: 500px !important;
+  max-height: 1500px !important;
+  overflow-y: auto !important;
+}

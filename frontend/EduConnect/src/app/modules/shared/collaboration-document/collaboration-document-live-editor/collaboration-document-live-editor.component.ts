@@ -6,12 +6,22 @@ import { SnackboxService } from '../../../../services/shared/snackbox.service';
 import validator from 'validator';
 import { CollaborationDocumentHubService } from '../../../../services/signalr-services/collaboration-document-hub.service';
 import { GetActiveUsersResponse } from '../../../../services/signalr-services/get-active-users-response';
-import { Subscription } from 'rxjs';
+import { max, Subscription } from 'rxjs';
+import { NgxDocViewerModule } from 'ngx-doc-viewer';
+import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 
+import { NgModule } from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { style } from '@angular/animations';
 @Component({
   selector: 'app-collaboration-document-live-editor',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    NgxDocViewerModule,
+    NgxEditorModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './collaboration-document-live-editor.component.html',
   styleUrl: './collaboration-document-live-editor.component.css',
 })
@@ -21,6 +31,24 @@ export class CollaborationDocumentLiveEditorComponent
   documentId: string = '';
   activeUsers: GetActiveUsersResponse[] = [];
   private subscription: Subscription = new Subscription();
+
+  public editor: Editor = new Editor({
+    history: true,
+  });
+
+  toolbar: Toolbar = [
+    ['bold', 'italic'],
+    ['underline', 'strike'],
+    ['code', 'blockquote'],
+    ['ordered_list', 'bullet_list'],
+    [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
+    ['link', 'image'],
+    ['text_color', 'background_color'],
+    ['align_left', 'align_center', 'align_right', 'align_justify'],
+  ];
+  editorContent: string = '';
+
+  content: FormControl<string | null> = new FormControl(null);
 
   constructor(
     private router: Router,
@@ -46,11 +74,20 @@ export class CollaborationDocumentLiveEditorComponent
       })
     );
 
+    this.subscription.add(
+      this.collaborationDocumentHubService.content$.subscribe((content) => {
+        this.editorContent = content;
+      })
+    )
+
     this.collaborationDocumentHubService
       .startConnection(this.documentId)
-      .then(() =>
-        this.collaborationDocumentHubService.getActiveUsers(this.documentId)
-      )
+      .then(() => {
+        this.collaborationDocumentHubService.getActiveUsers(this.documentId);
+        this.collaborationDocumentHubService.getDocumentContent(
+          this.documentId
+        );
+      })
       .catch((error) => {
         console.error('Error starting SignalR connection:', error);
       });
@@ -70,5 +107,13 @@ export class CollaborationDocumentLiveEditorComponent
       this.documentId
     );
     this.router.navigate(['/tutor/dashboard']);
+  }
+
+  onContentChange() {
+    console.log('Updating document with content:', this.editorContent);
+    this.collaborationDocumentHubService.updateDocumentContent(
+      this.documentId,
+      this.editorContent
+    );
   }
 }

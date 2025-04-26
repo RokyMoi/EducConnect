@@ -9,6 +9,7 @@ using EduConnect.Entities.CollaborationDocument;
 using EduConnect.Entities.Person;
 using EduConnect.Helpers;
 using EduConnect.Interfaces;
+using EduConnect.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace EduConnect.Repositories
@@ -373,6 +374,108 @@ namespace EduConnect.Repositories
             .ToListAsync();
 
 
+        }
+
+        public async Task<UpdateDocumentContentResponse?> UpdateDocumentContent(Guid documentId, Guid personId, string content)
+        {
+
+            var document = await _dataContext.Document
+            .Where(x => x.DocumentId == documentId).FirstOrDefaultAsync();
+
+
+
+            if (document == null)
+            {
+                _logger.LogWarning($"Document with ID: {documentId} not found.");
+                return null;
+            }
+
+            var person = await _dataContext.Person
+            .Include(x => x.PersonDetails)
+            .Include(x => x.PersonEmail)
+            .Where(x => x.PersonId == personId).FirstOrDefaultAsync();
+
+
+            document.Content = content;
+            document.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            _dataContext.Document.Update(document);
+            await _dataContext.SaveChangesAsync();
+            _logger.LogInformation($"Document with ID: {documentId} updated by person ID: {personId}.");
+            return new UpdateDocumentContentResponse
+            {
+                DocumentId = document.DocumentId,
+                Content = document.Content,
+                UpdatedByIdentificationData = IdentificationDataGetter.GetIdentificationData(person.PersonEmail, person.PersonDetails),
+                UpdatedAt = DateTimeOffset.FromUnixTimeMilliseconds((long)document.UpdatedAt).DateTime
+            };
+        }
+
+        public async Task<UpdateDocumentContentResponse?> GetDocumentContent(Guid documentId)
+        {
+            return await _dataContext
+            .Document
+            .Where(x => x.DocumentId == documentId)
+            .Select(
+                x => new UpdateDocumentContentResponse
+                {
+                    DocumentId = x.DocumentId,
+                    Content = x.Content,
+                    UpdatedByIdentificationData = string.Empty,
+                    UpdatedAt = DateTimeOffset.FromUnixTimeMilliseconds((long)x.UpdatedAt).DateTime
+                }
+            )
+            .FirstOrDefaultAsync();
+        }
+
+        public async Task<UpdateDocumentContentResponse?> ApplyDocumentUpdate(DocumentUpdateRepositoryRequest update)
+        {
+            using var transaction = await _dataContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var document = await _dataContext.Document
+                .Where(x => x.DocumentId == update.DocumentId).FirstOrDefaultAsync();
+
+                if (document == null || document.Version != update.ClientVersion)
+                {
+                    await transaction.RollbackAsync();
+                    if (document == null)
+                    {
+                        _logger.LogWarning($"Document with ID: {update.DocumentId} not found.");
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"Document ID {update.DocumentId} version mismatch. Expected: {update.ClientVersion}, Actual: {document.Version}");
+                    }
+                    return null;
+                }
+
+                var newContent = DatabaseUtility.ApplyDeltas(document.Content, update.Deltas);
+                document.Content = newContent;
+                document.Version++;
+                document.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+                await _dataContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return new UpdateDocumentContentResponse
+                {
+                    DocumentId = document.DocumentId,
+                    Content = document.Content,
+                    UpdatedByIdentificationData = string.Empty,
+                    UpdatedAt = DateTimeOffset.FromUnixTimeMilliseconds((long)document.UpdatedAt).DateTime,
+                    Version = document.Version
+
+                };
+
+
+            }
+            catch (System.Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, $"An error occurred while applying document update for document ID: {update.DocumentId}");
+                return null;
+            }
         }
     }
 }

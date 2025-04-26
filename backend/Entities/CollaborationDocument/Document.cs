@@ -17,6 +17,8 @@ namespace EduConnect.Entities.CollaborationDocument
 
         [ForeignKey(nameof(CreatedByPersonId))]
         public Person.Person? Person { get; set; } = null;
+
+        public long Version { get; set; } = 1;
         public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         public long? UpdatedAt { get; set; } = null;
 
