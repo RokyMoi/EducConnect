@@ -89,15 +89,10 @@ namespace EduConnect.SignalIR
 
             await Clients.Group(documentId.ToString()).SendAsync("UserJoined", $"User {Context.ConnectionId} joined the group {documentId}");
 
-            var document = await _collaborationDocumentRepository.GetDocumentContent(documentId);
-            await Clients.Caller.SendAsync("DocumentContentUpdated", document ?? new UpdateDocumentContentResponse
-            {
-                DocumentId = documentId,
-                Content = string.Empty,
-                UpdatedByIdentificationData = string.Empty,
-                UpdatedAt = DateTime.UtcNow
-            });
-            await this.GetActiveDocumentCollaborators(documentId);
+            var document = await _collaborationDocumentRepository.GetDocumentByIdForHub(documentId);
+
+            await Clients.Caller.SendAsync("GetInitialDocumentContent", document);
+
         }
 
         public async Task LeaveDocumentGroup(Guid documentId)
@@ -138,43 +133,19 @@ namespace EduConnect.SignalIR
         {
             var personId = GetPersonIdFromToken();
 
-            if (!await ValidateAccessRights(documentId, personId))
+            if (!await this.ValidateAccessRights(documentId, personId))
             {
-                _logger.LogError($"User {personId} does not have access rights to document {documentId}");
-                throw new HubException("User does not have access rights to this document");
+                throw new HubException("You do not have access to this document.");
             }
 
 
-            UpdateDocumentContentResponse updatedDocument = await _collaborationDocumentRepository.UpdateDocumentContent(documentId, personId, content);
+            var result = await _collaborationDocumentRepository.UpdateDocumentContent(documentId, personId, content);
 
-            await Clients.GroupExcept(documentId.ToString(), Context.ConnectionId).SendAsync("DocumentContentUpdated", updatedDocument);
-            _logger.LogInformation($"Document {documentId} content updated by user {personId}");
+            _logger.LogInformation($"Sending document update to group {documentId}");
+
+            await Clients.GroupExcept(documentId.ToString(), Context.ConnectionId).SendAsync("GetDocumentUpdate", content);
         }
 
-        public async Task SendDocumentUpdate(DocumentUpdateRepositoryRequest update)
-        {
-            var personId = GetPersonIdFromToken();
-
-            if (!await ValidateAccessRights(update.DocumentId, personId))
-            {
-                _logger.LogError($"User {personId} does not have access rights to document {update.DocumentId}");
-                throw new HubException("User does not have access rights to this document");
-            }
-
-            var result = await _collaborationDocumentRepository.ApplyDocumentUpdate(update);
-
-            if (result == null)
-            {
-
-                //Client needs to resync 
-                _logger.LogWarning("Client with connection ID {ConnectionId} needs to resync", Context.ConnectionId);
-                var currentState = await _collaborationDocumentRepository.GetDocumentContent(update.DocumentId);
-                await Clients.Caller.SendAsync("ForceResync", currentState);
-                return;
-            }
-
-            await Clients.GroupExcept(update.DocumentId.ToString(), Context.ConnectionId).SendAsync("DocumentUpdateReceived", result);
-        }
 
 
 

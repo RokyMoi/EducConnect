@@ -6,11 +6,13 @@ import {
   debounceTime,
   from,
   Observable,
+  Subject,
 } from 'rxjs';
 import { GetActiveUsersResponse } from './get-active-users-response';
 import { GetDocumentContentResponse } from '../../models/shared/signalr/collaboration-document-hub/get-document-content-response';
 import { DocumentDelta } from '../../models/shared/signalr/collaboration-document-hub/document-delta';
 import { DocumentUpdateRequest } from '../../models/shared/signalr/collaboration-document-hub/document-update-request';
+import { GetDocumentResponse } from '../../models/shared/signalr/collaboration-document-hub/get-document-response';
 @Injectable({
   providedIn: 'root',
 })
@@ -18,20 +20,20 @@ export class CollaborationDocumentHubService {
   private connection!: signalR.HubConnection;
   private userJoinedPromiseMap = new Map<string, Promise<void>>();
 
-  // Add a BehaviorSubject to track active users
   private activeUsersSubject = new BehaviorSubject<GetActiveUsersResponse[]>(
     []
   );
   public activeUsers$ = this.activeUsersSubject.asObservable();
 
-  public contentSubject = new BehaviorSubject<string>('');
-  public content$ = this.contentSubject.asObservable();
-
-  //Array representing queue of updates from the client to be sent to the server
-  private updateQueue: DocumentDelta[] = [];
-  private currentVersion: number = 1;
-  private isSending: boolean = false;
   private documentId: string = '';
+
+  public documentContentSubject = new BehaviorSubject<string>('');
+  public documentContent$ = this.documentContentSubject.asObservable();
+
+  private updateQueue: DocumentDelta[] = [];
+  private currentVersion = 1;
+  private isLocalUpdate = false;
+  private sendUpdatesSubject = new Subject<void>();
 
   constructor() {}
 
@@ -67,6 +69,13 @@ export class CollaborationDocumentHubService {
 
     this.userJoinedPromiseMap.set(documentId, userJoinedPromise);
 
+    this.connection.on('GetDocumentUpdate', (data) => {
+      console.log('Received document update:', data);
+      if (!this.isLocalUpdate) {
+        this.documentContentSubject.next(data);
+      }
+    });
+
     return this.connection.start().then(() => {
       this.connection.invoke('JoinDocumentGroup', documentId);
     });
@@ -81,27 +90,28 @@ export class CollaborationDocumentHubService {
     await this.connection.invoke('LeaveDocumentGroup', documentId);
   }
 
-  updateDocumentContent(documentId: string, content: string) {
-    console.log('Updating document ' + documentId + ' with content:', content);
-    this.connection.invoke('UpdateDocumentContent', documentId, content);
-  }
-
-  getDocumentContent(documentId: string) {
-    console.log('Getting document ' + documentId + ' content');
-    this.connection.on(
-      'DocumentContentUpdated',
-      (content: GetDocumentContentResponse) => {
-        console.log('Received document content:', content);
-        this.contentSubject.next(content.content);
-      }
-    );
-  }
-
   stopConnection(): Promise<void> {
     console.log('Stopping SignalR connection');
     return this.connection?.stop();
   }
 
-  
-  
+  getInitialDocumentContent() {
+    this.connection.on(
+      'GetInitialDocumentContent',
+      (data: GetDocumentResponse) => {
+        console.log('Initial document content received:', data);
+        this.documentContentSubject.next(data.content);
+      }
+    );
+  }
+
+  sendDocumentContentUpdate(content: string) {
+    console.log('Sending document content update:', content);
+    this.isLocalUpdate = true;
+    this.connection
+      .invoke('UpdateDocumentContent', this.documentId, content)
+      .then(() => {
+        this.isLocalUpdate = false;
+      });
+  }
 }

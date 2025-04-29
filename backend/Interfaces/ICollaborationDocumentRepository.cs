@@ -34,6 +34,7 @@ namespace EduConnect.Interfaces
         public Task<List<GetAllActiveCollaboratorsByDocumentId>> GetAllActiveCollaboratorsByDocumentId(Guid documentId);
         public Task<UpdateDocumentContentResponse?> UpdateDocumentContent(Guid documentId, Guid personId, string content);
         public Task<UpdateDocumentContentResponse?> GetDocumentContent(Guid documentId);
-        public Task<UpdateDocumentContentResponse?> ApplyDocumentUpdate(DocumentUpdateRepositoryRequest update);
+        public Task<UpdateDocumentContentResponse?> ApplyDocumentUpdate(UpdateDocumentContentRequest update);
+        Task<GetDocumentResponse?> GetDocumentByIdForHub(Guid documentId);
     }
 }

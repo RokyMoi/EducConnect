@@ -427,7 +427,7 @@ namespace EduConnect.Repositories
             .FirstOrDefaultAsync();
         }
 
-        public async Task<UpdateDocumentContentResponse?> ApplyDocumentUpdate(DocumentUpdateRepositoryRequest update)
+        public async Task<UpdateDocumentContentResponse?> ApplyDocumentUpdate(UpdateDocumentContentRequest update)
         {
             using var transaction = await _dataContext.Database.BeginTransactionAsync();
 
@@ -476,6 +476,24 @@ namespace EduConnect.Repositories
                 _logger.LogError(ex, $"An error occurred while applying document update for document ID: {update.DocumentId}");
                 return null;
             }
+        }
+
+        public async Task<GetDocumentResponse?> GetDocumentByIdForHub(Guid documentId)
+        {
+            return await _dataContext
+            .Document
+            .Where(
+                x => x.DocumentId == documentId
+            )
+            .Select(
+                x => new GetDocumentResponse
+                {
+                    DocumentId = x.DocumentId,
+                    Content = x.Content,
+                    Version = x.Version,
+                }
+            )
+            .FirstOrDefaultAsync();
         }
     }
 }

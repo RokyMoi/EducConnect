@@ -13,6 +13,7 @@ import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 import { NgModule } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { style } from '@angular/animations';
+import DeltaCalculator from '../../../../helpers/delta-calculator.helper';
 @Component({
   selector: 'app-collaboration-document-live-editor',
   standalone: true,
@@ -50,6 +51,8 @@ export class CollaborationDocumentLiveEditorComponent
 
   content: FormControl<string | null> = new FormControl(null);
 
+  private lastContent: string = '';
+  private isRemoteUpdate: boolean = false;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -75,22 +78,31 @@ export class CollaborationDocumentLiveEditorComponent
     );
 
     this.subscription.add(
-      this.collaborationDocumentHubService.content$.subscribe((content) => {
-        this.editorContent = content;
-      })
-    )
+      this.collaborationDocumentHubService.documentContent$.subscribe(
+        (content) => {
+          this.isRemoteUpdate = true;
+          this.content.setValue(content, { emitEvent: false });
+          setTimeout(() => (this.isRemoteUpdate = false), 0);
+        }
+      )
+    );
 
     this.collaborationDocumentHubService
       .startConnection(this.documentId)
       .then(() => {
         this.collaborationDocumentHubService.getActiveUsers(this.documentId);
-        this.collaborationDocumentHubService.getDocumentContent(
-          this.documentId
-        );
+        this.collaborationDocumentHubService.getInitialDocumentContent();
       })
       .catch((error) => {
         console.error('Error starting SignalR connection:', error);
       });
+
+    this.content.valueChanges.subscribe((value) => {
+      if (this.isRemoteUpdate) return;
+      this.collaborationDocumentHubService.sendDocumentContentUpdate(
+        value as string
+      );
+    });
   }
 
   async ngOnDestroy(): Promise<void> {
@@ -107,13 +119,5 @@ export class CollaborationDocumentLiveEditorComponent
       this.documentId
     );
     this.router.navigate(['/tutor/dashboard']);
-  }
-
-  onContentChange() {
-    console.log('Updating document with content:', this.editorContent);
-    this.collaborationDocumentHubService.updateDocumentContent(
-      this.documentId,
-      this.editorContent
-    );
   }
 }

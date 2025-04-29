@@ -1,5 +1,5 @@
 export interface DocumentDelta {
   position: number;
-  insert: string | null;
+  insert: string | null ;
   delete: number | null;
 }
