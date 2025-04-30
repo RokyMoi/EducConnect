@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using DiffMatchPatch;
 
 namespace EduConnect.SignalIR
 {
@@ -26,6 +27,7 @@ namespace EduConnect.SignalIR
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly ILogger<CollaborationDocumentHub> _logger = logger;
         private readonly ICollaborationDocumentRepository _collaborationDocumentRepository = collaborationDocumentRepository;
+        private readonly DiffMatchPatch.diff_match_patch _dmp = new();
 
         private readonly ConcurrentDictionary<string, Guid> _connections = new();
         private readonly ConcurrentDictionary<Guid, List<Guid>> _documentGroups = new();
@@ -138,8 +140,11 @@ namespace EduConnect.SignalIR
                 throw new HubException("You do not have access to this document.");
             }
 
+            var document = await _collaborationDocumentRepository.GetDocumentByIdForHub(documentId) ?? throw new HubException("Document not found.");
 
-            var result = await _collaborationDocumentRepository.UpdateDocumentContent(documentId, personId, content);
+            
+
+            await _collaborationDocumentRepository.UpdateDocumentContent(documentId, personId, content);
 
             _logger.LogInformation($"Sending document update to group {documentId}");
 

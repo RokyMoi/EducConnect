@@ -14,6 +14,8 @@ import { NgModule } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { style } from '@angular/animations';
 import DeltaCalculator from '../../../../helpers/delta-calculator.helper';
+import DiffPatchMatch from 'diff-match-patch';
+
 @Component({
   selector: 'app-collaboration-document-live-editor',
   standalone: true,
@@ -53,6 +55,8 @@ export class CollaborationDocumentLiveEditorComponent
 
   private lastContent: string = '';
   private isRemoteUpdate: boolean = false;
+  private dmp = new DiffPatchMatch();
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -98,10 +102,18 @@ export class CollaborationDocumentLiveEditorComponent
       });
 
     this.content.valueChanges.subscribe((value) => {
+      console.log('Content changed:', value);
+      const newContent = value as string;
+      const patch = this.dmp.patch_make(this.lastContent, newContent);
+      console.log('Patch made:', patch);
+
       if (this.isRemoteUpdate) return;
       this.collaborationDocumentHubService.sendDocumentContentUpdate(
+        this.documentId,
         value as string
       );
+
+      this.lastContent = newContent;
     });
   }
 

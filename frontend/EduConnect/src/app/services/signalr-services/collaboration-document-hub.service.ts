@@ -13,6 +13,7 @@ import { GetDocumentContentResponse } from '../../models/shared/signalr/collabor
 import { DocumentDelta } from '../../models/shared/signalr/collaboration-document-hub/document-delta';
 import { DocumentUpdateRequest } from '../../models/shared/signalr/collaboration-document-hub/document-update-request';
 import { GetDocumentResponse } from '../../models/shared/signalr/collaboration-document-hub/get-document-response';
+import DiffPatchMatch from 'diff-match-patch';
 @Injectable({
   providedIn: 'root',
 })
@@ -30,10 +31,11 @@ export class CollaborationDocumentHubService {
   public documentContentSubject = new BehaviorSubject<string>('');
   public documentContent$ = this.documentContentSubject.asObservable();
 
-  private updateQueue: DocumentDelta[] = [];
-  private currentVersion = 1;
   private isLocalUpdate = false;
-  private sendUpdatesSubject = new Subject<void>();
+  private lastDocumentContent: string = '';
+  private dmp = new DiffPatchMatch();
+  private documentPatchBatch: DiffPatchMatch.patch_obj[] = [];
+  private batchSendTimer: any;
 
   constructor() {}
 
@@ -69,10 +71,11 @@ export class CollaborationDocumentHubService {
 
     this.userJoinedPromiseMap.set(documentId, userJoinedPromise);
 
-    this.connection.on('GetDocumentUpdate', (data) => {
-      console.log('Received document update:', data);
+    this.connection.on('GetDocumentUpdate', (update) => {
+      console.log('Received document update:', update);
       if (!this.isLocalUpdate) {
-        this.documentContentSubject.next(data);
+        this.documentContentSubject.next(update);
+        this.lastDocumentContent = update;
       }
     });
 
@@ -100,14 +103,19 @@ export class CollaborationDocumentHubService {
       'GetInitialDocumentContent',
       (data: GetDocumentResponse) => {
         console.log('Initial document content received:', data);
+        this.lastDocumentContent = data.content;
+        console.log(
+          'Last document content after receiving initial document content:',
+          this.lastDocumentContent
+        );
         this.documentContentSubject.next(data.content);
       }
     );
   }
 
-  sendDocumentContentUpdate(content: string) {
-    console.log('Sending document content update:', content);
+  sendDocumentContentUpdate(documentId: string, content: string) {
     this.isLocalUpdate = true;
+    console.log('Sending document content update:', this.documentPatchBatch);
     this.connection
       .invoke('UpdateDocumentContent', this.documentId, content)
       .then(() => {
