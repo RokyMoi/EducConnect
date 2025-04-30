@@ -22,6 +22,147 @@ namespace EduConnect.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("EduConnect.Entities.CollaborationDocument.CollaborationDocumentActiveUser", b =>
+                {
+                    b.Property<Guid>("CollaborationDocumentActiveUserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ActiveUserPersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StatusChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CollaborationDocumentActiveUserId");
+
+                    b.HasIndex("ActiveUserPersonId");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("CollaborationDocumentActiveUser", "Document");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.CollaborationDocument.CollaborationDocumentInvitation", b =>
+                {
+                    b.Property<Guid>("CollaborationDocumentInvitationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("DocumentId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("InvitedByPersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("InvitedPersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool?>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("StatusChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CollaborationDocumentInvitationId");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("DocumentId1");
+
+                    b.HasIndex("InvitedByPersonId");
+
+                    b.HasIndex("InvitedPersonId");
+
+                    b.ToTable("CollaborationDocumentInvitation", "Document");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.CollaborationDocument.CollaborationDocumentParticipant", b =>
+                {
+                    b.Property<Guid>("CollaborationDocumentParticipantId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CollaborationDocumentInvitationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ParticipantPersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CollaborationDocumentParticipantId");
+
+                    b.HasIndex("CollaborationDocumentInvitationId");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("ParticipantPersonId");
+
+                    b.ToTable("CollaborationDocumentParticipant", "Document");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.CollaborationDocument.Document", b =>
+                {
+                    b.Property<Guid>("DocumentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("CreatedByPersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("DocumentId");
+
+                    b.HasIndex("CreatedByPersonId");
+
+                    b.ToTable("Document", "Document");
+                });
+
             modelBuilder.Entity("EduConnect.Entities.Course.Course", b =>
                 {
                     b.Property<Guid>("CourseId")
@@ -1754,6 +1895,88 @@ namespace EduConnect.Migrations
                     b.ToTable("WorkType", "Reference");
                 });
 
+            modelBuilder.Entity("EduConnect.Entities.CollaborationDocument.CollaborationDocumentActiveUser", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("ActiveUserPersonId");
+
+                    b.HasOne("EduConnect.Entities.CollaborationDocument.Document", "Document")
+                        .WithMany("CollaborationDocumentActiveUsers")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.CollaborationDocument.CollaborationDocumentInvitation", b =>
+                {
+                    b.HasOne("EduConnect.Entities.CollaborationDocument.Document", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.CollaborationDocument.Document", null)
+                        .WithMany("CollaborationDocumentInvitations")
+                        .HasForeignKey("DocumentId1");
+
+                    b.HasOne("EduConnect.Entities.Person.Person", "InvitedByPerson")
+                        .WithMany()
+                        .HasForeignKey("InvitedByPersonId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("EduConnect.Entities.Person.Person", "InvitedPerson")
+                        .WithMany()
+                        .HasForeignKey("InvitedPersonId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Document");
+
+                    b.Navigation("InvitedByPerson");
+
+                    b.Navigation("InvitedPerson");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.CollaborationDocument.CollaborationDocumentParticipant", b =>
+                {
+                    b.HasOne("EduConnect.Entities.CollaborationDocument.CollaborationDocumentInvitation", "CollaborationDocumentInvitation")
+                        .WithMany()
+                        .HasForeignKey("CollaborationDocumentInvitationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.CollaborationDocument.Document", "Document")
+                        .WithMany("CollaborationDocumentParticipants")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Person.Person", "ParticipantPerson")
+                        .WithMany()
+                        .HasForeignKey("ParticipantPersonId");
+
+                    b.Navigation("CollaborationDocumentInvitation");
+
+                    b.Navigation("Document");
+
+                    b.Navigation("ParticipantPerson");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.CollaborationDocument.Document", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("CreatedByPersonId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
             modelBuilder.Entity("EduConnect.Entities.Course.Course", b =>
                 {
                     b.HasOne("EduConnect.Entities.Course.CourseCategory", "CourseCategory")
@@ -2356,6 +2579,15 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.CollaborationDocument.Document", b =>
+                {
+                    b.Navigation("CollaborationDocumentActiveUsers");
+
+                    b.Navigation("CollaborationDocumentInvitations");
+
+                    b.Navigation("CollaborationDocumentParticipants");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.Course", b =>

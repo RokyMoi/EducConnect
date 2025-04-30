@@ -53,6 +53,7 @@ namespace EduConnect.Extensions
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<ITutorRepository, TutorRepository>();
             services.AddScoped<IPhotoService, PhotoService>();
+            services.AddScoped<ICollaborationDocumentRepository, CollaborationDocumentRepository>();
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
 
             services.AddScoped<ICountryRepository, CountryRepository>();

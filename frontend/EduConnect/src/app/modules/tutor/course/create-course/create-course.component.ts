@@ -16,7 +16,6 @@ import { CourseSupportedLanguagesComponent } from '../course-supported-languages
 import { CourseCreateService } from '../../../../services/course/course-create-service.service';
 import { CourseMainMaterialsComponent } from '../course-main-materials/course-main-materials.component';
 import { CourseType } from '../../../../models/reference/course-type';
-import { ConfirmCourseTypeComponent } from '../confirm-course-type/confirm-course-type.component';
 
 @Component({
   standalone: true,
@@ -72,7 +71,6 @@ export class CreateCourseComponent {
     CourseBasicInformation: CourseBasicInformationComponent,
     CourseSupportedLanguages: CourseSupportedLanguagesComponent,
     CourseMainMaterials: CourseMainMaterialsComponent,
-    ConfirmCourseType: ConfirmCourseTypeComponent,
   };
 
   selectedOption = 0;

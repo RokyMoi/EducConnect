@@ -1,0 +1,36 @@
+<div class="main-container">
+    <h2>
+        Collaboration Document Editor
+    </h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+    </div>
+    <section class="editor-container">
+        <div class="editor-menu-container">
+            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"></ngx-editor-menu>
+        </div>
+        <div class="editor-content-container">
+            <ngx-editor class="live-editor" [editor]="editor" [placeholder]="'Start typing so the others can see it'"
+                [formControl]="content"></ngx-editor>
+        </div>
+    </section>
+    <section class="users-section">
+        <div class="joined-users">
+            <h3>Active Collaborators ({{ activeUsers.length }})</h3>
+            <div class="users-here-list">
+                <div class="user-item" *ngFor="let user of activeUsers">
+                    <div class="user-header">
+                        <span class="user-id">ID: {{ user.personId }}</span>
+                        <span class="joined-at">{{ user.joinedAt | date:'medium' }}</span>
+                    </div>
+                    <div class="user-identification">
+                        {{ user.identificationData }}
+                    </div>
+                </div>
+                <div class="empty-state" *ngIf="activeUsers.length === 0">
+                    No active collaborators in this document
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

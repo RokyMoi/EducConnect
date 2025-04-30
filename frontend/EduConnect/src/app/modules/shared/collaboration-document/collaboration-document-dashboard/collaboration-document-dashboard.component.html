@@ -1,0 +1,216 @@
+<div class="main-container">
+    <h2>
+        Collaboration Dashboard
+    </h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+        <button class="create-action-button" (click)="onCreateNewDocument()">Create New Document</button>
+    </div>
+    <section class="created-by-person-section">
+        <h3>Documents by you</h3>
+        <div class="document-grid">
+            <div class="document-card" *ngFor="let document of documentsByUser">
+                <div class="document-header">
+                    <div class="document-title">{{ document.title }}</div>
+                    <div class="document-date">
+                        Created: {{ document.createdAt | date: 'mediumDate' }}
+                    </div>
+                </div>
+                <div class="document-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Participants</div>
+                        <div class="stat-value">{{ document.numberOfParticipants }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Total Invited</div>
+                        <div class="stat-value">{{ document.totalNumberOfInvitedUsers }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Accepted</div>
+                        <div class="stat-value">
+                            <span class="status-badge status-accepted">{{ document.numberOfAcceptedInvitations }}</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Rejected</div>
+                        <div class="stat-value">
+                            <span class="status-badge status-rejected">{{ document.numberOfRejectedInvitations }}</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Pending</div>
+                        <div class="stat-value">
+                            <span class="status-badge status-pending">{{ document.numberOfPendingInvitations }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="view-button" (click)="onOpenDocument(document.documentId)">View</button>
+                    <button class="invite-button" (click)="onOpenInviteUsers(document.documentId)">Invite Users</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="created-by-person-section">
+        <h3>Documents you joined</h3>
+        <div class="document-grid">
+            <div class="document-card" *ngFor="let document of documentsWhereUserIsParticipant">
+                <div class="document-header">
+                    <div class="document-title">{{ document.title }}</div>
+                    <div class="document-date">
+                        Created: {{ document.createdAt | date: 'mediumDate' }}
+                    </div>
+                </div>
+                <div class="document-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Created by:</span>
+                        <span class="detail-value">{{ document.createdByIdentificationData }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Participants:</span>
+                        <span class="detail-value">{{ document.numberOfParticipants }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Joined at:</span>
+                        <span class="detail-value">{{ document.joinedAt | date: 'medium' }}</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="view-button" (click)="onOpenDocument(document.documentId)">View</button>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <section class="created-by-person-section">
+        <h3>Invitations to other documents</h3>
+        <div class="invitation-grid">
+            <div class="invitation-card" *ngFor="let invitation of invitationsForUser">
+                <div class="invitation-header">
+                    <div class="invitation-title">{{ invitation.title }}</div>
+                    <div class="invitation-date">
+                        Created: {{ invitation.documentCreatedAt | date: 'mediumDate' }}
+                    </div>
+                </div>
+                <div class="invitation-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Invited by:</span>
+                        <span class="detail-value">{{ invitation.invitationSentByPersonIdentificationData }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Sent at:</span>
+                        <span class="detail-value">{{ invitation.invitationSentAt | date: 'medium' }}</span>
+                    </div>
+                    <div class="invitation-status">
+                        <span class="status-badge" [ngClass]="{
+      'status-pending': invitation.invitationStatus === null,
+      'status-accepted': invitation.invitationStatus === true,
+      'status-rejected': invitation.invitationStatus === false
+    }">
+                            {{ getStatusText(invitation.invitationStatus) }}
+                        </span>
+                        <div class="status-change-date" *ngIf="invitation.invitationStatusChangedAt">
+                            {{ invitation.invitationStatusChangedAt | date: 'medium' }}
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="reject-button" *ngIf="invitation.invitationStatus === null"
+                            (click)="onRejectInvitation(invitation.collaborationDocumentInvitationId, invitation.title)">Reject</button>
+                        <button class="accept-button" *ngIf="invitation.invitationStatus === null" (click)=" onAcceptInvitation(invitation.collaborationDocumentInvitationId,
+                            invitation.title)">Accept</button>
+                        <button *ngIf="invitation.invitationStatus === false" class="delete-button"
+                            (click)="deleteInvitation(invitation.collaborationDocumentInvitationId)">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="created-by-person-section">
+        <h3>Invitations you sent</h3>
+        <div class="invitation-grid">
+            <div class="invitation-card" *ngFor="let invitation of invitationsSentByUser">
+                <div class="invitation-header">
+                    <div class="invitation-title">{{ invitation.title }}</div>
+                    <div class="invitation-date">
+                        Created: {{ invitation.documentCreatedAt | date: 'mediumDate' }}
+                    </div>
+                </div>
+                <div class="invitation-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Invited user:</span>
+                        <span class="detail-value">{{ invitation.invitationSentToPersonIdentificationData }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Sent at:</span>
+                        <span class="detail-value">{{ invitation.invitationSentAt | date: 'medium' }}</span>
+                    </div>
+                    <div class="invitation-status">
+                        <span class="status-badge" [ngClass]="{
+                    'status-pending': invitation.invitationStatus === null,
+                    'status-accepted': invitation.invitationStatus === true,
+                    'status-rejected': invitation.invitationStatus === false
+                  }">
+                            {{ getStatusText(invitation.invitationStatus) }}
+                        </span>
+                        <div class="status-change-date" *ngIf="invitation.invitationStatusChangedAt">
+                            {{ invitation.invitationStatusChangedAt | date: 'medium' }}
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button *ngIf="invitation.invitationStatus === null" class="delete-button"
+                            (click)="onDeleteInvite(invitation.collaborationDocumentInvitationId, invitation.title, invitation.invitationSentToPersonIdentificationData)">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <app-custom-header-ng-content-dialog-box *ngIf="showCreateDialog" [title]="'Create Document'">
+        <p>Are you sure you want to create a new document where invited users can join and work together, if so enter
+            the name, and start collaboration on your new idea in real time</p>
+        <div class="form-item">
+            <label for="title">Document Name</label>
+            <input type="text" name="title" id="title" placeholder="Enter the name of the document"
+                [formControl]="documentNameFormControl">
+            <div class="error-container" *ngIf="documentNameFormControl.errors && documentNameFormControl.dirty">
+                <p *ngIf="documentNameFormControl.errors['required']">This field is required</p>
+                <p *ngIf="documentNameFormControl.errors['minlength']">Minimum length for this field is 10</p>
+                <p *ngIf="documentNameFormControl.errors['maxlength']">Maximum length for this field is 255</p>
+                <p *ngIf="documentNameFormControl.errors['titleExists']">This document title is already taken</p>
+            </div>
+            <div class="validation-status" *ngIf="isCheckingTitle">
+                <p class="validation-active-message">Checking if title is taken...</p>
+            </div>
+        </div>
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="cancelDialog()">Cancel</button>
+            <button class="confirm-button" [disabled]="documentNameFormControl.invalid"
+                (click)="createDocument()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+    <app-custom-header-ng-content-dialog-box *ngIf="showAcceptInvitationDialog" [title]="'Accept Invitation'">
+        <p>{{acceptInvitationDialogMessage}}</p>
+
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="onCancelAcceptInvitation()">Cancel</button>
+            <button class="positive-confirm-button" (click)="acceptInvitation()">Accept</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+    <app-custom-header-ng-content-dialog-box *ngIf="showRejectInvitationDialog" [title]="'Reject Invitation'">
+        <p>{{rejectInvitationDialogMessage}}</p>
+
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="onCancelRejectInvitation()">Cancel</button>
+            <button class="negative-confirm-button" (click)="rejectInvitation()">Reject</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+    <app-custom-header-ng-content-dialog-box *ngIf="showDeleteInviteDialog" [title]="'Delete Invite'">
+        <p>{{deleteInviteDialogMessage}}</p>
+
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="onCancelDeleteInvite()">Cancel</button>
+            <button class="negative-confirm-button" (click)="deleteInvite()">Delete</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+</div>
