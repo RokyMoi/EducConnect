@@ -120,6 +120,7 @@ namespace EduConnect.Middleware
             }
 
             context.HttpContext.Items["PersonId"] = databaseToken.Person.PersonId;
+            context.HttpContext.Items["Role"] = userRoles.FirstOrDefault()?.Name;
 
 
         }
