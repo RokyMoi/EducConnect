@@ -141,5 +141,7 @@ namespace EduConnect.Interfaces.Course
         Task<List<GetAllCourseTagsByCourseId>> GetAllCourseTagsByCourseId(Guid courseId);
         Task<List<GetAllTagsByTutorResponse>?> GetAllTagsByTutor(Guid tutorId, Guid? assignedToCourseId);
         Task<PaginatedResponse<GetTagsBySearchResponse>> GetTagsBySearch(GetTagsBySearchPaginatedRequest request);
+        Task<bool> CheckCourseThumbnailExistsByThumbnailId(Guid thumbnailId);
+        Task<bool> DeleteCourseThumbnailByThumbnailId(Guid thumbnailId);
     }
 }

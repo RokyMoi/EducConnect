@@ -31,9 +31,12 @@ namespace EduConnect.Controllers.Course
         ICourseRepository _courseRepository,
         IReferenceRepository _referenceRepository,
         ITutorRepository _tutorRepository,
-        AzureBlobStorageService _azureBlobStorageService
+        AzureBlobStorageService _azureBlobStorageService,
+        ILogger<CourseTutorController> logger
     ) : ControllerBase
     {
+        private readonly ILogger<CourseTutorController> _logger = logger;
+
         [HttpPost("create")]
         public async Task<IActionResult> CreateCourse([FromBody] CreateCourseRequest request)
         {
@@ -997,7 +1000,12 @@ namespace EduConnect.Controllers.Course
         [HttpGet("teaching-resource/download")]
         public async Task<IActionResult> DownloadCourseTeachingResource(Guid courseTeachingResourceId)
         {
-            var resourceFile = await _courseRepository.GetCourseLessonResourceById(courseTeachingResourceId);
+            _logger.LogInformation("Get Course Teaching Resource with Id: {courseTeachingResourceId}", courseTeachingResourceId);
+
+            var resourceFile = await _courseRepository.GetCourseTeachingResourceById(courseTeachingResourceId);
+
+            _logger.LogInformation("Fetch Result For Course Teaching Resource with Id: {courseTeachingResourceId}: {resourceFile}", courseTeachingResourceId, resourceFile);
+
 
             if (resourceFile == null)
             {
@@ -2568,7 +2576,56 @@ namespace EduConnect.Controllers.Course
             );
         }
 
+        [HttpDelete("thumbnail/delete-by-id/{thumbnailId}")]
+        public async Task<IActionResult> DeleteCourseThumbnailByThumbnailId([FromRoute] Guid thumbnailId)
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the course thumbnail, regarding your role, please contact an administrator for details",
+                        null
+                    )
+                );
+            }
+
+            var thumbnailExists = await _courseRepository.CheckCourseThumbnailExistsByThumbnailId(thumbnailId);
+
+            if (!thumbnailExists)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course thumbnail not found",
+                        null
+                    )
+                );
+            }
+
+            bool deleteResult = await _courseRepository.DeleteCourseThumbnailByThumbnailId(thumbnailId);
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the course thumbnail, please try again",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Course thumbnail deleted successfully", null)
+            );
+        }
     }
+
+
 
 
 

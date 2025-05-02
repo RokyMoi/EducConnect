@@ -1,1 +1,56 @@
-<p>tutor-file-explorer works!</p>
+<div class="main-container">
+    <h2>My Uploaded Files</h2>
+
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+    </div>
+
+    <div class="files-container" *ngIf="allFilesUploadedByPerson.length > 0; else noFiles">
+        <table class="files-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>File Name</th>
+                    <th>Size</th>
+                    <th>Type</th>
+                    <th>Upload Date</th>
+                    <th>Last Updated</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let file of allFilesUploadedByPerson">
+                    <td>{{ file.title }}</td>
+                    <td>{{ file.description || '-' }}</td>
+                    <td>{{ file.fileName }}</td>
+                    <td>{{ file.fileSize | fileSize }}</td>
+                    <td>{{ file.contentType }}</td>
+                    <td>{{ file.createdAt | date:'mediumDate' }}</td>
+                    <td>{{ (file.updatedAt | date:'mediumDate') || '-' }}</td>
+                    <td class="actions-cell">
+                        <button class="view-button" (click)="onOpenFile(file.source)"><i
+                                class="fas fa-eye"></i>Open</button>
+                        <button class="download-button" (click)="onDownloadFile(file)"><i
+                                class="fas fa-download"></i>Download</button>
+                        <button class="delete-button" (click)="onDeleteFile(file)"><i
+                                class="fas fa-trash-can"></i>Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ng-template #noFiles>
+        <div class="no-files-message">
+            No files uploaded yet.
+        </div>
+    </ng-template>
+    <app-custom-header-ng-content-dialog-box *ngIf="showDeleteDialog" [title]="'Delete File'">
+        <p>{{deleteDialogMessage}}</p>
+        <div class="dialog-actions">
+            <button class="cancel-button" (click)="onCancelDeleteDialog()">Cancel</button>
+            <button class="confirm-button" (click)="deleteFile()">Confirm</button>
+        </div>
+    </app-custom-header-ng-content-dialog-box>
+</div>

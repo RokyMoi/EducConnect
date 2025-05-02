@@ -65,6 +65,13 @@ export class TutorDashboardComponent implements OnInit {
         buttonText: 'View',
         link: '/tutor/collaboration',
       },
+      {
+        title: 'My Uploaded Files',
+        description: 'View all files you had uploaded here',
+        dataInfo: '',
+        buttonText: 'Explore',
+        link: '/tutor/files',
+      },
     ];
   }
 

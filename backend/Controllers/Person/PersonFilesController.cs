@@ -17,7 +17,7 @@ using EduConnect.Helpers;
 namespace EduConnect.Controllers.Person
 {
     [ApiController]
-    [Route("files")]
+    [Route("person/files")]
     [AuthenticationGuard(isTutor: true, isAdmin: true, isStudent: true)]
     public class PersonFilesController(
         ILogger<PersonFilesController> logger,
@@ -46,12 +46,14 @@ namespace EduConnect.Controllers.Person
                 new GetAllFilesUploadedByPersonResponse
                 {
                     Id = x.CourseTeachingResourceId,
-                    Source = $"/tutor/course/teaching-resources/details/{x.CourseTeachingResourceId}",
+                    Source = $"/tutor/course/teaching-resources/details/{x.CourseId}/{x.CourseTeachingResourceId}",
                     Title = x.Title,
                     Description = x.Description,
                     FileName = x.FileName,
                     ContentType = x.ContentType,
                     FileSize = x.FileSize,
+                    DownloadUrl = $"/tutor/course/teaching-resource/download?courseTeachingResourceId={x.CourseTeachingResourceId}",
+                    FileSourceType = Enums.FileSourceType.CourseTeachingResource,
                     CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).DateTime,
                     UpdatedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).DateTime : null,
                 }
@@ -71,6 +73,8 @@ namespace EduConnect.Controllers.Person
                     FileName = x.FileName,
                     ContentType = x.ContentType,
                     FileSize = x.FileSize,
+                    DownloadUrl = $"tutor/course/lessons/resources/details/{x.CourseLesson.CourseId}/{x.CourseLessonId}/{x.CourseLessonResourceId}",
+                    FileSourceType = Enums.FileSourceType.CourseLessonResource,
                     CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).DateTime,
                     UpdatedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).DateTime : null,
 
@@ -93,6 +97,7 @@ namespace EduConnect.Controllers.Person
                     FileName = x.Course.Title.ToLower().Replace(" ", "-") + "-thumbnail." + FileExtensionHelper.GetFileExtension(x.ContentType),
                     ContentType = x.ContentType,
                     FileSize = x.ThumbnailImageFile.Length,
+                    FileSourceType = Enums.FileSourceType.CourseThumbnail,
                     CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).DateTime,
                     UpdatedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).DateTime : null,
 
@@ -110,12 +115,13 @@ namespace EduConnect.Controllers.Person
                 x => new GetAllFilesUploadedByPersonResponse
                 {
                     Id = x.CoursePromotionImageId,
-                    Source = $"/tutor/course/promotion/details/{x.CoursePromotionImageId}",
+                    Source = $"/tutor/course/promotion/details/{x.CourseId}/{x.CoursePromotionImageId}",
                     Title = $"{x.Course.Title} promotion image",
                     Description = $"This is the promotion image for the course {x.Course.Title}",
                     FileName = $"{x.CoursePromotionImageId.ToString().Replace("-", "")}_promotion_image.{FileExtensionHelper.GetFileExtension(x.ContentType)}",
                     ContentType = x.ContentType,
                     FileSize = x.ImageFile.Length,
+                    FileSourceType = Enums.FileSourceType.CoursePromotionImage,
                     CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).DateTime,
                     UpdatedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).DateTime : null,
                 }

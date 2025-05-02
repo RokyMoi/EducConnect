@@ -644,4 +644,16 @@ export class CourseTutorControllerService {
       }
     );
   }
+
+  deleteCourseThumbnailByThumbnailId(thumbnailId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.delete(
+      `${this.apiUrl}/thumbnail/delete-by-id/${thumbnailId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
 }

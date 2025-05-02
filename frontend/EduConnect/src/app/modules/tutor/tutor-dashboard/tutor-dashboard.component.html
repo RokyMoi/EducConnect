@@ -1,10 +1,17 @@
 <div class="subheader">
-    <h3>Logged in</h3>
-    <h3>Email: {{dashboardUserInfo.email}}</h3>
-    <h3 *ngIf="dashboardUserInfo.username">Username: {{dashboardUserInfo.username}}
-    </h3>
-    <h3 *ngIf="dashboardUserInfo.firstName">Name: {{dashboardUserInfo.firstName}} {{dashboardUserInfo.lastName}}
-    </h3>
+    <div class="subheader-info">
+        <div class="user-meta">
+            <h3 class="status">Logged in</h3>
+            <div class="user-details">
+                <p class="user-email">{{dashboardUserInfo.email}}</p>
+                <p class="user-name" *ngIf="dashboardUserInfo.firstName">
+                    {{dashboardUserInfo.firstName}} {{dashboardUserInfo.lastName}}
+                <p class="user-username" *ngIf="dashboardUserInfo.username">
+                    {{dashboardUserInfo.username}}
+                </p>
+            </div>
+        </div>
+    </div>
     <button class="logout-button" (click)="logout()">Logout</button>
 </div>
 <div class="tutor-dashboard">

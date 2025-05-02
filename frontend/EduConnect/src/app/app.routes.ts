@@ -57,6 +57,7 @@ import { CourseTutorTagsComponent } from './modules/tutor/course/course-tutor-ta
 import { CollaborationDocumentDashboardComponent } from './modules/shared/collaboration-document/collaboration-document-dashboard/collaboration-document-dashboard.component';
 import { CollaborationDocumentLiveEditorComponent } from './modules/shared/collaboration-document/collaboration-document-live-editor/collaboration-document-live-editor.component';
 import { CollaborationDocumentInviteUsersComponent } from './modules/shared/collaboration-document/collaboration-document-invite-users/collaboration-document-invite-users.component';
+import { TutorFileExplorerComponent } from './modules/tutor/tutor-file-explorer/tutor-file-explorer/tutor-file-explorer.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -253,6 +254,12 @@ export const routes: Routes = [
   {
     path: 'tutor/course/tags/:courseId',
     component: CourseTutorTagsComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/files',
+    component: TutorFileExplorerComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'tutor' },
   },
