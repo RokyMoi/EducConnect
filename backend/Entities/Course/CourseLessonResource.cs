@@ -35,5 +35,8 @@ namespace EduConnect.Entities.Course
 
         public long? UpdatedAt { get; set; } = null;
 
+        public Guid? FolderId { get; set; }
+        [ForeignKey(nameof(FolderId))]
+        public Folder? Folder { get; set; } = null;
     }
 }

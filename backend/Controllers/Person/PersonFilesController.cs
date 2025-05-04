@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EduConnect.Helpers;
+using EduConnect.Migrations;
 
 namespace EduConnect.Controllers.Person
 {
@@ -138,6 +139,128 @@ namespace EduConnect.Controllers.Person
                     "Successfully fetched all files uploaded by person",
                     userFiles)
             );
+        }
+
+        [HttpPost("folders/create")]
+        public async Task<IActionResult> CreateFolder(CreateFolderRequest request)
+        {
+
+            var personId = _httpContextAccessor.HttpContext.Items["PersonId"].ToString();
+            var personIdGuid = Guid.Parse(personId);
+
+            string nameLowerCase = request.Name.ToLower();
+
+            //Check if the folder name exists for the given user
+            var folderExistsByName = await _dataContext
+            .Folder
+            .Where(
+                x => x.Name.ToLower() == nameLowerCase
+                && x.OwnerPersonId == personIdGuid
+            ).AnyAsync();
+
+            if (folderExistsByName)
+            {
+                return Conflict(
+                    ApiResponse<string>.GetApiResponse(
+                        $"Folder {request.Name} already exists",
+                        null
+                    )
+                );
+
+            }
+
+            //Check if the parent folder id is provided, if it exists
+            if (request.ParentFolderId.HasValue)
+            {
+                var parentFolderExists = await _dataContext
+                .Folder
+                .Where(
+                    x => x.FolderId == request.ParentFolderId
+                    && x.OwnerPersonId == personIdGuid
+                )
+                .AnyAsync();
+
+                if (!parentFolderExists)
+                {
+                    return NotFound(
+                        ApiResponse<string>.GetApiResponse(
+                            $"Specified parent folder does not exist",
+                            null
+                        )
+                    );
+                }
+            }
+
+            var folder = new Folder
+            {
+
+                Name = request.Name,
+                OwnerPersonId = personIdGuid,
+                ParentFolderId = request.ParentFolderId.HasValue ? request.ParentFolderId.Value : null,
+            };
+
+            await _dataContext.Folder.AddAsync(folder);
+            await _dataContext.SaveChangesAsync();
+            return Ok(
+                ApiResponse<string>.GetApiResponse(
+                    $"Successfully created folder {folder.Name}",
+                    null
+                )
+            );
+        }
+
+        [HttpGet("folders/all")]
+        public async Task<IActionResult> GetAllFolders()
+        {
+            var personId = _httpContextAccessor.HttpContext.Items["PersonId"].ToString();
+            var personIdGuid = Guid.Parse(personId);
+
+            var folders = await _dataContext
+            .Folder
+            .Where(x => x.OwnerPersonId == personIdGuid)
+            .Select(
+                x => new GetAllFoldersResponse
+                {
+                    FolderId = x.FolderId,
+                    Name = x.Name,
+                    ParentFolderId = x.ParentFolderId,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).DateTime,
+                    UpdatedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).DateTime : null,
+                }
+            ).ToListAsync();
+
+            return Ok(
+                ApiResponse<List<GetAllFoldersResponse>>.GetApiResponse(
+                    "Successfully fetched all folders",
+                    folders
+                )
+            );
+        }
+
+        [HttpPost("folders/add-file")]
+        public async Task<IActionResult> AddFileToFolder(AddFileToFolderRequest request)
+        {
+            var personId = _httpContextAccessor.HttpContext.Items["PersonId"].ToString();
+            var personIdGuid = Guid.Parse(personId);
+
+            var folder = await _dataContext
+            .Folder
+            .Where(
+                x => x.FolderId == request.FolderId
+            )
+            .FirstOrDefaultAsync();
+
+            if (folder == null)
+            {
+                return NotFound(
+                    ApiResponse<string>.GetApiResponse(
+                        $"Folder with id {request.FolderId} does not exist",
+                        null
+                    )
+                );
+            }
+
+            
         }
     }
 }

@@ -6,7 +6,7 @@ namespace EduConnect.Interfaces
     public interface ITokenService
     {
 
-        Task<AuthenticationToken?> CreateTokenAsync(Person person);
+        Task<AuthenticationToken?> CreateTokenAsync(EduConnect.Entities.Person.Person person);
         Task<bool> ValidateToken(string authenticationToken);
 
         Task<string?> GetRole(PersonEmail person);

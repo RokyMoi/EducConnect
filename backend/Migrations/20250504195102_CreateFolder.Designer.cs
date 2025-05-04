@@ -4,6 +4,7 @@ using EduConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250504195102_CreateFolder")]
+    partial class CreateFolder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -449,9 +452,6 @@ namespace EduConnect.Migrations
                     b.Property<long?>("FileSize")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid?>("FolderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ResourceUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -465,8 +465,6 @@ namespace EduConnect.Migrations
                     b.HasKey("CourseLessonResourceId");
 
                     b.HasIndex("CourseLessonId");
-
-                    b.HasIndex("FolderId");
 
                     b.ToTable("CourseLessonResource", "Course");
                 });
@@ -487,9 +485,6 @@ namespace EduConnect.Migrations
                     b.Property<long>("CreatedAt")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid?>("FolderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<byte[]>("ImageFile")
                         .HasColumnType("varbinary(max)");
 
@@ -499,8 +494,6 @@ namespace EduConnect.Migrations
                     b.HasKey("CoursePromotionImageId");
 
                     b.HasIndex("CourseId");
-
-                    b.HasIndex("FolderId");
 
                     b.ToTable("CoursePromotionImage", "Course");
                 });
@@ -565,9 +558,6 @@ namespace EduConnect.Migrations
                     b.Property<long?>("FileSize")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid?>("FolderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ResourceUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -581,8 +571,6 @@ namespace EduConnect.Migrations
                     b.HasKey("CourseTeachingResourceId");
 
                     b.HasIndex("CourseId");
-
-                    b.HasIndex("FolderId");
 
                     b.ToTable("CourseTeachingResource", "Course");
                 });
@@ -603,9 +591,6 @@ namespace EduConnect.Migrations
                     b.Property<long>("CreatedAt")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid?>("FolderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<byte[]>("ThumbnailImageFile")
                         .HasColumnType("varbinary(max)");
 
@@ -619,8 +604,6 @@ namespace EduConnect.Migrations
 
                     b.HasIndex("CourseId")
                         .IsUnique();
-
-                    b.HasIndex("FolderId");
 
                     b.ToTable("CourseThumbnail", "Course");
                 });
@@ -705,38 +688,6 @@ namespace EduConnect.Migrations
                     b.HasIndex("CourseId");
 
                     b.ToTable("CourseViewershipDataSnapshot", "Course");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.Folder", b =>
-                {
-                    b.Property<Guid>("FolderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid>("OwnerPersonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ParentFolderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long?>("UpdatedAt")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("FolderId");
-
-                    b.HasIndex("OwnerPersonId");
-
-                    b.HasIndex("ParentFolderId");
-
-                    b.ToTable("Folder", "Course");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.Tag", b =>
@@ -2172,13 +2123,7 @@ namespace EduConnect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduConnect.Entities.Course.Folder", "Folder")
-                        .WithMany()
-                        .HasForeignKey("FolderId");
-
                     b.Navigation("CourseLesson");
-
-                    b.Navigation("Folder");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.CoursePromotionImage", b =>
@@ -2189,13 +2134,7 @@ namespace EduConnect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduConnect.Entities.Course.Folder", "Folder")
-                        .WithMany()
-                        .HasForeignKey("FolderId");
-
                     b.Navigation("Course");
-
-                    b.Navigation("Folder");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.CourseTag", b =>
@@ -2227,13 +2166,7 @@ namespace EduConnect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduConnect.Entities.Course.Folder", "Folder")
-                        .WithMany()
-                        .HasForeignKey("FolderId");
-
                     b.Navigation("Course");
-
-                    b.Navigation("Folder");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.CourseThumbnail", b =>
@@ -2244,13 +2177,7 @@ namespace EduConnect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduConnect.Entities.Course.Folder", "Folder")
-                        .WithMany()
-                        .HasForeignKey("FolderId");
-
                     b.Navigation("Course");
-
-                    b.Navigation("Folder");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.CourseViewershipData", b =>
@@ -2281,23 +2208,6 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
-                });
-
-            modelBuilder.Entity("EduConnect.Entities.Course.Folder", b =>
-                {
-                    b.HasOne("EduConnect.Entities.Person.Person", "OwnerPerson")
-                        .WithMany()
-                        .HasForeignKey("OwnerPersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EduConnect.Entities.Course.Folder", "ParentFolder")
-                        .WithMany()
-                        .HasForeignKey("ParentFolderId");
-
-                    b.Navigation("OwnerPerson");
-
-                    b.Navigation("ParentFolder");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.Tag", b =>

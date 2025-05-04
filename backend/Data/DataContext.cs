@@ -80,6 +80,8 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<CourseViewershipDataSnapshot> CourseViewershipDataSnapshot { get; set; }
 
+    public DbSet<Folder> Folder { get; set; }
+
     public DbSet<Document> Document { get; set; }
 
     public DbSet<CollaborationDocumentInvitation> CollaborationDocumentInvitation { get; set; }
