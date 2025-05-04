@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgModule } from '@angular/core';
 import { PersonFilesControllerService } from '../../../../services/shared/person-files-controller.service';
 import { GetAllFilesUploadedByPersonResponse } from '../../../../models/shared/person-files-controller/get-all-files-uploaded-by-person-response';
 import { Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { FileSourceType } from '../../../../../enums/file-source-type.enum';
 import { SnackboxService } from '../../../../services/shared/snackbox.service';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { CustomHeaderNgContentDialogBoxComponent } from '../../../shared/custom-header-ng-content-dialog-box/custom-header-ng-content-dialog-box.component';
+import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-tutor-file-explorer',
@@ -17,6 +18,7 @@ import { CustomHeaderNgContentDialogBoxComponent } from '../../../shared/custom-
     CommonModule,
     FileSizePipe,
     CustomHeaderNgContentDialogBoxComponent,
+    FormsModule,
   ],
   templateUrl: './tutor-file-explorer.component.html',
   styleUrl: './tutor-file-explorer.component.css',
@@ -26,6 +28,15 @@ export class TutorFileExplorerComponent implements OnInit {
   showDeleteDialog: boolean = false;
   deleteDialogMessage: string = '';
   fileToDelete: GetAllFilesUploadedByPersonResponse | null = null;
+
+  originalFile: GetAllFilesUploadedByPersonResponse | null = null;
+  selectedFileForEdit: GetAllFilesUploadedByPersonResponse | null = null;
+  editTitle: string = '';
+  editDescription: string = '';
+  editFileName: string = '';
+
+  sortColumn: string | null = null;
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   constructor(
     private router: Router,
@@ -259,6 +270,191 @@ export class TutorFileExplorerComponent implements OnInit {
             );
           },
         });
+    }
+  }
+
+  startEdit(file: GetAllFilesUploadedByPersonResponse) {
+    this.originalFile = file;
+    this.selectedFileForEdit = file;
+  }
+
+  saveEdit() {
+    if (!this.selectedFileForEdit) return;
+
+    this.selectedFileForEdit.title =
+      this.selectedFileForEdit.title?.trim() || '';
+    this.selectedFileForEdit.description =
+      this.selectedFileForEdit.description?.trim() || '';
+
+    // Validation checks
+    if (this.selectedFileForEdit.title.length === 0) {
+      this.snackboxService.showSnackbox('Title is required', 'error');
+      return;
+    }
+
+    if (this.selectedFileForEdit.title.length > 100) {
+      this.snackboxService.showSnackbox(
+        'Title cannot exceed 100 characters',
+        'error'
+      );
+      return;
+    }
+
+    if (this.selectedFileForEdit.description.length === 0) {
+      this.snackboxService.showSnackbox('Description is required', 'error');
+      return;
+    }
+
+    if (this.selectedFileForEdit.description.length < 25) {
+      this.snackboxService.showSnackbox(
+        'Description must be at least 25 characters',
+        'error'
+      );
+      return;
+    }
+
+    if (this.selectedFileForEdit.description.length > 255) {
+      this.snackboxService.showSnackbox(
+        'Description cannot exceed 255 characters',
+        'error'
+      );
+      return;
+    }
+
+    console.log('Finished editing, saving,', this.selectedFileForEdit);
+    const index = this.allFilesUploadedByPerson.findIndex(
+      (file) => file.id === this.selectedFileForEdit?.id
+    );
+
+    if (index !== -1) {
+      this.allFilesUploadedByPerson[index] = { ...this.selectedFileForEdit };
+      this.snackboxService.showSnackbox(
+        'File details updated successfully',
+        'success'
+      );
+    } else {
+      this.snackboxService.showSnackbox(
+        'Error: File not found in the list',
+        'error'
+      );
+    }
+
+    if (
+      this.selectedFileForEdit.fileSourceType ===
+      FileSourceType.CourseTeachingResource
+    ) {
+      this.courseTutorControllerService
+        .updateCourseTeachingResourceMetadata({
+          courseTeachingResourceId: this.selectedFileForEdit.id as string,
+          title: this.selectedFileForEdit.title,
+          description: this.selectedFileForEdit.description,
+        })
+        .subscribe({
+          next: (response) => {
+            console.log('Response:', response);
+          },
+          error: (error) => {
+            console.log('Error:', error);
+            this.snackboxService.showSnackbox(
+              `Error updating file details: ${
+                error.error.message || 'Unknown error'
+              }`,
+              'error'
+            );
+            this.getAllFilesUploadedByPerson();
+          },
+        });
+    }
+    if (
+      this.selectedFileForEdit.fileSourceType ===
+      FileSourceType.CourseLessonResource
+    ) {
+      this.courseTutorControllerService
+        .updateCourseLessonResourceMetadata({
+          courseLessonResourceId: this.selectedFileForEdit.id as string,
+          title: this.selectedFileForEdit.title,
+          description: this.selectedFileForEdit.description,
+        })
+        .subscribe({
+          next: (response) => {
+            console.log(response);
+          },
+          error: (error) => {
+            console.log('Error:', error);
+            this.snackboxService.showSnackbox(
+              `Error updating file details: ${
+                error.error.message || 'Unknown error'
+              }`,
+              'error'
+            );
+          },
+        });
+    }
+
+    this.selectedFileForEdit = null;
+    this.originalFile = null;
+  }
+
+  cancelEdit() {
+    this.selectedFileForEdit = null;
+    this.originalFile = null;
+  }
+
+  get showAutoGeneratedNote(): boolean {
+    return this.allFilesUploadedByPerson.some((file) => !this.isEditable(file));
+  }
+
+  isEditable(file: GetAllFilesUploadedByPersonResponse): boolean {
+    return (
+      file.fileSourceType === FileSourceType.CourseTeachingResource ||
+      file.fileSourceType === FileSourceType.CourseLessonResource
+    );
+  }
+
+  sort(column: string) {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+
+    console.log('Sort by column:', column, 'Direction:', this.sortDirection);
+
+    if (this.sortColumn === 'size') {
+      this.allFilesUploadedByPerson.sort((a, b) => {
+        const sizeA = a.fileSize;
+        const sizeB = b.fileSize;
+        return this.sortDirection === 'asc'
+          ? (sizeA || 0) - (sizeB || 0)
+          : (sizeB || 0) - (sizeA || 0);
+      });
+    }
+
+    if (this.sortColumn === 'type') {
+      this.allFilesUploadedByPerson.sort((a, b) => {
+        const typeA = a.contentType;
+        const typeB = b.contentType;
+        return this.sortDirection === 'asc'
+          ? typeA.localeCompare(typeB)
+          : typeB.localeCompare(typeA);
+      });
+    }
+
+    if (this.sortColumn === 'uploadDate') {
+      this.allFilesUploadedByPerson.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return this.sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+      });
+    }
+
+    if (this.sortColumn === 'lastUpdated') {
+      this.allFilesUploadedByPerson.sort((a, b) => {
+        const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        return this.sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+      });
     }
   }
 }

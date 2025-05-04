@@ -143,5 +143,7 @@ namespace EduConnect.Interfaces.Course
         Task<PaginatedResponse<GetTagsBySearchResponse>> GetTagsBySearch(GetTagsBySearchPaginatedRequest request);
         Task<bool> CheckCourseThumbnailExistsByThumbnailId(Guid thumbnailId);
         Task<bool> DeleteCourseThumbnailByThumbnailId(Guid thumbnailId);
+        Task<bool> UpdateCourseTeachingResourceMetadata(UpdateTeachingResourceMetadataRequest request);
+        Task<bool> UpdateCourseLessonResourceMetadata(UpdateCourseLessonResourceMetadataRequest request);
     }
 }

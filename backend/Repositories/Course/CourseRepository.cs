@@ -1308,5 +1308,59 @@ namespace EduConnect.Repositories.Course
                 return false;
             }
         }
+
+        public async Task<bool> UpdateCourseTeachingResourceMetadata(UpdateTeachingResourceMetadataRequest request)
+        {
+            var courseTeachingResource = await _dataContext.CourseTeachingResource.Where(x => x.CourseTeachingResourceId == request.CourseTeachingResourceId).FirstOrDefaultAsync();
+
+            if (courseTeachingResource == null)
+            {
+                return false;
+            }
+
+            courseTeachingResource.Title = request.Title;
+            courseTeachingResource.Description = request.Description;
+            courseTeachingResource.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            try
+            {
+                _dataContext.CourseTeachingResource.Update(courseTeachingResource);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to update course teaching resource {request.CourseTeachingResourceId}");
+                return false;
+            }
+
+        }
+
+        public async Task<bool> UpdateCourseLessonResourceMetadata(UpdateCourseLessonResourceMetadataRequest request)
+        {
+            var resource = await _dataContext.CourseLessonResource.Where(x => x.CourseLessonResourceId == request.CourseLessonResourceId).FirstOrDefaultAsync();
+
+            if (resource == null)
+            {
+                return false;
+            }
+
+            resource.Title = request.Title;
+            resource.Description = request.Description;
+            resource.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            try
+            {
+                _dataContext.CourseLessonResource.Update(resource);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                _logger.LogError(ex, $"Failed to update course lesson resource {request.CourseLessonResourceId}");
+                return false;
+            }
+        }
     }
 }
