@@ -1,156 +1,216 @@
 ﻿using EduConnect.Data;
 using EduConnect.Entities.Course;
+using EduConnect.Entities.Shopping;
 using EduConnect.Entities.Student;
 using EduConnect.Interfaces.Shopping;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using EduConnect.Entities.Shopping;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EduConnect.Services
 {
-    public class WishlistService(DataContext _context) : IWishlistService
+    /// <summary>
+    /// Service for managing wishlist operations
+    /// </summary>
+    public class WishlistService : IWishlistService
     {
-       
-       
+        private readonly DataContext _context;
+        private readonly ILogger<WishlistService> _logger;
+
+        public WishlistService(DataContext context, ILogger<WishlistService> logger)
+        {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
         private async Task<Student> GetStudentByEmailAsync(string email)
         {
-            var person = await _context.PersonEmail
-                .FirstOrDefaultAsync(x => x.Email == email)
-                ?? throw new ArgumentException("Cannot read email from token sent");
+            if (string.IsNullOrEmpty(email))
+                throw new ArgumentException("Email cannot be null or empty", nameof(email));
 
-            return await _context.Student
-                .FirstOrDefaultAsync(x => x.PersonId == person.PersonId)
-                ?? throw new ArgumentException("Student not found");
+            var person = await _context.PersonEmail.FirstOrDefaultAsync(x => x.Email == email);
+            if (person == null)
+                throw new ArgumentException("Cannot read email from token sent", nameof(email));
+
+            var student = await _context.Student.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+            if (student == null)
+                throw new ArgumentException("Student not found", nameof(email));
+
+            return student;
         }
 
-        public async Task<Wishlist> CreateWishlistAsync(string email)
+        private async Task<Wishlist> GetOrCreateWishlistAsync(string email)
         {
             var student = await GetStudentByEmailAsync(email);
 
-            var existingWishlist = await _context.WishList
-                .FirstOrDefaultAsync(w => w.StudentID == student.StudentId);
-
-            if (existingWishlist != null)
-            {
-                return existingWishlist;
-            }
-
-            var newWishlist = new Wishlist
-            {
-                WishlistID = Guid.NewGuid(),
-                StudentID = student.StudentId,
-                Student = student,
-                Items = new List<Course>()
-            };
-
-            _context.WishList.Add(newWishlist);
-            await _context.SaveChangesAsync();
-
-            return newWishlist;
-        }
-
-        public async Task<bool> AddCourseToWishlistAsync(string email, Guid courseId)
-        {
-            var student = await GetStudentByEmailAsync(email);
-
-            var wishlist = await _context.WishList
+            var wishlist = await _context.Wishlist
                 .Include(w => w.Items)
-                .FirstOrDefaultAsync(w => w.StudentID == student.StudentId)
-                ?? throw new InvalidOperationException("Wishlist not found for student");
-
-            var course = await _context.Course.FindAsync(courseId)
-                ?? throw new ArgumentException("Course not found");
-
-            if (!wishlist.Items.Contains(course))
-            {
-                wishlist.Items.Add(course);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-
-            return false;
-        }
-
-        public async Task<bool> RemoveCourseFromWishlistAsync(string email, Guid courseId)
-        {
-            var student = await GetStudentByEmailAsync(email);
-
-            var wishlist = await _context.WishList
-                .Include(w => w.Items)
+                .ThenInclude(i => i.Course)
+                .ThenInclude(c => c.CourseDetails)
                 .FirstOrDefaultAsync(w => w.StudentID == student.StudentId);
 
             if (wishlist == null)
             {
-                return false;
-            }
+                wishlist = new Wishlist
+                {
+                    WishlistID = Guid.NewGuid(),
+                    StudentID = student.StudentId,
+                    Student = student
+                };
 
-            var course = await _context.Course.FindAsync(courseId);
-            if (course == null)
-            {
-                return false;
-            }
-
-            var removed = wishlist.Items.Remove(course);
-            if (removed)
-            {
+                _context.Wishlist.Add(wishlist);
                 await _context.SaveChangesAsync();
             }
 
-            return removed;
-        }
-
-        public async Task<bool> MoveCourseToShoppingCartAsync(string email, Guid courseId)
-        {
-            var student = await GetStudentByEmailAsync(email);
-
-            // Dohvat wishlist-a studenta
-            var wishlist = await _context.WishList
-                .Include(w => w.Items)
-                .FirstOrDefaultAsync(w => w.StudentID == student.StudentId)
-                ?? throw new InvalidOperationException("Wishlist not found for student");
-
-            // Dohvat kursa na osnovu courseId-a
-            var course = await _context.Course.FindAsync(courseId)
-                ?? throw new ArgumentException("Course not found");
-
-            // Uklanjanje kursa iz wishlist-a
-            if (!wishlist.Items.Remove(course))
-            {
-                return false; // Ako kurs nije pronađen u wishlist-u
-            }
-
-            // Dohvat shopping cart-a studenta
-            var shoppingCart = await _context.ShoppingCart
-                .Include(sc => sc.Items)
-                .FirstOrDefaultAsync(sc => sc.StudentID == student.StudentId)
-                ?? throw new InvalidOperationException("Shopping cart not found for student");
-
-            // Dodavanje kursa u shopping cart ako nije već prisutan
-            if (!shoppingCart.Items.Contains(course))
-            {
-                shoppingCart.Items.Add(course);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-
-            // Ako je kurs već u shopping cart-u, vraćamo ga nazad u wishlist
-            wishlist.Items.Add(course);
-            await _context.SaveChangesAsync();
-
-            return false; // Kurs je već bio u shopping cart-u
+            return wishlist;
         }
 
         public async Task<Wishlist?> GetWishlistForStudentAsync(string email)
         {
-            var student = await GetStudentByEmailAsync(email);
+            try
+            {
+                var student = await GetStudentByEmailAsync(email);
 
-            return await _context.WishList
-                .Include(w => w.Items)
-                .FirstOrDefaultAsync(w => w.StudentID == student.StudentId);
+                return await _context.Wishlist
+                    .Include(w => w.Items)
+                    .ThenInclude(i => i.Course)
+                    .ThenInclude(c => c.CourseDetails)
+                    .FirstOrDefaultAsync(w => w.StudentID == student.StudentId);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Failed to get wishlist for {Email}", email);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving wishlist for {Email}", email);
+                throw;
+            }
+        }
+
+        public async Task<bool> AddCourseToWishlistAsync(string email, Guid courseId)
+        {
+            try
+            {
+                var wishlist = await GetOrCreateWishlistAsync(email);
+
+                // Proveri da li je kurs već u listi želja
+                if (wishlist.Items.Any(item => item.CourseID == courseId))
+                {
+                    return false; // Već postoji u listi
+                }
+
+                // Proveri da li kurs postoji
+                var course = await _context.Course
+                    .Include(c => c.CourseDetails)
+                    .FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+                if (course == null)
+                {
+                    throw new ArgumentException("Course not found", nameof(courseId));
+                }
+
+                // Kreiraj novi WishlistItem
+                var wishlistItem = new WishlistItems
+                {
+                    WishtListItemId = Guid.NewGuid(),
+                    WishListId = wishlist.WishlistID,
+                    CourseID = courseId,
+                    Course = course,
+                    AddedAt = DateTime.UtcNow
+                };
+
+                // Direktno dodaj novi red u kontekst (ne preko kolekcije)
+                _context.WishlistItems.Add(wishlistItem);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex) when (!(ex is ArgumentException))
+            {
+                _logger.LogError(ex, "Error adding course {CourseId} to wishlist for {Email}", courseId, email);
+                throw;
+            }
+        }
+
+        public async Task<bool> RemoveCourseFromWishlistAsync(string email, Guid courseId)
+        {
+            try
+            {
+                var wishlist = await GetOrCreateWishlistAsync(email);
+
+                var item = wishlist.Items.FirstOrDefault(i => i.CourseID == courseId);
+                if (item != null)
+                {
+                    wishlist.Items.Remove(item);
+                    _context.WishlistItems.Remove(item);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing course {CourseId} from wishlist for {Email}", courseId, email);
+                throw;
+            }
+        }
+
+        public async Task<bool> IsCourseInWishlistAsync(string email, Guid courseId)
+        {
+            try
+            {
+                var wishlist = await GetWishlistForStudentAsync(email);
+                return wishlist?.Items.Any(i => i.CourseID == courseId) ?? false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking course {CourseId} in wishlist for {Email}", courseId, email);
+                throw;
+            }
+        }
+
+        public async Task<int> GetItemCountAsync(string email)
+        {
+            try
+            {
+                var wishlist = await GetWishlistForStudentAsync(email);
+                return wishlist?.Items.Count ?? 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting wishlist item count for {Email}", email);
+                throw;
+            }
+        }
+
+        public async Task<bool> ClearWishlistAsync(string email)
+        {
+            try
+            {
+                var wishlist = await GetOrCreateWishlistAsync(email);
+
+                var itemsToRemove = wishlist.Items.ToList();
+                foreach (var item in itemsToRemove)
+                {
+                    _context.WishlistItems.Remove(item);
+                }
+
+                wishlist.Items.Clear();
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error clearing wishlist for {Email}", email);
+                throw;
+            }
         }
     }
-
-
 }

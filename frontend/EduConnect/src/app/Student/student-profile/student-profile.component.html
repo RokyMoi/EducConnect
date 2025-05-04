@@ -1,11 +1,11 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>User Profile</title> 
-  <title>User Profile</title> 
+  <title>User Profile</title>
+  <title>User Profile</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 </head>
@@ -18,7 +18,7 @@
     <header class="profile-header">
       <div class="header-content">
         <div class="avatar-container">
-          <div [style.background-image]="'url('+ profilePicture+')'" class="avatar"></div>
+          <div [style.background-image]="'url('+ this.student.photoInfo.url +')'" class="avatar"></div>
           <div class="profile-actions">
             <button routerLink="/settings" class="action-btn edit-btn">Edit Profile</button>
             <button (click)="LogoutFromProfile()" class="action-btn logout-btn">Logout</button>
@@ -30,8 +30,8 @@
     <!-- Profile Main Content -->
     <main class="profile-main">
       <section class="profile-introduction">
-        <h2 class="username">Jane Doe</h2>
-        <p class="user-description" >Your description.</p>
+        <h2 class="username">{{this.student.studentInfo.firstName}} {{ this.student.studentInfo.lastName}}</h2>
+        <p class="user-description" >{{this.student.studentInfo.biography ? this.student.studentInfo.biography : "Nema deskripcije" }}</p>
       </section>
 
       <!-- Stats and Metrics -->
@@ -78,13 +78,13 @@
         <h3>Contact Information</h3>
         <div class="contact-info">
           <div class="info-item">
-            <i class="fas fa-envelope"></i> {{student?.email}}
+            <i class="fas fa-envelope"></i> {{this.student.studentInfo?.email}}
           </div>
           <div class="info-item">
             <i class="fas fa-phone"></i> {{student?.phoneNumber ? student?.phoneNumber : "Nema broja" }}
           </div>
           <div class="info-item">
-            <i class="fas fa-location-arrow"></i> {{student?.countryOfOrigin}}
+            <i class="fas fa-location-arrow"></i> {{this.student.studentInfo?.countryOfOrigin}}
           </div>
         </div>
       </section>

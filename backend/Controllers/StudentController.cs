@@ -38,21 +38,46 @@ namespace EduConnect.Controllers
 
             return Ok(students);
         }
-        [HttpGet("getCurrentStudentForProfile")]
+        [HttpGet("getCurrentStudentWithPhoto")]
         [CheckPersonLoginSignup]
-        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentByEmail()
+        public async Task<ActionResult> GetStudentWithPhoto()
         {
             var caller = new Caller(this.HttpContext);
             var students = await _studentRepo.GetStudentInfoByEmail(caller.Email);
 
             if (students == null)
             {
-
-                return NotFound("No students found.");
+                return NotFound(new
+                {
+                    message = "No students found.",
+                    timestamp = DateTime.UtcNow.ToString("o")
+                });
             }
 
+            var person = await db.PersonEmail.FirstOrDefaultAsync(x => x.Email == caller.Email);
+            if (person == null)
+            {
+                return NotFound(new
+                {
+                    message = "Cannot find user from token.",
+                    timestamp = DateTime.UtcNow.ToString("o")
+                });
+            }
 
-            return Ok(students);
+            var photo = await db.PersonPhoto.FirstOrDefaultAsync(x => x.PersonId == person.PersonId);
+            string photoUrl = photo == null
+                ? "https://res.cloudinary.com/dsuwjnudy/image/upload/v1735186361/ivbfqfru35jp7m8aeosn.jpg"
+                : photo.Url; // Assuming there's a URL property in PersonPhoto
+
+            return Ok(new
+            {
+                studentInfo = students,
+                photoInfo = new
+                {
+                    url = photoUrl
+                },
+                timestamp = DateTime.UtcNow.ToString("o")
+            });
         }
         [HttpGet("get-all-emails")]
         public async Task<ActionResult> GetAllEmails()

@@ -33,6 +33,8 @@ using EduConnect.SignalIR;
 using EduConnect.Interfaces.Shopping;
 using EduConnect.Interfaces.GenericTesting;
 using EduConnect.Repositories;
+using Stripe;
+using Microsoft.Extensions.Options;
 
 namespace EduConnect.Extensions
 {
@@ -48,7 +50,7 @@ namespace EduConnect.Extensions
             services.AddHttpClient();
 
             //ADD SCOOPED SERVICES 
-            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ITokenService, Services.TokenService>();
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<ITutorRepository, TutorRepository>();
@@ -70,6 +72,10 @@ namespace EduConnect.Extensions
             services.AddScoped<CountryExtractor>();
             services.AddScoped<ExtractIndustryClassification>();
             services.AddScoped<ExtractLearningCategoriesAndSubcategories>();
+           services.Configure<StripeSettings>(
+     configuration.GetSection("StripeSettings"));
+          services.AddSingleton(resolver => resolver
+                .GetRequiredService<IOptions<StripeSettings>>().Value);
 
 
             services.AddScoped<WorkTypeDatabaseSeeder>();
@@ -109,7 +115,7 @@ namespace EduConnect.Extensions
             services.AddSingleton<PresenceTracker>();
             services.AddHostedService<LearningCategoryAndSubcategoryHostedService>();
 
-            services.AddIdentity<Person, IdentityRole<Guid>>(
+            services.AddIdentity<Entities.Person.Person, IdentityRole<Guid>>(
                 options =>
                 {
                     options.Password.RequireDigit = false;
@@ -126,11 +132,13 @@ namespace EduConnect.Extensions
             .AddDefaultTokenProviders()
             .AddRoles<IdentityRole<Guid>>();
 
-            services.AddScoped<UserManager<Person>, PersonManager>();
+            services.AddScoped<UserManager<Entities.Person.Person>, PersonManager>();
 
 
 
             return services;
         }
     }
+
+ 
 }

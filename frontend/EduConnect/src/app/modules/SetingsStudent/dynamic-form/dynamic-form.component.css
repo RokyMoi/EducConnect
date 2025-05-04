@@ -1,0 +1,144 @@
+/* General Styles */
+:host {
+  display: block;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Main Form Container */
+.upload-container {
+  background: rgba(0, 0, 0, 0.7); /* Tamna pozadina */
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Heading */
+.upload-container h4 {
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 1px;
+  opacity: 0.9;
+  transition: transform 0.3s ease;
+}
+
+/* Input Field */
+input[type="text"] {
+  width: 100%;
+  padding: 0.8rem 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1); /* Tamnija pozadina za inpute */
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:focus {
+  border-color: #5efce8;
+  background: rgba(94, 252, 232, 0.2);
+  box-shadow: 0 0 12px rgba(94, 252, 232, 0.5);
+}
+
+input[type="text"]::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Error Message */
+.error-message {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: block;
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+/* Buttons */
+button {
+  padding: 0.8rem 1.5rem;
+  margin-top: 1rem;
+  border-radius: 50px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+button[type="submit"] {
+  background: linear-gradient(135deg, #5efce8, #736efe);
+  color: #000;
+  box-shadow: 0 4px 15px rgba(94, 252, 232, 0.3);
+}
+
+button[type="submit"]:disabled {
+  background: rgba(200, 200, 200, 0.3);
+  color: #999;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+}
+
+button[type="button"] {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+button[type="button"]:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #5efce8;
+  color: #5efce8;
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+  .upload-container {
+    padding: 1.5rem;
+  }
+
+  input[type="text"] {
+    padding: 0.75rem 1rem;
+  }
+
+  button {
+    padding: 0.6rem 1.25rem;
+  }
+}

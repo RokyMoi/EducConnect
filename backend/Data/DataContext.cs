@@ -44,7 +44,9 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
     public DbSet<Course> Course { get; set; }
  //SHOPPING PARTA
     public DbSet<ShoppingCart> ShoppingCart { get; set; }
-    public DbSet<Wishlist> WishList { get; set; }
+    public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
+    public DbSet<Wishlist> Wishlist { get; set; }
+    public DbSet<WishlistItems> WishlistItems { get; set; }
     public DbSet<StudentEnrollment> StudentEnrollment { get; set; }
 
 
@@ -76,7 +78,7 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<CourseLessonContent> CourseLessonContent { get; set; }
 
-    public DbSet<CourseEnrollment> CourseEnrollment { get; set; }
+    
 
     public DbSet<CourseLessonResource> CourseLessonResource { get; set; }
 

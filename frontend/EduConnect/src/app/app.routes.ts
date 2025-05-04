@@ -27,8 +27,6 @@ import { TutorTeachingStyleComponent } from './modules/signup/registration-step-
 import { DynamicFormComponent } from './modules/SetingsStudent/dynamic-form/dynamic-form.component';
 import { SendMessageComponent } from './Messenger/send-message/send-message.component';
 import { ListOfUsersComponent } from './Messenger/list-of-users/list-of-users.component';
-import { CartItemsComponent } from './ShoppingCart/cart-items/cart-items.component';
-import { WishlistComponent } from './modules/ShoppingCart/wishlist/wishlist.component';
 import { CourseSupportedLanguagesComponent } from './modules/tutor/course/course-supported-languages/course-supported-languages.component';
 import { CourseMainMaterialsComponent } from './modules/tutor/course/course-main-materials/course-main-materials.component';
 import { ConfirmCourseTypeComponent } from './modules/tutor/course/confirm-course-type/confirm-course-type.component';
@@ -53,6 +51,9 @@ import { StudentCourseDetailsComponent } from './modules/student/course/student-
 import { CourseTutorPromotionImagesComponent } from './modules/tutor/course/course-tutor-promotion-images/course-tutor-promotion-images.component';
 import { CoursePromotionImagesDetailsComponent } from './modules/tutor/course/course-promotion-images-details/course-promotion-images-details.component';
 import { CourseTutorAnalyticsDashboardComponent } from './modules/tutor/course/course-tutor-analytics-dashboard/course-tutor-analytics-dashboard.component';
+import { WishlistComponent } from './modules/ShoppingCart/wishlist/wishlist.component';
+import {CartItemsComponent} from './ShoppingCart/cart-items/cart-items.component';
+import {PaymentSuccessComponent} from './ShoppingCart/payment-succes/payment-succes.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -60,9 +61,25 @@ export const routes: Routes = [
   { path: 'settings', component: MainSettingsComponent },
   { path: 'student-register', component: RegisterStudentComponent },
   { path: 'tutor-signup', component: TutorSignupComponent },
+  {
+    path: 'cart-dwe', component: CartItemsComponent
+  },
+  {
+    path: 'course-wishlist', component: WishlistComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
   { path: 'login', component: LoginComponent },
-  { path: 'student-profile', component: StudentProfileComponent },
-  { path: 'learning-student', component: LearningComponent },
+  {
+    path: 'student-profile', component: StudentProfileComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  {
+    path: 'learning-student', component: LearningComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
 
   {
     path: 'student/course/search',
@@ -83,14 +100,32 @@ export const routes: Routes = [
     data: { requiredRole: 'student' },
   },
 
-  { path: 'photouploadcomponent', component: PhotoComponent },
-  { path: 'student-message-preview', component: MessagesComponent },
-  { path: 'direct-message', component: DirectMessagingsComponent },
+  {
+    path: 'photouploadcomponent', component: PhotoComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  {
+    path: 'student-message-preview', component: MessagesComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  {
+    path: 'direct-message', component: DirectMessagingsComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  { path: 'payment-success', component: PaymentSuccessComponent },
   {
     path: 'studentMessageThread/:id',
     component: StudentThreadMessageComponent,
   },
-  { path: 'viewOfAllCourses', component: CourseLandingPageComponent },
+  {
+    path: 'viewOfAllCourses',
+    component: CourseLandingPageComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' }
+  },
   { path: 'student-profile', component: StudentProfileComponent },
   { path: 'learning-student', component: LearningComponent },
   { path: 'student-dashboard', component: StudentDashboardComponent },
@@ -104,8 +139,6 @@ export const routes: Routes = [
   },
   { path: 'viewOfAllCourses', component: CourseLandingPageComponent },
   { path: 'send-message', component: SendMessageComponent },
-  { path: 'Shopping-Cart', component: CartItemsComponent },
-  { path: 'course-wishlist', component: WishlistComponent },
   { path: 'ListOfUsers', component: ListOfUsersComponent },
 
   {

@@ -24,18 +24,18 @@ student:any;
     this.ruter.navigate(['/']);
   }
   GetStudentInformations() {
-    
+
     const token = this.AccService.getAccessToken();
 
-   
+
     const headers = {
         'Authorization': `Bearer ${token}`,
     };
 
-    const LinkProfile = 'http://localhost:5177/api/Student/getCurrentStudentForProfile';
-    const ProfilePictureLink =`http://localhost:5177/Photo/GetCurrentUserProfilePicture`;
+    const LinkProfile = 'http://localhost:5177/api/Student/getCurrentStudentWithPhoto';
 
-   
+
+
     this.http.get(LinkProfile, { headers }).subscribe({
         next: (response) => {
             this.student = response;
@@ -45,16 +45,7 @@ student:any;
             console.error("Error fetching student data:", err);
         }
     });
-    this.http.get<{data: {url:string}}>(ProfilePictureLink,{headers}).subscribe({
-      next: (picture)=>{
-         this.profilePicture = picture.data.url;
-         console.log("Fetched data from PhotosPerson" + this.profilePicture);
-      },
-      error: err=> {
-        console.log("Error fetching profile picture data: " + err);
-      }
 
-    });
 }
 }
 

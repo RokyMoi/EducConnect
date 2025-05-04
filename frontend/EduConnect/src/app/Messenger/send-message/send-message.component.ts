@@ -75,11 +75,11 @@ export class SendMessageComponent {
       console.log('Form Submitted', this.messageForm.value);
 
       this.messageService
-        .SendMessageToUser(
+        .sendMessageToUser(
           this.messageForm.controls['email'].value,
           this.messageForm.controls['content'].value
         )
-        .then(() => {})
+        .then(() => { })
         .catch((error) => {
           console.error('Error sending message:', error);
         });

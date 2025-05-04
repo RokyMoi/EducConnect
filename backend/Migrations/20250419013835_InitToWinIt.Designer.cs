@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduConnect.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250326224600_AddTopicToCourseLesson")]
-    partial class AddTopicToCourseLesson
+    [Migration("20250419013835_InitToWinIt")]
+    partial class InitToWinIt
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,11 +53,8 @@ namespace EduConnect.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<bool?>("PublishedStatus")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("ShoppingCartID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("PublishedStatus")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -69,20 +66,13 @@ namespace EduConnect.Migrations
                     b.Property<long?>("UpdatedAt")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid?>("WishListId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("CourseId");
 
                     b.HasIndex("CourseCategoryId");
 
                     b.HasIndex("LearningDifficultyLevelId");
 
-                    b.HasIndex("ShoppingCartID");
-
                     b.HasIndex("TutorId");
-
-                    b.HasIndex("WishListId");
 
                     b.ToTable("Course", "Course");
                 });
@@ -223,8 +213,8 @@ namespace EduConnect.Migrations
                     b.Property<int?>("LessonSequenceOrder")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("PublishedStatus")
-                        .HasColumnType("bit");
+                    b.Property<int>("PublishedStatus")
+                        .HasColumnType("int");
 
                     b.Property<string>("ShortSummary")
                         .IsRequired()
@@ -281,6 +271,80 @@ namespace EduConnect.Migrations
                         .IsUnique();
 
                     b.ToTable("CourseLessonContent", "Course");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Course.CourseLessonResource", b =>
+                {
+                    b.Property<Guid>("CourseLessonResourceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CourseLessonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("FileData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ResourceUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CourseLessonResourceId");
+
+                    b.HasIndex("CourseLessonId");
+
+                    b.ToTable("CourseLessonResource", "Course");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Course.CoursePromotionImage", b =>
+                {
+                    b.Property<Guid>("CoursePromotionImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("ImageFile")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CoursePromotionImageId");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("CoursePromotionImage", "Course");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.CourseTag", b =>
@@ -386,6 +450,115 @@ namespace EduConnect.Migrations
                         .IsUnique();
 
                     b.ToTable("CourseThumbnail", "Course");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Course.CourseViewershipData", b =>
+                {
+                    b.Property<Guid>("CourseViewershipDataId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CourseViewershipDataId");
+
+                    b.Property<DateTime>("ClickedOn")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ClickedOn");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CourseId");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint")
+                        .HasColumnName("CreatedAt");
+
+                    b.Property<DateTime?>("EnteredDetailsAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("EnteredDetailsAt");
+
+                    b.Property<DateTime?>("LeftDetailsAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("LeftDetailsAt");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint")
+                        .HasColumnName("UpdatedAt");
+
+                    b.Property<int>("UserCameFrom")
+                        .HasColumnType("int")
+                        .HasColumnName("UserCameFrom");
+
+                    b.Property<Guid>("ViewedByPersonId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ViewedByPersonId");
+
+                    b.HasKey("CourseViewershipDataId");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("ViewedByPersonId");
+
+                    b.ToTable("CourseViewershipData", "Course");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Course.CourseViewershipDataSnapshot", b =>
+                {
+                    b.Property<Guid>("CourseViewershipDataSnapshotId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("AverageViewDurationInMinutes")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("CurrentlyViewing")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberOfUniqueVisitors")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalViews")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("UpdatedAt")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CourseViewershipDataSnapshotId");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("CourseViewershipDataSnapshot", "Course");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Course.StudentEnrollment", b =>
+                {
+                    b.Property<Guid>("StudentEnrollmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("EnrollmentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("StudentEnrollmentId");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("StudentEnrollment");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.Tag", b =>
@@ -825,11 +998,11 @@ namespace EduConnect.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ClientSecret")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("PaymentIntentId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("StudentID")
                         .HasColumnType("uniqueidentifier");
@@ -841,20 +1014,68 @@ namespace EduConnect.Migrations
                     b.ToTable("ShoppingCart");
                 });
 
-            modelBuilder.Entity("EduConnect.Entities.Shopping.WishList", b =>
+            modelBuilder.Entity("EduConnect.Entities.Shopping.ShoppingCartItem", b =>
                 {
-                    b.Property<Guid>("WishListId")
+                    b.Property<Guid>("ShoppingCartItemID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CourseID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ShoppingCartID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ShoppingCartItemID");
+
+                    b.HasIndex("CourseID");
+
+                    b.HasIndex("ShoppingCartID");
+
+                    b.ToTable("ShoppingCartItems");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Shopping.Wishlist", b =>
+                {
+                    b.Property<Guid>("WishlistID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("StudentID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("WishListId");
+                    b.HasKey("WishlistID");
 
                     b.HasIndex("StudentID");
 
-                    b.ToTable("WishList");
+                    b.ToTable("Wishlist");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Shopping.WishlistItems", b =>
+                {
+                    b.Property<Guid>("WihstListItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CourseID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("WishListId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("WihstListItemId");
+
+                    b.HasIndex("CourseID");
+
+                    b.HasIndex("WishListId");
+
+                    b.ToTable("WishlistItems");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Student.Student", b =>
@@ -1608,18 +1829,10 @@ namespace EduConnect.Migrations
                         .HasForeignKey("LearningDifficultyLevelId")
                         .IsRequired();
 
-                    b.HasOne("EduConnect.Entities.Shopping.ShoppingCart", null)
-                        .WithMany("Items")
-                        .HasForeignKey("ShoppingCartID");
-
                     b.HasOne("EduConnect.Entities.Tutor.Tutor", "Tutor")
                         .WithMany()
                         .HasForeignKey("TutorId")
                         .IsRequired();
-
-                    b.HasOne("EduConnect.Entities.Shopping.WishList", null)
-                        .WithMany("Items")
-                        .HasForeignKey("WishListId");
 
                     b.Navigation("CourseCategory");
 
@@ -1631,8 +1844,8 @@ namespace EduConnect.Migrations
             modelBuilder.Entity("EduConnect.Entities.Course.CourseDetails", b =>
                 {
                     b.HasOne("EduConnect.Entities.Course.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
+                        .WithOne("CourseDetails")
+                        .HasForeignKey("EduConnect.Entities.Course.CourseDetails", "CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1731,6 +1944,28 @@ namespace EduConnect.Migrations
                     b.Navigation("CourseLesson");
                 });
 
+            modelBuilder.Entity("EduConnect.Entities.Course.CourseLessonResource", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Course.CourseLesson", "CourseLesson")
+                        .WithMany()
+                        .HasForeignKey("CourseLessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CourseLesson");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Course.CoursePromotionImage", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Course.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("EduConnect.Entities.Course.CourseTag", b =>
                 {
                     b.HasOne("EduConnect.Entities.Course.Course", "Course")
@@ -1768,6 +2003,55 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Course.CourseViewershipData", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Course.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Person.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("ViewedByPersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Course.CourseViewershipDataSnapshot", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Course.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Course.StudentEnrollment", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Course.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Student.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Course.Tag", b =>
@@ -1905,7 +2189,26 @@ namespace EduConnect.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("EduConnect.Entities.Shopping.WishList", b =>
+            modelBuilder.Entity("EduConnect.Entities.Shopping.ShoppingCartItem", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Course.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Shopping.ShoppingCart", "ShoppingCart")
+                        .WithMany("Items")
+                        .HasForeignKey("ShoppingCartID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("ShoppingCart");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Shopping.Wishlist", b =>
                 {
                     b.HasOne("EduConnect.Entities.Student.Student", "Student")
                         .WithMany()
@@ -1914,6 +2217,25 @@ namespace EduConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("EduConnect.Entities.Shopping.WishlistItems", b =>
+                {
+                    b.HasOne("EduConnect.Entities.Course.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EduConnect.Entities.Shopping.Wishlist", "WishList")
+                        .WithMany("Items")
+                        .HasForeignKey("WishListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("WishList");
                 });
 
             modelBuilder.Entity("EduConnect.Entities.Student.Student", b =>
@@ -2146,6 +2468,9 @@ namespace EduConnect.Migrations
 
             modelBuilder.Entity("EduConnect.Entities.Course.Course", b =>
                 {
+                    b.Navigation("CourseDetails")
+                        .IsRequired();
+
                     b.Navigation("CourseThumbnail");
                 });
 
@@ -2179,7 +2504,7 @@ namespace EduConnect.Migrations
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("EduConnect.Entities.Shopping.WishList", b =>
+            modelBuilder.Entity("EduConnect.Entities.Shopping.Wishlist", b =>
                 {
                     b.Navigation("Items");
                 });
