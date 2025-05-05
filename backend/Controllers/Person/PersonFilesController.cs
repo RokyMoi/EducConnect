@@ -209,58 +209,5 @@ namespace EduConnect.Controllers.Person
             );
         }
 
-        [HttpGet("folders/all")]
-        public async Task<IActionResult> GetAllFolders()
-        {
-            var personId = _httpContextAccessor.HttpContext.Items["PersonId"].ToString();
-            var personIdGuid = Guid.Parse(personId);
-
-            var folders = await _dataContext
-            .Folder
-            .Where(x => x.OwnerPersonId == personIdGuid)
-            .Select(
-                x => new GetAllFoldersResponse
-                {
-                    FolderId = x.FolderId,
-                    Name = x.Name,
-                    ParentFolderId = x.ParentFolderId,
-                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CreatedAt).DateTime,
-                    UpdatedAt = x.UpdatedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(x.UpdatedAt.Value).DateTime : null,
-                }
-            ).ToListAsync();
-
-            return Ok(
-                ApiResponse<List<GetAllFoldersResponse>>.GetApiResponse(
-                    "Successfully fetched all folders",
-                    folders
-                )
-            );
-        }
-
-        [HttpPost("folders/add-file")]
-        public async Task<IActionResult> AddFileToFolder(AddFileToFolderRequest request)
-        {
-            var personId = _httpContextAccessor.HttpContext.Items["PersonId"].ToString();
-            var personIdGuid = Guid.Parse(personId);
-
-            var folder = await _dataContext
-            .Folder
-            .Where(
-                x => x.FolderId == request.FolderId
-            )
-            .FirstOrDefaultAsync();
-
-            if (folder == null)
-            {
-                return NotFound(
-                    ApiResponse<string>.GetApiResponse(
-                        $"Folder with id {request.FolderId} does not exist",
-                        null
-                    )
-                );
-            }
-
-            
-        }
     }
 }
