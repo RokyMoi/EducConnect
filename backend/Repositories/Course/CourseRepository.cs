@@ -12,8 +12,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EduConnect.Repositories.Course
 {
-    public class CourseRepository(DataContext _dataContext) : ICourseRepository
+    public class CourseRepository(DataContext _dataContext, ILogger<CourseRepository> logger) : ICourseRepository
     {
+        private readonly ILogger<CourseRepository> _logger = logger;
         public async Task<bool> CheckCoursePromotionImageExists(Guid coursePromotionImageId)
         {
             return await _dataContext.CoursePromotionImage.Where(x => x.CoursePromotionImageId == coursePromotionImageId).AnyAsync();
@@ -601,9 +602,12 @@ namespace EduConnect.Repositories.Course
 
         public async Task<CourseLessonResource?> GetCourseLessonResourceById(Guid courseLessonResourceId)
         {
-            return await _dataContext.CourseLessonResource.Where(
+            _logger.LogInformation("Get Course Lesson Resource By Id: {courseLessonResourceId}", courseLessonResourceId);
+            var result = await _dataContext.CourseLessonResource.Where(
                 x => x.CourseLessonResourceId == courseLessonResourceId
             ).FirstOrDefaultAsync();
+            _logger.LogInformation("Result: {result}", result);
+            return result;
         }
 
         public async Task<GetCourseLessonResourceWithoutFileDataByIdResponse?> GetCourseLessonResourceByIdWithoutFileData(Guid courseLessonResourceId)
@@ -1268,6 +1272,95 @@ namespace EduConnect.Repositories.Course
                 Items = items,
             };
 
+        }
+
+        public async Task<bool> CheckCourseThumbnailExistsByThumbnailId(Guid thumbnailId)
+        {
+            return await _dataContext.CourseThumbnail
+            .Where(x => x.CourseThumbnailId == thumbnailId)
+            .AnyAsync();
+        }
+
+        public async Task<bool> DeleteCourseThumbnailByThumbnailId(Guid thumbnailId)
+        {
+            var thumbnail = await _dataContext.CourseThumbnail
+            .Where(x => x.CourseThumbnailId == thumbnailId)
+            .FirstOrDefaultAsync();
+
+            if (thumbnail == null)
+            {
+                _logger.LogInformation($"Failed to delete thumbnail {thumbnailId}, not found", thumbnailId);
+
+                return false;
+            }
+
+            try
+            {
+                _dataContext.CourseThumbnail.Remove(thumbnail);
+                await _dataContext.SaveChangesAsync();
+                _logger.LogInformation($"Deleted thumbnail {thumbnailId}", thumbnailId);
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                _logger.LogError(ex, $"Failed to delete thumbnail {thumbnailId}", thumbnailId);
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateCourseTeachingResourceMetadata(UpdateTeachingResourceMetadataRequest request)
+        {
+            var courseTeachingResource = await _dataContext.CourseTeachingResource.Where(x => x.CourseTeachingResourceId == request.CourseTeachingResourceId).FirstOrDefaultAsync();
+
+            if (courseTeachingResource == null)
+            {
+                return false;
+            }
+
+            courseTeachingResource.Title = request.Title;
+            courseTeachingResource.Description = request.Description;
+            courseTeachingResource.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            try
+            {
+                _dataContext.CourseTeachingResource.Update(courseTeachingResource);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to update course teaching resource {request.CourseTeachingResourceId}");
+                return false;
+            }
+
+        }
+
+        public async Task<bool> UpdateCourseLessonResourceMetadata(UpdateCourseLessonResourceMetadataRequest request)
+        {
+            var resource = await _dataContext.CourseLessonResource.Where(x => x.CourseLessonResourceId == request.CourseLessonResourceId).FirstOrDefaultAsync();
+
+            if (resource == null)
+            {
+                return false;
+            }
+
+            resource.Title = request.Title;
+            resource.Description = request.Description;
+            resource.UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            try
+            {
+                _dataContext.CourseLessonResource.Update(resource);
+                await _dataContext.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+
+                _logger.LogError(ex, $"Failed to update course lesson resource {request.CourseLessonResourceId}");
+                return false;
+            }
         }
     }
 }

@@ -173,4 +173,7 @@ export default class ApiLinks {
 
   //CollaborationDocumentController base link
   public static readonly CollaborationDocumentControllerUrl = `${this.baseUrl}collaboration-document`;
+
+  //PersonFilesController base link
+  public static readonly PersonFilesControllerUrl = `${this.baseUrl}person/files`;
 }

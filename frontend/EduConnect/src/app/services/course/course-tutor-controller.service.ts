@@ -25,6 +25,8 @@ import { PaginatedResponse } from '../../models/shared/paginated-response';
 import { GetTagsBySearchResponse } from '../../models/course/course-tutor-controller/get-tags-by-search-response';
 import { AssignTagToCourseRequest } from '../../models/course/course-tutor-controller/assign-tag-to-course-request';
 import { CreateOrUpdateCourseTagRequest } from '../../models/course/course-tutor-controller/create-or-update-course-tag-request';
+import { UpdateCourseTeachingResourceMetadataRequest } from '../../models/course/course-tutor-controller/update-course-teaching-resource-metadata-request';
+import { UpdateCourseLessonResourceMetadataRequest } from '../../models/course/course-tutor-controller/update-course-lesson-resource-metadata-request';
 
 @Injectable({
   providedIn: 'root',
@@ -641,6 +643,46 @@ export class CourseTutorControllerService {
           Authorization: `Bearer ${token}`,
         },
         params: params,
+      }
+    );
+  }
+
+  deleteCourseThumbnailByThumbnailId(thumbnailId: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.delete(
+      `${this.apiUrl}/thumbnail/delete-by-id/${thumbnailId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  updateCourseTeachingResourceMetadata(
+    request: UpdateCourseTeachingResourceMetadataRequest
+  ) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.patch<DefaultServerResponse<null>>(
+      `${this.apiUrl}/teaching-resource/metadata-update`,
+      request,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  updateCourseLessonResourceMetadata(request: UpdateCourseLessonResourceMetadataRequest) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.patch<DefaultServerResponse<null>>(
+      `${this.apiUrl}/lesson/resource/metadata-update`,
+      request,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
   }

@@ -17,6 +17,7 @@ using EduConnect.Middleware;
 using EduConnect.Services;
 using EduConnect.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Stripe.Forwarding;
@@ -31,9 +32,12 @@ namespace EduConnect.Controllers.Course
         ICourseRepository _courseRepository,
         IReferenceRepository _referenceRepository,
         ITutorRepository _tutorRepository,
-        AzureBlobStorageService _azureBlobStorageService
+        AzureBlobStorageService _azureBlobStorageService,
+        ILogger<CourseTutorController> logger
     ) : ControllerBase
     {
+        private readonly ILogger<CourseTutorController> _logger = logger;
+
         [HttpPost("create")]
         public async Task<IActionResult> CreateCourse([FromBody] CreateCourseRequest request)
         {
@@ -292,6 +296,7 @@ namespace EduConnect.Controllers.Course
             (int totalViews, int uniqueUsers) = await _courseRepository.GetCourseAnalyticsForCourseManagementDashboard(courseId);
             var response = new CourseManagementDashboardResponse
             {
+
                 CourseId = course.CourseId,
                 Title = course.Title,
                 DifficultyLevel = course.LearningDifficultyLevel.Name,
@@ -997,7 +1002,12 @@ namespace EduConnect.Controllers.Course
         [HttpGet("teaching-resource/download")]
         public async Task<IActionResult> DownloadCourseTeachingResource(Guid courseTeachingResourceId)
         {
-            var resourceFile = await _courseRepository.GetCourseLessonResourceById(courseTeachingResourceId);
+            _logger.LogInformation("Get Course Teaching Resource with Id: {courseTeachingResourceId}", courseTeachingResourceId);
+
+            var resourceFile = await _courseRepository.GetCourseTeachingResourceById(courseTeachingResourceId);
+
+            _logger.LogInformation("Fetch Result For Course Teaching Resource with Id: {courseTeachingResourceId}: {resourceFile}", courseTeachingResourceId, resourceFile);
+
 
             if (resourceFile == null)
             {
@@ -2568,7 +2578,170 @@ namespace EduConnect.Controllers.Course
             );
         }
 
+        [HttpDelete("thumbnail/delete-by-id/{thumbnailId}")]
+        public async Task<IActionResult> DeleteCourseThumbnailByThumbnailId([FromRoute] Guid thumbnailId)
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the course thumbnail, regarding your role, please contact an administrator for details",
+                        null
+                    )
+                );
+            }
+
+            var thumbnailExists = await _courseRepository.CheckCourseThumbnailExistsByThumbnailId(thumbnailId);
+
+            if (!thumbnailExists)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course thumbnail not found",
+                        null
+                    )
+                );
+            }
+
+            bool deleteResult = await _courseRepository.DeleteCourseThumbnailByThumbnailId(thumbnailId);
+
+            if (!deleteResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while deleting the course thumbnail, please try again",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Course thumbnail deleted successfully", null)
+            );
+        }
+
+        [HttpPatch("teaching-resource/metadata-update")]
+        public async Task<IActionResult> UpdateTeachingResourceMetadata([FromBody] UpdateTeachingResourceMetadataRequest request)
+        {
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while updating the teaching resource metadata, regarding your role, please contact an administrator for details",
+                        null
+                    )
+                );
+            }
+
+            var resource = await _courseRepository.GetCourseTeachingResourceByIdWithoutFileData(request.CourseTeachingResourceId);
+
+            if (resource == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course teaching resource not found",
+                        null
+                    )
+                );
+            }
+
+            if (resource.Course.TutorId != tutor.TutorId)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "You cannot update the teaching resource metadata of a course that you do not own",
+                        null
+                    )
+                );
+            }
+
+            var updateResult = await _courseRepository.UpdateCourseTeachingResourceMetadata(request);
+
+            if (!updateResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while updating the teaching resource metadata, please try again",
+                        null
+                    )
+                );
+            }
+
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Course teaching resource metadata updated successfully", null)
+            );
+
+
+
+
+
+        }
+
+        [HttpPatch("lesson/resource/metadata-update")]
+        public async Task<IActionResult> UpdateCourseLessonResourceMetadata([FromBody] UpdateCourseLessonResourceMetadataRequest request)
+        {
+
+            var personId = Guid.Parse(HttpContext.Items["PersonId"].ToString());
+
+            var tutor = await _tutorRepository.GetTutorByPersonId(personId);
+
+            if (tutor == null)
+            {
+                return StatusCode(
+                    403,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while updating the course lesson resource metadata, regarding your role, please contact an administrator for details",
+                        null
+                    )
+                );
+            }
+
+            var resourceExists = await _courseRepository.CourseLessonResourceExists(request.CourseLessonResourceId);
+
+            if (!resourceExists)
+            {
+                return NotFound(
+                    ApiResponse<object>.GetApiResponse(
+                        "Course lesson resource not found",
+                        null
+                    )
+                );
+            }
+
+            bool updateResult = await _courseRepository.UpdateCourseLessonResourceMetadata(request);
+
+            if (!updateResult)
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<object>.GetApiResponse(
+                        "An error occurred while updating the course lesson resource metadata, please try again",
+                        null
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Course lesson resource metadata updated successfully", null)
+            );
+        }
     }
+
+
 
 
 
