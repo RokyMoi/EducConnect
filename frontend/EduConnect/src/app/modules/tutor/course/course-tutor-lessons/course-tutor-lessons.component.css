@@ -46,6 +46,23 @@
   background-color: darkgreen;
 }
 
+.view-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: blue;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.view-button:hover {
+  background-color: darkblue;
+}
+
 .lessons-list {
   display: flex;
   flex-direction: column;

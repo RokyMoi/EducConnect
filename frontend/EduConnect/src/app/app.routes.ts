@@ -58,6 +58,7 @@ import { CollaborationDocumentDashboardComponent } from './modules/shared/collab
 import { CollaborationDocumentLiveEditorComponent } from './modules/shared/collaboration-document/collaboration-document-live-editor/collaboration-document-live-editor.component';
 import { CollaborationDocumentInviteUsersComponent } from './modules/shared/collaboration-document/collaboration-document-invite-users/collaboration-document-invite-users.component';
 import { TutorFileExplorerComponent } from './modules/tutor/tutor-file-explorer/tutor-file-explorer/tutor-file-explorer.component';
+import { CourseTutorLessonsBrowseComponent } from './modules/tutor/course/course-tutor-lessons-browse/course-tutor-lessons-browse.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -194,6 +195,12 @@ export const routes: Routes = [
   {
     path: 'tutor/course/lessons/:courseId',
     component: CourseTutorLessonsComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/course/lessons/browse/:courseId',
+    component: CourseTutorLessonsBrowseComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'tutor' },
   },

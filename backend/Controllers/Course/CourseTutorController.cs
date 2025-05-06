@@ -2739,6 +2739,17 @@ namespace EduConnect.Controllers.Course
                 ApiResponse<object>.GetApiResponse("Course lesson resource metadata updated successfully", null)
             );
         }
+
+        [HttpGet("lesson/search")]
+        public async Task<IActionResult> GetCourseLessonContentByFullTextSearch([FromQuery] string searchQuery)
+        {
+            var content = await _courseRepository.GetCourseLessonByContentFullTextSearch(searchQuery);
+
+            return Ok(
+                ApiResponse<object>.GetApiResponse("Course lesson content retrieved successfully", content)
+            );
+
+        }
     }
 
 

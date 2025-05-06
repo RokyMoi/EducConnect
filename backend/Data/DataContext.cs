@@ -189,6 +189,11 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
         .HasForeignKey(e => e.DocumentId)
         .OnDelete(DeleteBehavior.NoAction);
 
+        builder.Entity<CourseLessonContent>()
+        .HasIndex(x => x.RowGuid)
+        .IsUnique()
+        .HasDatabaseName("IX_CourseLessonContent_RowGuid");
+
 
     }
 }

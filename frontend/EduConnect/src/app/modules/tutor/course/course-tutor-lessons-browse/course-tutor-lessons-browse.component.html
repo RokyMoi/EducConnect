@@ -1,0 +1,61 @@
+<!-- course-tutor-lessons-browse.component.html -->
+<div class="main-container">
+    <h2>Browse Lessons By Content</h2>
+    <div class="action-buttons-container">
+        <button class="go-back-button" (click)="goBack()">← Go Back</button>
+    </div>
+    <div class="search-container">
+        <div class="search-input-group">
+            <label for="searchInput">Search Lesson Content</label>
+            <input type="text" id="searchInput" placeholder="Enter search keywords..." (keyup)="onSearch($event)"
+                class="search-input">
+            <div class="search-hint">Search through all lesson contents (min. 3 characters)</div>
+        </div>
+    </div>
+
+    <div *ngIf="lessons.length > 0" class="results-summary">
+        Found {{lessons.length}} matching {{lessons.length === 1 ? 'lesson' : 'lessons'}} for "{{searchQuery}}"
+    </div>
+
+    <div class="lessons-list">
+        <div class="lesson-card" *ngFor="let lesson of lessons">
+            <div class="lesson-content">
+                <div class="lesson-header">
+                    <h3 class="lesson-title">{{lesson.title}}</h3>
+                    <span class="status-badge" [ngClass]="{
+                        'archived': lesson.publishedStatus === 2,
+                        'published': lesson.publishedStatus === 1,
+                        'draft': lesson.publishedStatus === 0
+                    }">
+                        {{this.getPublishedStatus(lesson.publishedStatus)}}
+                    </span>
+                </div>
+                <div class="lesson-meta">
+                    <span class="sequence">Order: {{lesson.lessonSequenceOrder ?? 'Not set'}}</span>
+                    <span class="topic">Topic: {{lesson.topic}}</span>
+                </div>
+
+                <!-- Highlighted Content Section -->
+                <div class="highlighted-content">
+                    <div class="content-snippets" [innerHTML]="lesson.content"></div>
+                </div>
+
+                <div class="lesson-dates">
+                    <span>Created: {{lesson.createdAt | date:'mediumDate'}}</span>
+                    <span *ngIf="lesson.statusChangedAt">Last updated: {{lesson.statusChangedAt |
+                        date:'longDate'}}</span>
+                </div>
+            </div>
+            <div class="lesson-actions">
+                <button class="button view-button" (click)="onViewLesson(lesson)">
+                    View Lesson
+                </button>
+                <button class="button" (click)="onViewLessonResources(lesson.courseLessonId)">Resources</button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="lessons.length === 0 && searchQuery" class="no-results">
+        No lessons found matching "{{searchQuery}}"
+    </div>
+</div>

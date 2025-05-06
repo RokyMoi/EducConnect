@@ -1,0 +1,140 @@
+.main-container {
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.action-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.go-back-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.go-back-button:hover {
+  background-color: #0056b3;
+}
+
+.search-container {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.search-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.search-input {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.search-hint {
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.results-summary {
+  padding: 1rem;
+  background: #e3f2fd;
+  color: #0b5ed7;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.highlighted-content {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #fff9e6;
+  border-radius: 6px;
+  border-left: 4px solid #ffd700;
+}
+
+.content-snippets {
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+.content-snippets strong {
+  background-color: #fff3cd;
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+  color: #856404;
+}
+
+.no-results {
+  padding: 2rem;
+  text-align: center;
+  color: #718096;
+  font-size: 1.1rem;
+  border: 2px dashed #e2e8f0;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.lesson-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  margin-bottom: 1rem;
+}
+
+.lesson-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.lesson-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+.view-button {
+  background-color: blue;
+  color: white;
+}
