@@ -84,6 +84,8 @@ namespace EduConnect.Extensions
             services.AddScoped<LanguageDatabaseSeeder>();
             // services.AddScoped<CourseTypeDatabaseSeeder>();
 
+            services.AddScoped<FullTextSearchEnableService>();
+
             //Add Middleware 
             services.AddScoped<CheckTutorRegistrationAttribute>();
             services.AddScoped<CheckPersonLoginSignupAttribute>();

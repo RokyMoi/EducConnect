@@ -6,6 +6,7 @@ using EduConnect.Data;
 using EduConnect.DTOs;
 using EduConnect.Entities.Course;
 using EduConnect.Enums;
+using EduConnect.Helpers;
 using EduConnect.Interfaces.Course;
 using EduConnect.Utilities;
 using Microsoft.EntityFrameworkCore;
@@ -1361,6 +1362,72 @@ namespace EduConnect.Repositories.Course
                 _logger.LogError(ex, $"Failed to update course lesson resource {request.CourseLessonResourceId}");
                 return false;
             }
+        }
+
+        public async Task<List<GetCourseLessonByContentFullTextSearchResponse>> GetCourseLessonByContentFullTextSearch(string searchQuery)
+        {
+            var formattedQuery = $"\"{searchQuery}\"";
+            var result = await _dataContext.CourseLessonContent
+            .FromSqlRaw(@"
+                SELECT cl.CourseLessonId, clc.CourseLessonContentId, cl.Title, cl.Topic, cl.ShortSummary, cl.PublishedStatus, cl.LessonSequenceOrder, clc.Content
+                FROM Course.CourseLessonContent clc 
+                INNER JOIN Course.CourseLesson cl ON clc.CourseLessonId = cl.CourseLessonId
+                WHERE CONTAINS(Content, {0})
+            ", formattedQuery)
+            .Select(x => new GetCourseLessonByContentFullTextSearchResponse
+            {
+                CourseLessonId = x.CourseLessonId,
+                CourseLessonContentId = x.CourseLessonContentId,
+                Title = x.CourseLesson.Title,
+                Topic = x.CourseLesson.Topic,
+                ShortSummary = x.CourseLesson.ShortSummary,
+                PublishedStatus = x.CourseLesson.PublishedStatus,
+                LessonSequenceOrder = x.CourseLesson.LessonSequenceOrder,
+                CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CourseLesson.CreatedAt).DateTime,
+                StatusChangedAt = x.CourseLesson.StatusChangedAt,
+
+                Content = x.Content
+            })
+            .ToListAsync();
+
+            if (result.Count == 0)
+            {
+                var searchQueryLowerCase = searchQuery.ToLower();
+                result = await _dataContext.CourseLessonContent
+                .Include(x => x.CourseLesson)
+                .Where(
+                    x => x.Content.ToLower().Contains(searchQueryLowerCase)
+
+                )
+                .Select(x => new GetCourseLessonByContentFullTextSearchResponse
+                {
+                    CourseLessonId = x.CourseLessonId,
+                    CourseLessonContentId = x.CourseLessonContentId,
+                    Title = x.CourseLesson.Title,
+                    Topic = x.CourseLesson.Topic,
+                    ShortSummary = x.CourseLesson.ShortSummary,
+                    PublishedStatus = x.CourseLesson.PublishedStatus,
+                    LessonSequenceOrder = x.CourseLesson.LessonSequenceOrder,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(x.CourseLesson.CreatedAt).DateTime,
+                    StatusChangedAt = x.CourseLesson.StatusChangedAt,
+                    Content = x.Content
+                })
+                .ToListAsync();
+            }
+            foreach (var item in result)
+            {
+                var matches = HtmlSentenceExtractor.ExtractSentencesWithKeywords(item.Content, searchQuery);
+
+                if (matches.Count != 0)
+                {
+                    var highlightedMatches = matches
+                        .Select(sentence => HtmlSentenceExtractor.HighlightKeywordInHtml(sentence, searchQuery));
+                    item.Content = string.Join(" ", highlightedMatches);
+                }
+
+            }
+
+            return result;
         }
     }
 }

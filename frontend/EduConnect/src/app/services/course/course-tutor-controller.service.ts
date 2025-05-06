@@ -27,6 +27,7 @@ import { AssignTagToCourseRequest } from '../../models/course/course-tutor-contr
 import { CreateOrUpdateCourseTagRequest } from '../../models/course/course-tutor-controller/create-or-update-course-tag-request';
 import { UpdateCourseTeachingResourceMetadataRequest } from '../../models/course/course-tutor-controller/update-course-teaching-resource-metadata-request';
 import { UpdateCourseLessonResourceMetadataRequest } from '../../models/course/course-tutor-controller/update-course-lesson-resource-metadata-request';
+import { GetCourseLessonByContentFullTextSearchResponse } from '../../models/course/course-tutor-controller/get-course-lesson-by-content-full-text-search-response';
 
 @Injectable({
   providedIn: 'root',
@@ -674,7 +675,9 @@ export class CourseTutorControllerService {
     );
   }
 
-  updateCourseLessonResourceMetadata(request: UpdateCourseLessonResourceMetadataRequest) {
+  updateCourseLessonResourceMetadata(
+    request: UpdateCourseLessonResourceMetadataRequest
+  ) {
     const token = localStorage.getItem('Authorization');
     return this.httpClient.patch<DefaultServerResponse<null>>(
       `${this.apiUrl}/lesson/resource/metadata-update`,
@@ -685,5 +688,16 @@ export class CourseTutorControllerService {
         },
       }
     );
+  }
+
+  getCourseLessonContentByFullTextSearch(searchQuery: string) {
+    const token = localStorage.getItem('Authorization');
+    return this.httpClient.get<
+      DefaultServerResponse<GetCourseLessonByContentFullTextSearchResponse[]>
+    >(`${this.apiUrl}/lesson/search?searchQuery=${searchQuery}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 }

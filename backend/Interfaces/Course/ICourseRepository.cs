@@ -145,5 +145,6 @@ namespace EduConnect.Interfaces.Course
         Task<bool> DeleteCourseThumbnailByThumbnailId(Guid thumbnailId);
         Task<bool> UpdateCourseTeachingResourceMetadata(UpdateTeachingResourceMetadataRequest request);
         Task<bool> UpdateCourseLessonResourceMetadata(UpdateCourseLessonResourceMetadataRequest request);
+        Task<List<GetCourseLessonByContentFullTextSearchResponse>> GetCourseLessonByContentFullTextSearch(string searchQuery);
     }
 }

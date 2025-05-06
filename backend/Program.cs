@@ -184,6 +184,15 @@ namespace EduConnect
                 }
             }
 
+            //Generate the index for full text search for CourseLessonContent Content field
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                var fullTextService = scope.ServiceProvider.GetRequiredService<FullTextSearchEnableService>();
+
+                await fullTextService.FullTextSearchSetup(dbContext);
+            }
+
 
 
             // Configure the HTTP request pipeline.

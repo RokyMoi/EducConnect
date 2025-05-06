@@ -3,8 +3,10 @@
     <h2>Course Lessons</h2>
     <div class="action-buttons-container">
         <button class="go-back-button" (click)="goBack()">← Go Back</button>
+        <button class="view-button" (click)="goToBrowseSection()">Browse Lessons By Content</button>
         <button class="create-action-button" (click)="onCreateLesson()">Add New Lesson</button>
     </div>
+    
     <div class="lessons-list">
         <div class="lesson-card" *ngFor="let lesson of lessons">
             <div class="lesson-content">

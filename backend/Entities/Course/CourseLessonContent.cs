@@ -25,7 +25,8 @@ namespace EduConnect.Entities.Course
 
         public long? UpdatedAt { get; set; } = null;
 
-
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid RowGuid { get; set; } = Guid.NewGuid();
     }
 
 

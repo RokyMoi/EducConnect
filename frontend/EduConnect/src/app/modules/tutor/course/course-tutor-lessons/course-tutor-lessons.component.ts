@@ -1,4 +1,4 @@
- import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackboxService } from '../../../../services/shared/snackbox.service';
@@ -9,7 +9,7 @@ import { PublishedStatus } from '../../../../../enums/published-status.enum';
 @Component({
   selector: 'app-course-tutor-lessons',
   standalone: true,
-  imports: [CommonModule],  
+  imports: [CommonModule],
   templateUrl: './course-tutor-lessons.component.html',
   styleUrl: './course-tutor-lessons.component.css',
 })
@@ -66,13 +66,7 @@ export class CourseTutorLessonsComponent implements OnInit {
     ]);
   }
 
-  toggleLessonStatus(lesson: GetAllCourseLessonsResponse) {
-    // Toggle publish status logic
-  }
-
-  archiveLesson(lesson: GetAllCourseLessonsResponse) {
-    // Archive lesson logic
-  }
+ 
 
   goBack() {
     this.router.navigate(['/tutor/course', this.courseId]);
@@ -88,5 +82,9 @@ export class CourseTutorLessonsComponent implements OnInit {
       this.courseId,
       lessonId,
     ]);
+  }
+
+  goToBrowseSection() {
+    this.router.navigate(['/tutor/course/lessons/browse', this.courseId]);
   }
 }
