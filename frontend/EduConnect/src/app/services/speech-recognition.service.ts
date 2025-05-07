@@ -7,7 +7,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class SpeechRecognitionService {
   private recognition: any;
   private isListening = false;
-  private transcriptSubject = new BehaviorSubject<string>(''); // ⬅️ Emits live updates
+  private transcriptSubject = new BehaviorSubject<string>('');
   private transcript: string = '';
 
   constructor(private zone: NgZone) {
@@ -26,24 +26,24 @@ export class SpeechRecognitionService {
     this.recognition.interimResults = false;
 
     this.recognition.onstart = () => {
-      console.log('🎤 Voice recognition started. Speak now...');
+      console.log('Voice recognition started. Speak now...');
     };
 
     this.recognition.onresult = (event: any) => {
       const tempTranscript = event.results[event.resultIndex][0].transcript;
       this.zone.run(() => {
-        console.log('📝 Transcript:', tempTranscript);
+        console.log('Transcript:', tempTranscript);
         this.transcript = this.transcript + tempTranscript;
         this.transcriptSubject.next(tempTranscript);
       });
     };
 
     this.recognition.onerror = (event: any) => {
-      console.error('❌ Recognition error:', event.error);
+      console.error('Recognition error:', event.error);
     };
 
     this.recognition.onend = () => {
-      console.log('🛑 Voice recognition ended.');
+      console.log('Voice recognition ended.');
       if (this.isListening) {
         this.recognition.start();
       }

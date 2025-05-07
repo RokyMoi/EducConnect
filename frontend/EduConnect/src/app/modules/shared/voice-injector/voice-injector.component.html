@@ -1,1 +1,2 @@
-<button class="voice-button" (click)="toggleListening()">Voice to text: {{isListening ? 'Stop' : 'Start'}}</button>
+<button class="voice-button" (click)="toggleListening()" [ngClass]="{'active': isListening}">Voice to text:
+    {{isListening ? 'Stop' : 'Start'}}</button>
