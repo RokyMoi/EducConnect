@@ -11,6 +11,7 @@ import { HeaderTemplateComponent } from './common/header/header-template/header-
 
 import { SnackboxComponent } from './modules/shared/snackbox/snackbox.component';
 import { HeaderComponent } from './landingPage/header/header.component';
+import { VoiceInjectorComponent } from "./modules/shared/voice-injector/voice-injector.component";
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,8 @@ import { HeaderComponent } from './landingPage/header/header.component';
     CommonModule,
     SnackboxComponent,
     HeaderComponent,
-  ],
+    VoiceInjectorComponent
+],
   standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
