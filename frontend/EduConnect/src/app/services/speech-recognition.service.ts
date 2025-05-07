@@ -1,12 +1,14 @@
 import { Injectable, NgZone } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SpeechRecognitionService {
-  recognition: any;
-  isListening = false;
-  transcript: string = '';
+  private recognition: any;
+  private isListening = false;
+  private transcriptSubject = new BehaviorSubject<string>(''); // ⬅️ Emits live updates
+  private transcript: string = '';
 
   constructor(private zone: NgZone) {
     const SpeechRecognition =
@@ -31,7 +33,8 @@ export class SpeechRecognitionService {
       const tempTranscript = event.results[event.resultIndex][0].transcript;
       this.zone.run(() => {
         console.log('📝 Transcript:', tempTranscript);
-        this.transcript += tempTranscript;
+        this.transcript = this.transcript + tempTranscript;
+        this.transcriptSubject.next(tempTranscript);
       });
     };
 
@@ -49,6 +52,7 @@ export class SpeechRecognitionService {
 
   startListening() {
     this.isListening = true;
+    this.transcriptSubject.next(''); // reset transcript
     this.recognition.start();
   }
 
@@ -57,7 +61,11 @@ export class SpeechRecognitionService {
     this.recognition.stop();
   }
 
-  getTranscript(): string {
-    return this.transcript;
+  getTranscriptStream(): Observable<string> {
+    return this.transcriptSubject.asObservable();
+  }
+
+  getFullTranscript(): string {
+    return this.transcriptSubject.value;
   }
 }
