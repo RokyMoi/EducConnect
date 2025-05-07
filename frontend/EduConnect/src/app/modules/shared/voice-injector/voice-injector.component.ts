@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NgStyle } from '@angular/common';
+import { NgClass, NgStyle } from '@angular/common';
 import { SpeechRecognitionService } from '../../../services/speech-recognition.service';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-voice-injector',
   standalone: true,
-  imports: [NgStyle],
+  imports: [NgStyle, NgClass],
   templateUrl: './voice-injector.component.html',
   styleUrl: './voice-injector.component.css',
 })
@@ -35,7 +35,6 @@ export class VoiceInjectorComponent implements OnInit, OnDestroy {
         .getTranscriptStream()
         .subscribe((text) => {
           this.transcription = text;
-          console.log('📡 Live transcript:', text);
           if (this.focusedElement) {
             this.injectTranscriptToFocusedElement(text);
           }
