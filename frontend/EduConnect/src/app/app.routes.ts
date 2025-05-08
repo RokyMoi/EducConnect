@@ -60,6 +60,8 @@ import { CollaborationDocumentInviteUsersComponent } from './modules/shared/coll
 import { TutorFileExplorerComponent } from './modules/tutor/tutor-file-explorer/tutor-file-explorer/tutor-file-explorer.component';
 import { CourseTutorLessonsBrowseComponent } from './modules/tutor/course/course-tutor-lessons-browse/course-tutor-lessons-browse.component';
 
+import { CourseStudentDashboardComponent } from './modules/student/course/course-student/course-student-dashboard/course-student-dashboard.component';
+
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
   { path: '', component: BodyComponent },
@@ -107,6 +109,12 @@ export const routes: Routes = [
   {
     path: 'studentMessageThread/:id',
     component: StudentThreadMessageComponent,
+  },
+  {
+    path: 'student/my-courses/dashboard',
+    component: CourseStudentDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
   },
   { path: 'viewOfAllCourses', component: CourseLandingPageComponent },
   { path: 'send-message', component: SendMessageComponent },

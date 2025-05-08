@@ -15,6 +15,8 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using EduConnect.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using EduConnect.Interfaces.Redis;
 
 namespace EduConnect
 {
@@ -52,11 +54,23 @@ namespace EduConnect
             builder.Services.AddScoped<UserManager<Person>, PersonManager>();
             builder.Services.AddScoped<PersonManager>();
 
+
+
             builder.Services.AddHostedService<ViewershipChangeService>();
             builder.Services.AddHostedService<CourseViewershipDataSnapshotService>();
             builder.Services.AddControllers();
 
             builder.Services.AddSignalR();
+
+            builder.Services.AddStackExchangeRedisCache(
+                options =>
+                {
+                    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+                    options.InstanceName = "EduConnect";
+                }
+            );
+
+            builder.Services.AddScoped<IRedisCachingService, RedisCachingService>();
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
