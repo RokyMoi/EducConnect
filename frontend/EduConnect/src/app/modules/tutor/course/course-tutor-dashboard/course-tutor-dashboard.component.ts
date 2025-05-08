@@ -48,6 +48,6 @@ export class CourseTutorDashboardComponent implements OnInit {
   }
 
   onViewCourse(courseId: string) {
-    this.router.navigate(['tutor/course/', courseId]);
+    this.router.navigate(['/tutor/course', courseId]);
   }
 }
