@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment.development';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { User } from '../models/User';
 import { take } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -41,12 +41,40 @@ export class MessageService {
 
     console.log(`Creating hub connection for ${otherEmail}`);
 
+    // Get the token directly before creating connection
+    const token = this.accService.getAccessToken();
+
+    if (!token) {
+      console.error('No access token available. Cannot create hub connection.');
+      // Try to get a token from localStorage or user object
+      const userFromStorage = localStorage.getItem('user');
+      if (userFromStorage) {
+        const parsedUser = JSON.parse(userFromStorage);
+        if (parsedUser?.Token) {
+          console.log('Found token in stored user object, will use this instead.');
+          user.Token = parsedUser.Token;
+        } else {
+          console.error('User found in storage but no token available.');
+          return;
+        }
+      } else {
+        console.error('No user found in storage. Cannot proceed with connection.');
+        return;
+      }
+    }
+
     // Create new connection with enhanced logging and retry logic
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(`${this.hubUrl}message?user=${otherEmail}`, {
         accessTokenFactory: () => {
+          // Check both potential token sources
+          const authToken = token || user.Token;
           console.log('Providing access token for hub connection');
-          return user.Token;
+          if (!authToken) {
+            console.error('No token available in accessTokenFactory');
+            throw new Error('Authentication token not available');
+          }
+          return authToken;
         },
         skipNegotiation: false,
         withCredentials: true
@@ -114,6 +142,14 @@ export class MessageService {
         console.error('Error connecting to message hub:', error);
         this.updateConnectionStatus('error');
 
+        // Check if it's an authentication error and try to refresh the token
+        if (error.toString().includes('authentication') || error.toString().includes('token')) {
+          console.log('Authentication error detected, attempting to refresh token...');
+
+          // If you have a token refresh mechanism, you could call it here
+          // For now, we'll just rely on the retry logic
+        }
+
         // Implementation for retry logic
         if (this.connectionRetryCount < this.maxRetryAttempts) {
           this.connectionRetryCount++;
@@ -169,7 +205,7 @@ export class MessageService {
       });
   }
 
-  getMessageThread(email: string) {
+  getMessageThread(email: string): Observable<Message[]> {
     let headers = new HttpHeaders();
     const token = this.accService.getAccessToken();
 
@@ -177,7 +213,7 @@ export class MessageService {
       headers = headers.append('Authorization', `Bearer ${token}`);
     } else {
       console.error('No access token found.');
-      return;
+      throw new Error('Authentication token not available');
     }
 
     return this.http.get<Message[]>(
@@ -213,5 +249,18 @@ export class MessageService {
       console.error('Error sending message:', error);
       throw error;
     }
+  }
+
+  // Method to check and refresh token if needed
+  ensureValidToken(): boolean {
+    const token = this.accService.getAccessToken();
+    if (!token) {
+      console.error('No access token available');
+      return false;
+    }
+
+    // For future enhancement: check token expiration if you have that info
+    // For now, we just check if token exists
+    return true;
   }
 }

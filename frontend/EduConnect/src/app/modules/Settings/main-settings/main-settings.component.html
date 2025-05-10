@@ -6,57 +6,74 @@
         <img [src]="photoUrl" alt="Profile Avatar" class="avatar" />
         <button (click)="OpenPhotoEditor()" class="btn-change-picture">Change Picture</button>
       </div>
-      <app-photo-comp 
-      *ngIf="statusController" 
+      <app-photo-comp
+      *ngIf="statusController"
       (FormStatus)="HandleFormStatus($event)">
     </app-photo-comp>
       <div class="profile-inputs">
+        <!-- First Name -->
         <div class="input-group">
-            <label for="firstname">First name</label>
-            <input type="text" id="firstname" disabled placeholder="Your description" />
-            <button (click)="OpenEditor('FirstName')" class="edit-btn"><i ></i> Edit</button>
-          </div>
-
-          <app-dynamic-form *ngIf="settingsControll && type=='FirstName'"
-           [ApiLink]="FirstNameLink" [valueNameChild]="'First Name'" 
-           (FormStatus)="HandleFormStatusForMain($event)"></app-dynamic-form>
-
-          <div class="input-group">
-            <label for="lastname">Last Name</label>
-            <input type="text" id="lastname" disabled placeholder="Your description" />
-            <button (click)="OpenEditor('LastName')" class="edit-btn"><i></i> Edit</button>
-          </div>
-
-          <app-dynamic-form *ngIf="settingsControll && type=='LastName'"
-           [ApiLink]="LastNameLink" 
-           [valueNameChild]="'Last Name'"
-           (FormStatus)="HandleFormStatusForMain($event)">
-          </app-dynamic-form>
-
-        <div class="input-group">
-          <label for="description">Description</label>
-          <input type="text" id="description" disabled placeholder="Your description" />
-          <button (click)="OpenEditor('Description')" class="edit-btn"><i></i> Edit</button>
+          <label>First name</label>
+          <input disabled [placeholder]="student?.studentInfo.firstName" />
+          <button (click)="OpenEditor('FirstName')" class="edit-btn">Edit</button>
         </div>
+        <app-dynamic-form
+          *ngIf="settingsControll && type==='FirstName'"
+          [ApiLink]="FirstNameLink"
+          [valueNameChild]="student?.studentInfo.firstName"
+          [fieldLabel]="'First name'"
+          (FormStatus)="HandleFormStatusForMain($event)">
+        </app-dynamic-form>
 
-        <app-dynamic-form *ngIf="settingsControll && type=='Description'"
-        [ApiLink]="DescriptionLink" [valueNameChild]="'Description'"
-        (FormStatus)="HandleFormStatusForMain($event)"
-        ></app-dynamic-form>
-
-       
+        <!-- Last Name -->
         <div class="input-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" disabled placeholder="********" />
-          <button (click)="OpenEditor('Password')" class="edit-btn"><i></i> Edit</button>
+          <label>Last name</label>
+          <input disabled [placeholder]="student?.studentInfo.lastName" />
+          <button (click)="OpenEditor('LastName')" class="edit-btn">Edit</button>
+        </div>
+        <app-dynamic-form
+          *ngIf="settingsControll && type==='LastName'"
+          [ApiLink]="LastNameLink"
+          [valueNameChild]="student?.studentInfo.lastName"
+          [fieldLabel]="'Last name'"
+          (FormStatus)="HandleFormStatusForMain($event)">
+        </app-dynamic-form>
+
+        <!-- Description -->
+        <div class="input-group">
+          <label>Description</label>
+          <input
+            disabled
+            [placeholder]="
+      student?.studentInfo.biography || 'No description'
+    "
+          />
+          <button (click)="OpenEditor('Description')" class="edit-btn">
+            Edit
+          </button>
+        </div>
+        <app-dynamic-form
+          *ngIf="settingsControll && type==='Description'"
+          [ApiLink]="DescriptionLink"
+          [valueNameChild]="student?.studentInfo.biography"
+          [fieldLabel]="'Description'"
+          (FormStatus)="HandleFormStatusForMain($event)">
+        </app-dynamic-form>
+
+        <!-- Password -->
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" disabled placeholder="********" />
+          <button (click)="OpenEditor('Password')" class="edit-btn">Edit</button>
         </div>
         <app-dynamic-form [ApiLink]="PasswordChangeLink"
-        *ngIf="settingsControll && type=='Password'"
-        [valueNameChild]="'Password'"
-        (FormStatus)="HandleFormStatusForMain($event)"></app-dynamic-form>
+                          *ngIf="settingsControll && type=='Password'"
+                          [valueNameChild]="'Password'"
+                          (FormStatus)="HandleFormStatusForMain($event)"></app-dynamic-form>
+
         <div class="input-group">
           <label for="phone">Phone</label>
-          <input type="text" id="phone" disabled placeholder="+1234567890" />
+          <input type="text" id="phone" disabled placeholder="{{student?.phoneNumber ? student?.phoneNumber : 'Nema broja'}}" />
           <button (click)="OpenEditor('Phone')" class="edit-btn"><i></i> Edit</button>
         </div>
         <!-- <label>Add social media links</label> -->
@@ -77,7 +94,7 @@
           </div> -->
       </div>
     </section>
-  
+
     <!-- Theme Section -->
     <section class="theme-section">
       <h2>Theme Settings</h2>
@@ -87,7 +104,7 @@
         <button class="theme-btn" id="gradient3">Gradient 3</button>
       </div>
     </section>
-  
+
     <!-- Blocked Users Section -->
     <section class="blocked-users-section">
       <h2>Blocked Users</h2>
@@ -107,7 +124,7 @@
             <button class="unblock-btn">Unblock</button>
           </div>
 
-          
+
         <!---BLOCKED USER2-->
         </div>
         <div class="blocked-item">
@@ -139,4 +156,3 @@
       </div>
     </section>
   </div>
-  

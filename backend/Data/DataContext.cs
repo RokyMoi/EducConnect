@@ -15,6 +15,7 @@ using EduConnect.Entities.Messenger;
 using EduConnect.Entities.Shopping;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using EduConnect.Entities.Promotion;
 
 namespace EduConnect.Data;
 
@@ -23,6 +24,10 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
     }
+    public DbSet<CoursePromotion> CoursePromotions { get; set; }
+    public DbSet<PromotionImages> PromotionImages { get; set; }
+    public DbSet<Entities.Course.CoursePromotionImage> CoursePromotionImage { get; set; }
+    public DbSet<PromotionDuration> PromotionDuration { get; set; }
 
     public DbSet<Person> Person { get; set; }
     public DbSet<PersonDetails> PersonDetails { get; set; }
@@ -82,7 +87,7 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<CourseLessonResource> CourseLessonResource { get; set; }
 
-    public DbSet<CoursePromotionImage> CoursePromotionImage { get; set; }
+  
 
     public DbSet<CourseViewershipData> CourseViewershipData { get; set; }
 

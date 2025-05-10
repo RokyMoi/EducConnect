@@ -46,7 +46,7 @@
                     <div id="content_1" class="tabcontent story-area">
                       <div class="story-container-1">
 
-                        <button mat-icon-button class="arrow-leftTutors" (click)="prevImage()">
+                        <button mat-icon-button class="arrow-leftTutors" (click)="prevTutorImage()">
                           <mat-icon>chevron_left</mat-icon>
                         </button>
 
@@ -103,7 +103,7 @@
                         </div>
 
 
-                        <button mat-icon-button class="arrow-rightTutors" (click)="nextImage()">
+                        <button mat-icon-button class="arrow-rightTutors" (click)="nextTutorImage()">
                           <mat-icon>chevron_right</mat-icon>
                         </button>
                       </div>
@@ -117,59 +117,51 @@
       </mat-card>
 
       <div class="CoursePromotionHeader">
-        <!---Svaka kartica ovde ng for#-->
-        <mat-card class="course-promotion" appearance="outlined">
+        <!-- Show a message if no promotions are loaded -->
+        <div *ngIf="!promotions || promotions.length === 0" class="no-promotions">
+          <mat-card appearance="outlined">
+            <mat-card-content>
+              <p class="FontText">No course promotions available at the moment.</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
 
+        <!-- Display promotions when available -->
+        <mat-card *ngFor="let promotion of promotions" class="course-promotion" appearance="outlined">
           <mat-card-header class="headerComp">
-            <!-- Avatar Image -->
             <div mat-card-avatar class="StudentPhoto"
-              [style.background-image]="'url(https://material.angular.io/assets/img/examples/shiba1.jpg)'"></div>
+                 [style.background-image]="'url(https://material.angular.io/assets/img/examples/shiba1.jpg)'"></div>
 
-            <!-- Title and Subtitle -->
-            <mat-card-title class="FontText">Profesor Bakajlic</mat-card-title>
+            <mat-card-title class="FontText">{{ promotion.tutorName }}</mat-card-title>
             <mat-card-subtitle class="TutorSub FontText">Professional Developer</mat-card-subtitle>
-
-            <!-- Button to Open Course -->
-            <button mat-stroked-button class="ButtonCourse FontText">Open Course</button>
+            <button mat-stroked-button (click)="OtvoriKurs(promotion)" class="ButtonCourse FontText">Open Course</button>
           </mat-card-header>
 
           <hr>
 
-          <!-- Card Content -->
           <mat-card-content class="contentDiv">
-            <p class="FontText">
-              The Shiba Inu is the smallest of the six original and distinct spitz breeds of dog from Japan.
-              A small, agile dog that copes very well with mountainous terrain, the Shiba Inu was originally bred for
-              hunting.
-            </p>
+            <p class="FontText">{{ promotion.description }}</p>
 
-            <!-- Carousel Wrapper -->
-            <div class="carousel-wrapper">
-              <!-- Left Arrow -->
-              <button mat-icon-button class="arrow-left" (click)="prevImage()">
+            <div class="carousel-wrapper" *ngIf="promotion.images && promotion.images.length">
+              <button mat-icon-button class="arrow-left" (click)="prevImage(promotion)" *ngIf="promotion.images.length > 1">
                 <mat-icon>chevron_left</mat-icon>
               </button>
 
-              <!-- Image Slider -->
-              <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba1.jpg" alt="Carousel Image">
+              <img mat-card-image
+                   [src]="promotionLoad.getImageUrl(promotion.images[promotion.currentImageIndex || 0].imageId)"
+                   alt="Promotion Image" />
 
-              <!-- Right Arrow -->
-              <button mat-icon-button class="arrow-right" (click)="nextImage()">
+              <button mat-icon-button class="arrow-right" (click)="nextImage(promotion)" *ngIf="promotion.images.length > 1">
                 <mat-icon>chevron_right</mat-icon>
               </button>
             </div>
           </mat-card-content>
 
-          <!-- Card Actions: Like and Comment Icons -->
           <mat-card-actions class="akcije">
             <mat-icon class="LikeIt">thumb_up</mat-icon>
-
           </mat-card-actions>
         </mat-card>
       </div>
-
-
-
     </div>
   </div>
 </body>

@@ -54,6 +54,9 @@ import { CourseTutorAnalyticsDashboardComponent } from './modules/tutor/course/c
 import { WishlistComponent } from './modules/ShoppingCart/wishlist/wishlist.component';
 import {CartItemsComponent} from './ShoppingCart/cart-items/cart-items.component';
 import {PaymentSuccessComponent} from './ShoppingCart/payment-succes/payment-succes.component';
+import {PromotionFormComponent} from './CoursePromotion/promotion-form/promotion-form.component';
+import {PromotionDetailsComponent} from './CoursePromotion/promotion-details/promotion-details.component';
+import {PromotionListComponent} from './CoursePromotion/promotion-list/promotion-list.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -116,6 +119,10 @@ export const routes: Routes = [
     data: { requiredRole: 'student' },
   },
   { path: 'payment-success', component: PaymentSuccessComponent },
+  {path: 'promotions/edit/:id', component: PromotionFormComponent},
+  {path: 'promotions/create', component: PromotionFormComponent},
+  {path: 'promotions/view/:id', component: PromotionDetailsComponent},
+  {path: 'promotions/list', component: PromotionListComponent},
   {
     path: 'studentMessageThread/:id',
     component: StudentThreadMessageComponent,

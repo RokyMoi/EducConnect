@@ -44,6 +44,7 @@
     <Folder Include="DTOs\Settings\" />
     <Folder Include="DTOs\ShoppingCart\" />
     <Folder Include="Migrations\" />
+    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>

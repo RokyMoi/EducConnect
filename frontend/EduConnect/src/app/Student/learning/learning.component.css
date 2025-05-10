@@ -5,7 +5,192 @@
     box-sizing: border-box;
     font-family: 'Arial', sans-serif;
   }
-  
+
+/* Modern White Mat-Paginator CSS with Orange Accents - Mobile Optimized */
+mat-paginator {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  padding: 10px 6px;
+  position: relative;
+  z-index: 1000; /* High z-index as requested */
+  transition: all 0.25s ease;
+  border: 1px solid #f2f2f2;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Style for the paginator container */
+::ng-deep .mat-mdc-paginator {
+  color: #333333;
+  font-weight: 500;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Range actions container - make it full width on mobile */
+::ng-deep .mat-mdc-paginator-range-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+/* Style for the range label */
+::ng-deep .mat-mdc-paginator-range-label {
+  margin: 0 12px;
+  color: #555555;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
+  /* For very small screens, ensure text is readable */
+  font-size: 14px;
+}
+
+/* Page size container styling for better mobile layout */
+::ng-deep .mat-mdc-paginator-page-size {
+  margin: 0;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 599px) {
+  ::ng-deep .mat-mdc-paginator-page-size {
+    margin-bottom: 8px;
+    margin-right: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  ::ng-deep .mat-mdc-paginator-range-label {
+    margin: 8px 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  ::ng-deep .mat-mdc-paginator-range-actions {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+}
+
+/* Navigation buttons - make them proper size for touch */
+::ng-deep .mat-mdc-paginator-navigation-previous,
+::ng-deep .mat-mdc-paginator-navigation-next,
+::ng-deep .mat-mdc-paginator-navigation-first,
+::ng-deep .mat-mdc-paginator-navigation-last {
+  background-color: #ff8533; /* Orange accent */
+  border-radius: 50%;
+  margin: 0 4px;
+  color: white;
+  transition: all 0.2s ease;
+  width: 40px;  /* Bigger target for mobile */
+  height: 40px; /* Bigger target for mobile */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: unset; /* Override default min-width for better mobile display */
+  padding: 0; /* Remove padding to ensure circle shape */
+}
+
+/* Touch-friendly hover state */
+::ng-deep .mat-mdc-paginator-navigation-previous:hover,
+::ng-deep .mat-mdc-paginator-navigation-next:hover,
+::ng-deep .mat-mdc-paginator-navigation-first:hover,
+::ng-deep .mat-mdc-paginator-navigation-last:hover {
+  background-color: #ff6600; /* Darker orange on hover */
+  box-shadow: 0 4px 8px rgba(255, 133, 51, 0.4);
+}
+
+::ng-deep .mat-mdc-paginator-navigation-previous:active,
+::ng-deep .mat-mdc-paginator-navigation-next:active,
+::ng-deep .mat-mdc-paginator-navigation-first:active,
+::ng-deep .mat-mdc-paginator-navigation-last:active {
+  background-color: #e65c00;
+}
+
+/* Style for the page size label */
+::ng-deep .mat-mdc-paginator-page-size-label {
+  color: #555555;
+  font-weight: 500;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+/* Dropdown styling */
+::ng-deep .mat-mdc-paginator .mat-mdc-select-value {
+  color: #333333;
+  font-weight: 500;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-select-arrow {
+  color: #ff8533; /* Orange accent */
+}
+
+/* Items per page select styling - mobile friendly */
+::ng-deep .mat-mdc-paginator-page-size-select {
+  margin: 0 4px;
+  min-width: 60px;
+}
+
+/* Form field styling */
+::ng-deep .mat-mdc-paginator .mat-mdc-form-field-flex {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  border: 1px solid #f0f0f0;
+  padding: 0 8px;
+  height: 40px; /* Taller for better touch targets */
+}
+
+/* Disabled button styling - clear visual feedback */
+::ng-deep .mat-mdc-paginator-navigation-previous.mat-mdc-button-disabled,
+::ng-deep .mat-mdc-paginator-navigation-next.mat-mdc-button-disabled,
+::ng-deep .mat-mdc-paginator-navigation-first.mat-mdc-button-disabled,
+::ng-deep .mat-mdc-paginator-navigation-last.mat-mdc-button-disabled {
+  opacity: 0.5;
+  background-color: #f0f0f0;
+  color: #999999;
+  box-shadow: none;
+}
+
+/* Orange accent line - responsive width */
+mat-paginator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 80%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ff8533, transparent);
+  border-radius: 3px;
+}
+
+/* Optimize for very small screens */
+@media (max-width: 359px) {
+  ::ng-deep .mat-mdc-paginator-range-label {
+    font-size: 12px;
+  }
+
+  ::ng-deep .mat-mdc-paginator-navigation-previous,
+  ::ng-deep .mat-mdc-paginator-navigation-next,
+  ::ng-deep .mat-mdc-paginator-navigation-first,
+  ::ng-deep .mat-mdc-paginator-navigation-last {
+    width: 36px;
+    height: 36px;
+    margin: 0 2px;
+  }
+}
   body {
     background: linear-gradient(145deg, #6a11cb, #2575fc);
     color: white;
@@ -19,10 +204,10 @@
     font-size: 16px;
     line-height: 1.6;
   }
-  
+
   /* Header Section - Welcome User */
   .header {
-  
+
     text-align: center;
     margin-bottom: 40px;
     width: 90%;
@@ -31,7 +216,7 @@
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   }
-  
+
   .header h1 {
     font-size: 3rem;
     font-weight: 700;
@@ -39,12 +224,12 @@
     color: white;
     text-transform: uppercase;
   }
-  
+
   .header p {
     font-size: 1.2rem;
     color: rgba(255, 255, 255, 0.8);
   }
-  
+
   /* Search and Filter Section */
   .filters-container {
     display: flex;
@@ -58,7 +243,7 @@
     padding: 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   }
-  
+
   .search-bar {
     display: flex;
     align-items: center;
@@ -68,7 +253,7 @@
     width: 300px;
     transition: all 0.3s ease;
   }
-  
+
   .search-bar input {
     border: none;
     outline: none;
@@ -79,27 +264,27 @@
     width: 100%;
     border-radius: 30px;
   }
-  
+
   .search-bar input::placeholder {
     color: #bbb;
   }
-  
+
   .search-bar i {
     font-size: 1.2rem;
     color: #888;
     margin-left: 10px;
   }
-  
+
   .search-bar:hover {
     background-color: #e2e2e2;
   }
-  
+
   .filters {
     display: flex;
     gap: 20px;
     align-items: center;
   }
-  
+
   .filter select {
     padding: 10px;
     font-size: 1rem;
@@ -109,11 +294,11 @@
     color: #333;
     transition: all 0.3s ease;
   }
-  
+
   .filter select:hover {
     border-color: #4caf50;
   }
-  
+
   /* Course List Section */
   .course-list {
     display: grid;
@@ -122,7 +307,7 @@
     width: 90%;
     max-width: 1200px;
   }
-  
+
   .course-card {
     background-color: #fff;
     color: #333;
@@ -134,37 +319,37 @@
     flex-direction: column;
     overflow: hidden;
   }
-  
+
   .course-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
   }
-  
+
   .course-card img {
     width: 100%;
     height: 180px;
     object-fit: cover;
     border-radius: 8px;
   }
-  
+
   .course-card h3 {
     font-size: 1.5rem;
     margin-top: 15px;
     color: #333;
   }
-  
+
   .course-card .category {
     font-size: 1rem;
     color: #777;
     margin-bottom: 10px;
   }
-  
+
   .course-card .description {
     font-size: 0.9rem;
     color: #555;
     margin-bottom: 15px;
   }
-  
+
   .course-card .progress-bar {
     background-color: #f0f0f0;
     border-radius: 5px;
@@ -172,13 +357,13 @@
     width: 100%;
     margin-bottom: 20px;
   }
-  
+
   .course-card .progress {
     background-color: #4caf50;
     height: 100%;
     border-radius: 5px;
   }
-  
+
   .course-card .btn {
     background-color: #2575fc;
     color: white;
@@ -190,33 +375,32 @@
     transition: background-color 0.3s ease;
     border: none;
   }
-  
+
   .course-card .btn:hover {
     background-color: #6a11cb;
   }
-  
-  
+
+
   .course-card:hover {
     box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
     transform: translateY(-25px);
   }
-  
+
   /* Media Queries for responsiveness */
   @media (max-width: 768px) {
     .filters-container {
       flex-direction: column;
       align-items: flex-start;
     }
-  
+
     .search-bar {
       width: 100%;
       margin-bottom: 20px;
     }
-  
+
     .filters {
       width: 100%;
       justify-content: flex-start;
       gap: 15px;
     }
   }
-  

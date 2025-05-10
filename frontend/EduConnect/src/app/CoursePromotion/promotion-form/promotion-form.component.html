@@ -1,0 +1,114 @@
+<div class="promotion-form-container" *ngIf="!loading; else loadingTemplate">
+  <form [formGroup]="promotionForm" (ngSubmit)="onSubmit()" novalidate>
+    <mat-card class="form-card">
+      <mat-card-title>{{ isEditMode ? 'Edit Promotion' : 'Create Promotion' }}</mat-card-title>
+      <mat-card-content>
+        <div class="form-grid">
+
+          <div class="course-selection">
+            <label class="section-title">Select a Course</label>
+            <div class="course-grid">
+              <div
+                class="course-card"
+                *ngFor="let course of courses"
+                [class.selected]="promotionForm.get('courseId')?.value === course.courseId"
+                (click)="promotionForm.get('courseId')?.setValue(course.courseId)">
+                <img [src]="course.slika" alt="{{ course.title }}" />
+                <div class="course-title">{{ course.title }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Title -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Title</mat-label>
+            <input matInput formControlName="title" maxlength="500" placeholder="Enter promotion title" required>
+            <mat-hint align="end">{{ (promotionForm.get('title')?.value || '').length  || 0 }}/500</mat-hint>
+          </mat-form-field>
+
+          <!-- Description -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput rows="5" formControlName="description" maxlength="2000"
+                      placeholder="Enter promotion description"></textarea>
+            <mat-hint align="end">{{ (promotionForm.get('description')?.value || '').length || 0 }}/2000</mat-hint>
+          </mat-form-field>
+
+          <!-- Dates -->
+          <div class="date-fields">
+            <mat-form-field appearance="outline">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>End Date</mat-label>
+              <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <!-- Status -->
+          <mat-form-field appearance="outline" class="full-width" *ngIf="isEditMode">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option *ngFor="let status of PromotionStatus | keyvalue" [value]="status.value">
+                {{ status.key }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Image Upload -->
+          <div class="upload-section">
+            <label for="file-upload" class="upload-label">
+              <mat-icon>cloud_upload</mat-icon>
+              Upload Images
+            </label>
+            <input type="file" id="file-upload" (change)="onFileSelected($event)" multiple hidden>
+            <div class="file-list" *ngIf="uploadedFiles.length > 0">
+              <div *ngFor="let file of uploadedFiles; let i = index" class="file-item">
+                <span>{{ file.name }}</span>
+                <button mat-icon-button color="warn" (click)="removeUploadedFile(i)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Existing Images (if edit) -->
+          <div *ngIf="existingImages.length > 0" class="image-gallery">
+            <div class="image-thumb" *ngFor="let image of existingImages">
+              <img [src]="image.url" [alt]="image.imageId">
+              <div class="image-controls">
+                <button mat-mini-button color="warn" (click)="removeExistingImage(image.imageId)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+                <button mat-mini-button color="primary" [disabled]="mainImageId === image.imageId"
+                        (click)="setMainImage(image.imageId)">
+                  <mat-icon>star</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="form-actions">
+        <button mat-flat-button color="primary" [disabled]="submitting">
+          {{ isEditMode ? 'Update' : 'Create' }}
+        </button>
+        <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>
+
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+</ng-template>

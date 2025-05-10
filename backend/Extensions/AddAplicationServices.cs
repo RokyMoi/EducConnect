@@ -36,6 +36,7 @@ using EduConnect.Repositories;
 using Stripe;
 using Microsoft.Extensions.Options;
 
+
 namespace EduConnect.Extensions
 {
     public static class AddAppServices
@@ -63,6 +64,9 @@ namespace EduConnect.Extensions
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IPersonAvailabilityRepository, PersonAvailabilityRepository>();
             services.AddScoped<IPersonPhoneNumberRepository, PersonPhoneNumberRepository>();
+
+
+           
 
             services.AddScoped<ICourseRepository, CourseRepository>(); services.AddScoped<IMessageRepository, MessageRepository>();
 

@@ -1086,36 +1086,6 @@ namespace EduConnect.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CourseEnrollment",
-                schema: "Course",
-                columns: table => new
-                {
-                    CourseEnrollmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedAt = table.Column<long>(type: "bigint", nullable: false),
-                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CourseEnrollment", x => x.CourseEnrollmentId);
-                    table.ForeignKey(
-                        name: "FK_CourseEnrollment_Course_CourseId",
-                        column: x => x.CourseId,
-                        principalSchema: "Course",
-                        principalTable: "Course",
-                        principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CourseEnrollment_Student_StudentId",
-                        column: x => x.StudentId,
-                        principalSchema: "Student",
-                        principalTable: "Student",
-                        principalColumn: "StudentId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CourseLanguage",
                 schema: "Course",
                 columns: table => new
@@ -1199,6 +1169,30 @@ namespace EduConnect.Migrations
                     table.PrimaryKey("PK_CoursePromotionImage", x => x.CoursePromotionImageId);
                     table.ForeignKey(
                         name: "FK_CoursePromotionImage_Course_CourseId",
+                        column: x => x.CourseId,
+                        principalSchema: "Course",
+                        principalTable: "Course",
+                        principalColumn: "CourseId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CoursePromotions",
+                columns: table => new
+                {
+                    PromotionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<long>(type: "bigint", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CoursePromotions", x => x.PromotionId);
+                    table.ForeignKey(
+                        name: "FK_CoursePromotions_Course_CourseId",
                         column: x => x.CourseId,
                         principalSchema: "Course",
                         principalTable: "Course",
@@ -1408,14 +1402,14 @@ namespace EduConnect.Migrations
                 name: "WishlistItems",
                 columns: table => new
                 {
-                    WihstListItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    WishtListItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     WishListId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CourseID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AddedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WishlistItems", x => x.WihstListItemId);
+                    table.PrimaryKey("PK_WishlistItems", x => x.WishtListItemId);
                     table.ForeignKey(
                         name: "FK_WishlistItems_Course_CourseID",
                         column: x => x.CourseID,
@@ -1483,6 +1477,50 @@ namespace EduConnect.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "PromotionDuration",
+                columns: table => new
+                {
+                    DurationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PromotionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StartDate = table.Column<long>(type: "bigint", nullable: false),
+                    EndDate = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PromotionDuration", x => x.DurationId);
+                    table.ForeignKey(
+                        name: "FK_PromotionDuration_CoursePromotions_PromotionId",
+                        column: x => x.PromotionId,
+                        principalTable: "CoursePromotions",
+                        principalColumn: "PromotionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PromotionImages",
+                columns: table => new
+                {
+                    ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PromotionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageData = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: false),
+                    IsMainImage = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PromotionImages", x => x.ImageId);
+                    table.ForeignKey(
+                        name: "FK_PromotionImages_CoursePromotions_PromotionId",
+                        column: x => x.PromotionId,
+                        principalTable: "CoursePromotions",
+                        principalColumn: "PromotionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -1543,18 +1581,6 @@ namespace EduConnect.Migrations
                 column: "LearningSubcategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CourseEnrollment_CourseId",
-                schema: "Course",
-                table: "CourseEnrollment",
-                column: "CourseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CourseEnrollment_StudentId",
-                schema: "Course",
-                table: "CourseEnrollment",
-                column: "StudentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CourseLanguage_CourseId",
                 schema: "Course",
                 table: "CourseLanguage",
@@ -1595,6 +1621,11 @@ namespace EduConnect.Migrations
                 name: "IX_CoursePromotionImage_CourseId",
                 schema: "Course",
                 table: "CoursePromotionImage",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CoursePromotions_CourseId",
+                table: "CoursePromotions",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
@@ -1770,6 +1801,16 @@ namespace EduConnect.Migrations
                 column: "PersonId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PromotionDuration_PromotionId",
+                table: "PromotionDuration",
+                column: "PromotionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PromotionImages_PromotionId",
+                table: "PromotionImages",
+                column: "PromotionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ShoppingCart_StudentID",
                 table: "ShoppingCart",
                 column: "StudentID");
@@ -1914,10 +1955,6 @@ namespace EduConnect.Migrations
                 schema: "Course");
 
             migrationBuilder.DropTable(
-                name: "CourseEnrollment",
-                schema: "Course");
-
-            migrationBuilder.DropTable(
                 name: "CourseLanguage",
                 schema: "Course");
 
@@ -2000,6 +2037,12 @@ namespace EduConnect.Migrations
                 schema: "Person");
 
             migrationBuilder.DropTable(
+                name: "PromotionDuration");
+
+            migrationBuilder.DropTable(
+                name: "PromotionImages");
+
+            migrationBuilder.DropTable(
                 name: "ShoppingCartItems");
 
             migrationBuilder.DropTable(
@@ -2057,6 +2100,9 @@ namespace EduConnect.Migrations
             migrationBuilder.DropTable(
                 name: "Country",
                 schema: "Reference");
+
+            migrationBuilder.DropTable(
+                name: "CoursePromotions");
 
             migrationBuilder.DropTable(
                 name: "ShoppingCart");
