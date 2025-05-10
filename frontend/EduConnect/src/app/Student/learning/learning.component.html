@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Learning - Courses</title>
- 
+
 </head>
 <body>
 
@@ -13,77 +13,35 @@
     <h1>Welcome, Dusko!</h1>
     <p>Ready to learn something new? Explore your courses and track your progress.</p>
   </div>
-
+  <mat-paginator
+    *ngIf="totalItems > 0"
+    [length]="totalItems"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    [pageIndex]="pageIndex"
+    (page)="handlePageEvent($event)"
+    aria-label="Select page">
+  </mat-paginator>
 
 
   <!-- Course List Section -->
-  <div class="course-list">
- 
-    <div class="course-card">
-      <img src="https://via.placeholder.com/300" alt="Course Image">
-      <h3>Angular for Beginners</h3>
-      <p class="category">Category: Web Development</p>
-      <p class="description">Learn Angular from scratch and build dynamic web applications.</p>
+  <div class="course-list" >
+
+    <div class="course-card" *ngFor="let kurs of courses">
+      <img [src]="kurs.thumbnailUrl" alt="Course Image">
+      <h3>{{kurs.title}}</h3>
+      <p class="category">Category: {{kurs.category}}</p>
+      <p class="description">{{kurs.description}}</p>
       <div class="progress-bar">
         <div class="progress"></div>
       </div>
       <button class="btn">Start Course</button>
     </div>
 
-
-    <div class="course-card">
-      <img src="https://via.placeholder.com/300" alt="Course Image">
-      <h3>UI/UX Design Fundamentals</h3>
-      <p class="category">Category: Design</p>
-      <p class="description">Master UI/UX design principles and create beautiful user interfaces.</p>
-      <div class="progress-bar">
-        <div class="progress" style="width: 70%;"></div>
-      </div>
-      <button class="btn">Start Course</button>
-    </div>
-    <div class="course-card">
-        <img src="https://via.placeholder.com/300" alt="Course Image">
-        <h3>UI/UX Design Fundamentals</h3>
-        <p class="category">Category: Design</p>
-        <p class="description">Master UI/UX design principles and create beautiful user interfaces.</p>
-        <div class="progress-bar">
-          <div class="progress" style="width: 70%;"></div>
-        </div>
-        <button class="btn">Start Course</button>
-      </div>
-      <div class="course-card">
-        <img src="https://via.placeholder.com/300" alt="Course Image">
-        <h3>UI/UX Design Fundamentals</h3>
-        <p class="category">Category: Design</p>
-        <p class="description">Master UI/UX design principles and create beautiful user interfaces.</p>
-        <div class="progress-bar">
-          <div class="progress" style="width: 70%;"></div>
-        </div>
-        <button class="btn">Start Course</button>
-      </div>
-      <div class="course-card">
-        <img src="https://via.placeholder.com/300" alt="Course Image">
-        <h3>UI/UX Design Fundamentals</h3>
-        <p class="category">Category: Design</p>
-        <p class="description">Master UI/UX design principles and create beautiful user interfaces.</p>
-        <div class="progress-bar">
-          <div class="progress" style="width: 70%;"></div>
-        </div>
-        <button class="btn">Start Course</button>
-      </div>
-
-    <div class="course-card">
-      <img src="https://via.placeholder.com/300" alt="Course Image">
-      <h3>Python for Data Science</h3>
-      <p class="category">Category: Data Science</p>
-      <p class="description">Learn Python and apply it to data science for data analysis and machine learning.</p>
-      <div class="progress-bar">
-        <div class="progress" style="width: 40%;"></div>
-      </div>
-      <button class="btn">Start Course</button>
-    </div>
-
   </div>
+
+
+
 
 </body>
 </html>

@@ -38,6 +38,7 @@ this.router.navigateByUrl("/ListOfUsers");
 
   ngOnInit(): void {
     this.LoadMessages();
+    console.log("Current User Email: ",this.AccountService.CurrentUser()?.Email)
   }
 
   OpenAThread(message: any): void {
@@ -50,6 +51,7 @@ this.router.navigateByUrl("/ListOfUsers");
   }
 
   InitiliazeUserForPhoto(message: any) {
+    console.log("Current User Email: ",this.AccountService.CurrentUser()?.Email)
     const currentUserEmail = this.AccountService.CurrentUser()?.Email;
     this.UserPhotoEmai =
       currentUserEmail === message.senderEmail

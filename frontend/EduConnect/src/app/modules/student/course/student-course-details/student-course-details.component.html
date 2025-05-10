@@ -3,7 +3,7 @@
         <h2 class="component-title">{{course.title}}</h2>
         <div class="action-buttons-container">
             <button class="go-back-button" (click)="goBack()">← Back to Courses</button>
-            <button class="enroll-button">Enroll Now</button>
+            <button (click)="EnrollujCourse()" class="enroll-button">{{buttonCourseLabel}}></button>
         </div>
     </div>
 

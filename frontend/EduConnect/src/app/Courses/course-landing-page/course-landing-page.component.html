@@ -1,49 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MyCourses</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
 </head>
+
 <body>
 
   <header>
     <div class="logo-container">
-    <button routerLink="/student-dashboard" class="search-button" style="margin: 20px">Go Back to Feed</button>
+      <button class="search-button" (click)="goBack()" style="margin: 20px">Go Back to Feed</button>
     </div>
-  
+
     <div class="search-filter-container">
-       
-      <input type="text" class="search-bar" placeholder="Search courses..." />
-      <select class="category-selector">
-        <option value="all">All Categories</option>
-        <option value="web-dev">Web Development</option>
-        <option value="data-science">Data Science</option>
-        <option value="design">Design</option>
-        <option value="marketing">Marketing</option>
+      <input type="text" class="search-bar" (input)="onSearch($event)" placeholder="Search courses..." />
+      <h5>Items per Page:</h5>
+      <select class="category-selector" [formControl]="selectItemsPerPageFormControl">
+        <option *ngFor="let item of numberOfItemsPerPage" [value]="item">{{ item }}</option>
       </select>
-      <button class="search-button">
-      sreach
-      </button>
+    </div>
+    <div class="number-of-results-container">
+      <h3 style="margin-left: 5px;">Results: {{totalItems}}</h3>
     </div>
   </header>
 
+  <div class="no-results-section" *ngIf="courses.length === 0">
+    <h2>No results found for <span>{{ searchQuery }}</span></h2>
+    <p>*Maybe try changing your search query</p>
+  </div>
+
   <div class="courses-grid">
-    
-    <div class="course-card">
-      <img class="course-image" src="https://via.placeholder.com/300x200/3498db/ffffff?text=Angular" alt="Course Image">
+    <div class="course-card" *ngFor="let course of courses">
+      <img class="course-image"
+        [src]="course.thumbnailUrl || 'https://dummyimage.com/320x200/cccccc/969696.png&text=No+Thumbnail'"
+        alt="Course Image" />
+
       <div class="course-info">
-        <h3 class="course-title">Learn Angular from Scratch</h3>
+        <h2 class="course-title">{{ course.title }}</h2>
+
+        <p class="course-description">
+          {{ course.description.length > 300 ? (course.description | slice:0:300) + '...' : course.description }}
+        </p>
+
+        <div class="course-meta">
+          <span class="category">Category: <strong>{{ course.courseCategoryName }}</strong></span>
+          <span class="difficulty">Difficulty: <strong>{{ course.learningDifficultyLevelName }}</strong></span>
+          <span class="created">Created On: <strong>{{ course.createdAt | date:'MMM d, yyyy' }}</strong></span>
+          <span *ngIf="course.minNumberOfStudents">Min Students: <strong>{{ course.minNumberOfStudents
+              }}</strong></span>
+          <span *ngIf="course.maxNumberOfStudents">Max Students: <strong>{{ course.maxNumberOfStudents
+              }}</strong></span>
+          <span>Lesson Num.: <strong>{{ course.numberOfLessons }}</strong></span>
+        </div>
+
+        <div class="course-footer">
+          <span class="price">
+            <strong>{{ course.price !== 0 ? ('$' + course.price.toFixed(2)) : 'Free' }}</strong>
+          </span>
+        </div>
+
         <div class="course-actions">
-          <button class="btn open-course">Open Course</button>
-          <button class="btn add-to-wishlist">Add to Wishlist</button>
+          <button class="btn open-course" (click)="onViewCourse(course.courseId)">Open Course</button>
+          <button class="btn add-to-wishlist" (click)="DodajNoviKurs(course.courseId)">Add to Wishlist</button>
         </div>
       </div>
     </div>
+  </div>
 
+  <div class="page-control-container">
+
+    <div class="page-control-buttons">
+      <p><strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong> pages</p>
+      <button (click)="previousPage()" class="search-button" [disabled]="currentPage === 1 || paginationDisabled">
+        Previous
+      </button>
+
+      <button style="margin-left: 5px" (click)="nextPage()" class="search-button"
+        [disabled]="currentPage === totalPages || paginationDisabled">
+        Next
+      </button>
+    </div>
   </div>
 
 </body>
+
 </html>

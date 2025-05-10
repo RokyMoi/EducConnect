@@ -1,0 +1,140 @@
+/* RESET & BASE */
+* {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+body {
+  background: #f0f4f8;
+  color: #1f2937;
+  padding: 1rem;
+}
+
+/* BOX LAYOUT */
+.course-box {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 2rem auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* MAIN CONTENT */
+.main {
+  flex: 2;
+  padding: 1.5rem;
+}
+.title {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+.meta {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+.meta span {
+  margin: 0 0.25rem;
+}
+.learn-list {
+  list-style: none;
+}
+.learn-list li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+}
+.learn-list li::before {
+  content: '✔';
+  position: absolute;
+  left: 0;
+  color: #10b981;
+}
+
+/* SIDEBAR */
+.sidebar {
+  flex: 1;
+  background: #ffffff;
+  padding: 1.5rem;
+  border-left: 1px solid #e2e8f0;
+  text-align: center;
+}
+.preview {
+  width: 100%;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+.price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1e40af;
+  margin-bottom: 1rem;
+}
+
+/* BUTTONS */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #fff;
+  background: #60a5fa;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.btn:hover {
+  background: #3b82f6;
+  transform: translateY(-2px);
+}
+.btn.outline {
+  background: transparent;
+  color: #3b82f6;
+  border: 1.5px solid #3b82f6;
+}
+.btn.outline:hover {
+  background: #bfdbfe;
+}
+
+/* GUARANTEE & INCLUDES */
+.guarantee {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+.includes {
+  list-style: none;
+  font-size: 0.9rem;
+  color: #4b5563;
+  text-align: left;
+}
+.includes li {
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .course-box {
+    flex-direction: column-reverse;
+
+    .sidebar {
+      border-left: none;
+      border-top: 1px solid #e2e8f0;
+    }
+  }
+}

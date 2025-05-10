@@ -1,0 +1,285 @@
+/* Global container with gradient background */
+.promotion-form-container {
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Card styling */
+.form-card {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  animation: fadeIn 0.8s ease-in-out;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.form-card:hover {
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Layout */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.date-fields {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.date-fields mat-form-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Upload section */
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.course-selection {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.course-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: flex-start;
+}
+
+.course-card {
+  width: 160px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: linear-gradient(to bottom right, #f2f4ff, #e6ecff);
+  text-align: center;
+  padding: 10px;
+  border: 2px solid transparent;
+}
+
+.course-card img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.course-title {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.course-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.course-card.selected {
+  border-color: #3f51b5;
+  box-shadow: 0 0 0 4px rgba(63, 81, 181, 0.2);
+}
+::ng-deep .mat-calendar {
+  background: linear-gradient(135deg, #f0f4ff, #dbe5ff); /* светло-плави градијент */
+  color: #1a1a1a;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+::ng-deep .mat-calendar-body-cell-content {
+  color: #1a1a1a !important;
+  border-radius: 50%;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+::ng-deep .mat-calendar-body-cell:hover .mat-calendar-body-cell-content {
+  background-color: rgba(63, 81, 181, 0.1) !important; /* hover ефекат */
+}
+
+::ng-deep .mat-calendar-body-selected .mat-calendar-body-cell-content {
+  background-color: #3f51b5 !important;
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+::ng-deep .mat-calendar-arrow {
+  color: #3f51b5;
+}
+
+::ng-deep .mat-calendar-table-header th {
+  color: #3f51b5;
+  font-weight: 500;
+}
+
+::ng-deep .mat-datepicker-content {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.upload-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: #1976d2;
+  font-weight: 600;
+  background: linear-gradient(to right, #64b5f6, #9575cd);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+  color: #fff;
+  width: fit-content;
+}
+
+.upload-label:hover {
+  background: linear-gradient(to right, #42a5f5, #7e57c2);
+}
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafafa;
+  padding: 0.5rem 1rem;
+  border-left: 4px solid #64b5f6;
+  border-radius: 6px;
+  animation: slideIn 0.4s ease;
+}
+
+/* Image gallery */
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: flex-start;
+}
+
+.image-thumb {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease;
+}
+
+.image-thumb:hover {
+  transform: scale(1.05);
+}
+
+.image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-controls {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 4px;
+  padding: 2px;
+}
+
+/* Form actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .form-card {
+    padding: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .image-thumb {
+    width: 100px;
+    height: 100px;
+  }
+
+  .upload-label {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Spinner */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}

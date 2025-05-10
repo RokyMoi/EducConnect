@@ -1,19 +1,41 @@
-<div class="upload-container">
-<h4> Please enter your {{valueNameChild}}</h4>
-<form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()">
-    <input type="text" formControlName="userInput"  placeholder="Enter your {{valueNameChild}}"/>
+<div class="form-container">
+  <form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()">
+    <h3>Edit {{fieldLabel}}</h3>
 
-    <div *ngIf="dynamicForm.controls['userInput'].touched && dynamicForm.controls['userInput'].invalid">
- 
-        <small class="error-message">Email is required.</small>
+    <div class="form-group">
+      <label for="userInput">{{fieldLabel}}</label>
+      <input
+        [type]="fieldLabel === 'Password' ? 'password' : 'text'"
+        id="userInput"
+        formControlName="userInput"
+        class="form-control"
+        [ngClass]="{'is-invalid': userInput?.invalid && this.dynamicForm.get('userInput')?.touched}"
+      />
 
+      <!-- Validation messages -->
+      <div class="invalid-feedback" *ngIf="userInput?.invalid && this.dynamicForm.get('userInput')?.touched">
+        <div *ngIf="userInput?.errors?.['required']">{{fieldLabel}} is required</div>
+        <div *ngIf="userInput?.errors?.['minlength']">Password must be at least 8 characters</div>
+        <div *ngIf="userInput?.errors?.['pattern']">Please enter a valid format</div>
+      </div>
+
+      <!-- API error message -->
+      <div class="alert alert-danger mt-2" *ngIf="errorMessage">
+        {{errorMessage}}
+      </div>
     </div>
-    
-  
 
-
-  
-    <button type="submit" [disabled]="dynamicForm.controls['userInput'].invalid">Upload</button>
-    <button (click)="ChangeFormStatus()">Close</button>
-</form>
-  </div>
+    <div class="form-actions">
+      <button type="button" (click)="ChangeFormStatus()" class="btn btn-secondary">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="dynamicForm.invalid || isSubmitting">
+        <span *ngIf="isSubmitting">Saving...</span>
+        <span *ngIf="!isSubmitting">Save Changes</span>
+      </button>
+    </div>
+  </form>
+</div>

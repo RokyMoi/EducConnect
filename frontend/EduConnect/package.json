@@ -29,6 +29,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@microsoft/signalr": "^8.0.7",
+    "@stripe/stripe-js": "^6.1.0",
     "@types/signalr": "^2.4.3",
     "chart.js": "^4.4.8",
     "diff-match-patch": "^1.0.5",

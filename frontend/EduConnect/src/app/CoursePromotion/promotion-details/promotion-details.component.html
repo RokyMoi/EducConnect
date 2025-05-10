@@ -1,0 +1,90 @@
+<div class="details-container">
+  <button type="button" class="back-btn" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon> Back to List
+  </button>
+
+  <div *ngIf="loading" class="loader-container">
+    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    <p>Loading promotion details...</p>
+  </div>
+
+  <div *ngIf="error" class="error-container">
+    <mat-icon>error</mat-icon>
+    <p>Error loading promotion details. Please try again later.</p>
+    <button type="button" class="btn retry" (click)="loadPromotion()">Retry</button>
+  </div>
+
+  <ng-container *ngIf="!loading && !error && promotion">
+    <div class="header">
+      <h1 class="title">{{ promotion.title || 'Untitled Promotion' }}</h1>
+      <span class="status-badge" [ngClass]="getStatusClass(promotion.status)">
+        {{ getStatusText(promotion.status) }}
+      </span>
+    </div>
+
+    <div class="dates">
+      <div class="date-item">
+        <label>Start Date</label>
+        <span>{{ formatDate(promotion.startDate) }}</span>
+      </div>
+      <div class="date-item">
+        <label>End Date</label>
+        <span>{{ formatDate(promotion.endDate) }}</span>
+      </div>
+    </div>
+
+    <div class="main-image-wrapper" *ngIf="promotion.images && promotion.images.length > 0">
+      <img
+        [src]="getImageUrl(mainImageId || promotion.images[0].imageId)"
+        [alt]="'Main image for ' + promotion.title"
+        class="main-image"
+      />
+    </div>
+
+    <div class="no-images" *ngIf="!promotion.images || promotion.images.length === 0">
+      <mat-icon>image_not_supported</mat-icon>
+      <p>No images available for this promotion</p>
+    </div>
+
+    <div class="gallery" *ngIf="promotion.images && promotion.images.length > 0">
+      <div class="thumb-container" *ngFor="let img of promotion.images">
+        <img
+          [src]="getImageUrl(img.imageId)"
+          [alt]="'Thumbnail ' + img.imageId"
+          class="thumb"
+          [class.active]="mainImageId === img.imageId || (!mainImageId && img.imageId === promotion.images[0].imageId)"
+          (click)="setMainImage(img.imageId)"
+        />
+      </div>
+    </div>
+
+    <div class="description">
+      <h2>Description</h2>
+      <p>{{ promotion.description || 'No description available' }}</p>
+    </div>
+
+    <div class="actions">
+      <div class="status-selector">
+        <label for="statusSelect">Status:</label>
+        <select
+          id="statusSelect"
+          #statusSelect
+          [ngModel]="promotion.status"
+          (change)="updateStatus(+statusSelect.value)">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="button-group">
+        <button type="button" class="btn edit" (click)="editPromotion()">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        <button type="button" class="btn delete" (click)="deletePromotion()">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</div>

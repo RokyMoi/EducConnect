@@ -28,7 +28,7 @@ export class StudentThreadMessageComponent implements OnInit, OnDestroy {
   messageContent = '';
   photourl = '';
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.threadId = this.route.snapshot.paramMap.get('id')!;
@@ -38,13 +38,13 @@ export class StudentThreadMessageComponent implements OnInit, OnDestroy {
 
       const currentUser = this.accountService.CurrentUser();
       if (currentUser?.Email === this.senderEmail) {
-        this.messageService.ceateHubConnection(
+        this.messageService.createHubConnection(
           currentUser,
           this.recipientEmail
         );
       }
       if (currentUser?.Email === this.recipientEmail) {
-        this.messageService.ceateHubConnection(currentUser, this.senderEmail);
+        this.messageService.createHubConnection(currentUser, this.senderEmail);
       }
 
       const currentUserEmail = this.accountService.CurrentUser()?.Email;
@@ -60,7 +60,7 @@ export class StudentThreadMessageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.messageService.StopHubConnection();
+    this.messageService.stopHubConnection();
   }
 
   sendMessage(): void {
@@ -79,7 +79,7 @@ export class StudentThreadMessageComponent implements OnInit, OnDestroy {
     }
 
     this.messageService
-      .SendMessageToUser(recipientEmailToSend, this.messageContent)
+      .sendMessageToUser(recipientEmailToSend, this.messageContent)
       .then(() => {
         this.messageContent = ''; // Clear the message input
       })

@@ -1,0 +1,128 @@
+<div class="toolbar">
+  <button mat-raised-button color="primary" (click)="createPromotion()">New Promotion</button>
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Search by Title</mat-label>
+    <input
+      #searchInput
+      matInput
+      (keyup)="applyFilter(searchInput.value)"
+      placeholder="e.g. Summer Sale">
+    <button
+      *ngIf="dataSource.filter"
+      matSuffix
+      mat-icon-button
+      aria-label="Clear"
+      (click)="searchInput.value=''; applyFilter('')">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+  <button mat-icon-button [disabled]="!selection.hasValue()" (click)="deleteSelected()" matTooltip="Delete Selected">
+    <mat-icon>delete</mat-icon>
+  </button>
+  <button mat-icon-button (click)="exportCSV()" matTooltip="Export CSV">
+    <mat-icon>file_download</mat-icon>
+  </button>
+</div>
+
+<div class="table-container" *ngIf="!loading; else loadingTpl">
+  <table mat-table [dataSource]="dataSource" matSort>
+
+    <!-- Select Checkbox Column -->
+    <ng-container matColumnDef="select">
+      <th mat-header-cell *matHeaderCellDef>
+        <mat-checkbox
+          (change)="masterToggle()"
+          [checked]="isAllSelected()"
+          [indeterminate]="selection.hasValue() && !isAllSelected()">
+        </mat-checkbox>
+      </th>
+      <td mat-cell *matCellDef="let row">
+        <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                      [checked]="selection.isSelected(row)">
+        </mat-checkbox>
+      </td>
+    </ng-container>
+
+    <!-- Title Column -->
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Title</th>
+      <td mat-cell *matCellDef="let element">{{ element.title }}</td>
+    </ng-container>
+
+    <!-- Course Name Column -->
+    <ng-container matColumnDef="courseName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Course</th>
+      <td mat-cell *matCellDef="let element">{{ element.courseName }}</td>
+    </ng-container>
+
+    <!-- Status Column -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+      <td mat-cell *matCellDef="let element">
+        <span class="status-badge" [ngClass]="getStatusClass(element.status)">
+          {{ getStatusText(element.status) }}
+        </span>
+      </td>
+    </ng-container>
+
+    <!-- Duration Column -->
+    <ng-container matColumnDef="duration">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Duration</th>
+      <td mat-cell *matCellDef="let element" class="duration-cell">
+        <div class="duration-tooltip" [matTooltip]="'From ' + formatDate(element.startDate) + ' to ' + formatDate(element.endDate)">
+          <mat-icon class="duration-icon">schedule</mat-icon>
+          <span>{{ element.duration }}</span>
+        </div>
+      </td>
+    </ng-container>
+
+    <!-- Created At Column -->
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Created At</th>
+      <td mat-cell *matCellDef="let element">{{ formatDate(element.createdAt) }}</td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button (click)="viewPromotion(element)" matTooltip="View">
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button mat-icon-button (click)="editPromotion(element)" matTooltip="Edit">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="deletePromotion(element.promotionId)" matTooltip="Delete">
+          <mat-icon>delete</mat-icon>
+        </button>
+
+        <button mat-icon-button [matMenuTriggerFor]="statusMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #statusMenu="matMenu">
+          <button mat-menu-item (click)="updateStatus(element, PromotionStatus.Active)">Activate</button>
+          <button mat-menu-item (click)="updateStatus(element, PromotionStatus.Paused)">Pause</button>
+          <button mat-menu-item (click)="updateStatus(element, PromotionStatus.Completed)">Complete</button>
+          <button mat-menu-item (click)="updateStatus(element, PromotionStatus.Canceled)">Cancel</button>
+        </mat-menu>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+    <!-- Row shown when there is no matching data -->
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell no-data-cell" colspan="7">No data matching the filter "{{dataSource.filter}}"</td>
+    </tr>
+  </table>
+
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="loading-spinner">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    <p>Loading promotions...</p>
+  </div>
+</ng-template>

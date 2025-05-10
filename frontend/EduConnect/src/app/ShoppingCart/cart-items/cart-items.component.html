@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart</title>
+  <script src="https://js.stripe.com/v3/"></script>
+
 </head>
 <body>
     <header>
@@ -18,45 +20,32 @@
     <div class="container">
         <h1> Shopping Cart</h1>
 
-    
-        <div id="shopping-cart" class="tab-content">
-            <div class="cart-item">
-                <div class="item-info">
-                    <div class="image-container">
-                        <img src="https://via.placeholder.com/150" alt="Complete Japanese Course" class="course-image">
-                    </div>
-                    <div class="text-details">
-                        <h2>Complete Japanese Course: Learn Japanese for Beginners</h2>
-                        <p class="instructor">by Lingua Ed.</p>
-                        <p class="price">€69.99</p>
-                    </div>
-                </div>
-                <div class="item-actions">
-                    <button class="remove">Remove</button>
-                    <button class="wishlist">Move to Wishlist</button>
-                </div>
-            </div>
 
-            <div class="cart-item">
-                <div class="item-info">
-                    <div class="image-container">
-                        <img src="https://via.placeholder.com/150" alt="Python Django Course" class="course-image">
-                    </div>
-                    <div class="text-details">
-                        <h2>Python Django - The Practical Guide</h2>
-                        <p class="instructor">by Akademici</p>
-                        <p class="price">€49.99</p>
-                    </div>
-                </div>
+        <div id="shopping-cart" class="tab-content">
+          <div class="cart-item" *ngFor="let course of kursevi">
+            <div class="item-info">
+              <div class="image-container">
+                <!-- Dynamically bind course image URL -->
+                <img [src]="course.thumbnailUrl" alt="{{ course.title }}" class="course-image">
+              </div>
+              <div class="text-details">
+                <!-- Bind course title and instructor -->
+                <h2>{{ course.title }}</h2>
+                <p class="instructor">by {{ course.instructor }}</p>
+                <!-- Bind course price -->
+                <p class="price">€{{ course.price }}</p>
+              </div>
+            </div>
                 <div class="item-actions">
-                    <button class="remove">Remove</button>
-                    <button class="wishlist">Move to Wishlist</button>
+                    <button class="remove" (click)="ObrisiKurs(course.courseId)">Remove</button>
+                    <button class="wishlist" (click)="OpenCourse(course.courseId)">Open Course</button>
                 </div>
             </div>
 
             <div class="summary">
-                <p class="total">Total: <span>€119.98</span></p>
-                <button class="checkout">Checkout</button>
+                <p class="total">Total: ${{totalprice}}</p>
+                <button class="checkout" (click)="ClearCart()">Clear Cart</button>
+              <button class="checkout" (click)="onCheckout()">Checkout</button>
             </div>
         </div>
     </div>

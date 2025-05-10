@@ -1,0 +1,63 @@
+<div class="payment-result-container">
+  <!-- Loading state -->
+  <div *ngIf="this.isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <h2>Verifying your payment...</h2>
+    <p>Please wait while we confirm your payment with our payment processor.</p>
+  </div>
+
+  <!-- Payment success state -->
+  <div *ngIf="!this.isLoading && this.paymentSuccessful" class="success-container">
+    <div class="success-icon">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" fill="#4CAF50"/>
+        <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <h1>Payment Successful!</h1>
+    <p class="success-message">Thank you for your purchase. Your courses are now available in your account.</p>
+
+    <!-- Payment details -->
+    <div class="payment-details" *ngIf="this.paymentDetails">
+      <div class="detail-row">
+        <span class="label">Amount Paid:</span>
+        <span class="value">{{this.paymentDetails.currency | uppercase}} {{this.paymentDetails.amountTotal | number:'1.2-2'}}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Email:</span>
+        <span class="value">{{this.paymentDetails.customerEmail}}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Transaction ID:</span>
+        <span class="value transaction-id">{{this.sessionId}}</span>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-buttons">
+      <button class="primary-button" (click)="this.goToCourses()">Go to My Courses</button>
+      <button class="secondary-button" (click)="this.goToHome()">Return to Homepage</button>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="!this.isLoading && !this.paymentSuccessful" class="error-container">
+    <div class="error-icon">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" fill="#F44336"/>
+        <path d="M12 8V12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="12" cy="16" r="1" fill="white"/>
+      </svg>
+    </div>
+
+    <h1>Payment Issue</h1>
+    <p class="error-message">{{this.errorMessage || 'There was an issue with your payment.'}}</p>
+
+    <!-- Action buttons for error state -->
+    <div class="action-buttons">
+      <button class="primary-button" (click)="this.goToCart()">Return to Cart</button>
+      <button class="secondary-button" (click)="this.goToHome()">Go to Homepage</button>
+    </div>
+  </div>
+</div>

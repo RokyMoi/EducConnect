@@ -30,6 +30,22 @@ namespace EduConnect.Services
             return UploadResult;
         }
 
+        public async Task<ImageUploadResult> AddPhotoForPost(IFormFile file)
+        {
+            var UploadResult = new ImageUploadResult();
+            if (file.Length > 0)
+            {
+                using var stream = file.OpenReadStream();
+                var UploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "coursePostPromotion"
+                };
+                UploadResult = await _cloudinary.UploadAsync(UploadParams);
+            }
+            return UploadResult;
+        }
+
         public async Task<DeletionResult> DeletePhotoAsync(string publicID)
         {
             var DeleteParams = new DeletionParams(publicID);

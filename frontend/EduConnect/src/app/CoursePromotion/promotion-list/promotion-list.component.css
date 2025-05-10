@@ -1,0 +1,154 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  padding: 16px;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: linear-gradient(135deg, #e0f7fa 0%, #e8eaf6 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* New Promotion button */
+.toolbar button[mat-raised-button] {
+  background: linear-gradient(45deg, #4facfe, #00f2fe);
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform .2s, box-shadow .2s;
+}
+.toolbar button[mat-raised-button]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Search field */
+.search-field {
+  flex: 1 1 280px;
+}
+.search-field .mat-form-field-flex {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+.search-field input.mat-input-element {
+  color: #333;
+}
+.search-field .mat-form-field-label {
+  color: #666 !important;
+}
+.search-field .mat-icon {
+  color: #888;
+}
+.search-field button.mat-icon-button {
+  color: #ff6b6b;
+}
+
+/* Icon buttons in toolbar */
+.toolbar .mat-icon-button {
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  transition: background .2s, transform .2s;
+}
+.toolbar .mat-icon-button:hover {
+  background: #f0f0f0;
+  transform: scale(1.1);
+}
+
+/* Table container */
+.table-container {
+  flex: 1;
+  overflow: auto;
+  margin-top: 16px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.mat-header-cell, .mat-cell {
+  padding: 12px 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+.mat-header-cell {
+  font-weight: 600;
+  background: #fafafa;
+  color: #555;
+}
+
+/* Row hover */
+tr.mat-row:hover {
+  background: #f9f9f9;
+}
+
+/* Checkbox column */
+.mat-cell .mat-checkbox .mat-checkbox-frame {
+  border-color: #4facfe;
+}
+.mat-cell .mat-checkbox.mat-accent .mat-checkbox-background {
+  background-color: #4facfe !important;
+}
+
+/* Status labels */
+.status-draft     { color: #9e9e9e; font-style: italic; }
+.status-active    { color: #4caf50; font-weight: 600; }
+.status-paused    { color: #ff9800; }
+.status-completed { color: #2196f3; }
+.status-canceled  { color: #f44336; }
+
+/* Paginator */
+.mat-paginator {
+  margin-top: 12px;
+  background: #fafafa;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.mat-paginator .mat-button {
+  color: #333;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .toolbar { justify-content: center; }
+  .search-field { flex: 1 1 200px; }
+}
+
+@media (max-width: 768px) {
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar button, .search-field { width: 100%; }
+  table { font-size: 13px; }
+  .mat-header-cell, .mat-cell { padding: 10px 6px; }
+}
+
+@media (max-width: 480px) {
+  .mat-header-cell:nth-child(n+4),
+  .mat-cell:nth-child(n+4) {
+    display: none;
+  }
+}

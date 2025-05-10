@@ -9,310 +9,303 @@ using Microsoft.AspNetCore.Identity;
 using EduConnect.SignalIR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using EduConnect.Services;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using EduConnect.Interfaces.Redis;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace EduConnect
 {
     public class Program
     {
-
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Configure structured logging
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
 
-            builder.Logging.SetMinimumLevel(LogLevel.Information);
-
             builder.Services.AddHttpContextAccessor();
 
-            Console.WriteLine(RuntimeInformation.OSDescription);
+            // Security headers
+            builder.Services.AddAntiforgery(options => {
+                options.SuppressXFrameOptionsHeader = false;
+            });
 
-            Console.WriteLine(RuntimeInformation.OSArchitecture);
-            //Configure Kestrel to allow request body up to 100MB in size
-            builder.WebHost.ConfigureKestrel(
-                options =>
-                {
-                    options.Limits.MaxRequestBodySize = 120 * 1024 * 1024;
-                }
-            );
+            // Configure Kestrel with reasonable limits
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100MB
+                options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
+                options.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(30);
+            });
 
             // Extension for services implemented
             builder.Services.AddApplicationServices(builder.Configuration);
             builder.Services.AddJWTAuthService(builder.Configuration);
             builder.Services.AddDatabaseConnectionServices(builder.Configuration, builder.Environment);
 
+            // Configure SignalR with increased message size
+            builder.Services.AddSignalR(options => {
+                options.MaximumReceiveMessageSize = 102400; // 100KB
+                options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+                options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+                options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+            });
+
             builder.Services.AddScoped<UserManager<Person>, PersonManager>();
             builder.Services.AddScoped<PersonManager>();
 
+          //  builder.Services.AddHostedService<ViewershipChangeService>();
 
-
-            builder.Services.AddHostedService<ViewershipChangeService>();
-            builder.Services.AddHostedService<CourseViewershipDataSnapshotService>();
-            builder.Services.AddControllers();
-
-            builder.Services.AddSignalR();
-
-            builder.Services.AddStackExchangeRedisCache(
-                options =>
-                {
-                    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
-                    options.InstanceName = "EduConnect";
-                }
-            );
-
-            builder.Services.AddScoped<IRedisCachingService, RedisCachingService>();
-
+            builder.Services.AddControllers()
+                .AddJsonOptions(options => {
+                    // Prevent JSON circular reference issues
+                    options.JsonSerializerOptions.ReferenceHandler =
+                        System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(
-                c =>
-                {
-
-                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Library API", Version = "v1" });
-
-                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                    {
-                        In = ParameterLocation.Header,
-                        Description = "Please enter a valid token",
-                        Name = "Authorization",
-                        Type = SecuritySchemeType.Http,
-                        BearerFormat = "JWT",
-                        Scheme = "Bearer"
-                    });
-
-                    c.AddSecurityRequirement(
-                        new OpenApiSecurityRequirement
-                        {
-                            {
-                                new OpenApiSecurityScheme
-                                {
-                                    Reference = new OpenApiReference
-                                        {
-                                            Type=ReferenceType.SecurityScheme,
-                                            Id="Bearer"
-                                        }
-                                },
-                                Array.Empty<string>()
-                            }
-                        }
-                    );
-
-                }
-            );
-
-            //Setup CORS Policy, for request originating from frontend application origin only (http://localhost:4200)
-
-            //Get link to frontend application from app.settings.json (AllowedOrigins:FrontendApplication)
-            var frontendApplicationOrigin = builder.Configuration.GetSection("AllowedOrigins:FrontendApplication").Value;
-
-            //Add CORS Policy
-            builder.Services.AddCors(options =>
+            builder.Services.AddSwaggerGen(c =>
             {
-                options.AddPolicy("FrontEndPolicy", policy =>
+                c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    policy.WithOrigins(frontendApplicationOrigin)  // Allow frontend origin
-                          .AllowAnyHeader()                       // Allow any headers
-                          .AllowAnyMethod()/// Allow any methods (GET, POST, etc.)
-                          .AllowCredentials()
-                          .WithExposedHeaders("Authorization"); // Expose the Authorization header
+                    Title = "EduConnect API",
+                    Version = "v1",
+                    Description = "API for EduConnect platform"
                 });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter a valid token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(
+                    new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type=ReferenceType.SecurityScheme,
+                                    Id="Bearer"
+                                }
+                            },
+                            Array.Empty<string>()
+                        }
+                    }
+                );
             });
 
-            //Set CORS Policy for requests from Swagger, only in development environment
-            if (builder.Environment.IsDevelopment())
+            // Get link to frontend application from appsettings.json
+            var frontendApplicationOrigin = builder.Configuration.GetSection("AllowedOrigins:FrontendApplication").Value;
+            if (string.IsNullOrEmpty(frontendApplicationOrigin))
             {
-                //Get link to swagger localhost instance for http requests testing from app.settings.json (AllowedOrigins:Swagger)
-                var swaggerLink = builder.Configuration.GetSection("AllowedOrigins:Swagger").Value;
+                throw new InvalidOperationException("Frontend application origin is not configured in appsettings.json");
+            }
 
-                //Add CORS Policy
-                builder.Services.AddCors(options =>
+            // Consolidated CORS configuration
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
                 {
-                    options.AddPolicy("SwaggerDevelopmentEnvironmentPolicy", policy =>
-                    {
-                        policy.WithOrigins(swaggerLink).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-                    });
+                    policy.WithOrigins(frontendApplicationOrigin)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials() // Critical for SignalR
+                          .WithExposedHeaders("Authorization");
                 });
 
-            }
+                // Add separate policy for Swagger if needed
+                if (builder.Environment.IsDevelopment())
+                {
+                    var swaggerLink = builder.Configuration.GetSection("AllowedOrigins:Swagger").Value;
+                    if (!string.IsNullOrEmpty(swaggerLink))
+                    {
+                        options.AddPolicy("SwaggerPolicy", policy =>
+                        {
+                            policy.WithOrigins(swaggerLink)
+                                  .AllowAnyHeader()
+                                  .AllowAnyMethod()
+                                  .AllowCredentials();
+                        });
+                    }
+                }
+            });
+
             var app = builder.Build();
 
-            //Seed database with work type data
-            using (var scope = app.Services.CreateScope())
-            {
-                //The following code block is used to seed the database with work and employment type data
-                //This code block uses async operations, but to not make the Main class async, GetAwaiter().GetResult() to execute the async operation, which is blocking in nature, and will block the Main method from executing the next line of code until the async operation is completed
+            // Seed database with necessary data
+            await SeedDatabaseAsync(app);
 
-                try
-                {
-                    //Get the WorkType database seeder scoped service from the service container
-                    var workTypeSeeder = scope.ServiceProvider.GetRequiredService<WorkTypeDatabaseSeeder>();
-                    workTypeSeeder.SeedWorkTypeDataToDatabase().GetAwaiter().GetResult();
-
-                    //Get the EmploymentType database scoped seeder service from the service container
-                    var employmentTypeSeeder = scope.ServiceProvider.GetRequiredService<EmploymentTypeDatabaseSeeder>();
-                    employmentTypeSeeder.SeedEmploymentTypeDataToDatabase().GetAwaiter().GetResult();
-
-                    //Get the TutorRegistrationStatus database seeder scoped service from the service container
-                    var tutorRegistrationStatusSeeder = scope.ServiceProvider.GetRequiredService<TutorRegistrationStatusDataSeeder>();
-                    tutorRegistrationStatusSeeder.SeedTutorRegistrationStatusDataToDatabase().GetAwaiter().GetResult();
-
-                    //Get the CommunicationType database seeder scoped service from the service container
-                    var communicationTypeSeeder = scope.ServiceProvider.GetRequiredService<CommunicationTypeDatabaseSeeder>();
-                    communicationTypeSeeder.SeedCommunicationTypeDataToDatabase().GetAwaiter().GetResult();
-
-                    //Get the EngagementMethod database seeder scoped service from the service container
-                    var engagementMethodSeeder = scope.ServiceProvider.GetRequiredService<EngagementMethodDatabaseSeeder>();
-                    engagementMethodSeeder.SeedEngagementMethodDataToDatabase().GetAwaiter().GetResult();
-
-                    //Get the TutorType database seeder scoped service from the service container
-                    var tutorTeachingStyleTypeDatabaseSeeder = scope.ServiceProvider.GetRequiredService<TutorTeachingStyleTypeDatabaseSeeder>();
-                    tutorTeachingStyleTypeDatabaseSeeder.SeedTutorTeachingStyleTypeDataToDatabase().GetAwaiter().GetResult();
-
-
-                    //Get the LearningDifficultyLevel database seeder scoped service from the service container
-                    var learningDifficultyLevelDatabaseSeeder = scope.ServiceProvider.GetRequiredService<LearningDifficultyLevelDatabaseSeeder>();
-                    learningDifficultyLevelDatabaseSeeder.SeedLearningDifficultyLevelDataToDatabase().
-                    GetAwaiter().GetResult();
-
-                    //Get the Language database seeder scoped service from the service container
-                    var languageDatabaseSeeder = scope.ServiceProvider.GetRequiredService<LanguageDatabaseSeeder>();
-                    languageDatabaseSeeder.SeedLanguageDataToDatabase().GetAwaiter().GetResult();
-
-
-                }
-                catch (Exception ex)
-                {
-                    // Log and handle seeding errors
-                    Console.Error.WriteLine($"An error occurred during seeding: {ex.Message}");
-                }
-            }
-
-            //Generate the index for full text search for CourseLessonContent Content field
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-                var fullTextService = scope.ServiceProvider.GetRequiredService<FullTextSearchEnableService>();
-
-                await fullTextService.FullTextSearchSetup(dbContext);
-            }
-
-
-
-            // Configure the HTTP request pipeline.
+            // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(options =>
                 {
                     options.EnablePersistAuthorization();
+                    options.DefaultModelsExpandDepth(-1); // Hide schemas section
                 });
             }
-
-
+            else
+            {
+                // Add security headers in production
+                app.UseHsts();
+            }
 
             app.UseHttpsRedirection();
 
+            // Apply security headers
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+                context.Response.Headers.Append("X-Frame-Options", "DENY");
+                context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+                context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+                context.Response.Headers.Append("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+                await next();
+            });
 
+            // IMPORTANT: UseCors must come BEFORE UseRouting and authentication
+            app.UseCors(); // Apply default policy to all endpoints
 
             app.UseRouting();
-
-            app.UseCors("FrontEndPolicy");
-
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseAntiforgery();
 
-            //Set backend application to use CORS policy for requests originating only from specific origin (frontend application)
-
-            //Set backend application to use CORS policy for requests originating only from specific origin (swagger) in development environment
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseCors("SwaggerDevelopmentEnvironmentPolicy");
-
-            }
-
+            // Map endpoints at the end
             app.MapControllers();
-            app.MapHub<CourseAnalyticsHub>("/course-analytics-hub");
-            app.MapHub<CollaborationDocumentHub>("hubs/collaboration-document").RequireAuthorization()
-            .RequireCors("FrontEndPolicy");
-            app.MapHub<PresenceHub>("hubs/presence");
-            app.MapHub<MessageHub>("hubs/message");
 
-            using (var scope = app.Services.CreateScope())
+            // Map SignalR hubs
+            app.MapHub<CourseAnalyticsHub>("/course-analytics-hub");
+            app.MapHub<PresenceHub>("/hubs/presence");
+            app.MapHub<MessageHub>("/hubs/message");
+
+            // Create superadmin user if not exists
+            await CreateSuperAdminUserAsync(app);
+
+            app.Run();
+        }
+
+        private static async Task SeedDatabaseAsync(WebApplication app)
+        {
+            using var scope = app.Services.CreateScope();
+            try
+            {
+                var workTypeSeeder = scope.ServiceProvider.GetRequiredService<WorkTypeDatabaseSeeder>();
+                await workTypeSeeder.SeedWorkTypeDataToDatabase();
+
+                var employmentTypeSeeder = scope.ServiceProvider.GetRequiredService<EmploymentTypeDatabaseSeeder>();
+                await employmentTypeSeeder.SeedEmploymentTypeDataToDatabase();
+
+                var tutorRegistrationStatusSeeder = scope.ServiceProvider.GetRequiredService<TutorRegistrationStatusDataSeeder>();
+                await tutorRegistrationStatusSeeder.SeedTutorRegistrationStatusDataToDatabase();
+
+                var communicationTypeSeeder = scope.ServiceProvider.GetRequiredService<CommunicationTypeDatabaseSeeder>();
+                await communicationTypeSeeder.SeedCommunicationTypeDataToDatabase();
+
+                var engagementMethodSeeder = scope.ServiceProvider.GetRequiredService<EngagementMethodDatabaseSeeder>();
+                await engagementMethodSeeder.SeedEngagementMethodDataToDatabase();
+
+                var tutorTeachingStyleTypeDatabaseSeeder = scope.ServiceProvider.GetRequiredService<TutorTeachingStyleTypeDatabaseSeeder>();
+                await tutorTeachingStyleTypeDatabaseSeeder.SeedTutorTeachingStyleTypeDataToDatabase();
+
+                var learningDifficultyLevelDatabaseSeeder = scope.ServiceProvider.GetRequiredService<LearningDifficultyLevelDatabaseSeeder>();
+                await learningDifficultyLevelDatabaseSeeder.SeedLearningDifficultyLevelDataToDatabase();
+
+                var languageDatabaseSeeder = scope.ServiceProvider.GetRequiredService<LanguageDatabaseSeeder>();
+                await languageDatabaseSeeder.SeedLanguageDataToDatabase();
+            }
+            catch (Exception ex)
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred during database seeding");
+            }
+        }
+
+        private static async Task CreateSuperAdminUserAsync(WebApplication app)
+        {
+            using var scope = app.Services.CreateScope();
+            try
             {
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Person>>();
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
                 var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
+                // Create roles if they don't exist
                 var roles = new[] { "Admin", "Tutor", "Student" };
-
                 foreach (var role in roles)
                 {
                     if (!await roleManager.RoleExistsAsync(role))
                     {
                         await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+                        logger.LogInformation("Created role: {Role}", role);
                     }
                 }
 
+                // Check if superadmin exists
                 var superAdminEmail = "superadmin@educonnect.com";
                 var superAdminUsername = "superadmin";
-                var superAdminPassword = "1234";
 
-                var superAdmin = await dbContext.PersonEmail.Where(x => x.Email == superAdminEmail).AnyAsync();
+                // In production, this should be loaded from configuration or environment variables
+                var superAdminPassword = app.Environment.IsDevelopment()
+                    ? "1234"
+                    : Guid.NewGuid().ToString(); // Generate a secure password in production
 
-                Console.WriteLine("SuperAdmin user exists: " + superAdmin);
+                var superAdmin = await dbContext.PersonEmail
+                    .AnyAsync(x => x.Email == superAdminEmail);
+
+                logger.LogInformation("SuperAdmin user exists: {Exists}", superAdmin);
+
                 if (!superAdmin)
                 {
-
-                    //Create new Person
-                    var Person = new EduConnect.Entities.Person.Person
+                    // Create new Person
+                    var person = new EduConnect.Entities.Person.Person
                     {
                         PersonId = Guid.NewGuid(),
                         PersonPublicId = Guid.NewGuid(),
                         Email = superAdminEmail,
                         UserName = superAdminUsername,
-                        IsActive = false,
+                        IsActive = true,
                         CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                         ModifiedAt = null
                     };
 
-
-
-                    var result = await userManager.CreateAsync(Person, superAdminPassword);
+                    var result = await userManager.CreateAsync(person, superAdminPassword);
                     await dbContext.SaveChangesAsync();
 
                     if (result.Succeeded)
                     {
-                        await userManager.AddToRoleAsync(Person, "Admin");
+                        await userManager.AddToRoleAsync(person, "Admin");
+                        logger.LogInformation("Added SuperAdmin user with ID {PersonId}", person.PersonId);
 
-                        Console.WriteLine("Added SuperAdmin user, set role to Admin");
-
-                        //Create new PersonEmail
-                        var PersonEmail = new PersonEmail
+                        // Create related records
+                        var personEmail = new PersonEmail
                         {
-                            PersonId = Person.PersonId,
+                            PersonId = person.PersonId,
                             PersonEmailId = Guid.NewGuid(),
                             Email = superAdminEmail,
                             CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                             ModifiedAt = null
-
                         };
 
-                        //Create new PersonDetails
-                        var PersonDetails = new PersonDetails
+                        var personDetails = new PersonDetails
                         {
                             PersonDetailsId = Guid.NewGuid(),
-                            PersonId = Person.PersonId,
+                            PersonId = person.PersonId,
                             FirstName = "SuperAdmin",
                             LastName = "SuperAdmin",
                             Username = superAdminUsername,
@@ -321,55 +314,52 @@ namespace EduConnect
                             ModifiedAt = null,
                         };
 
-
-
-
-
-
-                        //Create new PersonPassword 
-                        var PersonPassword = new PersonPassword
+                        var salt = EncryptionUtilities.GenerateSalt();
+                        var personPassword = new PersonPassword
                         {
-                            PersonId = Person.PersonId,
+                            PersonId = person.PersonId,
                             PersonPasswordId = Guid.NewGuid(),
                             PasswordHash = EncryptionUtilities.HashPassword(superAdminPassword),
                             CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                             ModifiedAt = null
                         };
 
-                        //Create new PersonSalt 
-                        var PersonSalt = new PersonSalt
+                        var personSalt = new PersonSalt
                         {
                             PersonSaltId = Guid.NewGuid(),
-                            PersonId = Person.PersonId,
+                            PersonId = person.PersonId,
                             NumberOfRounds = 12,
-                            Salt = EncryptionUtilities.GenerateSalt(),
+                            Salt = salt,
                             CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                             ModifiedAt = null
                         };
 
-                        await dbContext.PersonEmail.AddAsync(PersonEmail);
-                        await dbContext.PersonPassword.AddAsync(PersonPassword);
-                        await dbContext.PersonSalt.AddAsync(PersonSalt);
-                        await dbContext.PersonDetails.AddAsync(PersonDetails);
+                        await dbContext.PersonEmail.AddAsync(personEmail);
+                        await dbContext.PersonPassword.AddAsync(personPassword);
+                        await dbContext.PersonSalt.AddAsync(personSalt);
+                        await dbContext.PersonDetails.AddAsync(personDetails);
                         await dbContext.SaveChangesAsync();
-                    }
 
-                    if (!result.Succeeded)
-                    {
-                        Console.WriteLine("Failed to create SuperAdmin user");
-
-                        Console.WriteLine("Error list: ");
-                        foreach (var error in result.Errors)
+                        if (app.Environment.IsProduction())
                         {
-                            Console.WriteLine("Code: " + error.Code);
-                            Console.WriteLine("Description:" + error.Description);
+                            logger.LogWarning("SuperAdmin created with auto-generated password. Please check logs or reset password.");
                         }
                     }
-
-
+                    else
+                    {
+                        logger.LogError("Failed to create SuperAdmin user");
+                        foreach (var error in result.Errors)
+                        {
+                            logger.LogError("Error: {Code} - {Description}", error.Code, error.Description);
+                        }
+                    }
                 }
             }
-            app.Run();
+            catch (Exception ex)
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while creating the SuperAdmin user");
+            }
         }
     }
 }

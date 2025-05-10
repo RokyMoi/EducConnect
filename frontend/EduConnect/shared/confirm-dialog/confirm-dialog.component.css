@@ -1,0 +1,38 @@
+mat-dialog-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+}
+
+mat-dialog-content {
+  font-size: 1rem;
+  margin: 10px 0;
+  text-align: center;
+  color: #555;
+}
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  button {
+    font-size: 1rem;
+    padding: 10px 20px;
+  }
+
+  button.mat-raised-button {
+    background-color: #1976d2;
+    color: white;
+  }
+
+  button.mat-button {
+    background-color: transparent;
+    color: #f44336;
+  }
+
+  button.mat-raised-button:hover {
+    background-color: #1565c0;
+  }
+}

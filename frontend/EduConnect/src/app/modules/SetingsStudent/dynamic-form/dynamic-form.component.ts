@@ -1,74 +1,119 @@
-import { NgIf } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
   Component,
   EventEmitter,
-  inject,
   Input,
   OnInit,
   Output,
+  inject
 } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
-  Validators,
+  Validators
 } from '@angular/forms';
+import { CommonModule, NgIf } from '@angular/common';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AccountService } from '../../../services/account.service';
+import { Observable, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-dynamic-form',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf],
+  imports: [CommonModule, ReactiveFormsModule, NgIf],
   templateUrl: './dynamic-form.component.html',
-  styleUrl: './dynamic-form.component.css',
+  styleUrls: ['./dynamic-form.component.css'],
 })
 export class DynamicFormComponent implements OnInit {
-  ChangeFormStatus() {
-    this.FormStatus.emit(false);
-  }
-  http = inject(HttpClient);
-  accountService = inject(AccountService);
+  private http = inject(HttpClient);
+  private accountService = inject(AccountService);
+
   dynamicForm!: FormGroup;
-  @Input() valueNameChild: string = '';
-  @Input() ApiLink: string = '';
+  isSubmitting = false;
+  errorMessage = '';
+
+  @Input() valueNameChild = '';
+  @Input() ApiLink = '';
+  @Input() fieldLabel = '';
   @Output() FormStatus = new EventEmitter<boolean>();
-  @Output() FormType = new EventEmitter<string>();
+
   constructor(private fb: FormBuilder) {}
+
   ngOnInit(): void {
+    this.createForm();
+  }
+
+  /**
+   * Create form with appropriate validators based on field type
+   */
+  private createForm(): void {
+    let validators = [Validators.required];
+
+    // Add specific validators based on field type
+    if (this.fieldLabel === 'Password') {
+      validators.push(Validators.minLength(8));
+    } else if (this.fieldLabel === 'Phone') {
+      // Basic phone validation - adjust based on your requirements
+      validators.push(Validators.pattern(/^[0-9+\-\s]*$/));
+    }
+
     this.dynamicForm = this.fb.group({
-      userInput: new FormControl('', [Validators.required]),
+      userInput: new FormControl(this.valueNameChild, validators)
     });
   }
 
-  onSubmit() {
-    if (this.dynamicForm.valid) {
-      const userInputValue = this.dynamicForm.controls['userInput'].value;
-      console.log('Form Submitted:', userInputValue);
-      this.UploadingResult(userInputValue);
-      this.FormStatus.emit(false);
-    } else {
-      console.error('Form is invalid.');
-      this.dynamicForm.markAllAsTouched();
-    }
+  get userInput() {
+    return this.dynamicForm.get('userInput');
   }
-  UploadingResult(email: string) {
+
+  /**
+   * Close the form
+   */
+  ChangeFormStatus() {
+    this.FormStatus.emit(false);
+  }
+
+  /**
+   * Handle form submission
+   */
+  onSubmit() {
+    if (this.dynamicForm.invalid) {
+      this.dynamicForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.errorMessage = '';
+
+    const inputVal = this.userInput!.value as string;
+
+    this.uploadResult(inputVal).pipe(
+      finalize(() => this.isSubmitting = false)
+    ).subscribe({
+      next: (response) => {
+        console.log(`Successfully updated ${this.fieldLabel}:`, response);
+        // Signal to parent that form has been submitted and closed
+        this.FormStatus.emit(false);
+      },
+      error: (err) => {
+        console.error(`Failed to update ${this.fieldLabel}:`, err);
+        this.errorMessage = err.error?.message || 'Update failed. Please try again.';
+      }
+    });
+  }
+
+  /**
+   * Make the API call to update the value
+   */
+  private uploadResult(input: string): Observable<any> {
     const token = this.accountService.getAccessToken();
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     });
 
-    const apiUrl = `${this.ApiLink}?input=${encodeURIComponent(email)}`;
-
-    this.http.post(apiUrl, {}, { headers }).subscribe({
-      next: () => {
-        console.log('Successfully submitted.');
-      },
-      error: (err) => {
-        console.error('Error occurred while sending request:', err);
-      },
-    });
+    const url = `${this.ApiLink}?input=${encodeURIComponent(input)}`;
+    return this.http.post(url, {}, { headers });
   }
 }
