@@ -4,29 +4,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using EduConnect.Data;
 using EduConnect.DTOs;
-using EduConnect.Entities.Course;
 using EduConnect.SignalIR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using MimeKit.Cryptography;
-using static EduConnect.SignalIR.CourseAnalyticsHub;
 
 namespace EduConnect.Services
 {
-    public class ViewershipChangeService : BackgroundService
+    public class CourseViewershipChangeService : BackgroundService
     {
-        private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        private readonly IHubContext<CourseAnalyticsHub> _hubContext = hubContext;
+        private readonly IHubContext<CourseAnalyticsHub> _hubContext;
         private long lastSyncVersion;
 
-
-        public ViewershipChangeService(IServiceScopeFactory scopeFactory, IHubContext<CourseAnalyticsHub> hubContext)
+        public CourseViewershipChangeService(IServiceScopeFactory scopeFactory, IHubContext<CourseAnalyticsHub> hubContext)
         {
-            _scopeFactory = scopeFactory;
-            _hubContext = hubContext;
+            this._scopeFactory = scopeFactory;
+            this._hubContext = hubContext;
         }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Console.WriteLine("ViewershipChangeService is running.");

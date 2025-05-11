@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using EduConnect.Interfaces.Redis;
+using EduConnect.Services;
 
 namespace EduConnect
 {
@@ -71,8 +72,8 @@ namespace EduConnect
             builder.Services.AddScoped<UserManager<Person>, PersonManager>();
             builder.Services.AddScoped<PersonManager>();
 
-            builder.Services.AddHostedService<ViewershipChangeService>();
-            builder.Services.AddHostedService<CourseViewershipDataSnapshotService>();
+            builder.Services.AddHostedService<CourseViewershipChangeService>();
+            builder.Services.AddHostedService<CourseViewershipDataSnapshotBackgroundService>();
 
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
