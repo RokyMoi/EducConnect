@@ -15,6 +15,7 @@ using EduConnect.Entities.Messenger;
 using EduConnect.Entities.Shopping;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using EduConnect.Entities.CollaborationDocument;
 using EduConnect.Entities.Promotion;
 
 namespace EduConnect.Data;
@@ -24,10 +25,6 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
     }
-    public DbSet<CoursePromotion> CoursePromotions { get; set; }
-    public DbSet<PromotionImages> PromotionImages { get; set; }
-    public DbSet<Entities.Course.CoursePromotionImage> CoursePromotionImage { get; set; }
-    public DbSet<PromotionDuration> PromotionDuration { get; set; }
 
     public DbSet<Person> Person { get; set; }
     public DbSet<PersonDetails> PersonDetails { get; set; }
@@ -43,20 +40,11 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
     public DbSet<TutorRegistrationStatus> TutorRegistrationStatus { get; set; }
     public DbSet<Student> Student { get; set; }
     public DbSet<Message> Message { get; set; }
-
     public DbSet<StudentDetails> StudentDetails { get; set; }
     public DbSet<Country> Country { get; set; }
     public DbSet<Course> Course { get; set; }
- //SHOPPING PARTA
     public DbSet<ShoppingCart> ShoppingCart { get; set; }
-    public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
-    public DbSet<Wishlist> Wishlist { get; set; }
-    public DbSet<WishlistItems> WishlistItems { get; set; }
-    public DbSet<StudentEnrollment> StudentEnrollment { get; set; }
-
-
-
-
+    public DbSet<Wishlist> WishList { get; set; }
     public DbSet<LearningCategory> LearningCategory { get; set; }
     public DbSet<EduConnect.Entities.Learning.LearningSubcategory> LearningSubCategory { get; set; }
     public DbSet<PersonEducationInformation> PersonEducationInformation { get; set; }
@@ -83,15 +71,33 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
 
     public DbSet<CourseLessonContent> CourseLessonContent { get; set; }
 
-    
+    public DbSet<CourseEnrollment> CourseEnrollment { get; set; }
 
     public DbSet<CourseLessonResource> CourseLessonResource { get; set; }
 
-  
+    public DbSet<CoursePromotionImage> CoursePromotionImage { get; set; }
 
     public DbSet<CourseViewershipData> CourseViewershipData { get; set; }
 
     public DbSet<CourseViewershipDataSnapshot> CourseViewershipDataSnapshot { get; set; }
+
+    public DbSet<Folder> Folder { get; set; }
+
+    public DbSet<Document> Document { get; set; }
+
+    public DbSet<CollaborationDocumentInvitation> CollaborationDocumentInvitation { get; set; }
+
+    public DbSet<CollaborationDocumentParticipant> CollaborationDocumentParticipant { get; set; }
+    public DbSet<CollaborationDocumentActiveUser> CollaborationDocumentActiveUser { get; set; }
+
+    public DbSet<CoursePromotion> CoursePromotion { get; set; }
+    public DbSet<PromotionImages> PromotionImages { get; set; }
+    public DbSet<PromotionDuration> PromotionDuration { get; set; }
+    public DbSet<ShoppingCartItem> ShoppingCartItem { get; set; }
+    public DbSet<StudentEnrollment> StudentEnrollment { get; set; }
+    public DbSet<Wishlist> Wishlist { get; set; }
+    public DbSet<WishlistItems> WishlistItems { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -161,5 +167,42 @@ public class DataContext : IdentityDbContext<Person, IdentityRole<Guid>, Guid>
             .WithMany()
             .HasForeignKey(c => c.LearningDifficultyLevelId)
             .OnDelete(DeleteBehavior.ClientSetNull);
+
+
+        builder.Entity<Document>()
+        .HasOne(i => i.Person)
+        .WithMany()
+        .HasForeignKey(i => i.CreatedByPersonId)
+        .OnDelete(DeleteBehavior.NoAction);
+
+
+        builder.Entity<CollaborationDocumentInvitation>()
+            .HasOne(i => i.InvitedPerson)
+            .WithMany()
+            .HasForeignKey(i => i.InvitedPersonId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CollaborationDocumentInvitation>()
+       .HasOne(e => e.InvitedPerson)
+       .WithMany()
+       .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CollaborationDocumentInvitation>()
+            .HasOne(e => e.InvitedByPerson)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CollaborationDocumentInvitation>()
+        .HasOne(e => e.Document)
+        .WithMany()
+        .HasForeignKey(e => e.DocumentId)
+        .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CourseLessonContent>()
+        .HasIndex(x => x.RowGuid)
+        .IsUnique()
+        .HasDatabaseName("IX_CourseLessonContent_RowGuid");
+
+
     }
 }

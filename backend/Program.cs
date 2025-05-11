@@ -10,10 +10,10 @@ using EduConnect.SignalIR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Security.Cryptography;
-using EduConnect.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using EduConnect.Interfaces.Redis;
 
 namespace EduConnect
 {
@@ -31,7 +31,8 @@ namespace EduConnect
             builder.Services.AddHttpContextAccessor();
 
             // Security headers
-            builder.Services.AddAntiforgery(options => {
+            builder.Services.AddAntiforgery(options =>
+            {
                 options.SuppressXFrameOptionsHeader = false;
             });
 
@@ -49,20 +50,33 @@ namespace EduConnect
             builder.Services.AddDatabaseConnectionServices(builder.Configuration, builder.Environment);
 
             // Configure SignalR with increased message size
-            builder.Services.AddSignalR(options => {
+            builder.Services.AddSignalR(options =>
+            {
                 options.MaximumReceiveMessageSize = 102400; // 100KB
                 options.EnableDetailedErrors = builder.Environment.IsDevelopment();
                 options.KeepAliveInterval = TimeSpan.FromSeconds(15);
                 options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
             });
 
+            builder.Services.AddStackExchangeRedisCache(
+               options =>
+               {
+                   options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+                   options.InstanceName = "EduConnect";
+               }
+           );
+
+            // builder.Services.AddScoped<IRedisCachingService, RedisCachingService>();
+
             builder.Services.AddScoped<UserManager<Person>, PersonManager>();
             builder.Services.AddScoped<PersonManager>();
 
-          //  builder.Services.AddHostedService<ViewershipChangeService>();
+            builder.Services.AddHostedService<ViewershipChangeService>();
+            builder.Services.AddHostedService<CourseViewershipDataSnapshotService>();
 
             builder.Services.AddControllers()
-                .AddJsonOptions(options => {
+                .AddJsonOptions(options =>
+                {
                     // Prevent JSON circular reference issues
                     options.JsonSerializerOptions.ReferenceHandler =
                         System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
@@ -190,6 +204,7 @@ namespace EduConnect
 
             // Map SignalR hubs
             app.MapHub<CourseAnalyticsHub>("/course-analytics-hub");
+            app.MapHub<CollaborationDocumentHub>("hubs/collaboration-document").RequireAuthorization();
             app.MapHub<PresenceHub>("/hubs/presence");
             app.MapHub<MessageHub>("/hubs/message");
 

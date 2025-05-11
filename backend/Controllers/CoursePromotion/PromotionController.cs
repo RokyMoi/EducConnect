@@ -36,7 +36,7 @@ namespace EduConnect.Controllers
         {
             try
             {
-                var promotions = await _context.CoursePromotions
+                var promotions = await _context.CoursePromotion
                     .Include(p => p.Course)
                     .ThenInclude(pt => pt.Tutor)
                     .ThenInclude(pd => pd.Person)
@@ -94,7 +94,7 @@ namespace EduConnect.Controllers
                     return Unauthorized("User is not a tutor.");
 
                 // Get only promotions belonging to this tutor's courses
-                var promotions = await _context.CoursePromotions
+                var promotions = await _context.CoursePromotion
                     .Include(p => p.Course)
                     .Include(p => p.Duration)
                     .Include(p => p.Images)
@@ -135,7 +135,7 @@ namespace EduConnect.Controllers
         {
             try
             {
-                var promotion = await _context.CoursePromotions
+                var promotion = await _context.CoursePromotion
                     .Include(p => p.Course)
                     .Include(p => p.Duration)
                     .Include(p => p.Images)
@@ -243,7 +243,7 @@ namespace EduConnect.Controllers
                         }
                     }
 
-                    _context.CoursePromotions.Add(promotion);
+                    _context.CoursePromotion.Add(promotion);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
@@ -276,7 +276,7 @@ namespace EduConnect.Controllers
             try
             {
                 // First check if promotion exists without tracking
-                var promotionExists = await _context.CoursePromotions
+                var promotionExists = await _context.CoursePromotion
                     .AsNoTracking()
                     .AnyAsync(p => p.PromotionId == id);
 
@@ -304,7 +304,7 @@ namespace EduConnect.Controllers
                     try
                     {
                         // Fetch fresh entity with explicit loading of related entities to minimize tracking issues
-                        var promotion = await _context.CoursePromotions
+                        var promotion = await _context.CoursePromotion
                             .Include(p => p.Duration)
                             .Include(p => p.Images)
                             .FirstOrDefaultAsync(p => p.PromotionId == id);
@@ -404,7 +404,7 @@ namespace EduConnect.Controllers
                         _logger.LogWarning(ex, "Concurrency conflict updating promotion {PromotionId}", id);
 
                         // Check if the entity still exists
-                        var stillExists = await _context.CoursePromotions.AnyAsync(p => p.PromotionId == id);
+                        var stillExists = await _context.CoursePromotion.AnyAsync(p => p.PromotionId == id);
                         if (!stillExists)
                         {
                             return NotFound("Promotion has been deleted by another user");
@@ -438,7 +438,7 @@ namespace EduConnect.Controllers
                 try
                 {
                     // Just check that the promotion exists - don't load full entity with all relations
-                    var promotion = await _context.CoursePromotions.FindAsync(id);
+                    var promotion = await _context.CoursePromotion.FindAsync(id);
                     if (promotion == null)
                     {
                         return NotFound("Promotion not found");
@@ -518,7 +518,7 @@ namespace EduConnect.Controllers
 
                 try
                 {
-                    var promotion = await _context.CoursePromotions
+                    var promotion = await _context.CoursePromotion
                         .Include(p => p.Duration)
                         .Include(p => p.Images)
                         .FirstOrDefaultAsync(p => p.PromotionId == id);
@@ -539,7 +539,7 @@ namespace EduConnect.Controllers
                         _context.PromotionImages.Remove(image);
                     }
 
-                    _context.CoursePromotions.Remove(promotion);
+                    _context.CoursePromotion.Remove(promotion);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
@@ -551,7 +551,7 @@ namespace EduConnect.Controllers
                     _logger.LogWarning(ex, "Concurrency conflict deleting promotion {PromotionId}", id);
 
                     // Check if the entity still exists
-                    var stillExists = await _context.CoursePromotions.AnyAsync(p => p.PromotionId == id);
+                    var stillExists = await _context.CoursePromotion.AnyAsync(p => p.PromotionId == id);
                     if (!stillExists)
                     {
                         // It's already gone, so that's what the client wanted
@@ -655,7 +655,7 @@ namespace EduConnect.Controllers
             try
             {
                 // First check if promotion exists
-                var promotionExists = await _context.CoursePromotions
+                var promotionExists = await _context.CoursePromotion
                     .AsNoTracking()
                     .AnyAsync(p => p.PromotionId == id);
 
@@ -703,7 +703,7 @@ namespace EduConnect.Controllers
 
         private bool PromotionExists(Guid id)
         {
-            return _context.CoursePromotions.Any(e => e.PromotionId == id);
+            return _context.CoursePromotion.Any(e => e.PromotionId == id);
         }
     }
 }

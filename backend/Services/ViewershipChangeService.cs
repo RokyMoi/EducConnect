@@ -14,13 +14,19 @@ using static EduConnect.SignalIR.CourseAnalyticsHub;
 
 namespace EduConnect.Services
 {
-    public class ViewershipChangeService(IServiceScopeFactory scopeFactory, IHubContext<CourseAnalyticsHub> hubContext) : BackgroundService
+    public class ViewershipChangeService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
 
         private readonly IHubContext<CourseAnalyticsHub> _hubContext = hubContext;
         private long lastSyncVersion;
 
+
+        public ViewershipChangeService(IServiceScopeFactory scopeFactory, IHubContext<CourseAnalyticsHub> hubContext)
+        {
+            _scopeFactory = scopeFactory;
+            _hubContext = hubContext;
+        }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Console.WriteLine("ViewershipChangeService is running.");

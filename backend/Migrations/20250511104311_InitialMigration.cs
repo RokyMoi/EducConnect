@@ -6,13 +6,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EduConnect.Migrations
 {
     /// <inheritdoc />
-    public partial class InitToWinIt : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
                 name: "Person");
+
+            migrationBuilder.EnsureSchema(
+                name: "Document");
 
             migrationBuilder.EnsureSchema(
                 name: "Reference");
@@ -378,6 +381,60 @@ namespace EduConnect.Migrations
                     table.ForeignKey(
                         name: "FK_AuthenticationToken_Person_PersonId",
                         column: x => x.PersonId,
+                        principalSchema: "Person",
+                        principalTable: "Person",
+                        principalColumn: "PersonId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Document",
+                schema: "Document",
+                columns: table => new
+                {
+                    DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedByPersonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Version = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedAt = table.Column<long>(type: "bigint", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Document", x => x.DocumentId);
+                    table.ForeignKey(
+                        name: "FK_Document_Person_CreatedByPersonId",
+                        column: x => x.CreatedByPersonId,
+                        principalSchema: "Person",
+                        principalTable: "Person",
+                        principalColumn: "PersonId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Folder",
+                schema: "Course",
+                columns: table => new
+                {
+                    FolderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ParentFolderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    OwnerPersonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<long>(type: "bigint", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Folder", x => x.FolderId);
+                    table.ForeignKey(
+                        name: "FK_Folder_Folder_ParentFolderId",
+                        column: x => x.ParentFolderId,
+                        principalSchema: "Course",
+                        principalTable: "Folder",
+                        principalColumn: "FolderId");
+                    table.ForeignKey(
+                        name: "FK_Folder_Person_OwnerPersonId",
+                        column: x => x.OwnerPersonId,
                         principalSchema: "Person",
                         principalTable: "Person",
                         principalColumn: "PersonId",
@@ -869,6 +926,81 @@ namespace EduConnect.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CollaborationDocumentActiveUser",
+                schema: "Document",
+                columns: table => new
+                {
+                    CollaborationDocumentActiveUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ActiveUserPersonId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    StatusChangedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<long>(type: "bigint", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CollaborationDocumentActiveUser", x => x.CollaborationDocumentActiveUserId);
+                    table.ForeignKey(
+                        name: "FK_CollaborationDocumentActiveUser_Document_DocumentId",
+                        column: x => x.DocumentId,
+                        principalSchema: "Document",
+                        principalTable: "Document",
+                        principalColumn: "DocumentId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CollaborationDocumentActiveUser_Person_ActiveUserPersonId",
+                        column: x => x.ActiveUserPersonId,
+                        principalSchema: "Person",
+                        principalTable: "Person",
+                        principalColumn: "PersonId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CollaborationDocumentInvitation",
+                schema: "Document",
+                columns: table => new
+                {
+                    CollaborationDocumentInvitationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    InvitedPersonId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InvitedByPersonId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: true),
+                    StatusChangedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<long>(type: "bigint", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true),
+                    DocumentId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CollaborationDocumentInvitation", x => x.CollaborationDocumentInvitationId);
+                    table.ForeignKey(
+                        name: "FK_CollaborationDocumentInvitation_Document_DocumentId",
+                        column: x => x.DocumentId,
+                        principalSchema: "Document",
+                        principalTable: "Document",
+                        principalColumn: "DocumentId");
+                    table.ForeignKey(
+                        name: "FK_CollaborationDocumentInvitation_Document_DocumentId1",
+                        column: x => x.DocumentId1,
+                        principalSchema: "Document",
+                        principalTable: "Document",
+                        principalColumn: "DocumentId");
+                    table.ForeignKey(
+                        name: "FK_CollaborationDocumentInvitation_Person_InvitedByPersonId",
+                        column: x => x.InvitedByPersonId,
+                        principalSchema: "Person",
+                        principalTable: "Person",
+                        principalColumn: "PersonId");
+                    table.ForeignKey(
+                        name: "FK_CollaborationDocumentInvitation_Person_InvitedPersonId",
+                        column: x => x.InvitedPersonId,
+                        principalSchema: "Person",
+                        principalTable: "Person",
+                        principalColumn: "PersonId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ShoppingCart",
                 columns: table => new
                 {
@@ -1039,6 +1171,43 @@ namespace EduConnect.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CollaborationDocumentParticipant",
+                schema: "Document",
+                columns: table => new
+                {
+                    CollaborationDocumentParticipantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ParticipantPersonId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CollaborationDocumentInvitationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<long>(type: "bigint", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CollaborationDocumentParticipant", x => x.CollaborationDocumentParticipantId);
+                    table.ForeignKey(
+                        name: "FK_CollaborationDocumentParticipant_CollaborationDocumentInvitation_CollaborationDocumentInvitationId",
+                        column: x => x.CollaborationDocumentInvitationId,
+                        principalSchema: "Document",
+                        principalTable: "CollaborationDocumentInvitation",
+                        principalColumn: "CollaborationDocumentInvitationId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CollaborationDocumentParticipant_Document_DocumentId",
+                        column: x => x.DocumentId,
+                        principalSchema: "Document",
+                        principalTable: "Document",
+                        principalColumn: "DocumentId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CollaborationDocumentParticipant_Person_ParticipantPersonId",
+                        column: x => x.ParticipantPersonId,
+                        principalSchema: "Person",
+                        principalTable: "Person",
+                        principalColumn: "PersonId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CourseDetails",
                 schema: "Course",
                 columns: table => new
@@ -1082,6 +1251,36 @@ namespace EduConnect.Migrations
                         principalSchema: "Reference",
                         principalTable: "LearningSubcategory",
                         principalColumn: "LearningSubcategoryId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CourseEnrollment",
+                schema: "Course",
+                columns: table => new
+                {
+                    CourseEnrollmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<long>(type: "bigint", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourseEnrollment", x => x.CourseEnrollmentId);
+                    table.ForeignKey(
+                        name: "FK_CourseEnrollment_Course_CourseId",
+                        column: x => x.CourseId,
+                        principalSchema: "Course",
+                        principalTable: "Course",
+                        principalColumn: "CourseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CourseEnrollment_Student_StudentId",
+                        column: x => x.StudentId,
+                        principalSchema: "Student",
+                        principalTable: "Student",
+                        principalColumn: "StudentId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -1153,31 +1352,7 @@ namespace EduConnect.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CoursePromotionImage",
-                schema: "Course",
-                columns: table => new
-                {
-                    CoursePromotionImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageFile = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    CreatedAt = table.Column<long>(type: "bigint", nullable: false),
-                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CoursePromotionImage", x => x.CoursePromotionImageId);
-                    table.ForeignKey(
-                        name: "FK_CoursePromotionImage_Course_CourseId",
-                        column: x => x.CourseId,
-                        principalSchema: "Course",
-                        principalTable: "Course",
-                        principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CoursePromotions",
+                name: "CoursePromotion",
                 columns: table => new
                 {
                     PromotionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -1190,14 +1365,45 @@ namespace EduConnect.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CoursePromotions", x => x.PromotionId);
+                    table.PrimaryKey("PK_CoursePromotion", x => x.PromotionId);
                     table.ForeignKey(
-                        name: "FK_CoursePromotions_Course_CourseId",
+                        name: "FK_CoursePromotion_Course_CourseId",
                         column: x => x.CourseId,
                         principalSchema: "Course",
                         principalTable: "Course",
                         principalColumn: "CourseId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CoursePromotionImage",
+                schema: "Course",
+                columns: table => new
+                {
+                    CoursePromotionImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageFile = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    CreatedAt = table.Column<long>(type: "bigint", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true),
+                    FolderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CoursePromotionImage", x => x.CoursePromotionImageId);
+                    table.ForeignKey(
+                        name: "FK_CoursePromotionImage_Course_CourseId",
+                        column: x => x.CourseId,
+                        principalSchema: "Course",
+                        principalTable: "Course",
+                        principalColumn: "CourseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CoursePromotionImage_Folder_FolderId",
+                        column: x => x.FolderId,
+                        principalSchema: "Course",
+                        principalTable: "Folder",
+                        principalColumn: "FolderId");
                 });
 
             migrationBuilder.CreateTable(
@@ -1209,7 +1415,8 @@ namespace EduConnect.Migrations
                     CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TagId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<long>(type: "bigint", nullable: false),
-                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true),
+                    TagId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1223,6 +1430,12 @@ namespace EduConnect.Migrations
                     table.ForeignKey(
                         name: "FK_CourseTag_Tag_TagId",
                         column: x => x.TagId,
+                        principalSchema: "Course",
+                        principalTable: "Tag",
+                        principalColumn: "TagId");
+                    table.ForeignKey(
+                        name: "FK_CourseTag_Tag_TagId1",
+                        column: x => x.TagId1,
                         principalSchema: "Course",
                         principalTable: "Tag",
                         principalColumn: "TagId");
@@ -1243,7 +1456,8 @@ namespace EduConnect.Migrations
                     ResourceUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<long>(type: "bigint", nullable: false),
-                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true),
+                    FolderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1255,6 +1469,12 @@ namespace EduConnect.Migrations
                         principalTable: "Course",
                         principalColumn: "CourseId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CourseTeachingResource_Folder_FolderId",
+                        column: x => x.FolderId,
+                        principalSchema: "Course",
+                        principalTable: "Folder",
+                        principalColumn: "FolderId");
                 });
 
             migrationBuilder.CreateTable(
@@ -1268,7 +1488,8 @@ namespace EduConnect.Migrations
                     ThumbnailUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ThumbnailImageFile = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     CreatedAt = table.Column<long>(type: "bigint", nullable: false),
-                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true),
+                    FolderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1280,6 +1501,12 @@ namespace EduConnect.Migrations
                         principalTable: "Course",
                         principalColumn: "CourseId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CourseThumbnail_Folder_FolderId",
+                        column: x => x.FolderId,
+                        principalSchema: "Course",
+                        principalTable: "Folder",
+                        principalColumn: "FolderId");
                 });
 
             migrationBuilder.CreateTable(
@@ -1343,7 +1570,7 @@ namespace EduConnect.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ShoppingCartItems",
+                name: "ShoppingCartItem",
                 columns: table => new
                 {
                     ShoppingCartItemID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -1353,16 +1580,16 @@ namespace EduConnect.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShoppingCartItems", x => x.ShoppingCartItemID);
+                    table.PrimaryKey("PK_ShoppingCartItem", x => x.ShoppingCartItemID);
                     table.ForeignKey(
-                        name: "FK_ShoppingCartItems_Course_CourseID",
+                        name: "FK_ShoppingCartItem_Course_CourseID",
                         column: x => x.CourseID,
                         principalSchema: "Course",
                         principalTable: "Course",
                         principalColumn: "CourseId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ShoppingCartItems_ShoppingCart_ShoppingCartID",
+                        name: "FK_ShoppingCartItem_ShoppingCart_ShoppingCartID",
                         column: x => x.ShoppingCartID,
                         principalTable: "ShoppingCart",
                         principalColumn: "ShoppingCartID",
@@ -1434,7 +1661,8 @@ namespace EduConnect.Migrations
                     CourseLessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<long>(type: "bigint", nullable: false),
-                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true),
+                    RowGuid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1463,7 +1691,8 @@ namespace EduConnect.Migrations
                     ResourceUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<long>(type: "bigint", nullable: false),
-                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true)
+                    UpdatedAt = table.Column<long>(type: "bigint", nullable: true),
+                    FolderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1475,6 +1704,12 @@ namespace EduConnect.Migrations
                         principalTable: "CourseLesson",
                         principalColumn: "CourseLessonId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CourseLessonResource_Folder_FolderId",
+                        column: x => x.FolderId,
+                        principalSchema: "Course",
+                        principalTable: "Folder",
+                        principalColumn: "FolderId");
                 });
 
             migrationBuilder.CreateTable(
@@ -1490,9 +1725,9 @@ namespace EduConnect.Migrations
                 {
                     table.PrimaryKey("PK_PromotionDuration", x => x.DurationId);
                     table.ForeignKey(
-                        name: "FK_PromotionDuration_CoursePromotions_PromotionId",
+                        name: "FK_PromotionDuration_CoursePromotion_PromotionId",
                         column: x => x.PromotionId,
-                        principalTable: "CoursePromotions",
+                        principalTable: "CoursePromotion",
                         principalColumn: "PromotionId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1514,9 +1749,9 @@ namespace EduConnect.Migrations
                 {
                     table.PrimaryKey("PK_PromotionImages", x => x.ImageId);
                     table.ForeignKey(
-                        name: "FK_PromotionImages_CoursePromotions_PromotionId",
+                        name: "FK_PromotionImages_CoursePromotion_PromotionId",
                         column: x => x.PromotionId,
-                        principalTable: "CoursePromotions",
+                        principalTable: "CoursePromotion",
                         principalColumn: "PromotionId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1543,6 +1778,60 @@ namespace EduConnect.Migrations
                 schema: "Person",
                 table: "AuthenticationToken",
                 column: "PersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CollaborationDocumentActiveUser_ActiveUserPersonId",
+                schema: "Document",
+                table: "CollaborationDocumentActiveUser",
+                column: "ActiveUserPersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CollaborationDocumentActiveUser_DocumentId",
+                schema: "Document",
+                table: "CollaborationDocumentActiveUser",
+                column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CollaborationDocumentInvitation_DocumentId",
+                schema: "Document",
+                table: "CollaborationDocumentInvitation",
+                column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CollaborationDocumentInvitation_DocumentId1",
+                schema: "Document",
+                table: "CollaborationDocumentInvitation",
+                column: "DocumentId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CollaborationDocumentInvitation_InvitedByPersonId",
+                schema: "Document",
+                table: "CollaborationDocumentInvitation",
+                column: "InvitedByPersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CollaborationDocumentInvitation_InvitedPersonId",
+                schema: "Document",
+                table: "CollaborationDocumentInvitation",
+                column: "InvitedPersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CollaborationDocumentParticipant_CollaborationDocumentInvitationId",
+                schema: "Document",
+                table: "CollaborationDocumentParticipant",
+                column: "CollaborationDocumentInvitationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CollaborationDocumentParticipant_DocumentId",
+                schema: "Document",
+                table: "CollaborationDocumentParticipant",
+                column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CollaborationDocumentParticipant_ParticipantPersonId",
+                schema: "Document",
+                table: "CollaborationDocumentParticipant",
+                column: "ParticipantPersonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Course_CourseCategoryId",
@@ -1581,6 +1870,18 @@ namespace EduConnect.Migrations
                 column: "LearningSubcategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CourseEnrollment_CourseId",
+                schema: "Course",
+                table: "CourseEnrollment",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseEnrollment_StudentId",
+                schema: "Course",
+                table: "CourseEnrollment",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CourseLanguage_CourseId",
                 schema: "Course",
                 table: "CourseLanguage",
@@ -1612,10 +1913,28 @@ namespace EduConnect.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_CourseLessonContent_RowGuid",
+                schema: "Course",
+                table: "CourseLessonContent",
+                column: "RowGuid",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CourseLessonResource_CourseLessonId",
                 schema: "Course",
                 table: "CourseLessonResource",
                 column: "CourseLessonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseLessonResource_FolderId",
+                schema: "Course",
+                table: "CourseLessonResource",
+                column: "FolderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CoursePromotion_CourseId",
+                table: "CoursePromotion",
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CoursePromotionImage_CourseId",
@@ -1624,9 +1943,10 @@ namespace EduConnect.Migrations
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CoursePromotions_CourseId",
-                table: "CoursePromotions",
-                column: "CourseId");
+                name: "IX_CoursePromotionImage_FolderId",
+                schema: "Course",
+                table: "CoursePromotionImage",
+                column: "FolderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseTag_CourseId",
@@ -1641,10 +1961,22 @@ namespace EduConnect.Migrations
                 column: "TagId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CourseTag_TagId1",
+                schema: "Course",
+                table: "CourseTag",
+                column: "TagId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CourseTeachingResource_CourseId",
                 schema: "Course",
                 table: "CourseTeachingResource",
                 column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseTeachingResource_FolderId",
+                schema: "Course",
+                table: "CourseTeachingResource",
+                column: "FolderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseThumbnail_CourseId",
@@ -1652,6 +1984,12 @@ namespace EduConnect.Migrations
                 table: "CourseThumbnail",
                 column: "CourseId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseThumbnail_FolderId",
+                schema: "Course",
+                table: "CourseThumbnail",
+                column: "FolderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseViewershipData_CourseId",
@@ -1670,6 +2008,24 @@ namespace EduConnect.Migrations
                 schema: "Course",
                 table: "CourseViewershipDataSnapshot",
                 column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Document_CreatedByPersonId",
+                schema: "Document",
+                table: "Document",
+                column: "CreatedByPersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Folder_OwnerPersonId",
+                schema: "Course",
+                table: "Folder",
+                column: "OwnerPersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Folder_ParentFolderId",
+                schema: "Course",
+                table: "Folder",
+                column: "ParentFolderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LearningSubcategory_LearningCategoryId",
@@ -1803,7 +2159,8 @@ namespace EduConnect.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PromotionDuration_PromotionId",
                 table: "PromotionDuration",
-                column: "PromotionId");
+                column: "PromotionId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_PromotionImages_PromotionId",
@@ -1816,13 +2173,13 @@ namespace EduConnect.Migrations
                 column: "StudentID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShoppingCartItems_CourseID",
-                table: "ShoppingCartItems",
+                name: "IX_ShoppingCartItem_CourseID",
+                table: "ShoppingCartItem",
                 column: "CourseID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShoppingCartItems_ShoppingCartID",
-                table: "ShoppingCartItems",
+                name: "IX_ShoppingCartItem_ShoppingCartID",
+                table: "ShoppingCartItem",
                 column: "ShoppingCartID");
 
             migrationBuilder.CreateIndex(
@@ -1951,7 +2308,19 @@ namespace EduConnect.Migrations
                 schema: "Person");
 
             migrationBuilder.DropTable(
+                name: "CollaborationDocumentActiveUser",
+                schema: "Document");
+
+            migrationBuilder.DropTable(
+                name: "CollaborationDocumentParticipant",
+                schema: "Document");
+
+            migrationBuilder.DropTable(
                 name: "CourseDetails",
+                schema: "Course");
+
+            migrationBuilder.DropTable(
+                name: "CourseEnrollment",
                 schema: "Course");
 
             migrationBuilder.DropTable(
@@ -2043,7 +2412,7 @@ namespace EduConnect.Migrations
                 name: "PromotionImages");
 
             migrationBuilder.DropTable(
-                name: "ShoppingCartItems");
+                name: "ShoppingCartItem");
 
             migrationBuilder.DropTable(
                 name: "StudentDetails",
@@ -2066,6 +2435,10 @@ namespace EduConnect.Migrations
                 name: "WishlistItems");
 
             migrationBuilder.DropTable(
+                name: "CollaborationDocumentInvitation",
+                schema: "Document");
+
+            migrationBuilder.DropTable(
                 name: "CourseType",
                 schema: "Reference");
 
@@ -2086,6 +2459,10 @@ namespace EduConnect.Migrations
                 schema: "Course");
 
             migrationBuilder.DropTable(
+                name: "Folder",
+                schema: "Course");
+
+            migrationBuilder.DropTable(
                 name: "EmploymentType",
                 schema: "Reference");
 
@@ -2102,7 +2479,7 @@ namespace EduConnect.Migrations
                 schema: "Reference");
 
             migrationBuilder.DropTable(
-                name: "CoursePromotions");
+                name: "CoursePromotion");
 
             migrationBuilder.DropTable(
                 name: "ShoppingCart");
@@ -2124,6 +2501,10 @@ namespace EduConnect.Migrations
 
             migrationBuilder.DropTable(
                 name: "Wishlist");
+
+            migrationBuilder.DropTable(
+                name: "Document",
+                schema: "Document");
 
             migrationBuilder.DropTable(
                 name: "LearningCategory",

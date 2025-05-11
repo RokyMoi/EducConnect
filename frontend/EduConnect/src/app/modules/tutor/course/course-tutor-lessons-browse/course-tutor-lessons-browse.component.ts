@@ -72,7 +72,13 @@ export class CourseTutorLessonsBrowseComponent implements OnInit {
     return PublishedStatus[publishedStatus];
   }
 
-  onViewLesson(lesson: GetCourseLessonByContentFullTextSearchResponse) {}
+  onViewLesson(lesson: GetCourseLessonByContentFullTextSearchResponse) {
+    this.router.navigate([
+      '/tutor/course/lessons/details',
+      this.courseId,
+      lesson.courseLessonId,
+    ]);
+  }
 
   onViewLessonResources(lessonId: string) {
     this.router.navigate([

@@ -34,12 +34,12 @@ namespace EduConnect.Controllers.Course
         IReferenceRepository _referenceRepository,
         ITutorRepository _tutorRepository,
         AzureBlobStorageService _azureBlobStorageService,
-        ILogger<CourseTutorController> logger,
-        IRedisCachingService _redisCachingService
+        ILogger<CourseTutorController> logger
+    // IRedisCachingService _redisCachingService
     ) : ControllerBase
     {
         private readonly ILogger<CourseTutorController> _logger = logger;
-        private readonly IRedisCachingService _redisCachingService = _redisCachingService;
+        // private readonly IRedisCachingService _redisCachingService = _redisCachingService;
 
         [HttpPost("create")]
         public async Task<IActionResult> CreateCourse([FromBody] CreateCourseRequest request)
@@ -118,7 +118,7 @@ namespace EduConnect.Controllers.Course
                 MaxNumberOfStudents = request.MaxNumberOfStudents,
                 Price = request.Price,
                 PublishedStatus = Enums.PublishedStatus.Draft,
-                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 UpdatedAt = null
 
             };
@@ -185,17 +185,17 @@ namespace EduConnect.Controllers.Course
 
             var cacheKey = $"course_tutor_all_{tutor.TutorId}";
             //Get courses from cache
-            var cachedCourses = await _redisCachingService.GetCache<List<GetAllCoursesResponse>>(cacheKey);
+            // var cachedCourses = await _redisCachingService.GetCache<List<GetAllCoursesResponse>>(cacheKey);
 
-            if (cachedCourses != null)
-            {
-                return Ok(
-                ApiResponse<object>.GetApiResponse(
-                    "Courses retrieved successfully",
-                    cachedCourses
-                )
-            );
-            }
+            // if (cachedCourses != null)
+            // {
+            //     return Ok(
+            //     ApiResponse<object>.GetApiResponse(
+            //         "Courses retrieved successfully",
+            //         cachedCourses
+            //     )
+            // );
+            // }
 
             var courses = await _courseRepository.GetAllCoursesByTutorId(tutor.TutorId);
 
@@ -241,7 +241,7 @@ namespace EduConnect.Controllers.Course
             ;
 
             //Cache miss - store courses in cache
-            await _redisCachingService.SetCache(cacheKey, response);
+            // await _redisCachingService.SetCache(cacheKey, response);
 
 
             return Ok(
@@ -293,18 +293,18 @@ namespace EduConnect.Controllers.Course
             }
 
             //Check caching, and return if found
-            var cacheKey = $"tutor_course_dashboard_info_{courseId}";
-            var cachedCourse = await _redisCachingService.GetCache<CourseManagementDashboardResponse>(cacheKey);
+            // var cacheKey = $"tutor_course_dashboard_info_{courseId}";
+            // var cachedCourse = await _redisCachingService.GetCache<CourseManagementDashboardResponse>(cacheKey);
 
-            if (cachedCourse != null)
-            { 
-                return Ok(
-                    ApiResponse<object>.GetApiResponse(
-                        "Course dashboard info retrieved successfully",
-                        cachedCourse
-                    )
-                );
-            }
+            // if (cachedCourse != null)
+            // { 
+            //     return Ok(
+            //         ApiResponse<object>.GetApiResponse(
+            //             "Course dashboard info retrieved successfully",
+            //             cachedCourse
+            //         )
+            //     );
+            // }
 
             var thumbnail = await _courseRepository.GetCourseThumbnailByCourseId(courseId);
 
@@ -361,8 +361,8 @@ namespace EduConnect.Controllers.Course
             };
 
             PrintObjectUtility.PrintObjectProperties(response);
-            //Cache the response
-            await _redisCachingService.SetCache(cacheKey, response);
+            // //Cache the response
+            // await _redisCachingService.SetCache(cacheKey, response);
 
             return Ok(
                 ApiResponse<object>.GetApiResponse(
@@ -1563,17 +1563,17 @@ namespace EduConnect.Controllers.Course
 
             }
 
-            var cacheKey = $"tutor_course_lessons_all_{courseId}";
-            var cachedLessons = await _redisCachingService.GetCache<List<CourseLesson>>(cacheKey);
-            if (cachedLessons != null)
-            { 
-                return Ok(
-                    ApiResponse<object>.GetApiResponse(
-                        "Lessons retrieved successfully",
-                        cachedLessons
-                    )
-                );
-            }
+            // var cacheKey = $"tutor_course_lessons_all_{courseId}";
+            // var cachedLessons = await _redisCachingService.GetCache<List<CourseLesson>>(cacheKey);
+            // if (cachedLessons != null)
+            // { 
+            //     return Ok(
+            //         ApiResponse<object>.GetApiResponse(
+            //             "Lessons retrieved successfully",
+            //             cachedLessons
+            //         )
+            //     );
+            // }
 
             var lessons = await _courseRepository.GetAllCourseLessons(courseId);
 
@@ -1582,7 +1582,7 @@ namespace EduConnect.Controllers.Course
                 return NoContent();
             }
 
-            await _redisCachingService.SetCache(cacheKey, lessons);
+            // await _redisCachingService.SetCache(cacheKey, lessons);
 
             return Ok(
                 ApiResponse<object>.GetApiResponse(

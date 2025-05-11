@@ -28,7 +28,7 @@ namespace EduConnect.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    
+
     public class PaymentController : ControllerBase
     {
         private readonly StripeSettings _stripeSettings;
@@ -46,7 +46,7 @@ namespace EduConnect.Controllers
             IConfiguration configuration,
             IStudentEnrollmentService enrollmentService,
             IShoppingCartService shoppingCartService,
-            ILogger<PaymentController> logger,DataContext context)
+            ILogger<PaymentController> logger, DataContext context)
         {
             _stripeSettings = stripeOptions.Value ?? throw new ArgumentNullException(nameof(stripeOptions));
             _frontendUrl = configuration["AppSettings:FrontendUrl"]
@@ -71,7 +71,7 @@ namespace EduConnect.Controllers
         /// </summary>
         /// <param name="request">Contains optional CartId to process.</param>
         /// <returns>Session ID and publishable key on success.</returns>
-        
+
         [HttpPost("create-checkout-session")]
         [CheckPersonLoginSignup]
         public async Task<IActionResult> CreateCheckoutSession([FromBody] CheckoutRequest request)
@@ -361,7 +361,7 @@ namespace EduConnect.Controllers
 
                 // Step 3: Retrieve all items from the shopping cart
                 Console.WriteLine($"[STRIPE_WEBHOOK] Retrieving items from cart ID: {cartId}");
-                var cartItems = await _context.ShoppingCartItems
+                var cartItems = await _context.ShoppingCartItem
                     .Where(i => i.ShoppingCartID == cartId)
                     .ToListAsync();
                 if (!cartItems.Any())

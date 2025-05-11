@@ -150,7 +150,7 @@ namespace EduConnect.Services
                 if (cartItem != null)
                 {
                     shoppingCart.Items.Remove(cartItem);
-                    _context.ShoppingCartItems.Remove(cartItem);
+                    _context.ShoppingCartItem.Remove(cartItem);
 
                     shoppingCart.LastModified = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
@@ -284,7 +284,7 @@ namespace EduConnect.Services
                 };
 
                 // Direktno dodaj novi red u kontekst (ne preko kolekcije)
-                _context.ShoppingCartItems.Add(shoppingCartItem);
+                _context.ShoppingCartItem.Add(shoppingCartItem);
                 await _context.SaveChangesAsync();
 
                 return true;
@@ -327,7 +327,7 @@ namespace EduConnect.Services
 
                 // Remove from cart
                 shoppingCart.Items.Remove(cartItem);
-                _context.ShoppingCartItems.Remove(cartItem);
+                _context.ShoppingCartItem.Remove(cartItem);
                 shoppingCart.LastModified = DateTime.UtcNow;
 
                 // Add to wishlist 
@@ -379,7 +379,7 @@ namespace EduConnect.Services
                 var itemsToRemove = shoppingCart.Items.ToList();
                 foreach (var item in itemsToRemove)
                 {
-                    _context.ShoppingCartItems.Remove(item);
+                    _context.ShoppingCartItem.Remove(item);
                 }
 
                 shoppingCart.Items.Clear();

@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EduConnect.Helpers;
-using EduConnect.Migrations;
 
 namespace EduConnect.Controllers.Person
 {

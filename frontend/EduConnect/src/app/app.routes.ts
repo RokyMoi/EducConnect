@@ -29,7 +29,6 @@ import { SendMessageComponent } from './Messenger/send-message/send-message.comp
 import { ListOfUsersComponent } from './Messenger/list-of-users/list-of-users.component';
 import { CourseSupportedLanguagesComponent } from './modules/tutor/course/course-supported-languages/course-supported-languages.component';
 import { CourseMainMaterialsComponent } from './modules/tutor/course/course-main-materials/course-main-materials.component';
-import { ConfirmCourseTypeComponent } from './modules/tutor/course/confirm-course-type/confirm-course-type.component';
 import { CourseLessonsComponent } from './modules/tutor/course/self-paced-course/course-lessons/course-lessons.component';
 
 import { CreateCourseDetailsComponent } from './modules/tutor/create-course/create-course-details/create-course-details.component';
@@ -52,11 +51,17 @@ import { CourseTutorPromotionImagesComponent } from './modules/tutor/course/cour
 import { CoursePromotionImagesDetailsComponent } from './modules/tutor/course/course-promotion-images-details/course-promotion-images-details.component';
 import { CourseTutorAnalyticsDashboardComponent } from './modules/tutor/course/course-tutor-analytics-dashboard/course-tutor-analytics-dashboard.component';
 import { WishlistComponent } from './modules/ShoppingCart/wishlist/wishlist.component';
-import {CartItemsComponent} from './ShoppingCart/cart-items/cart-items.component';
-import {PaymentSuccessComponent} from './ShoppingCart/payment-succes/payment-succes.component';
-import {PromotionFormComponent} from './CoursePromotion/promotion-form/promotion-form.component';
-import {PromotionDetailsComponent} from './CoursePromotion/promotion-details/promotion-details.component';
-import {PromotionListComponent} from './CoursePromotion/promotion-list/promotion-list.component';
+import { CartItemsComponent } from './ShoppingCart/cart-items/cart-items.component';
+import { PaymentSuccessComponent } from './ShoppingCart/payment-succes/payment-succes.component';
+import { PromotionFormComponent } from './CoursePromotion/promotion-form/promotion-form.component';
+import { PromotionDetailsComponent } from './CoursePromotion/promotion-details/promotion-details.component';
+import { PromotionListComponent } from './CoursePromotion/promotion-list/promotion-list.component';
+import { TutorFileExplorerComponent } from './modules/tutor/tutor-file-explorer/tutor-file-explorer/tutor-file-explorer.component';
+import { CourseTutorTagsComponent } from './modules/tutor/course/course-tutor-tags/course-tutor-tags.component';
+import { CollaborationDocumentDashboardComponent } from './modules/shared/collaboration-document/collaboration-document-dashboard/collaboration-document-dashboard.component';
+import { CollaborationDocumentInviteUsersComponent } from './modules/shared/collaboration-document/collaboration-document-invite-users/collaboration-document-invite-users.component';
+import { CollaborationDocumentLiveEditorComponent } from './modules/shared/collaboration-document/collaboration-document-live-editor/collaboration-document-live-editor.component';
+import { CourseTutorLessonsBrowseComponent } from './modules/tutor/course/course-tutor-lessons-browse/course-tutor-lessons-browse.component';
 
 export const routes: Routes = [
   { path: 'index', component: BodyComponent },
@@ -65,21 +70,25 @@ export const routes: Routes = [
   { path: 'student-register', component: RegisterStudentComponent },
   { path: 'tutor-signup', component: TutorSignupComponent },
   {
-    path: 'cart-dwe', component: CartItemsComponent
+    path: 'cart-dwe',
+    component: CartItemsComponent,
   },
   {
-    path: 'course-wishlist', component: WishlistComponent,
+    path: 'course-wishlist',
+    component: WishlistComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'student' },
   },
   { path: 'login', component: LoginComponent },
   {
-    path: 'student-profile', component: StudentProfileComponent,
+    path: 'student-profile',
+    component: StudentProfileComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'student' },
   },
   {
-    path: 'learning-student', component: LearningComponent,
+    path: 'learning-student',
+    component: LearningComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'student' },
   },
@@ -104,25 +113,28 @@ export const routes: Routes = [
   },
 
   {
-    path: 'photouploadcomponent', component: PhotoComponent,
+    path: 'photouploadcomponent',
+    component: PhotoComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'student' },
   },
   {
-    path: 'student-message-preview', component: MessagesComponent,
+    path: 'student-message-preview',
+    component: MessagesComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'student' },
   },
   {
-    path: 'direct-message', component: DirectMessagingsComponent,
+    path: 'direct-message',
+    component: DirectMessagingsComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'student' },
   },
   { path: 'payment-success', component: PaymentSuccessComponent },
-  {path: 'promotions/edit/:id', component: PromotionFormComponent},
-  {path: 'promotions/create', component: PromotionFormComponent},
-  {path: 'promotions/view/:id', component: PromotionDetailsComponent},
-  {path: 'promotions/list', component: PromotionListComponent},
+  { path: 'promotions/edit/:id', component: PromotionFormComponent },
+  { path: 'promotions/create', component: PromotionFormComponent },
+  { path: 'promotions/view/:id', component: PromotionDetailsComponent },
+  { path: 'promotions/list', component: PromotionListComponent },
   {
     path: 'studentMessageThread/:id',
     component: StudentThreadMessageComponent,
@@ -131,7 +143,7 @@ export const routes: Routes = [
     path: 'viewOfAllCourses',
     component: CourseLandingPageComponent,
     canActivate: [AuthenticationGuardService],
-    data: { requiredRole: 'student' }
+    data: { requiredRole: 'student' },
   },
   { path: 'student-profile', component: StudentProfileComponent },
   { path: 'learning-student', component: LearningComponent },
@@ -233,6 +245,12 @@ export const routes: Routes = [
     data: { requiredRole: 'tutor' },
   },
   {
+    path: 'tutor/course/lessons/browse/:courseId',
+    component: CourseTutorLessonsBrowseComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
     path: 'tutor/course/lessons/new/:courseId',
     component: CourseTutorLessonDetailsComponent,
     canActivate: [AuthenticationGuardService],
@@ -286,11 +304,79 @@ export const routes: Routes = [
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'tutor' },
   },
+  {
+    path: 'tutor/course/tags/:courseId',
+    component: CourseTutorTagsComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'tutor/files',
+    component: TutorFileExplorerComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
 
   //Admin routes
   {
     path: 'admin/dashboard',
     component: AdminDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'admin' },
+  },
+
+  //Shared routes
+  {
+    path: 'tutor/collaboration',
+    component: CollaborationDocumentDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'student/collaboration',
+    component: CollaborationDocumentDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  {
+    path: 'admin/collaboration',
+    component: CollaborationDocumentDashboardComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'admin' },
+  },
+  {
+    path: 'tutor/collaboration/document/:documentId',
+    component: CollaborationDocumentLiveEditorComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'student/collaboration/document/:documentId',
+    component: CollaborationDocumentLiveEditorComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  {
+    path: 'admin/collaboration/document/:documentId',
+    component: CollaborationDocumentLiveEditorComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'admin' },
+  },
+  {
+    path: 'tutor/collaboration/invite/:documentId',
+    component: CollaborationDocumentInviteUsersComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'tutor' },
+  },
+  {
+    path: 'student/collaboration/invite/:documentId',
+    component: CollaborationDocumentInviteUsersComponent,
+    canActivate: [AuthenticationGuardService],
+    data: { requiredRole: 'student' },
+  },
+  {
+    path: 'admin/collaboration/invite/:documentId',
+    component: CollaborationDocumentInviteUsersComponent,
     canActivate: [AuthenticationGuardService],
     data: { requiredRole: 'admin' },
   },
